@@ -1,6 +1,6 @@
-[submodule "sharpen"]
-	path = sharpen
-	url = https://github.com/hazzik/sharpen.git
-[submodule "rhino"]
-	path = rhino
+[submodule "reference/rhino"]
+	path = reference/rhino
 	url = https://github.com/hazzik/rhino.git
+[submodule "reference/sharpen"]
+	path = reference/sharpen
+	url = https://github.com/hazzik/sharpen.git
