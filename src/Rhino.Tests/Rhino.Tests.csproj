@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BE3DE178-290C-4A20-A8E1-BC5091380C46}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rhino</RootNamespace>
+    <AssemblyName>Rhino</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rhino\Rhino.csproj">
+      <Project>{ffa067fa-eb0f-4b26-92ff-76d435d1f690}</Project>
+      <Name>Rhino</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sharpen\Sharpen\Sharpen.csproj">
+      <Project>{72944a6c-45ff-4ef8-b349-8c9cabf519d4}</Project>
+      <Name>Sharpen</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Drivers\JsDriver.cs" />
+    <Compile Include="Drivers\JsTestsBase.cs" />
+    <Compile Include="Drivers\ShellTest.cs" />
+    <Compile Include="Drivers\StandardTests.cs" />
+    <Compile Include="Drivers\TestUtils.cs" />
+    <Compile Include="Testing\TestErrorReporter.cs" />
+    <Compile Include="Tests\ApplyOnPrimitiveNumberTest.cs" />
+    <Compile Include="Tests\ArrayConcatTest.cs" />
+    <Compile Include="Tests\Bug409702Test.cs" />
+    <Compile Include="Tests\Bug412433Test.cs" />
+    <Compile Include="Tests\Bug419940Test.cs" />
+    <Compile Include="Tests\Bug421071Test.cs" />
+    <Compile Include="Tests\Bug448816Test.cs" />
+    <Compile Include="Tests\Bug466207Test.cs" />
+    <Compile Include="Tests\Bug467396Test.cs" />
+    <Compile Include="Tests\Bug482203Test.cs" />
+    <Compile Include="Tests\Bug491621Test.cs" />
+    <Compile Include="Tests\Bug492525Test.cs" />
+    <Compile Include="Tests\Bug496585Test.cs" />
+    <Compile Include="Tests\Bug637811Test.cs" />
+    <Compile Include="Tests\Bug685403Test.cs" />
+    <Compile Include="Tests\Bug687669Test.cs" />
+    <Compile Include="Tests\Bug688018Test.cs" />
+    <Compile Include="Tests\Bug688021Test.cs" />
+    <Compile Include="Tests\Bug688023Test.cs" />
+    <Compile Include="Tests\Bug689308Test.cs" />
+    <Compile Include="Tests\Bug689314Test.cs" />
+    <Compile Include="Tests\Bug708801Test.cs" />
+    <Compile Include="Tests\Bug714204Test.cs" />
+    <Compile Include="Tests\ClassShutterExceptionTest.cs" />
+    <Compile Include="Tests\Commonjs\Module\ComplianceTest.cs" />
+    <Compile Include="Tests\Commonjs\Module\RequireJarTest.cs" />
+    <Compile Include="Tests\Commonjs\Module\RequireTest.cs" />
+    <Compile Include="Tests\ContextFactoryTest.cs" />
+    <Compile Include="Tests\ContinuationsApiTest.cs" />
+    <Compile Include="Tests\CustomSetterAcceptNullScriptableTest.cs" />
+    <Compile Include="Tests\DecompileTest.cs" />
+    <Compile Include="Tests\DefineClassMapInheritance.cs" />
+    <Compile Include="Tests\DefineClassTest.cs" />
+    <Compile Include="Tests\DefineFunctionPropertiesTest.cs" />
+    <Compile Include="Tests\DeletePropertyTest.cs" />
+    <Compile Include="Tests\DoctestsTest.cs" />
+    <Compile Include="Tests\ErrorPropertiesTest.cs" />
+    <Compile Include="Tests\Es5\ObjectGetOwnPropertyDescriptorTest.cs" />
+    <Compile Include="Tests\Es5\ObjectGetOwnPropertyNamesTest.cs" />
+    <Compile Include="Tests\Es5\ObjectKeysTest.cs" />
+    <Compile Include="Tests\Es5\Test262RegExpTest.cs" />
+    <Compile Include="Tests\Evaluator.cs" />
+    <Compile Include="Tests\FunctionTest.cs" />
+    <Compile Include="Tests\GeneratedClassNameTest.cs" />
+    <Compile Include="Tests\GeneratedMethodNameTest.cs" />
+    <Compile Include="Tests\GlobalParseXTest.cs" />
+    <Compile Include="Tests\JavaAcessibilityTest.cs" />
+    <Compile Include="Tests\Json\JsonParserTest.cs" />
+    <Compile Include="Tests\JsTestsTest.cs" />
+    <Compile Include="Tests\MozillaSuiteTest.cs" />
+    <Compile Include="Tests\NativeArrayTest.cs" />
+    <Compile Include="Tests\NativeStringTest.cs" />
+    <Compile Include="Tests\ObserveInstructionCountTest.cs" />
+    <Compile Include="Tests\ParserTest.cs" />
+    <Compile Include="Tests\PrimitiveTypeScopeResolutionTest.cs" />
+    <Compile Include="Tests\PrivateAccessClass.cs" />
+    <Compile Include="Tests\StackTraceTest.cs" />
+    <Compile Include="Tests\StrictModeApiTest.cs" />
+    <Compile Include="Tests\TypeOfTest.cs" />
+    <Compile Include="Tests\Utils.cs" />
+    <Compile Include="Tests\WriteReadOnlyPropertyTest.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

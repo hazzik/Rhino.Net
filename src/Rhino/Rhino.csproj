@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FFA067FA-EB0F-4B26-92FF-76D435D1F690}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rhino</RootNamespace>
+    <AssemblyName>Rhino</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Annotations\JSConstructor.cs" />
+    <Compile Include="Annotations\JSFunction.cs" />
+    <Compile Include="Annotations\JSGetter.cs" />
+    <Compile Include="Annotations\JSSetter.cs" />
+    <Compile Include="Annotations\JSStaticFunction.cs" />
+    <Compile Include="Arguments.cs" />
+    <Compile Include="Ast\ArrayComprehension.cs" />
+    <Compile Include="Ast\ArrayComprehensionLoop.cs" />
+    <Compile Include="Ast\ArrayLiteral.cs" />
+    <Compile Include="Ast\Assignment.cs" />
+    <Compile Include="Ast\AstNode.cs" />
+    <Compile Include="Ast\AstRoot.cs" />
+    <Compile Include="Ast\Block.cs" />
+    <Compile Include="Ast\BreakStatement.cs" />
+    <Compile Include="Ast\CatchClause.cs" />
+    <Compile Include="Ast\Comment.cs" />
+    <Compile Include="Ast\ConditionalExpression.cs" />
+    <Compile Include="Ast\ContinueStatement.cs" />
+    <Compile Include="Ast\DestructuringForm.cs" />
+    <Compile Include="Ast\DoLoop.cs" />
+    <Compile Include="Ast\ElementGet.cs" />
+    <Compile Include="Ast\EmptyExpression.cs" />
+    <Compile Include="Ast\EmptyStatement.cs" />
+    <Compile Include="Ast\ErrorCollector.cs" />
+    <Compile Include="Ast\ErrorNode.cs" />
+    <Compile Include="Ast\ExpressionStatement.cs" />
+    <Compile Include="Ast\ForInLoop.cs" />
+    <Compile Include="Ast\ForLoop.cs" />
+    <Compile Include="Ast\FunctionCall.cs" />
+    <Compile Include="Ast\FunctionNode.cs" />
+    <Compile Include="Ast\GeneratorExpression.cs" />
+    <Compile Include="Ast\GeneratorExpressionLoop.cs" />
+    <Compile Include="Ast\IdeErrorReporter.cs" />
+    <Compile Include="Ast\IfStatement.cs" />
+    <Compile Include="Ast\InfixExpression.cs" />
+    <Compile Include="Ast\Jump.cs" />
+    <Compile Include="Ast\KeywordLiteral.cs" />
+    <Compile Include="Ast\Label.cs" />
+    <Compile Include="Ast\LabeledStatement.cs" />
+    <Compile Include="Ast\LetNode.cs" />
+    <Compile Include="Ast\Loop.cs" />
+    <Compile Include="Ast\Name.cs" />
+    <Compile Include="Ast\NewExpression.cs" />
+    <Compile Include="Ast\NodeVisitor.cs" />
+    <Compile Include="Ast\NumberLiteral.cs" />
+    <Compile Include="Ast\ObjectLiteral.cs" />
+    <Compile Include="Ast\ObjectProperty.cs" />
+    <Compile Include="Ast\ParenthesizedExpression.cs" />
+    <Compile Include="Ast\ParseProblem.cs" />
+    <Compile Include="Ast\PropertyGet.cs" />
+    <Compile Include="Ast\RegExpLiteral.cs" />
+    <Compile Include="Ast\ReturnStatement.cs" />
+    <Compile Include="Ast\Scope.cs" />
+    <Compile Include="Ast\ScriptNode.cs" />
+    <Compile Include="Ast\StringLiteral.cs" />
+    <Compile Include="Ast\SwitchCase.cs" />
+    <Compile Include="Ast\SwitchStatement.cs" />
+    <Compile Include="Ast\Symbol.cs" />
+    <Compile Include="Ast\ThrowStatement.cs" />
+    <Compile Include="Ast\TryStatement.cs" />
+    <Compile Include="Ast\UnaryExpression.cs" />
+    <Compile Include="Ast\VariableDeclaration.cs" />
+    <Compile Include="Ast\VariableInitializer.cs" />
+    <Compile Include="Ast\WhileLoop.cs" />
+    <Compile Include="Ast\WithStatement.cs" />
+    <Compile Include="Ast\XmlDotQuery.cs" />
+    <Compile Include="Ast\XmlElemRef.cs" />
+    <Compile Include="Ast\XmlExpression.cs" />
+    <Compile Include="Ast\XmlFragment.cs" />
+    <Compile Include="Ast\XmlLiteral.cs" />
+    <Compile Include="Ast\XmlMemberGet.cs" />
+    <Compile Include="Ast\XmlPropRef.cs" />
+    <Compile Include="Ast\XmlRef.cs" />
+    <Compile Include="Ast\XmlString.cs" />
+    <Compile Include="Ast\Yield.cs" />
+    <Compile Include="BaseFunction.cs" />
+    <Compile Include="BoundFunction.cs" />
+    <Compile Include="Callable.cs" />
+    <Compile Include="ClassCache.cs" />
+    <Compile Include="ClassShutter.cs" />
+    <Compile Include="CodeGenerator.cs" />
+    <Compile Include="Commonjs\Module\ModuleScope.cs" />
+    <Compile Include="Commonjs\Module\ModuleScript.cs" />
+    <Compile Include="Commonjs\Module\ModuleScriptProvider.cs" />
+    <Compile Include="Commonjs\Module\Provider\CachingModuleScriptProviderBase.cs" />
+    <Compile Include="Commonjs\Module\Provider\DefaultUrlConnectionExpiryCalculator.cs" />
+    <Compile Include="Commonjs\Module\Provider\ModuleSource.cs" />
+    <Compile Include="Commonjs\Module\Provider\ModuleSourceProvider.cs" />
+    <Compile Include="Commonjs\Module\Provider\ModuleSourceProviderBase.cs" />
+    <Compile Include="Commonjs\Module\Provider\MultiModuleScriptProvider.cs" />
+    <Compile Include="Commonjs\Module\Provider\ParsedContentType.cs" />
+    <Compile Include="Commonjs\Module\Provider\SoftCachingModuleScriptProvider.cs" />
+    <Compile Include="Commonjs\Module\Provider\StrongCachingModuleScriptProvider.cs" />
+    <Compile Include="Commonjs\Module\Provider\UrlConnectionExpiryCalculator.cs" />
+    <Compile Include="Commonjs\Module\Provider\UrlConnectionSecurityDomainProvider.cs" />
+    <Compile Include="Commonjs\Module\Provider\UrlModuleSourceProvider.cs" />
+    <Compile Include="Commonjs\Module\Require.cs" />
+    <Compile Include="Commonjs\Module\RequireBuilder.cs" />
+    <Compile Include="CompilerEnvirons.cs" />
+    <Compile Include="ConsString.cs" />
+    <Compile Include="ConstProperties.cs" />
+    <Compile Include="Context.cs" />
+    <Compile Include="ContextAction.cs" />
+    <Compile Include="ContextFactory.cs" />
+    <Compile Include="ContextListener.cs" />
+    <Compile Include="ContinuationPending.cs" />
+    <Compile Include="Debug\DebugFrame.cs" />
+    <Compile Include="Debug\DebuggableObject.cs" />
+    <Compile Include="Debug\DebuggableScript.cs" />
+    <Compile Include="Debug\Debugger.cs" />
+    <Compile Include="Decompiler.cs" />
+    <Compile Include="DefaultErrorReporter.cs" />
+    <Compile Include="DefiningClassLoader.cs" />
+    <Compile Include="Delegator.cs" />
+    <Compile Include="DToA.cs" />
+    <Compile Include="EcmaError.cs" />
+    <Compile Include="ErrorReporter.cs" />
+    <Compile Include="Evaluator.cs" />
+    <Compile Include="EvaluatorException.cs" />
+    <Compile Include="Function.cs" />
+    <Compile Include="FunctionObject.cs" />
+    <Compile Include="GeneratedClassLoader.cs" />
+    <Compile Include="Icode.cs" />
+    <Compile Include="IdFunctionCall.cs" />
+    <Compile Include="IdFunctionObject.cs" />
+    <Compile Include="IdScriptableObject.cs" />
+    <Compile Include="ImporterTopLevel.cs" />
+    <Compile Include="InterfaceAdapter.cs" />
+    <Compile Include="InterpretedFunction.cs" />
+    <Compile Include="Interpreter.cs" />
+    <Compile Include="InterpreterData.cs" />
+    <Compile Include="IRFactory.cs" />
+    <Compile Include="JavaAdapter.cs" />
+    <Compile Include="JavaMembers.cs" />
+    <Compile Include="JavaScriptException.cs" />
+    <Compile Include="Jdk13\VMBridge_jdk13.cs" />
+    <Compile Include="Jdk15\VMBridge_jdk15.cs" />
+    <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Kit.cs" />
+    <Compile Include="LazilyLoadedCtor.cs" />
+    <Compile Include="MemberBox.cs" />
+    <Compile Include="NativeArray.cs" />
+    <Compile Include="NativeBoolean.cs" />
+    <Compile Include="NativeCall.cs" />
+    <Compile Include="NativeContinuation.cs" />
+    <Compile Include="NativeDate.cs" />
+    <Compile Include="NativeError.cs" />
+    <Compile Include="NativeFunction.cs" />
+    <Compile Include="NativeGenerator.cs" />
+    <Compile Include="NativeGlobal.cs" />
+    <Compile Include="NativeIterator.cs" />
+    <Compile Include="NativeJavaArray.cs" />
+    <Compile Include="NativeJavaClass.cs" />
+    <Compile Include="NativeJavaConstructor.cs" />
+    <Compile Include="NativeJavaMethod.cs" />
+    <Compile Include="NativeJavaObject.cs" />
+    <Compile Include="NativeJavaPackage.cs" />
+    <Compile Include="NativeJavaTopPackage.cs" />
+    <Compile Include="NativeJSON.cs" />
+    <Compile Include="NativeMath.cs" />
+    <Compile Include="NativeNumber.cs" />
+    <Compile Include="NativeObject.cs" />
+    <Compile Include="NativeScript.cs" />
+    <Compile Include="NativeString.cs" />
+    <Compile Include="NativeWith.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="NodeTransformer.cs" />
+    <Compile Include="ObjArray.cs" />
+    <Compile Include="ObjToIntMap.cs" />
+    <Compile Include="Optimizer\Block.cs" />
+    <Compile Include="Optimizer\ClassCompiler.cs" />
+    <Compile Include="Optimizer\Codegen.cs" />
+    <Compile Include="Optimizer\OptFunctionNode.cs" />
+    <Compile Include="Optimizer\Optimizer.cs" />
+    <Compile Include="Optimizer\OptRuntime.cs" />
+    <Compile Include="Optimizer\OptTransformer.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="PolicySecurityController.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ref.cs" />
+    <Compile Include="RefCallable.cs" />
+    <Compile Include="RegExpProxy.cs" />
+    <Compile Include="Regexp\NativeRegExp.cs" />
+    <Compile Include="Regexp\NativeRegExpCtor.cs" />
+    <Compile Include="Regexp\RegExpImpl.cs" />
+    <Compile Include="Regexp\SubString.cs" />
+    <Compile Include="RhinoException.cs" />
+    <Compile Include="RhinoSecurityManager.cs" />
+    <Compile Include="Script.cs" />
+    <Compile Include="Scriptable.cs" />
+    <Compile Include="ScriptableObject.cs" />
+    <Compile Include="ScriptRuntime.cs" />
+    <Compile Include="ScriptStackElement.cs" />
+    <Compile Include="SecureCaller.cs" />
+    <Compile Include="SecurityController.cs" />
+    <Compile Include="SecurityUtilities.cs" />
+    <Compile Include="Serialize\ScriptableInputStream.cs" />
+    <Compile Include="Serialize\ScriptableOutputStream.cs" />
+    <Compile Include="SpecialRef.cs" />
+    <Compile Include="Synchronizer.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="TokenStream.cs" />
+    <Compile Include="Tools\Debugger\Dim.cs" />
+    <Compile Include="Tools\Debugger\GuiCallback.cs" />
+    <Compile Include="Tools\Debugger\Main.cs" />
+    <Compile Include="Tools\Debugger\ScopeProvider.cs" />
+    <Compile Include="Tools\Debugger\SourceProvider.cs" />
+    <Compile Include="Tools\Debugger\SwingGui.cs" />
+    <Compile Include="Tools\Debugger\Treetable\AbstractCellEditor.cs" />
+    <Compile Include="Tools\Debugger\Treetable\JTreeTable.cs" />
+    <Compile Include="Tools\Debugger\Treetable\TreeTableModel.cs" />
+    <Compile Include="Tools\Debugger\Treetable\TreeTableModelAdapter.cs" />
+    <Compile Include="Tools\Idswitch\CodePrinter.cs" />
+    <Compile Include="Tools\Idswitch\FileBody.cs" />
+    <Compile Include="Tools\Idswitch\IdValuePair.cs" />
+    <Compile Include="Tools\Idswitch\Main.cs" />
+    <Compile Include="Tools\Idswitch\SwitchGenerator.cs" />
+    <Compile Include="Tools\Jsc\Main.cs" />
+    <Compile Include="Tools\Shell\ConsoleTextArea.cs" />
+    <Compile Include="Tools\Shell\Environment.cs" />
+    <Compile Include="Tools\Shell\Global.cs" />
+    <Compile Include="Tools\Shell\JavaPolicySecurity.cs" />
+    <Compile Include="Tools\Shell\JSConsole.cs" />
+    <Compile Include="Tools\Shell\Main.cs" />
+    <Compile Include="Tools\Shell\QuitAction.cs" />
+    <Compile Include="Tools\Shell\SecurityProxy.cs" />
+    <Compile Include="Tools\Shell\ShellConsole.cs" />
+    <Compile Include="Tools\Shell\ShellContextFactory.cs" />
+    <Compile Include="Tools\Shell\ShellLine.cs" />
+    <Compile Include="Tools\SourceReader.cs" />
+    <Compile Include="Tools\ToolErrorReporter.cs" />
+    <Compile Include="TopLevel.cs" />
+    <Compile Include="UintMap.cs" />
+    <Compile Include="Undefined.cs" />
+    <Compile Include="UniqueTag.cs" />
+    <Compile Include="V8dtoa\CachedPowers.cs" />
+    <Compile Include="V8dtoa\DiyFp.cs" />
+    <Compile Include="V8dtoa\DoubleHelper.cs" />
+    <Compile Include="V8dtoa\FastDtoa.cs" />
+    <Compile Include="V8dtoa\FastDtoaBuilder.cs" />
+    <Compile Include="VMBridge.cs" />
+    <Compile Include="WrapFactory.cs" />
+    <Compile Include="WrappedException.cs" />
+    <Compile Include="Wrapper.cs" />
+    <Compile Include="Xmlimpl\Namespace.cs" />
+    <Compile Include="Xmlimpl\QName.cs" />
+    <Compile Include="Xmlimpl\XML.cs" />
+    <Compile Include="Xmlimpl\XMLCtor.cs" />
+    <Compile Include="Xmlimpl\XMLLibImpl.cs" />
+    <Compile Include="Xmlimpl\XMLList.cs" />
+    <Compile Include="Xmlimpl\XMLName.cs" />
+    <Compile Include="Xmlimpl\XmlNode.cs" />
+    <Compile Include="Xmlimpl\XMLObjectImpl.cs" />
+    <Compile Include="Xmlimpl\XmlProcessor.cs" />
+    <Compile Include="Xmlimpl\XMLWithScope.cs" />
+    <Compile Include="Xml\XMLLib.cs" />
+    <Compile Include="Xml\XMLObject.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sharpen\Sharpen\Sharpen.csproj">
+      <Project>{72944a6c-45ff-4ef8-b349-8c9cabf519d4}</Project>
+      <Name>Sharpen</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
