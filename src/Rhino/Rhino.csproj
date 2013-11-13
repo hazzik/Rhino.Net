@@ -256,7 +256,6 @@
     <Compile Include="Tools\Idswitch\IdValuePair.cs" />
     <Compile Include="Tools\Idswitch\Main.cs" />
     <Compile Include="Tools\Idswitch\SwitchGenerator.cs" />
-    <Compile Include="Tools\Jsc\Main.cs" />
     <Compile Include="Tools\SourceReader.cs" />
     <Compile Include="Tools\ToolErrorReporter.cs" />
     <Compile Include="TopLevel.cs" />
@@ -294,6 +293,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Tools\Jsc\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

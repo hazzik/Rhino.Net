@@ -17,7 +17,7 @@ using Sharpen;
 namespace Rhino.Tools.Jsc
 {
 	/// <author>Norris Boyd</author>
-	public class Main
+	public class Program
 	{
 		/// <summary>Main entry point.</summary>
 		/// <remarks>
@@ -28,13 +28,13 @@ namespace Rhino.Tools.Jsc
 		/// </remarks>
 		public static void Main(string[] args)
 		{
-			Rhino.Tools.Jsc.Main main = new Rhino.Tools.Jsc.Main();
+			Rhino.Tools.Jsc.Program main = new Rhino.Tools.Jsc.Program();
 			args = main.ProcessOptions(args);
 			if (args == null)
 			{
 				if (main.printHelp)
 				{
-					System.Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.usage", typeof(Rhino.Tools.Jsc.Main).FullName));
+					System.Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.usage", typeof(Rhino.Tools.Jsc.Program).FullName));
 					System.Environment.Exit(0);
 				}
 				System.Environment.Exit(1);
@@ -45,7 +45,7 @@ namespace Rhino.Tools.Jsc
 			}
 		}
 
-		public Main()
+		public Program()
 		{
 			reporter = new ToolErrorReporter(true);
 			compilerEnv = new CompilerEnvirons();
@@ -246,7 +246,7 @@ namespace Rhino.Tools.Jsc
 		/// <remarks>Print a usage message.</remarks>
 		private static void BadUsage(string s)
 		{
-			System.Console.Error.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.bad.usage", typeof(Rhino.Tools.Jsc.Main).FullName, s));
+			System.Console.Error.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.bad.usage", typeof(Rhino.Tools.Jsc.Program).FullName, s));
 		}
 
 		/// <summary>Compile JavaScript source.</summary>
