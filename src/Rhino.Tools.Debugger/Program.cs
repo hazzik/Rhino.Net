@@ -26,7 +26,7 @@ namespace Rhino.Tools.Debugger
 	/// <see cref="SwingGui">SwingGui</see>
 	/// ).
 	/// </remarks>
-	public class Main
+	public class Program
 	{
 		/// <summary>The debugger.</summary>
 		/// <remarks>The debugger.</remarks>
@@ -38,7 +38,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Creates a new Main.</summary>
 		/// <remarks>Creates a new Main.</remarks>
-		public Main(string title)
+		public Program(string title)
 		{
 			dim = new Dim();
 			debugGui = new SwingGui(dim, title);
@@ -240,9 +240,9 @@ namespace Rhino.Tools.Debugger
 		/// </remarks>
 		public static void Main(string[] args)
 		{
-			Rhino.Tools.Debugger.Main main = new Rhino.Tools.Debugger.Main("Rhino JavaScript Debugger");
+			Rhino.Tools.Debugger.Program main = new Rhino.Tools.Debugger.Program("Rhino JavaScript Debugger");
 			main.DoBreak();
-			main.SetExitAction(new Main.IProxy(Main.IProxy.EXIT_ACTION));
+			main.SetExitAction(new Program.IProxy(Main.IProxy.EXIT_ACTION));
 			Runtime.SetIn(main.GetIn());
 			Runtime.SetOut(main.GetOut());
 			Runtime.SetErr(main.GetErr());
@@ -271,7 +271,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="Main(string[])">Main(string[])</see>
 		/// .
 		/// </remarks>
-		public static Rhino.Tools.Debugger.Main MainEmbedded(string title)
+		public static Rhino.Tools.Debugger.Program MainEmbedded(string title)
 		{
 			ContextFactory factory = ContextFactory.GetGlobal();
 			Global global = new Global();
@@ -289,7 +289,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="Main(string[])">Main(string[])</see>
 		/// .
 		/// </remarks>
-		public static Rhino.Tools.Debugger.Main MainEmbedded(ContextFactory factory, Scriptable scope, string title)
+		public static Rhino.Tools.Debugger.Program MainEmbedded(ContextFactory factory, Scriptable scope, string title)
 		{
 			return MainEmbeddedImpl(factory, scope, title);
 		}
@@ -304,7 +304,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="Main(string[])">Main(string[])</see>
 		/// .
 		/// </remarks>
-		public static Rhino.Tools.Debugger.Main MainEmbedded(ContextFactory factory, ScopeProvider scopeProvider, string title)
+		public static Rhino.Tools.Debugger.Program MainEmbedded(ContextFactory factory, ScopeProvider scopeProvider, string title)
 		{
 			return MainEmbeddedImpl(factory, scopeProvider, title);
 		}
@@ -314,15 +314,15 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="MainEmbedded(string)">MainEmbedded(string)</see>
 		/// , etc.
 		/// </summary>
-		private static Rhino.Tools.Debugger.Main MainEmbeddedImpl(ContextFactory factory, object scopeProvider, string title)
+		private static Rhino.Tools.Debugger.Program MainEmbeddedImpl(ContextFactory factory, object scopeProvider, string title)
 		{
 			if (title == null)
 			{
 				title = "Rhino JavaScript Debugger (embedded usage)";
 			}
-			Rhino.Tools.Debugger.Main main = new Rhino.Tools.Debugger.Main(title);
+			Rhino.Tools.Debugger.Program main = new Rhino.Tools.Debugger.Program(title);
 			main.DoBreak();
-			main.SetExitAction(new Main.IProxy(Main.IProxy.EXIT_ACTION));
+			main.SetExitAction(new Program.IProxy(Main.IProxy.EXIT_ACTION));
 			main.AttachTo(factory);
 			if (scopeProvider is ScopeProvider)
 			{
@@ -424,7 +424,7 @@ namespace Rhino.Tools.Debugger
 			/// </summary>
 			public static ScopeProvider NewScopeProvider(Scriptable scope)
 			{
-				Main.IProxy scopeProvider = new Main.IProxy(SCOPE_PROVIDER);
+				Program.IProxy scopeProvider = new Program.IProxy(SCOPE_PROVIDER);
 				scopeProvider.scope = scope;
 				return scopeProvider;
 			}

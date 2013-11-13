@@ -241,16 +241,6 @@
     <Compile Include="Synchronizer.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenStream.cs" />
-    <Compile Include="Tools\Debugger\Dim.cs" />
-    <Compile Include="Tools\Debugger\GuiCallback.cs" />
-    <Compile Include="Tools\Debugger\Main.cs" />
-    <Compile Include="Tools\Debugger\ScopeProvider.cs" />
-    <Compile Include="Tools\Debugger\SourceProvider.cs" />
-    <Compile Include="Tools\Debugger\SwingGui.cs" />
-    <Compile Include="Tools\Debugger\Treetable\AbstractCellEditor.cs" />
-    <Compile Include="Tools\Debugger\Treetable\JTreeTable.cs" />
-    <Compile Include="Tools\Debugger\Treetable\TreeTableModel.cs" />
-    <Compile Include="Tools\Debugger\Treetable\TreeTableModelAdapter.cs" />
     <Compile Include="Tools\Idswitch\CodePrinter.cs" />
     <Compile Include="Tools\Idswitch\FileBody.cs" />
     <Compile Include="Tools\Idswitch\IdValuePair.cs" />
@@ -293,7 +283,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
-    <Folder Include="Tools\Jsc\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
