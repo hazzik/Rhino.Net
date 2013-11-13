@@ -464,7 +464,7 @@ namespace Rhino.Tools.Shell
 		private static ShellConsole.JLineShellConsoleV1 GetJLineShellConsoleV1(ClassLoader classLoader, Type readerClass, Scriptable scope, Encoding cs)
 		{
 			// ConsoleReader reader = new ConsoleReader();
-			ConstructorInfo<object> c = readerClass.GetConstructor();
+			ConstructorInfo c = readerClass.GetConstructor();
 			object reader = c.NewInstance();
 			// reader.setBellEnabled(false);
 			TryInvoke(reader, "setBellEnabled", BOOLEAN_ARG, false);
@@ -482,7 +482,7 @@ namespace Rhino.Tools.Shell
 		private static ShellConsole.JLineShellConsoleV2 GetJLineShellConsoleV2(ClassLoader classLoader, Type readerClass, Scriptable scope, Encoding cs)
 		{
 			// ConsoleReader reader = new ConsoleReader();
-			ConstructorInfo<object> c = readerClass.GetConstructor();
+			ConstructorInfo c = readerClass.GetConstructor();
 			object reader = c.NewInstance();
 			// reader.setBellEnabled(false);
 			TryInvoke(reader, "setBellEnabled", BOOLEAN_ARG, false);

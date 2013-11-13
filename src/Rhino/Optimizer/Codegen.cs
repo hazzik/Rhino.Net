@@ -92,7 +92,7 @@ namespace Rhino.Optimizer
 			NativeFunction f;
 			try
 			{
-				ConstructorInfo<object> ctor = cl.GetConstructors()[0];
+				ConstructorInfo ctor = cl.GetConstructors()[0];
 				object[] initArgs = new object[] { scope, cx, Sharpen.Extensions.ValueOf(0) };
 				f = (NativeFunction)ctor.NewInstance(initArgs);
 			}

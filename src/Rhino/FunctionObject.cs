@@ -83,7 +83,7 @@ namespace Rhino
 			// API class
 			if (methodOrConstructor is ConstructorInfo)
 			{
-				member = new MemberBox((ConstructorInfo<object>)methodOrConstructor);
+				member = new MemberBox((ConstructorInfo)methodOrConstructor);
 				isStatic = true;
 			}
 			else

@@ -709,7 +709,7 @@ namespace Rhino
 				}
 			}
 			// Reflect constructors
-			ConstructorInfo<object>[] constructors = GetAccessibleConstructors(includePrivate);
+			ConstructorInfo[] constructors = GetAccessibleConstructors(includePrivate);
 			MemberBox[] ctorMembers = new MemberBox[constructors.Length];
 			for (int i_1 = 0; i_1 != constructors.Length; ++i_1)
 			{
@@ -718,7 +718,7 @@ namespace Rhino
 			ctors = new NativeJavaMethod(ctorMembers, cl.Name);
 		}
 
-		private ConstructorInfo<object>[] GetAccessibleConstructors(bool includePrivate)
+		private ConstructorInfo[] GetAccessibleConstructors(bool includePrivate)
 		{
 			// The JVM currently doesn't allow changing access on java.lang.Class
 			// constructors, so don't try
@@ -726,7 +726,7 @@ namespace Rhino
 			{
 				try
 				{
-					ConstructorInfo<object>[] cons = cl.GetDeclaredConstructors();
+					ConstructorInfo[] cons = cl.GetDeclaredConstructors();
 					return cons;
 				}
 				catch (SecurityException)

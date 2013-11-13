@@ -47,7 +47,7 @@ namespace Rhino.Jdk15
 			{
 				if (member is ConstructorInfo)
 				{
-					return ((ConstructorInfo<object>)member).IsVarArgs();
+					return ((ConstructorInfo)member).IsVarArgs();
 				}
 				else
 				{

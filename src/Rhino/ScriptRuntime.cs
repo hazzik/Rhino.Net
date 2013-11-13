@@ -3653,7 +3653,7 @@ search_break: ;
 				try
 				{
 					Type[] parm = new Type[] { ScriptRuntime.ContextClass };
-					ConstructorInfo<object> globalClassCtor = globalClass.GetConstructor(parm);
+					ConstructorInfo globalClassCtor = globalClass.GetConstructor(parm);
 					object[] arg = new object[] { cx };
 					return (ScriptableObject)globalClassCtor.NewInstance(arg);
 				}

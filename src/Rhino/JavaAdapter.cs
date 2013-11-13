@@ -385,8 +385,8 @@ namespace Rhino
 				}
 			}
 			string superName = superClass.FullName.Replace('.', '/');
-			ConstructorInfo<object>[] ctors = superClass.GetDeclaredConstructors();
-			foreach (ConstructorInfo<object> ctor in ctors)
+			ConstructorInfo[] ctors = superClass.GetDeclaredConstructors();
+			foreach (ConstructorInfo ctor in ctors)
 			{
 				int mod = ctor.Attributes;
 				if (Modifier.IsPublic(mod) || Modifier.IsProtected(mod))
@@ -701,7 +701,7 @@ namespace Rhino
 			private readonly Script script;
 		}
 
-		private static void GenerateCtor<_T0>(ClassFileWriter cfw, string adapterName, string superName, ConstructorInfo<_T0> superCtor)
+		private static void GenerateCtor<_T0>(ClassFileWriter cfw, string adapterName, string superName, ConstructorInfo superCtor)
 		{
 			short locals = 3;
 			// this + factory + delegee

@@ -1395,8 +1395,8 @@ namespace Rhino
 			}
 			// If we got here, there isn't an "init" method with the right
 			// parameter types.
-			ConstructorInfo<object>[] ctors = clazz.GetConstructors();
-			ConstructorInfo<object> protoCtor = null;
+			ConstructorInfo[] ctors = clazz.GetConstructors();
+			ConstructorInfo protoCtor = null;
 			for (int i_1 = 0; i_1 < ctors.Length; i_1++)
 			{
 				if (ctors[i_1].GetParameterTypes().Length == 0)

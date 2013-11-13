@@ -81,7 +81,7 @@ namespace Rhino.Jdk13
 			// class loaders? Using cf.getApplicationClassLoader() ?
 			ClassLoader loader = interfaces[0].GetClassLoader();
 			Type cl = Proxy.GetProxyClass(loader, interfaces);
-			ConstructorInfo<object> c;
+			ConstructorInfo c;
 			try
 			{
 				c = cl.GetConstructor(new Type[] { typeof(InvocationHandler) });
@@ -96,7 +96,7 @@ namespace Rhino.Jdk13
 
 		protected internal override object NewInterfaceProxy(object proxyHelper, ContextFactory cf, InterfaceAdapter adapter, object target, Scriptable topScope)
 		{
-			ConstructorInfo<object> c = (ConstructorInfo<object>)proxyHelper;
+			ConstructorInfo c = (ConstructorInfo)proxyHelper;
 			InvocationHandler handler = new _InvocationHandler_107(target, adapter, cf, topScope);
 			// In addition to methods declared in the interface, proxies
 			// also route some java.lang.Object methods through the

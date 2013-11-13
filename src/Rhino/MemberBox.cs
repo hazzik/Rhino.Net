@@ -49,7 +49,7 @@ namespace Rhino
 			Init(method);
 		}
 
-		internal MemberBox(ConstructorInfo<object> constructor)
+		internal MemberBox(ConstructorInfo constructor)
 		{
 			Init(constructor);
 		}
@@ -61,7 +61,7 @@ namespace Rhino
 			this.vararg = VMBridge.instance.IsVarArgs(method);
 		}
 
-		private void Init<_T0>(ConstructorInfo<_T0> constructor)
+		private void Init<_T0>(ConstructorInfo constructor)
 		{
 			this.memberObject = constructor;
 			this.argTypes = constructor.GetParameterTypes();
@@ -73,9 +73,9 @@ namespace Rhino
 			return (MethodInfo)memberObject;
 		}
 
-		internal ConstructorInfo<object> Ctor()
+		internal ConstructorInfo Ctor()
 		{
-			return (ConstructorInfo<object>)memberObject;
+			return (ConstructorInfo)memberObject;
 		}
 
 		internal MemberInfo Member()
@@ -120,7 +120,7 @@ namespace Rhino
 			}
 			else
 			{
-				ConstructorInfo<object> ctor = Ctor();
+				ConstructorInfo ctor = Ctor();
 				string name = ((Type)ctor.DeclaringType).FullName;
 				int lastDot = name.LastIndexOf('.');
 				if (lastDot >= 0)
@@ -189,7 +189,7 @@ namespace Rhino
 
 		internal object NewInstance(object[] args)
 		{
-			ConstructorInfo<object> ctor = Ctor();
+			ConstructorInfo ctor = Ctor();
 			try
 			{
 				try
@@ -281,7 +281,7 @@ namespace Rhino
 			}
 			else
 			{
-				Init((ConstructorInfo<object>)member);
+				Init((ConstructorInfo)member);
 			}
 		}
 
@@ -321,7 +321,7 @@ namespace Rhino
 			}
 			else
 			{
-				WriteParameters(@out, ((ConstructorInfo<object>)member).GetParameterTypes());
+				WriteParameters(@out, ((ConstructorInfo)member).GetParameterTypes());
 			}
 		}
 
