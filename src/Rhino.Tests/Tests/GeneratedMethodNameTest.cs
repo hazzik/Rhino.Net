@@ -7,11 +7,11 @@
  */
 
 using System;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>Takes care that the name of the method generated for a function "looks like" the original function name.</summary>
 	/// <remarks>

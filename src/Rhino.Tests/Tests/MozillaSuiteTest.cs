@@ -11,12 +11,12 @@ using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using NUnit.Framework.Runners;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tests;
-using Rhino.Tests.Tools.Shell;
+using Rhino.Drivers;
+using Rhino.Tests;
+using Rhino.Tools.Shell;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>
 	/// This JUnit suite runs the Mozilla test suite (in mozilla.org CVS

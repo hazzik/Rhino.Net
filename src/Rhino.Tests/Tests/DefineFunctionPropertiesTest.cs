@@ -6,11 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>Example of defining global functions.</summary>
 	/// <remarks>Example of defining global functions.</remarks>
@@ -80,7 +80,7 @@ namespace Rhino.Tests.Tests
 		/// a global function, the 'this' object is the global object.
 		/// In this case we look up a value that we associated with the global
 		/// object using
-		/// <see cref="Rhino.Tests.ScriptableObject.GetAssociatedValue(object)">Rhino.Tests.ScriptableObject.GetAssociatedValue(object)</see>
+		/// <see cref="Rhino.ScriptableObject.GetAssociatedValue(object)">Rhino.ScriptableObject.GetAssociatedValue(object)</see>
 		/// .
 		/// </remarks>
 		public static object G(Context cx, Scriptable thisObj, object[] args, Function funObj)

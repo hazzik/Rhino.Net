@@ -8,13 +8,13 @@
 
 using System;
 using System.IO;
-using Rhino.Tests;
+using Rhino;
+using Rhino.Commonjs.Module;
+using Rhino.Commonjs.Module.Provider;
 using Rhino.Tests.Commonjs.Module;
-using Rhino.Tests.Commonjs.Module.Provider;
-using Rhino.Tests.Tests.Commonjs.Module;
 using Sharpen;
 
-namespace Rhino.Tests.Tests.Commonjs.Module
+namespace Rhino.Tests.Commonjs.Module
 {
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: RequireTest.java,v 1.1 2011/04/07 22:24:37 hannes%helma.at Exp $</version>

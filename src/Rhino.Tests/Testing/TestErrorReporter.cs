@@ -8,10 +8,10 @@
 
 using System;
 using NUnit.Framework;
-using Rhino.Tests;
+using Rhino;
 using Sharpen;
 
-namespace Rhino.Tests.Testing
+namespace Rhino.Testing
 {
 	/// <summary>
 	/// <p>An error reporter for testing that verifies that messages reported to the

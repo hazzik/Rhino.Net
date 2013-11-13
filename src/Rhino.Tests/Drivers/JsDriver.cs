@@ -15,11 +15,11 @@ using Javax.Xml.Parsers;
 using Javax.Xml.Transform;
 using Javax.Xml.Transform.Dom;
 using Javax.Xml.Transform.Stream;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tools.Shell;
+using Rhino.Drivers;
+using Rhino.Tools.Shell;
 using Sharpen;
 
-namespace Rhino.Tests.Drivers
+namespace Rhino.Drivers
 {
 	/// <version>$Id: JsDriver.java,v 1.10 2009/05/15 12:30:45 nboyd%atg.com Exp $</version>
 	public class JsDriver

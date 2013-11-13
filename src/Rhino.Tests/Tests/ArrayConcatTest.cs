@@ -7,11 +7,11 @@
  */
 
 using NUnit.Framework;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>Test for overloaded array concat with non-dense arg.</summary>
 	/// <remarks>

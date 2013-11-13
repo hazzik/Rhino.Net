@@ -6,11 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>
 	/// Takes care that the class name of the generated class "looks like"

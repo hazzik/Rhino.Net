@@ -10,12 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework.Runners;
-using Rhino.Tests;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tools.Shell;
+using Rhino;
+using Rhino.Drivers;
+using Rhino.Tools.Shell;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>Run doctests in folder testsrc/doctests.</summary>
 	/// <remarks>
@@ -58,7 +58,7 @@ namespace Rhino.Tests.Tests
 
 			public bool Accept(FilePath f)
 			{
-				return f.GetName().EndsWith(Rhino.Tests.Tests.DoctestsTest.doctestsExtension);
+				return f.GetName().EndsWith(Rhino.Tests.DoctestsTest.doctestsExtension);
 			}
 		}
 

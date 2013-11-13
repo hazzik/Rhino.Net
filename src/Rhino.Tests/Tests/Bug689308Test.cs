@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using Rhino;
+using Rhino.Ast;
 using Rhino.Tests;
-using Rhino.Tests.Ast;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <author>AndrГ© Bargull</author>
 	[NUnit.Framework.TestFixture]

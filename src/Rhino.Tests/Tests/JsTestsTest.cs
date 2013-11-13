@@ -7,11 +7,11 @@
  */
 
 using System.IO;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tests;
+using Rhino.Drivers;
+using Rhino.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	[NUnit.Framework.TestFixture]
 	public class JsTestsTest : JsTestsBase

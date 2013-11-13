@@ -7,11 +7,11 @@
  */
 
 using System.Text;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <author>AndrГ© Bargull</author>
 	[NUnit.Framework.TestFixture]

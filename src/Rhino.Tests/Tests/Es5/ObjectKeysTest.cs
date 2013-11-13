@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
-using Rhino.Tests.Tests.Es5;
+using Rhino.Tests.Es5;
 using Sharpen;
 
-namespace Rhino.Tests.Tests.Es5
+namespace Rhino.Tests.Es5
 {
 	[NUnit.Framework.TestFixture]
 	public class ObjectKeysTest

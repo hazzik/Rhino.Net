@@ -7,12 +7,12 @@
  */
 
 using NUnit.Framework;
+using Rhino;
+using Rhino.Ast;
 using Rhino.Tests;
-using Rhino.Tests.Ast;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <author>Hannes Wallnoefer</author>
 	[NUnit.Framework.TestFixture]
@@ -20,7 +20,7 @@ namespace Rhino.Tests.Tests
 	{
 		/// <summary>
 		/// Asserts that the value returned by
-		/// <see cref="Rhino.Tests.Ast.AstNode.ToSource()">Rhino.Tests.Ast.AstNode.ToSource()</see>
+		/// <see cref="Rhino.Ast.AstNode.ToSource()">Rhino.Ast.AstNode.ToSource()</see>
 		/// after
 		/// the given input source was parsed equals the specified expected output source.
 		/// </summary>
@@ -28,7 +28,7 @@ namespace Rhino.Tests.Tests
 		/// <param name="expectedOutput">
 		/// the JavaScript source that is expected to be
 		/// returned by
-		/// <see cref="Rhino.Tests.Ast.AstNode.ToSource()">Rhino.Tests.Ast.AstNode.ToSource()</see>
+		/// <see cref="Rhino.Ast.AstNode.ToSource()">Rhino.Ast.AstNode.ToSource()</see>
 		/// </param>
 		private void AssertSource(string source, string expectedOutput)
 		{

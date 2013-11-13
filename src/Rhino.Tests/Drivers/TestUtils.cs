@@ -9,11 +9,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Rhino.Tests;
-using Rhino.Tests.Drivers;
+using Rhino;
+using Rhino.Drivers;
 using Sharpen;
 
-namespace Rhino.Tests.Drivers
+namespace Rhino.Drivers
 {
 	public class TestUtils
 	{

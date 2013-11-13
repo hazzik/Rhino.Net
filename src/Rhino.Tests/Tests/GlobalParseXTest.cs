@@ -7,11 +7,11 @@
  */
 
 using NUnit.Framework;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>Tests for global functions parseFloat and parseInt.</summary>
 	/// <remarks>Tests for global functions parseFloat and parseInt.</remarks>

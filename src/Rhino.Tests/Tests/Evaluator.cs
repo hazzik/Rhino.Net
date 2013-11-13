@@ -7,11 +7,11 @@
  */
 
 using System.Collections.Generic;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	public class Evaluator
 	{

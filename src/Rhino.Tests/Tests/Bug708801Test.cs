@@ -7,13 +7,13 @@
  */
 
 using System.Collections.Generic;
+using Rhino;
+using Rhino.Ast;
+using Rhino.Optimizer;
 using Rhino.Tests;
-using Rhino.Tests.Ast;
-using Rhino.Tests.Optimizer;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <author>AndrГ© Bargull</author>
 	[NUnit.Framework.TestFixture]
@@ -54,7 +54,7 @@ namespace Rhino.Tests.Tests
 			/// Compiles
 			/// <code>source</code>
 			/// and returns the transformed and optimized
-			/// <see cref="Rhino.Tests.Ast.ScriptNode">Rhino.Tests.Ast.ScriptNode</see>
+			/// <see cref="Rhino.Ast.ScriptNode">Rhino.Ast.ScriptNode</see>
 			/// </summary>
 			protected internal virtual ScriptNode Compile(CharSequence source)
 			{

@@ -8,12 +8,12 @@
 
 using System;
 using System.IO;
-using Rhino.Tests;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tools.Shell;
+using Rhino;
+using Rhino.Drivers;
+using Rhino.Tools.Shell;
 using Sharpen;
 
-namespace Rhino.Tests.Drivers
+namespace Rhino.Drivers
 {
 	/// <version>$Id: ShellTest.java,v 1.14 2011/03/29 15:17:49 hannes%helma.at Exp $</version>
 	public class ShellTest

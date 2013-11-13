@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using Rhino.Tests;
+using Rhino;
+using Rhino.Json;
 using Rhino.Tests.Json;
-using Rhino.Tests.Tests.Json;
 using Sharpen;
 
-namespace Rhino.Tests.Tests.Json
+namespace Rhino.Tests.Json
 {
 	[NUnit.Framework.TestFixture]
 	public class JsonParserTest

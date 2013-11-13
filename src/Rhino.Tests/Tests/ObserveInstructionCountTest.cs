@@ -7,12 +7,12 @@
  */
 
 using System;
+using Rhino;
+using Rhino.Drivers;
 using Rhino.Tests;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]

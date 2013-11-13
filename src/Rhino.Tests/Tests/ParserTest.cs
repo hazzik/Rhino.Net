@@ -9,13 +9,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Rhino;
+using Rhino.Ast;
+using Rhino.Testing;
 using Rhino.Tests;
-using Rhino.Tests.Ast;
-using Rhino.Tests.Testing;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	[NUnit.Framework.TestFixture]
 	[NUnit.Framework.TestFixture]

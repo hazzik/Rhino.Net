@@ -8,12 +8,12 @@
 
 using System;
 using System.IO;
+using Rhino;
+using Rhino.Serialize;
 using Rhino.Tests;
-using Rhino.Tests.Serialize;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>
 	/// Test of new API functions for running and resuming scripts containing

@@ -8,11 +8,11 @@
 
 using System;
 using NUnit.Framework;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]

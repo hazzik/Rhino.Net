@@ -7,15 +7,15 @@
  */
 
 using NUnit.Framework;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>
 	/// Test for
-	/// <see cref="Rhino.Tests.Context.DecompileScript(Rhino.Tests.Script, int)">Rhino.Tests.Context.DecompileScript(Rhino.Tests.Script, int)</see>
+	/// <see cref="Rhino.Context.DecompileScript(Rhino.Script, int)">Rhino.Context.DecompileScript(Rhino.Script, int)</see>
 	/// .
 	/// </summary>
 	/// <author>Marc Guillemot</author>

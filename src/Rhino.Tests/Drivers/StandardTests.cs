@@ -8,11 +8,11 @@
 
 using System;
 using NUnit.Framework;
-using Rhino.Tests.Drivers;
-using Rhino.Tests.Tools.Shell;
+using Rhino.Drivers;
+using Rhino.Tools.Shell;
 using Sharpen;
 
-namespace Rhino.Tests.Drivers
+namespace Rhino.Drivers
 {
 	/// <summary>Executes the tests in the js/tests directory, much like jsDriver.pl does.</summary>
 	/// <remarks>

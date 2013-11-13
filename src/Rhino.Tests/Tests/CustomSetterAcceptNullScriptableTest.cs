@@ -7,16 +7,16 @@
  */
 
 using System.Reflection;
+using Rhino;
 using Rhino.Tests;
-using Rhino.Tests.Tests;
 using Sharpen;
 
-namespace Rhino.Tests.Tests
+namespace Rhino.Tests
 {
 	/// <summary>
 	/// Takes care that it's possible to set <code>null</code> value
 	/// when using custom setter for a
-	/// <see cref="Rhino.Tests.Scriptable">Rhino.Tests.Scriptable</see>
+	/// <see cref="Rhino.Scriptable">Rhino.Scriptable</see>
 	/// object.
 	/// See https://bugzilla.mozilla.org/show_bug.cgi?id=461138
 	/// </summary>
