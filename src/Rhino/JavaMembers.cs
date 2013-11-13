@@ -213,7 +213,7 @@ namespace Rhino
 				string suffix = "[]";
 				if (arrayDimension == 1)
 				{
-					return name.Concat(suffix);
+					return System.String.Concat(name, suffix);
 				}
 				else
 				{
@@ -670,7 +670,7 @@ namespace Rhino
 						// setter
 						MemberBox setter = null;
 						NativeJavaMethod setters = null;
-						string setterName = "set".Concat(nameComponent);
+						string setterName = System.String.Concat("set", nameComponent);
 						if (ht.ContainsKey(setterName))
 						{
 							// Is this value a method?
@@ -778,7 +778,7 @@ namespace Rhino
 
 		private MemberBox FindGetter(bool isStatic, IDictionary<string, object> ht, string prefix, string propertyName)
 		{
-			string getterName = prefix.Concat(propertyName);
+			string getterName = System.String.Concat(prefix, propertyName);
 			if (ht.ContainsKey(getterName))
 			{
 				// Check that the getter is a method.

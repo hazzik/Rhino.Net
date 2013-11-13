@@ -96,7 +96,7 @@ namespace Rhino.Commonjs.Module.Provider
 
 		private static string EnsureTrailingSlash(string path)
 		{
-			return path.EndsWith("/") ? path : path.Concat("/");
+			return path.EndsWith("/") ? path : System.String.Concat(path, "/");
 		}
 
 		/// <summary>

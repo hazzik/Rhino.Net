@@ -893,7 +893,7 @@ again_break: ;
 				if (N == 1)
 				{
 					string arg = ScriptRuntime.ToString(args[0]);
-					return target.Concat(arg);
+					return System.String.Concat(target, arg);
 				}
 			}
 			// Find total capacity for the final string to avoid unnecessary

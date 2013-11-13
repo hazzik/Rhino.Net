@@ -2374,7 +2374,7 @@ namespace Rhino
 							}
 						}
 						string s1 = left.GetString();
-						left.SetString(s1.Concat(s2));
+						left.SetString(System.String.Concat(s1, s2));
 						return left;
 					}
 					else
@@ -2394,7 +2394,7 @@ namespace Rhino
 									string s2;
 									s1 = ScriptRuntime.NumberToString(left.GetDouble(), 10);
 									s2 = right.GetString();
-									right.SetString(s1.Concat(s2));
+									right.SetString(System.String.Concat(s1, s2));
 									return right;
 								}
 							}

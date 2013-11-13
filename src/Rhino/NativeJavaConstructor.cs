@@ -47,7 +47,7 @@ namespace Rhino
 		public override string GetFunctionName()
 		{
 			string sig = JavaMembers.LiveConnectSignature(ctor.argTypes);
-			return "<init>".Concat(sig);
+			return System.String.Concat("<init>", sig);
 		}
 
 		public override string ToString()
