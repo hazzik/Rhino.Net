@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino", "Rhino\Rhino.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Tests", "Rhino.Tests\Rhino.Tests.csproj", "{BE3DE178-290C-4A20-A8E1-BC5091380C46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Tools.Shell", "Rhino.Tools.Shell\Rhino.Tools.Shell.csproj", "{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BE3DE178-290C-4A20-A8E1-BC5091380C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE3DE178-290C-4A20-A8E1-BC5091380C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE3DE178-290C-4A20-A8E1-BC5091380C46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

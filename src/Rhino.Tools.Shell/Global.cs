@@ -245,7 +245,7 @@ namespace Rhino.Tools.Shell
 				string file = Context.ToString(arg);
 				try
 				{
-					Main.ProcessFile(cx, thisObj, file);
+					Program.ProcessFile(cx, thisObj, file);
 				}
 				catch (IOException ioex)
 				{

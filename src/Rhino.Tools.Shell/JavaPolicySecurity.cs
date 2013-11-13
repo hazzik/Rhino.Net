@@ -156,7 +156,7 @@ namespace Rhino.Tools.Shell
 				ProtectionDomain staticDomain = this._enclosing.GetUrlDomain(url);
 				try
 				{
-					Main.ProcessFileSecure(cx, scope, url.ToExternalForm(), staticDomain);
+					Program.ProcessFileSecure(cx, scope, url.ToExternalForm(), staticDomain);
 				}
 				catch (IOException ioex)
 				{

@@ -218,7 +218,6 @@
     <Compile Include="Optimizer\OptTransformer.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="PolicySecurityController.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ref.cs" />
     <Compile Include="RefCallable.cs" />
     <Compile Include="RegExpProxy.cs" />
@@ -258,17 +257,6 @@
     <Compile Include="Tools\Idswitch\Main.cs" />
     <Compile Include="Tools\Idswitch\SwitchGenerator.cs" />
     <Compile Include="Tools\Jsc\Main.cs" />
-    <Compile Include="Tools\Shell\ConsoleTextArea.cs" />
-    <Compile Include="Tools\Shell\Environment.cs" />
-    <Compile Include="Tools\Shell\Global.cs" />
-    <Compile Include="Tools\Shell\JavaPolicySecurity.cs" />
-    <Compile Include="Tools\Shell\JSConsole.cs" />
-    <Compile Include="Tools\Shell\Main.cs" />
-    <Compile Include="Tools\Shell\QuitAction.cs" />
-    <Compile Include="Tools\Shell\SecurityProxy.cs" />
-    <Compile Include="Tools\Shell\ShellConsole.cs" />
-    <Compile Include="Tools\Shell\ShellContextFactory.cs" />
-    <Compile Include="Tools\Shell\ShellLine.cs" />
     <Compile Include="Tools\SourceReader.cs" />
     <Compile Include="Tools\ToolErrorReporter.cs" />
     <Compile Include="TopLevel.cs" />
@@ -303,6 +291,9 @@
       <Project>{72944a6c-45ff-4ef8-b349-8c9cabf519d4}</Project>
       <Name>Sharpen</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

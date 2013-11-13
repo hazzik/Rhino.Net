@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rhino.Tools.Shell\Rhino.Tools.Shell.csproj">
+      <Project>{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}</Project>
+      <Name>Rhino.Tools.Shell</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino\Rhino.csproj">
       <Project>{ffa067fa-eb0f-4b26-92ff-76d435d1f690}</Project>
       <Name>Rhino</Name>
