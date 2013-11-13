@@ -16,7 +16,7 @@ using Sharpen;
 
 namespace Rhino.Tools.Idswitch
 {
-	public class Main
+	public class Program
 	{
 		private const string SWITCH_TAG_STR = "string_id_map";
 
@@ -572,7 +572,7 @@ namespace Rhino.Tools.Idswitch
 
 		public static void Main(string[] args)
 		{
-			Rhino.Tools.Idswitch.Main self = new Rhino.Tools.Idswitch.Main();
+			Rhino.Tools.Idswitch.Program self = new Rhino.Tools.Idswitch.Program();
 			int status = self.Exec(args);
 			System.Environment.Exit(status);
 		}

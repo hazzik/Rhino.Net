@@ -241,11 +241,6 @@
     <Compile Include="Synchronizer.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenStream.cs" />
-    <Compile Include="Tools\Idswitch\CodePrinter.cs" />
-    <Compile Include="Tools\Idswitch\FileBody.cs" />
-    <Compile Include="Tools\Idswitch\IdValuePair.cs" />
-    <Compile Include="Tools\Idswitch\Main.cs" />
-    <Compile Include="Tools\Idswitch\SwitchGenerator.cs" />
     <Compile Include="Tools\SourceReader.cs" />
     <Compile Include="Tools\ToolErrorReporter.cs" />
     <Compile Include="TopLevel.cs" />
