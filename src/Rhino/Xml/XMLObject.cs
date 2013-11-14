@@ -76,13 +76,13 @@ namespace Rhino.Xml
 		/// <remarks>
 		/// Custom <tt>+</tt> operator.
 		/// Should return
-		/// <see cref="Rhino.Scriptable.NOT_FOUND">Rhino.Scriptable.NOT_FOUND</see>
+		/// <see cref="Rhino.ScriptableConstants.NOT_FOUND">Rhino.ScriptableConstants.NOT_FOUND</see>
 		/// if this object does not have
 		/// custom addition operator for the given value,
 		/// or the result of the addition operation.
 		/// <p>
 		/// The default implementation returns
-		/// <see cref="Rhino.Scriptable.NOT_FOUND">Rhino.Scriptable.NOT_FOUND</see>
+		/// <see cref="Rhino.ScriptableConstants.NOT_FOUND">Rhino.ScriptableConstants.NOT_FOUND</see>
 		/// to indicate no custom addition operation.
 		/// </remarks>
 		/// <param name="cx">the Context object associated with the current thread.</param>

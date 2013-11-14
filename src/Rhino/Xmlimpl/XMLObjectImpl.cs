@@ -244,7 +244,7 @@ namespace Rhino.Xmlimpl
 		/// <summary>
 		/// XMLObject always compare with any value and equivalentValues
 		/// never returns
-		/// <see cref="Rhino.Scriptable.NOT_FOUND">Rhino.Scriptable.NOT_FOUND</see>
+		/// <see cref="Rhino.ScriptableConstants.NOT_FOUND">Rhino.ScriptableConstants.NOT_FOUND</see>
 		/// for them but rather
 		/// calls equivalentXml(value) and wrap the result as Boolean.
 		/// </summary>

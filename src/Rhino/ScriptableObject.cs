@@ -1134,7 +1134,7 @@ namespace Rhino
 		/// <remarks>
 		/// Custom <tt>==</tt> operator.
 		/// Must return
-		/// <see cref="Scriptable.NOT_FOUND">Scriptable.NOT_FOUND</see>
+		/// <see cref="ScriptableConstants.NOT_FOUND">ScriptableConstants.NOT_FOUND</see>
 		/// if this object does not
 		/// have custom equality operator for the given value,
 		/// <tt>Boolean.TRUE</tt> if this object is equivalent to <tt>value</tt>,
@@ -1143,7 +1143,7 @@ namespace Rhino
 		/// <p>
 		/// The default implementation returns Boolean.TRUE
 		/// if <tt>this == value</tt> or
-		/// <see cref="Scriptable.NOT_FOUND">Scriptable.NOT_FOUND</see>
+		/// <see cref="ScriptableConstants.NOT_FOUND">ScriptableConstants.NOT_FOUND</see>
 		/// otherwise.
 		/// It indicates that by default custom equality is available only if
 		/// <tt>value</tt> is <tt>this</tt> in which case true is returned.
@@ -2497,7 +2497,7 @@ namespace Rhino
 		/// <returns>
 		/// the value of a property with name <code>name</code> found in
 		/// <code>obj</code> or any object in its prototype chain, or
-		/// <code>Scriptable.NOT_FOUND</code> if not found
+		/// <code>ScriptableConstants.NOT_FOUND</code> if not found
 		/// </returns>
 		/// <since>1.5R2</since>
 		public static object GetProperty(Scriptable obj, string name)
@@ -2538,7 +2538,7 @@ namespace Rhino
 		/// the value of a property with name <code>name</code> found in
 		/// <code>obj</code> or any object in its prototype chain, or
 		/// null if not found. Note that it does not return
-		/// <see cref="Scriptable.NOT_FOUND">Scriptable.NOT_FOUND</see>
+		/// <see cref="ScriptableConstants.NOT_FOUND">ScriptableConstants.NOT_FOUND</see>
 		/// as it can ordinarily not be
 		/// converted to most of the types.
 		/// </returns>
@@ -2569,7 +2569,7 @@ namespace Rhino
 		/// <returns>
 		/// the value of a property with index <code>index</code> found in
 		/// <code>obj</code> or any object in its prototype chain, or
-		/// <code>Scriptable.NOT_FOUND</code> if not found
+		/// <code>ScriptableConstants.NOT_FOUND</code> if not found
 		/// </returns>
 		/// <since>1.5R2</since>
 		public static object GetProperty(Scriptable obj, int index)
@@ -2607,7 +2607,7 @@ namespace Rhino
 		/// the value of a property with name <code>name</code> found in
 		/// <code>obj</code> or any object in its prototype chain, or
 		/// null if not found. Note that it does not return
-		/// <see cref="Scriptable.NOT_FOUND">Scriptable.NOT_FOUND</see>
+		/// <see cref="ScriptableConstants.NOT_FOUND">ScriptableConstants.NOT_FOUND</see>
 		/// as it can ordinarily not be
 		/// converted to most of the types.
 		/// </returns>
