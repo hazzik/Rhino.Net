@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+using System.Threading;
 using Rhino;
 using Rhino.Jdk13;
 using Sharpen;
@@ -28,11 +29,11 @@ namespace Rhino.Jdk13
 			// garbage collection of Rhino classes. For details see comments
 			// by Attila Szegedi in
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=281067#c5
-			object[] storage = contextLocal.Get();
+			object[] storage = contextLocal.Value;
 			if (storage == null)
 			{
 				storage = new object[1];
-				contextLocal.Set(storage);
+				contextLocal.Value = storage;
 			}
 			return storage;
 		}

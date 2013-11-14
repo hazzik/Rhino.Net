@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Rhino;
 using Rhino.Commonjs.Module;
 using Sharpen;
@@ -285,7 +286,7 @@ namespace Rhino.Commonjs.Module
 			}
 			// Check if it is currently being loaded on the current thread
 			// (supporting circular dependencies).
-			IDictionary<string, Scriptable> threadLoadingModules = loadingModuleInterfaces.Get();
+			IDictionary<string, Scriptable> threadLoadingModules = loadingModuleInterfaces.Value;
 			if (threadLoadingModules != null)
 			{
 				exports = threadLoadingModules.Get(id);
@@ -323,7 +324,7 @@ namespace Rhino.Commonjs.Module
 				if (outermostLocked)
 				{
 					threadLoadingModules = new Dictionary<string, Scriptable>();
-					loadingModuleInterfaces.Set(threadLoadingModules);
+					loadingModuleInterfaces.Value = threadLoadingModules;
 				}
 				// Must make the module exports available immediately on the
 				// current thread, to satisfy the CommonJS Modules/1.1 requirement
@@ -362,7 +363,7 @@ namespace Rhino.Commonjs.Module
 						// threads from observing a partially loaded circular
 						// dependency of a module that completed loading.
 						exportedModuleInterfaces.PutAll(threadLoadingModules);
-						loadingModuleInterfaces.Set(null);
+						loadingModuleInterfaces.Value = null;
 					}
 				}
 			}

@@ -45,6 +45,8 @@
 -typeMapping java.lang.StackOverflowError System.StackOverflowException  
 -typeMapping java.lang.StringBuilder System.Text.StringBuilder
 -typeMapping java.lang.Throwable System.Exception
+-typeMapping java.lang.ThreadLocal System.Threading.ThreadLocal
+-typeMapping java.lang.ThreadLocal<> System.Threading.ThreadLocal
 -typeMapping java.math.BigInteger Mono.Math.BigInteger
 -typeMapping java.net.InetAddress System.Net.IPAddress
 -typeMapping java.net.InetSocketAddress System.Net.IPEndPoint
@@ -156,6 +158,8 @@
 -propertyMapping java.lang.reflect.Member.getModifiers Attributes
 -propertyMapping java.lang.reflect.Method.getModifiers Attributes
 -propertyMapping java.lang.Class.getModifiers Attributes
+-propertyMapping java.lang.ThreadLocal.get Value
+-propertyMapping java.lang.ThreadLocal.set Value
 -propertyMapping java.net.InetSocketAddress.getAddress Address
 -propertyMapping java.net.InetSocketAddress.getPort Port
 -propertyMapping java.net.ServerSocket.getLocalSocketAddress LocalEndPoint
