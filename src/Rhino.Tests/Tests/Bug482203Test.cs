@@ -14,7 +14,6 @@ using Sharpen;
 namespace Rhino.Tests
 {
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class Bug482203Test
 	{
 		/// <exception cref="System.Exception"></exception>

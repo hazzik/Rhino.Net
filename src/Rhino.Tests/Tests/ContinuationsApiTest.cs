@@ -27,7 +27,6 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class ContinuationsApiTest
 	{
 		internal Scriptable globalScope;

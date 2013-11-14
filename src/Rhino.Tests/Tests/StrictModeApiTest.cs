@@ -16,7 +16,6 @@ namespace Rhino.Tests
 	/// <remarks>Test of strict mode APIs.</remarks>
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class StrictModeApiTest
 	{
 		private ScriptableObject global;

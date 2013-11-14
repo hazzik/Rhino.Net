@@ -15,7 +15,6 @@ namespace Rhino.Tests
 	/// <summary>See https://bugzilla.mozilla.org/show_bug.cgi?id=412433</summary>
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class Bug412433Test
 	{
 		[NUnit.Framework.Test]

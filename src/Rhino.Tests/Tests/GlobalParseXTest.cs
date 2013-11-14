@@ -17,7 +17,6 @@ namespace Rhino.Tests
 	/// <remarks>Tests for global functions parseFloat and parseInt.</remarks>
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class GlobalParseXTest
 	{
 		/// <summary>

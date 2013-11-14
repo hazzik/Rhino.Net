@@ -14,7 +14,6 @@ namespace Rhino.Tests
 {
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class ContextFactoryTest
 	{
 		internal class MyFactory : ContextFactory

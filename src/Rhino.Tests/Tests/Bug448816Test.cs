@@ -17,7 +17,6 @@ namespace Rhino.Tests
 	/// <summary>See https://bugzilla.mozilla.org/show_bug.cgi?id=448816</summary>
 	/// <author>Hannes Wallnoefer</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class Bug448816Test
 	{
 		internal IDictionary<object, object> map;

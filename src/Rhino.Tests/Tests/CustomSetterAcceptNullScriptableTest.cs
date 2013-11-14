@@ -22,7 +22,6 @@ namespace Rhino.Tests
 	/// </summary>
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class CustomSetterAcceptNullScriptableTest
 	{
 		[System.Serializable]

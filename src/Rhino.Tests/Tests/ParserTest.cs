@@ -18,7 +18,6 @@ using Sharpen;
 namespace Rhino.Tests
 {
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class ParserTest
 	{
 		internal CompilerEnvirons environment;

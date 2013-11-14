@@ -14,7 +14,6 @@ using Sharpen;
 namespace Rhino.Tests
 {
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class Bug421071Test
 	{
 		private ContextFactory factory;

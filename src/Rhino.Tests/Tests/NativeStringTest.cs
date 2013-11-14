@@ -15,7 +15,6 @@ namespace Rhino.Tests
 {
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class NativeStringTest
 	{
 		/// <summary>

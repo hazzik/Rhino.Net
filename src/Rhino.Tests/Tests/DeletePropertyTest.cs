@@ -19,7 +19,6 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class DeletePropertyTest
 	{
 		/// <summary>delete should not delete anything in the prototype chain.</summary>

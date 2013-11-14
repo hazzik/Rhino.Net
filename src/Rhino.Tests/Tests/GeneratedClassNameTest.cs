@@ -23,7 +23,6 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class GeneratedClassNameTest
 	{
 		/// <exception cref="System.Exception"></exception>

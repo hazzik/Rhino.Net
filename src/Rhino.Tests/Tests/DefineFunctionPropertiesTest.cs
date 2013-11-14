@@ -16,7 +16,6 @@ namespace Rhino.Tests
 	/// <remarks>Example of defining global functions.</remarks>
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class DefineFunctionPropertiesTest
 	{
 		internal ScriptableObject global;

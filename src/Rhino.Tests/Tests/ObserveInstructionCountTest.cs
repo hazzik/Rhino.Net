@@ -16,7 +16,6 @@ namespace Rhino.Tests
 {
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class ObserveInstructionCountTest
 	{
 		internal class MyContext : Context

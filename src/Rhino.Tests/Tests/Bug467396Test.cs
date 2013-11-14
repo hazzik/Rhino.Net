@@ -19,7 +19,6 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <author>Hannes Wallnoefer</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class Bug467396Test
 	{
 		[NUnit.Framework.Test]

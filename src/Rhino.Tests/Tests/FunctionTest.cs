@@ -17,7 +17,6 @@ namespace Rhino.Tests
 	/// <remarks>Unit tests for Function.</remarks>
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class FunctionTest
 	{
 		/// <summary>

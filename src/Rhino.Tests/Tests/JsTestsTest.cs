@@ -13,7 +13,6 @@ using Sharpen;
 
 namespace Rhino.Tests
 {
-	[NUnit.Framework.TestFixture]
 	public class JsTestsTest : JsTestsBase
 	{
 		internal static readonly string baseDirectory = "testsrc" + FilePath.separator + "jstests";

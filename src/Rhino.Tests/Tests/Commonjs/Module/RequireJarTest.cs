@@ -18,7 +18,6 @@ namespace Rhino.Tests.Commonjs.Module
 {
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: RequireTest.java,v 1.1 2011/04/07 22:24:37 hannes%helma.at Exp $</version>
-	[NUnit.Framework.TestFixture]
 	public class RequireJarTest : RequireTest
 	{
 		/// <exception cref="System.Exception"></exception>

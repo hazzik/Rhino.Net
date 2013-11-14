@@ -15,7 +15,6 @@ namespace Rhino.Tests
 {
 	/// <author>donnamalayeri</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class JavaAcessibilityTest
 	{
 		protected internal readonly Global global = new Global();

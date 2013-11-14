@@ -16,7 +16,6 @@ namespace Rhino.Tests
 {
 	/// <author>Marc Guillemot</author>
 	[NUnit.Framework.TestFixture]
-	[NUnit.Framework.TestFixture]
 	public class StackTraceTest
 	{
 		internal static readonly string LS = Runtime.GetProperty("line.separator");
