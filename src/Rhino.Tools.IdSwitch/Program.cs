@@ -572,7 +572,7 @@ namespace Rhino.Tools.Idswitch
 
 		public static void Main(string[] args)
 		{
-			Rhino.Tools.Idswitch.Program self = new Rhino.Tools.Idswitch.Program();
+			Program self = new Program();
 			int status = self.Exec(args);
 			System.Environment.Exit(status);
 		}

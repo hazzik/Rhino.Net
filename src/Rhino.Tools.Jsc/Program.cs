@@ -12,6 +12,7 @@ using System.IO;
 using Rhino;
 using Rhino.Optimizer;
 using Rhino.Tools;
+using Rhino.Tools.Jsc;
 using Sharpen;
 
 namespace Rhino.Tools.Jsc
@@ -28,13 +29,13 @@ namespace Rhino.Tools.Jsc
 		/// </remarks>
 		public static void Main(string[] args)
 		{
-			Rhino.Tools.Jsc.Program main = new Rhino.Tools.Jsc.Program();
+			Program main = new Program();
 			args = main.ProcessOptions(args);
 			if (args == null)
 			{
 				if (main.printHelp)
 				{
-					System.Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.usage", typeof(Rhino.Tools.Jsc.Program).FullName));
+					System.Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.usage", typeof(Program).FullName));
 					System.Environment.Exit(0);
 				}
 				System.Environment.Exit(1);
@@ -246,7 +247,7 @@ namespace Rhino.Tools.Jsc
 		/// <remarks>Print a usage message.</remarks>
 		private static void BadUsage(string s)
 		{
-			System.Console.Error.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.bad.usage", typeof(Rhino.Tools.Jsc.Program).FullName, s));
+			System.Console.Error.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.bad.usage", typeof(Program).FullName, s));
 		}
 
 		/// <summary>Compile JavaScript source.</summary>
@@ -347,7 +348,7 @@ namespace Rhino.Tools.Jsc
 		private FilePath GetOutputFile(FilePath parentDir, string className)
 		{
 			string path = className.Replace('.', FilePath.separatorChar);
-			path = path.Concat(".class");
+			path = System.String.Concat(path, ".class");
 			FilePath f = new FilePath(parentDir, path);
 			string dirPath = f.GetParent();
 			if (dirPath != null)

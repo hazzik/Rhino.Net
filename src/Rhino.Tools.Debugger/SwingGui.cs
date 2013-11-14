@@ -811,7 +811,7 @@ namespace Rhino.Tools.Debugger
 				MethodInfo m = typeof(JSplitPane).GetMethod("setResizeWeight", new Type[] { typeof(double) });
 				m.Invoke(pane, new object[] { weight });
 			}
-			catch (NoSuchMethodException)
+			catch (MissingMethodException)
 			{
 			}
 			catch (MemberAccessException)

@@ -235,27 +235,27 @@ namespace Rhino.Tools.Debugger
 		/// <summary>Main entry point.</summary>
 		/// <remarks>
 		/// Main entry point.  Creates a debugger attached to a Rhino
-		/// <see cref="Rhino.Tools.Shell.Main">Rhino.Tools.Shell.Main</see>
+		/// <see cref="Rhino.Tools.Shell.Program">Rhino.Tools.Shell.Program</see>
 		/// shell session.
 		/// </remarks>
 		public static void Main(string[] args)
 		{
-			Rhino.Tools.Debugger.Program main = new Rhino.Tools.Debugger.Program("Rhino JavaScript Debugger");
+			Program main = new Program("Rhino JavaScript Debugger");
 			main.DoBreak();
 			main.SetExitAction(new Program.IProxy(Main.IProxy.EXIT_ACTION));
 			Runtime.SetIn(main.GetIn());
 			Runtime.SetOut(main.GetOut());
 			Runtime.SetErr(main.GetErr());
-			Global global = Rhino.Tools.Shell.Main.GetGlobal();
+			Global global = Program.GetGlobal();
 			global.SetIn(main.GetIn());
 			global.SetOut(main.GetOut());
 			global.SetErr(main.GetErr());
-			main.AttachTo(Rhino.Tools.Shell.Main.shellContextFactory);
+			main.AttachTo(Program.shellContextFactory);
 			main.SetScope(global);
 			main.Pack();
 			main.SetSize(600, 460);
 			main.SetVisible(true);
-			Rhino.Tools.Shell.Main.Exec(args);
+			Program.Exec(args);
 		}
 
 		/// <summary>Entry point for embedded applications.</summary>
@@ -271,7 +271,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="Main(string[])">Main(string[])</see>
 		/// .
 		/// </remarks>
-		public static Rhino.Tools.Debugger.Program MainEmbedded(string title)
+		public static Program MainEmbedded(string title)
 		{
 			ContextFactory factory = ContextFactory.GetGlobal();
 			Global global = new Global();
@@ -289,7 +289,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="Main(string[])">Main(string[])</see>
 		/// .
 		/// </remarks>
-		public static Rhino.Tools.Debugger.Program MainEmbedded(ContextFactory factory, Scriptable scope, string title)
+		public static Program MainEmbedded(ContextFactory factory, Scriptable scope, string title)
 		{
 			return MainEmbeddedImpl(factory, scope, title);
 		}
@@ -304,7 +304,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="Main(string[])">Main(string[])</see>
 		/// .
 		/// </remarks>
-		public static Rhino.Tools.Debugger.Program MainEmbedded(ContextFactory factory, ScopeProvider scopeProvider, string title)
+		public static Program MainEmbedded(ContextFactory factory, ScopeProvider scopeProvider, string title)
 		{
 			return MainEmbeddedImpl(factory, scopeProvider, title);
 		}
@@ -314,13 +314,13 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="MainEmbedded(string)">MainEmbedded(string)</see>
 		/// , etc.
 		/// </summary>
-		private static Rhino.Tools.Debugger.Program MainEmbeddedImpl(ContextFactory factory, object scopeProvider, string title)
+		private static Program MainEmbeddedImpl(ContextFactory factory, object scopeProvider, string title)
 		{
 			if (title == null)
 			{
 				title = "Rhino JavaScript Debugger (embedded usage)";
 			}
-			Rhino.Tools.Debugger.Program main = new Rhino.Tools.Debugger.Program(title);
+			Program main = new Program(title);
 			main.DoBreak();
 			main.SetExitAction(new Program.IProxy(Main.IProxy.EXIT_ACTION));
 			main.AttachTo(factory);

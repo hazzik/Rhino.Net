@@ -24,13 +24,13 @@ namespace Rhino.Xmlimpl
 
 		private Rhino.Xmlimpl.Namespace prototype;
 
-		private XmlNode.Namespace ns;
+		private Rhino.Xmlimpl.XmlNode.Namespace ns;
 
 		private Namespace()
 		{
 		}
 
-		internal static Rhino.Xmlimpl.Namespace Create(Scriptable scope, Rhino.Xmlimpl.Namespace prototype, XmlNode.Namespace @namespace)
+		internal static Rhino.Xmlimpl.Namespace Create(Scriptable scope, Rhino.Xmlimpl.Namespace prototype, Rhino.Xmlimpl.XmlNode.Namespace @namespace)
 		{
 			Rhino.Xmlimpl.Namespace rv = new Rhino.Xmlimpl.Namespace();
 			rv.SetParentScope(scope);
@@ -40,7 +40,7 @@ namespace Rhino.Xmlimpl
 			return rv;
 		}
 
-		internal XmlNode.Namespace GetDelegate()
+		internal Rhino.Xmlimpl.XmlNode.Namespace GetDelegate()
 		{
 			return ns;
 		}
@@ -336,7 +336,7 @@ L0_break: ;
 		internal virtual Rhino.Xmlimpl.Namespace NewNamespace(string uri)
 		{
 			Rhino.Xmlimpl.Namespace prototype = (this.prototype == null) ? this : this.prototype;
-			return Create(this.GetParentScope(), prototype, XmlNode.Namespace.Create(uri));
+			return Create(this.GetParentScope(), prototype, Rhino.Xmlimpl.XmlNode.Namespace.Create(uri));
 		}
 
 		internal virtual Rhino.Xmlimpl.Namespace NewNamespace(string prefix, string uri)
@@ -346,7 +346,7 @@ L0_break: ;
 				return NewNamespace(uri);
 			}
 			Rhino.Xmlimpl.Namespace prototype = (this.prototype == null) ? this : this.prototype;
-			return Create(this.GetParentScope(), prototype, XmlNode.Namespace.Create(prefix, uri));
+			return Create(this.GetParentScope(), prototype, Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri));
 		}
 
 		internal virtual Rhino.Xmlimpl.Namespace ConstructNamespace(object uriValue)

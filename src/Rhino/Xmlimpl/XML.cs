@@ -8,7 +8,6 @@
 
 using System;
 using System.Text;
-using System.Xml;
 using Rhino;
 using Rhino.Xml;
 using Rhino.Xmlimpl;
@@ -21,14 +20,14 @@ namespace Rhino.Xmlimpl
 	{
 		internal const long serialVersionUID = -630969919086449092L;
 
-		private XmlNode node;
+		private Rhino.Xmlimpl.XmlNode node;
 
-		internal XML(XMLLibImpl lib, Scriptable scope, XMLObject prototype, XmlNode node) : base(lib, scope, prototype)
+		internal XML(XMLLibImpl lib, Scriptable scope, XMLObject prototype, Rhino.Xmlimpl.XmlNode node) : base(lib, scope, prototype)
 		{
 			Initialize(node);
 		}
 
-		internal virtual void Initialize(XmlNode node)
+		internal virtual void Initialize(Rhino.Xmlimpl.XmlNode node)
 		{
 			this.node = node;
 			this.node.SetXml(this);
@@ -66,7 +65,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal virtual XmlNode GetAnnotation()
+		internal virtual Rhino.Xmlimpl.XmlNode GetAnnotation()
 		{
 			return node;
 		}
@@ -139,7 +138,7 @@ namespace Rhino.Xmlimpl
 		//    Methods that merit further review
 		//
 		//
-		internal virtual XmlNode.QName GetNodeQname()
+		internal virtual Rhino.Xmlimpl.XmlNode.QName GetNodeQname()
 		{
 			return this.node.GetQname();
 		}
@@ -150,7 +149,7 @@ namespace Rhino.Xmlimpl
 			{
 				return null;
 			}
-			XmlNode[] children = this.node.GetMatchingChildren(XmlNode.Filter.TRUE);
+			Rhino.Xmlimpl.XmlNode[] children = this.node.GetMatchingChildren(Rhino.Xmlimpl.XmlNode.Filter.TRUE);
 			Rhino.Xmlimpl.XML[] rv = new Rhino.Xmlimpl.XML[children.Length];
 			for (int i = 0; i < rv.Length; i++)
 			{
@@ -161,7 +160,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual Rhino.Xmlimpl.XML[] GetAttributes()
 		{
-			XmlNode[] attributes = this.node.GetAttributes();
+			Rhino.Xmlimpl.XmlNode[] attributes = this.node.GetAttributes();
 			Rhino.Xmlimpl.XML[] rv = new Rhino.Xmlimpl.XML[attributes.Length];
 			for (int i = 0; i < rv.Length; i++)
 			{
@@ -254,7 +253,7 @@ namespace Rhino.Xmlimpl
 			this.node.Normalize();
 		}
 
-		private Rhino.Xmlimpl.XML ToXML(XmlNode node)
+		private Rhino.Xmlimpl.XML ToXML(Rhino.Xmlimpl.XmlNode node)
 		{
 			if (node.GetXml() == null)
 			{
@@ -292,7 +291,7 @@ namespace Rhino.Xmlimpl
 			XMLList rv = NewXMLList();
 			rv.SetTargets(this, name.ToQname());
 			//    TODO    Should have an XMLNode.Filter implementation based on XMLName
-			XmlNode[] elements = this.node.GetMatchingChildren(XmlNode.Filter.ELEMENT);
+			Rhino.Xmlimpl.XmlNode[] elements = this.node.GetMatchingChildren(Rhino.Xmlimpl.XmlNode.Filter.ELEMENT);
 			for (int i = 0; i < elements.Length; i++)
 			{
 				if (name.Matches(ToXML(elements[i])))
@@ -309,7 +308,7 @@ namespace Rhino.Xmlimpl
 			XMLList rv = NewXMLList();
 			//    TODO    Should this also match processing instructions?  If so, we have to change the filter and also the XMLName
 			//            class to add an acceptsProcessingInstruction() method
-			XmlNode[] elements = this.node.GetMatchingChildren(XmlNode.Filter.ELEMENT);
+			Rhino.Xmlimpl.XmlNode[] elements = this.node.GetMatchingChildren(Rhino.Xmlimpl.XmlNode.Filter.ELEMENT);
 			for (int i = 0; i < elements.Length; i++)
 			{
 				if (xmlName.MatchesElement(elements[i].GetQname()))
@@ -332,7 +331,7 @@ namespace Rhino.Xmlimpl
 			XMLList rv = NewXMLList();
 			XMLName all = XMLName.FormStar();
 			rv.SetTargets(this, all.ToQname());
-			XmlNode[] children = this.node.GetMatchingChildren(XmlNode.Filter.TRUE);
+			Rhino.Xmlimpl.XmlNode[] children = this.node.GetMatchingChildren(Rhino.Xmlimpl.XmlNode.Filter.TRUE);
 			for (int i = 0; i < children.Length; i++)
 			{
 				rv.AddToList(ToXML(children[i]));
@@ -354,7 +353,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual Rhino.Xmlimpl.XML GetXmlChild(int index)
 		{
-			XmlNode child = this.node.GetChild(index);
+			Rhino.Xmlimpl.XmlNode child = this.node.GetChild(index);
 			if (child.GetXml() == null)
 			{
 				child.SetXml(NewXML(child));
@@ -464,7 +463,7 @@ namespace Rhino.Xmlimpl
 
 		internal override object Parent()
 		{
-			XmlNode parent = this.node.Parent();
+			Rhino.Xmlimpl.XmlNode parent = this.node.Parent();
 			if (parent == null)
 			{
 				return null;
@@ -506,21 +505,21 @@ namespace Rhino.Xmlimpl
 		internal override XMLList Comments()
 		{
 			XMLList rv = NewXMLList();
-			this.node.AddMatchingChildren(rv, XmlNode.Filter.COMMENT);
+			this.node.AddMatchingChildren(rv, Rhino.Xmlimpl.XmlNode.Filter.COMMENT);
 			return rv;
 		}
 
 		internal override XMLList Text()
 		{
 			XMLList rv = NewXMLList();
-			this.node.AddMatchingChildren(rv, XmlNode.Filter.TEXT);
+			this.node.AddMatchingChildren(rv, Rhino.Xmlimpl.XmlNode.Filter.TEXT);
 			return rv;
 		}
 
 		internal override XMLList ProcessingInstructions(XMLName xmlName)
 		{
 			XMLList rv = NewXMLList();
-			this.node.AddMatchingChildren(rv, XmlNode.Filter.PROCESSING_INSTRUCTION(xmlName));
+			this.node.AddMatchingChildren(rv, Rhino.Xmlimpl.XmlNode.Filter.PROCESSING_INSTRUCTION(xmlName));
 			return rv;
 		}
 
@@ -533,18 +532,18 @@ namespace Rhino.Xmlimpl
 		//    going to insert into?  insertAfter might get confused about where to
 		//    insert.  This actually came up with SpiderMonkey, leading to a (very)
 		//    long discussion.  See bug #354145.
-		private XmlNode[] GetNodesForInsert(object value)
+		private Rhino.Xmlimpl.XmlNode[] GetNodesForInsert(object value)
 		{
 			if (value is Rhino.Xmlimpl.XML)
 			{
-				return new XmlNode[] { ((Rhino.Xmlimpl.XML)value).node };
+				return new Rhino.Xmlimpl.XmlNode[] { ((Rhino.Xmlimpl.XML)value).node };
 			}
 			else
 			{
 				if (value is XMLList)
 				{
 					XMLList list = (XMLList)value;
-					XmlNode[] rv = new XmlNode[list.Length()];
+					Rhino.Xmlimpl.XmlNode[] rv = new Rhino.Xmlimpl.XmlNode[list.Length()];
 					for (int i = 0; i < list.Length(); i++)
 					{
 						rv[i] = list.Item(i).node;
@@ -553,7 +552,7 @@ namespace Rhino.Xmlimpl
 				}
 				else
 				{
-					return new XmlNode[] { XmlNode.CreateText(GetProcessor(), ScriptRuntime.ToString(value)) };
+					return new Rhino.Xmlimpl.XmlNode[] { Rhino.Xmlimpl.XmlNode.CreateText(GetProcessor(), ScriptRuntime.ToString(value)) };
 				}
 			}
 		}
@@ -584,7 +583,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (this.node.IsParentType())
 			{
-				XmlNode[] nodes = GetNodesForInsert(xml);
+				Rhino.Xmlimpl.XmlNode[] nodes = GetNodesForInsert(xml);
 				this.node.InsertChildrenAt(this.node.GetChildCount(), nodes);
 			}
 			return this;
@@ -611,7 +610,7 @@ namespace Rhino.Xmlimpl
 			}
 			else
 			{
-				XmlNode[] toInsert = GetNodesForInsert(xml);
+				Rhino.Xmlimpl.XmlNode[] toInsert = GetNodesForInsert(xml);
 				int index = GetChildIndexOf(child);
 				if (index != -1)
 				{
@@ -630,7 +629,7 @@ namespace Rhino.Xmlimpl
 			}
 			else
 			{
-				XmlNode[] toInsert = GetNodesForInsert(xml);
+				Rhino.Xmlimpl.XmlNode[] toInsert = GetNodesForInsert(xml);
 				int index = GetChildIndexOf(child);
 				if (index != -1)
 				{
@@ -651,7 +650,7 @@ namespace Rhino.Xmlimpl
 			{
 				this.node.RemoveChild(0);
 			}
-			XmlNode[] toInsert = GetNodesForInsert(xml);
+			Rhino.Xmlimpl.XmlNode[] toInsert = GetNodesForInsert(xml);
 			// append new children
 			this.node.InsertChildrenAt(0, toInsert);
 			return this;
@@ -688,19 +687,19 @@ namespace Rhino.Xmlimpl
 
 		internal virtual Rhino.Xmlimpl.Namespace[] InScopeNamespaces()
 		{
-			XmlNode.Namespace[] inScope = this.node.GetInScopeNamespaces();
+			Rhino.Xmlimpl.XmlNode.Namespace[] inScope = this.node.GetInScopeNamespaces();
 			return CreateNamespaces(inScope);
 		}
 
-		private XmlNode.Namespace Adapt(Rhino.Xmlimpl.Namespace ns)
+		private Rhino.Xmlimpl.XmlNode.Namespace Adapt(Rhino.Xmlimpl.Namespace ns)
 		{
 			if (ns.Prefix() == null)
 			{
-				return XmlNode.Namespace.Create(ns.Uri());
+				return Rhino.Xmlimpl.XmlNode.Namespace.Create(ns.Uri());
 			}
 			else
 			{
-				return XmlNode.Namespace.Create(ns.Prefix(), ns.Uri());
+				return Rhino.Xmlimpl.XmlNode.Namespace.Create(ns.Prefix(), ns.Uri());
 			}
 		}
 
@@ -735,7 +734,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual Rhino.Xmlimpl.Namespace[] NamespaceDeclarations()
 		{
-			XmlNode.Namespace[] declarations = node.GetNamespaceDeclarations();
+			Rhino.Xmlimpl.XmlNode.Namespace[] declarations = node.GetNamespaceDeclarations();
 			return CreateNamespaces(declarations);
 		}
 
@@ -864,7 +863,7 @@ namespace Rhino.Xmlimpl
 				StringBuilder rv = new StringBuilder();
 				for (int i = 0; i < this.node.GetChildCount(); i++)
 				{
-					XmlNode child = this.node.GetChild(i);
+					Rhino.Xmlimpl.XmlNode child = this.node.GetChild(i);
 					if (!child.IsProcessingInstructionType() && !child.IsCommentType())
 					{
 						// TODO: Probably inefficient; taking clean non-optimized
@@ -919,7 +918,7 @@ namespace Rhino.Xmlimpl
 		}
 
 		//    Support experimental Java interface
-		internal virtual XmlNode ToDomNode()
+		internal virtual System.Xml.XmlNode ToDomNode()
 		{
 			return node.ToDomNode();
 		}

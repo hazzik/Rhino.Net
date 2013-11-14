@@ -76,7 +76,7 @@ namespace Rhino.Tools.Shell
 					return m.Invoke(obj, args);
 				}
 			}
-			catch (NoSuchMethodException)
+			catch (MissingMethodException)
 			{
 			}
 			catch (ArgumentException)
@@ -442,7 +442,7 @@ namespace Rhino.Tools.Shell
 					return GetJLineShellConsoleV1(classLoader, readerClass, scope, cs);
 				}
 			}
-			catch (NoSuchMethodException)
+			catch (MissingMethodException)
 			{
 			}
 			catch (MemberAccessException)
@@ -457,7 +457,7 @@ namespace Rhino.Tools.Shell
 			return null;
 		}
 
-		/// <exception cref="Sharpen.NoSuchMethodException"></exception>
+		/// <exception cref="System.MissingMethodException"></exception>
 		/// <exception cref="Sharpen.InstantiationException"></exception>
 		/// <exception cref="System.MemberAccessException"></exception>
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
@@ -475,7 +475,7 @@ namespace Rhino.Tools.Shell
 			return new ShellConsole.JLineShellConsoleV1(reader, cs);
 		}
 
-		/// <exception cref="Sharpen.NoSuchMethodException"></exception>
+		/// <exception cref="System.MissingMethodException"></exception>
 		/// <exception cref="Sharpen.InstantiationException"></exception>
 		/// <exception cref="System.MemberAccessException"></exception>
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
@@ -510,7 +510,7 @@ namespace Rhino.Tools.Shell
 
 		private Scriptable global;
 
-		/// <exception cref="Sharpen.NoSuchMethodException"></exception>
+		/// <exception cref="System.MissingMethodException"></exception>
 		internal FlexibleCompletor(Type completorClass, Scriptable global)
 		{
 			this.global = global;

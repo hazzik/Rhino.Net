@@ -20,6 +20,7 @@
 -fullyQualify SocketAddress
 -fullyQualify Test
 -fullyQualify Thread
+-fullyQualify XmlNode
 
 -typeMapping com.db4o.ObjectSet Db4objects.Db4o.IObjectSet 
 -typeMapping java.io.CharArrayWriter System.IO.StringWriter
@@ -74,6 +75,12 @@
 -typeMapping java.util.zip.Deflater ICSharpCode.SharpZipLib.Zip.Compression.Deflater
 -typeMapping java.util.zip.Inflater ICSharpCode.SharpZipLib.Zip.Compression.Inflater
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
+-typeMapping org.w3c.dom.Comment System.Xml.XmlComment
+-typeMapping org.w3c.dom.Document System.Xml.XmlDocument
+-typeMapping org.w3c.dom.Element System.Xml.XmlElement
+-typeMapping org.w3c.dom.Node System.Xml.XmlNode
+-typeMapping org.w3c.dom.NodeList System.Xml.XmlNodeList
+-typeMapping org.w3c.dom.Text System.Xml.XmlText
 
 -methodMapping com.db4o.ObjectSet.hasNext Db4objects.Db4o.IObjectSet.HasNext 
 -methodMapping com.db4o.ObjectSet.next Db4objects.Db4o.IObjectSet.Next  
@@ -148,6 +155,7 @@
 -methodMapping java.util.zip.Deflater.end Finish
 -methodMapping java.util.zip.Inflater.end Finish
 -methodMapping System.out.println System.Console.WriteLine
+-methodMapping org.w3c.dom.NodeList.getParentNode Parent
 
 -propertyMapping java.lang.Class.getPackage Assembly
 -propertyMapping java.lang.Class.getSimpleName Name
@@ -182,6 +190,14 @@
 -propertyMapping java.util.zip.Inflater.getBytesRead TotalIn
 -propertyMapping java.util.zip.Inflater.getRemaining RemainingInput
 -propertyMapping java.util.zip.Inflater.needsInput IsNeedingInput
+-propertyMapping org.w3c.dom.Document.getDocumentElement DocumentElement
+-propertyMapping org.w3c.dom.Node.getChildNodes ChildNodes
+-propertyMapping org.w3c.dom.Node.getOwnerDocument OwnerDocument
+-propertyMapping org.w3c.dom.Node.getParentNode ParentNode
+-propertyMapping org.w3c.dom.Node.getTextContent InnerText
+-propertyMapping org.w3c.dom.Node.setParentNode ParentNode
+-propertyMapping org.w3c.dom.Node.setTextContent InnerText
+-propertyMapping org.w3c.dom.NodeList.getLength Count
 
 -fieldMapping java.util.Locale.ENGLISH Sharpen.Extensions.GetEnglishCulture()
 -fieldMapping java.util.Locale.GERMAN Sharpen.Extensions.GetGermanCulture()

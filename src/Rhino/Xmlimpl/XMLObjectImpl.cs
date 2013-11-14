@@ -55,12 +55,12 @@ namespace Rhino.Xmlimpl
 			return lib;
 		}
 
-		internal XML NewXML(XmlNode node)
+		internal XML NewXML(Rhino.Xmlimpl.XmlNode node)
 		{
 			return lib.NewXML(node);
 		}
 
-		internal virtual XML XmlFromNode(XmlNode node)
+		internal virtual XML XmlFromNode(Rhino.Xmlimpl.XmlNode node)
 		{
 			if (node.GetXml() == null)
 			{
@@ -89,21 +89,21 @@ namespace Rhino.Xmlimpl
 			return lib.NewQName(uri, localName, prefix);
 		}
 
-		internal QName NewQName(XmlNode.QName name)
+		internal QName NewQName(Rhino.Xmlimpl.XmlNode.QName name)
 		{
 			return lib.NewQName(name);
 		}
 
-		internal Namespace CreateNamespace(XmlNode.Namespace declaration)
+		internal Namespace CreateNamespace(Rhino.Xmlimpl.XmlNode.Namespace declaration)
 		{
 			if (declaration == null)
 			{
 				return null;
 			}
-			return lib.CreateNamespaces(new XmlNode.Namespace[] { declaration })[0];
+			return lib.CreateNamespaces(new Rhino.Xmlimpl.XmlNode.Namespace[] { declaration })[0];
 		}
 
-		internal Namespace[] CreateNamespaces(XmlNode.Namespace[] declarations)
+		internal Namespace[] CreateNamespaces(Rhino.Xmlimpl.XmlNode.Namespace[] declarations)
 		{
 			return lib.CreateNamespaces(declarations);
 		}
@@ -406,7 +406,7 @@ namespace Rhino.Xmlimpl
 				// or DESCENDANTS_FLAG has to be set
 				throw Kit.CodeBug();
 			}
-			XmlNode.QName qname = lib.ToNodeQName(cx, elem, attribute);
+			Rhino.Xmlimpl.XmlNode.QName qname = lib.ToNodeQName(cx, elem, attribute);
 			XMLName rv = XMLName.Create(qname, attribute, descendants);
 			rv.InitXMLObject(this);
 			return rv;
@@ -1500,7 +1500,7 @@ L0_break: ;
 
 				case Id_attributes:
 				{
-					return realThis.GetMatches(XMLName.Create(XmlNode.QName.Create(null, null), true, false));
+					return realThis.GetMatches(XMLName.Create(Rhino.Xmlimpl.XmlNode.QName.Create(null, null), true, false));
 				}
 
 				case Id_child:
@@ -1541,7 +1541,7 @@ L0_break: ;
 
 				case Id_descendants:
 				{
-					XmlNode.QName qname = (args.Length == 0) ? XmlNode.QName.Create(null, null) : lib.ToNodeQName(cx, args[0], false);
+					Rhino.Xmlimpl.XmlNode.QName qname = (args.Length == 0) ? Rhino.Xmlimpl.XmlNode.QName.Create(null, null) : lib.ToNodeQName(cx, args[0], false);
 					return realThis.GetMatches(XMLName.Create(qname, false, true));
 				}
 
@@ -1628,7 +1628,7 @@ L0_break: ;
 			return (i < args.Length) ? args[i] : Undefined.instance;
 		}
 
-		internal XML NewTextElementXML(XmlNode reference, XmlNode.QName qname, string value)
+		internal XML NewTextElementXML(Rhino.Xmlimpl.XmlNode reference, Rhino.Xmlimpl.XmlNode.QName qname, string value)
 		{
 			return lib.NewTextElementXML(reference, qname, value);
 		}
@@ -1652,7 +1652,7 @@ L0_break: ;
 
 		internal XML CreateEmptyXML()
 		{
-			return NewXML(XmlNode.CreateEmpty(GetProcessor()));
+			return NewXML(Rhino.Xmlimpl.XmlNode.CreateEmpty(GetProcessor()));
 		}
 	}
 }

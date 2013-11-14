@@ -217,7 +217,7 @@ namespace Rhino.Xmlimpl
 		}
 
 		// document builders that don't support reset() can't be pooled
-		private void AddProcessingInstructionsTo(IList<XmlNode> list, XmlNode node)
+		private void AddProcessingInstructionsTo(IList<System.Xml.XmlNode> list, System.Xml.XmlNode node)
 		{
 			if (node is ProcessingInstruction)
 			{
@@ -232,7 +232,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		private void AddCommentsTo(IList<XmlNode> list, XmlNode node)
+		private void AddCommentsTo(IList<System.Xml.XmlNode> list, System.Xml.XmlNode node)
 		{
 			if (node is XmlComment)
 			{
@@ -247,7 +247,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		private void AddTextNodesToRemoveAndTrim(IList<XmlNode> toRemove, XmlNode node)
+		private void AddTextNodesToRemoveAndTrim(IList<System.Xml.XmlNode> toRemove, System.Xml.XmlNode node)
 		{
 			if (node is XmlText)
 			{
@@ -279,7 +279,7 @@ namespace Rhino.Xmlimpl
 		}
 
 		/// <exception cref="Org.Xml.Sax.SAXException"></exception>
-		internal XmlNode ToXml(string defaultNamespaceUri, string xml)
+		internal System.Xml.XmlNode ToXml(string defaultNamespaceUri, string xml)
 		{
 			//    See ECMA357 10.3.1
 			DocumentBuilder builder = null;
@@ -290,18 +290,18 @@ namespace Rhino.Xmlimpl
 				XmlDocument document = builder.Parse(new InputSource(new StringReader(syntheticXml)));
 				if (ignoreProcessingInstructions)
 				{
-					IList<XmlNode> list = new AList<XmlNode>();
+					IList<System.Xml.XmlNode> list = new AList<System.Xml.XmlNode>();
 					AddProcessingInstructionsTo(list, document);
-					foreach (XmlNode node in list)
+					foreach (System.Xml.XmlNode node in list)
 					{
 						node.ParentNode.RemoveChild(node);
 					}
 				}
 				if (ignoreComments)
 				{
-					IList<XmlNode> list = new AList<XmlNode>();
+					IList<System.Xml.XmlNode> list = new AList<System.Xml.XmlNode>();
 					AddCommentsTo(list, document);
-					foreach (XmlNode node in list)
+					foreach (System.Xml.XmlNode node in list)
 					{
 						node.ParentNode.RemoveChild(node);
 					}
@@ -312,9 +312,9 @@ namespace Rhino.Xmlimpl
 					//    Refers to element-only content models, which means we would need to have a validating parser and DTD or schema
 					//    so that it would know which whitespace to ignore.
 					//    Instead we will try to delete it ourselves.
-					IList<XmlNode> list = new AList<XmlNode>();
+					IList<System.Xml.XmlNode> list = new AList<System.Xml.XmlNode>();
 					AddTextNodesToRemoveAndTrim(list, document);
-					foreach (XmlNode node in list)
+					foreach (System.Xml.XmlNode node in list)
 					{
 						node.ParentNode.RemoveChild(node);
 					}
@@ -328,12 +328,12 @@ namespace Rhino.Xmlimpl
 				{
 					if (rv.Count == 0)
 					{
-						XmlNode node = document.CreateTextNode(string.Empty);
+						System.Xml.XmlNode node = document.CreateTextNode(string.Empty);
 						return node;
 					}
 					else
 					{
-						XmlNode node = rv.Item(0);
+						System.Xml.XmlNode node = rv.Item(0);
 						document.DocumentElement.RemoveChild(node);
 						return node;
 					}
@@ -380,7 +380,7 @@ namespace Rhino.Xmlimpl
 		}
 
 		//    TODO    Cannot remember what this is for, so whether it should use settings or not
-		private string ToString(XmlNode node)
+		private string ToString(System.Xml.XmlNode node)
 		{
 			DOMSource source = new DOMSource(node);
 			StringWriter writer = new StringWriter();
@@ -459,7 +459,7 @@ namespace Rhino.Xmlimpl
 			return ToString(copy);
 		}
 
-		internal string EcmaToXmlString(XmlNode node)
+		internal string EcmaToXmlString(System.Xml.XmlNode node)
 		{
 			//    See ECMA 357 Section 10.2.1
 			StringBuilder s = new StringBuilder();
@@ -516,7 +516,7 @@ namespace Rhino.Xmlimpl
 			string beforeContent = s.ToString();
 			//    We "mark" all the nodes first; if we tried to do this loop otherwise, it would behave unexpectedly (the inserted nodes
 			//    would contribute to the length and it might never terminate).
-			AList<XmlNode> toIndent = new AList<XmlNode>();
+			AList<System.Xml.XmlNode> toIndent = new AList<System.Xml.XmlNode>();
 			bool indentChildren = false;
 			for (int i_2 = 0; i_2 < e.ChildNodes.Count; i_2++)
 			{

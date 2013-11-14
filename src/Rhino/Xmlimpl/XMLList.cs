@@ -19,24 +19,24 @@ namespace Rhino.Xmlimpl
 	{
 		internal const long serialVersionUID = -4543618751670781135L;
 
-		private XmlNode.InternalList _annos;
+		private Rhino.Xmlimpl.XmlNode.InternalList _annos;
 
 		private XMLObjectImpl targetObject = null;
 
-		private XmlNode.QName targetProperty = null;
+		private Rhino.Xmlimpl.XmlNode.QName targetProperty = null;
 
 		internal XMLList(XMLLibImpl lib, Scriptable scope, XMLObject prototype) : base(lib, scope, prototype)
 		{
-			_annos = new XmlNode.InternalList();
+			_annos = new Rhino.Xmlimpl.XmlNode.InternalList();
 		}
 
-		internal virtual XmlNode.InternalList GetNodeList()
+		internal virtual Rhino.Xmlimpl.XmlNode.InternalList GetNodeList()
 		{
 			return _annos;
 		}
 
 		//    TODO    Should be XMLObjectImpl, XMLName?
-		internal virtual void SetTargets(XMLObjectImpl @object, XmlNode.QName property)
+		internal virtual void SetTargets(XMLObjectImpl @object, Rhino.Xmlimpl.XmlNode.QName property)
 		{
 			targetObject = @object;
 			targetProperty = property;
@@ -65,7 +65,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (index < Length())
 			{
-				XmlNode.InternalList newAnnoList = new XmlNode.InternalList();
+				Rhino.Xmlimpl.XmlNode.InternalList newAnnoList = new Rhino.Xmlimpl.XmlNode.InternalList();
 				newAnnoList.Add(_annos, 0, index);
 				newAnnoList.Add(xml);
 				newAnnoList.Add(_annos, index + 1, Length());
@@ -77,7 +77,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (index < Length())
 			{
-				XmlNode.InternalList newAnnoList = new XmlNode.InternalList();
+				Rhino.Xmlimpl.XmlNode.InternalList newAnnoList = new Rhino.Xmlimpl.XmlNode.InternalList();
 				newAnnoList.Add(_annos, 0, index);
 				newAnnoList.Add(xml);
 				newAnnoList.Add(_annos, index, Length());
@@ -339,7 +339,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		private XML GetXML(XmlNode.InternalList _annos, int index)
+		private XML GetXML(Rhino.Xmlimpl.XmlNode.InternalList _annos, int index)
 		{
 			if (index >= 0 && index < Length())
 			{
@@ -811,7 +811,7 @@ namespace Rhino.Xmlimpl
 		private Rhino.Xmlimpl.XMLList GetPropertyList(XMLName name)
 		{
 			Rhino.Xmlimpl.XMLList propertyList = NewXMLList();
-			XmlNode.QName qname = null;
+			Rhino.Xmlimpl.XmlNode.QName qname = null;
 			if (!name.IsDescendants() && !name.IsAttributeName())
 			{
 				// Only set the targetProperty if this is a regular child get

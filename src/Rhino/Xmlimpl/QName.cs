@@ -26,13 +26,13 @@ namespace Rhino.Xmlimpl
 
 		private Rhino.Xmlimpl.QName prototype;
 
-		private XmlNode.QName delegate_;
+		private Rhino.Xmlimpl.XmlNode.QName delegate_;
 
 		private QName()
 		{
 		}
 
-		internal static Rhino.Xmlimpl.QName Create(XMLLibImpl lib, Scriptable scope, Rhino.Xmlimpl.QName prototype, XmlNode.QName delegate_)
+		internal static Rhino.Xmlimpl.QName Create(XMLLibImpl lib, Scriptable scope, Rhino.Xmlimpl.QName prototype, Rhino.Xmlimpl.XmlNode.QName delegate_)
 		{
 			Rhino.Xmlimpl.QName rv = new Rhino.Xmlimpl.QName();
 			rv.lib = lib;
@@ -101,12 +101,12 @@ namespace Rhino.Xmlimpl
 		}
 
 		[System.ObsoleteAttribute(@"")]
-		internal XmlNode.QName ToNodeQname()
+		internal Rhino.Xmlimpl.XmlNode.QName ToNodeQname()
 		{
 			return delegate_;
 		}
 
-		internal XmlNode.QName GetDelegate()
+		internal Rhino.Xmlimpl.XmlNode.QName GetDelegate()
 		{
 			return delegate_;
 		}
@@ -377,16 +377,16 @@ L0_break: ;
 			{
 				prototype = this;
 			}
-			XmlNode.Namespace ns = null;
+			Rhino.Xmlimpl.XmlNode.Namespace ns = null;
 			if (q_prefix != null)
 			{
-				ns = XmlNode.Namespace.Create(q_prefix, q_uri);
+				ns = Rhino.Xmlimpl.XmlNode.Namespace.Create(q_prefix, q_uri);
 			}
 			else
 			{
 				if (q_uri != null)
 				{
-					ns = XmlNode.Namespace.Create(q_uri);
+					ns = Rhino.Xmlimpl.XmlNode.Namespace.Create(q_uri);
 				}
 				else
 				{
@@ -397,7 +397,7 @@ L0_break: ;
 			{
 				q_localName = null;
 			}
-			return Create(lib, this.GetParentScope(), prototype, XmlNode.QName.Create(ns, q_localName));
+			return Create(lib, this.GetParentScope(), prototype, Rhino.Xmlimpl.XmlNode.QName.Create(ns, q_localName));
 		}
 
 		//    See ECMA357 13.3.2

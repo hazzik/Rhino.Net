@@ -148,10 +148,10 @@ namespace Rhino.Tools.Shell
 			// System.setIn(consoleTextArea.getIn());
 			// System.setOut(consoleTextArea.getOut());
 			// System.setErr(consoleTextArea.getErr());
-			Rhino.Tools.Shell.Program.SetIn(consoleTextArea.GetIn());
-			Rhino.Tools.Shell.Program.SetOut(consoleTextArea.GetOut());
-			Rhino.Tools.Shell.Program.SetErr(consoleTextArea.GetErr());
-			Rhino.Tools.Shell.Program.Main(args);
+			Program.SetIn(consoleTextArea.GetIn());
+			Program.SetOut(consoleTextArea.GetOut());
+			Program.SetErr(consoleTextArea.GetErr());
+			Program.Main(args);
 		}
 
 		private sealed class _WindowAdapter_135 : WindowAdapter

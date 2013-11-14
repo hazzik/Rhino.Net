@@ -129,7 +129,7 @@ namespace Rhino.Xmlimpl
 			return false;
 		}
 
-		private XmlNode.QName qname;
+		private Rhino.Xmlimpl.XmlNode.QName qname;
 
 		private bool isAttributeName;
 
@@ -144,26 +144,26 @@ namespace Rhino.Xmlimpl
 		internal static Rhino.Xmlimpl.XMLName FormStar()
 		{
 			Rhino.Xmlimpl.XMLName rv = new Rhino.Xmlimpl.XMLName();
-			rv.qname = XmlNode.QName.Create(null, null);
+			rv.qname = Rhino.Xmlimpl.XmlNode.QName.Create(null, null);
 			return rv;
 		}
 
 		[System.ObsoleteAttribute(@"")]
-		internal static Rhino.Xmlimpl.XMLName FormProperty(XmlNode.Namespace @namespace, string localName)
+		internal static Rhino.Xmlimpl.XMLName FormProperty(Rhino.Xmlimpl.XmlNode.Namespace @namespace, string localName)
 		{
 			if (localName != null && localName.Equals("*"))
 			{
 				localName = null;
 			}
 			Rhino.Xmlimpl.XMLName rv = new Rhino.Xmlimpl.XMLName();
-			rv.qname = XmlNode.QName.Create(@namespace, localName);
+			rv.qname = Rhino.Xmlimpl.XmlNode.QName.Create(@namespace, localName);
 			return rv;
 		}
 
 		/// <summary>TODO: marked deprecated by original author</summary>
 		internal static Rhino.Xmlimpl.XMLName FormProperty(string uri, string localName)
 		{
-			return FormProperty(XmlNode.Namespace.Create(uri), localName);
+			return FormProperty(Rhino.Xmlimpl.XmlNode.Namespace.Create(uri), localName);
 		}
 
 		/// <summary>TODO: marked deprecated by original implementor</summary>
@@ -197,7 +197,7 @@ namespace Rhino.Xmlimpl
 			return Rhino.Xmlimpl.XMLName.FormProperty(defaultNamespaceUri, name);
 		}
 
-		internal static Rhino.Xmlimpl.XMLName Create(XmlNode.QName qname, bool attribute, bool descendants)
+		internal static Rhino.Xmlimpl.XMLName Create(Rhino.Xmlimpl.XmlNode.QName qname, bool attribute, bool descendants)
 		{
 			Rhino.Xmlimpl.XMLName rv = new Rhino.Xmlimpl.XMLName();
 			rv.qname = qname;
@@ -207,7 +207,7 @@ namespace Rhino.Xmlimpl
 		}
 
 		[System.ObsoleteAttribute(@"")]
-		internal static Rhino.Xmlimpl.XMLName Create(XmlNode.QName qname)
+		internal static Rhino.Xmlimpl.XMLName Create(Rhino.Xmlimpl.XmlNode.QName qname)
 		{
 			return Create(qname, false, false);
 		}
@@ -507,7 +507,7 @@ namespace Rhino.Xmlimpl
 			return buff.ToString();
 		}
 
-		internal XmlNode.QName ToQname()
+		internal Rhino.Xmlimpl.XmlNode.QName ToQname()
 		{
 			return this.qname;
 		}
@@ -517,7 +517,7 @@ namespace Rhino.Xmlimpl
 			return LocalName().Equals("*") || LocalName().Equals(localName);
 		}
 
-		internal bool MatchesElement(XmlNode.QName qname)
+		internal bool MatchesElement(Rhino.Xmlimpl.XmlNode.QName qname)
 		{
 			if (this.Uri() == null || this.Uri().Equals(qname.GetNamespace().GetUri()))
 			{
@@ -531,7 +531,7 @@ namespace Rhino.Xmlimpl
 
 		internal bool Matches(XML node)
 		{
-			XmlNode.QName qname = node.GetNodeQname();
+			Rhino.Xmlimpl.XmlNode.QName qname = node.GetNodeQname();
 			string nodeUri = null;
 			if (qname.GetNamespace() != null)
 			{
