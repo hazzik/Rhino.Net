@@ -2218,10 +2218,10 @@ namespace Rhino
 			}
 			// Special rules for numbers: NaN is considered the same value,
 			// while zeroes with different signs are considered different.
-			if (currentValue is Number && newValue is Number)
+			if (currentValue.IsNumber() && newValue.IsNumber())
 			{
-				double d1 = System.Convert.ToDouble(((Number)currentValue));
-				double d2 = System.Convert.ToDouble(((Number)newValue));
+				double d1 = System.Convert.ToDouble(currentValue);
+				double d2 = System.Convert.ToDouble(newValue);
 				if (double.IsNaN(d1) && double.IsNaN(d2))
 				{
 					return true;
@@ -3656,9 +3656,9 @@ namespace Rhino
 			}
 			else
 			{
-				if (key is Number)
+				if (key.IsNumber())
 				{
-					value = Get(System.Convert.ToInt32(((Number)key)), this);
+					value = Get(System.Convert.ToInt32(key), this);
 				}
 			}
 			if (value == ScriptableConstants.NOT_FOUND || value == Undefined.instance)

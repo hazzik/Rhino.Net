@@ -161,7 +161,7 @@ namespace Rhino.Xmlimpl
 				}
 				else
 				{
-					if (nameValue is bool || nameValue is Number || nameValue == Undefined.instance || nameValue == null)
+					if (nameValue is bool || nameValue.IsNumber()|| nameValue == Undefined.instance || nameValue == null)
 					{
 						throw BadXMLName(nameValue);
 					}
@@ -190,7 +190,7 @@ namespace Rhino.Xmlimpl
 		private static Exception BadXMLName(object value)
 		{
 			string msg;
-			if (value is Number)
+			if (value.IsNumber())
 			{
 				msg = "Can not construct XML name from number: ";
 			}
@@ -242,7 +242,7 @@ namespace Rhino.Xmlimpl
 					}
 					else
 					{
-						if (nameValue is bool || nameValue is Number || nameValue == Undefined.instance || nameValue == null)
+						if (nameValue is bool || nameValue.IsNumber()|| nameValue == Undefined.instance || nameValue == null)
 						{
 							throw BadXMLName(nameValue);
 						}
@@ -291,9 +291,9 @@ namespace Rhino.Xmlimpl
 				}
 				else
 				{
-					if (value is Number)
+					if (value.IsNumber())
 					{
-						double d = System.Convert.ToDouble(((Number)value));
+						double d = System.Convert.ToDouble(value);
 						long l = (long)d;
 						if (l == d && 0 <= l && l <= unchecked((long)(0xFFFFFFFFL)))
 						{
@@ -757,7 +757,7 @@ namespace Rhino.Xmlimpl
 				}
 				else
 				{
-					if (nameValue is bool || nameValue is Number || nameValue == Undefined.instance || nameValue == null)
+					if (nameValue is bool || nameValue.IsNumber()|| nameValue == Undefined.instance || nameValue == null)
 					{
 						throw BadXMLName(nameValue);
 					}

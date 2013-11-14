@@ -480,9 +480,9 @@ namespace Rhino.Xmlimpl
 			}
 			else
 			{
-				if (name is Number)
+				if (name.IsNumber())
 				{
-					double x = System.Convert.ToDouble(((Number)name));
+					double x = System.Convert.ToDouble(name);
 					// Check that number is positive 0
 					result = (x == 0.0 && 1.0 / x > 0);
 				}

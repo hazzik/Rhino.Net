@@ -618,7 +618,7 @@ namespace Rhino
 					}
 					else
 					{
-						if (value is Number)
+						if (value.IsNumber())
 						{
 							return JSTYPE_NUMBER;
 						}
@@ -1086,9 +1086,9 @@ namespace Rhino
 
 		private static double ToDouble(object value)
 		{
-			if (value is Number)
+			if (value.IsNumber())
 			{
-				return System.Convert.ToDouble(((Number)value));
+				return System.Convert.ToDouble(value);
 			}
 			else
 			{
@@ -1129,7 +1129,7 @@ namespace Rhino
 						{
 							try
 							{
-								return System.Convert.ToDouble(((Number)meth.Invoke(value, (object[])null)));
+								return System.Convert.ToDouble(meth.Invoke(value, (object[])null));
 							}
 							catch (MemberAccessException)
 							{

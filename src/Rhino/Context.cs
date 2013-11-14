@@ -1781,7 +1781,7 @@ namespace Rhino
 		/// <returns>value suitable to pass to any API that takes JavaScript values.</returns>
 		public static object JavaToJS(object value, Scriptable scope)
 		{
-			if (value is string || value is Number || value is bool || value is Scriptable)
+			if (value is string || value.IsNumber() || value is bool || value is Scriptable)
 			{
 				return value;
 			}

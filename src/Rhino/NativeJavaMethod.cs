@@ -83,7 +83,7 @@ namespace Rhino
 						}
 						else
 						{
-							if (value is Number)
+							if (value.IsNumber())
 							{
 								s = "number";
 							}

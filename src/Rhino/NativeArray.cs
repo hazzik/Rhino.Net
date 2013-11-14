@@ -518,9 +518,9 @@ again_break: ;
 			}
 			else
 			{
-				if (id is Number)
+				if (id.IsNumber())
 				{
-					return ToArrayIndex(System.Convert.ToDouble(((Number)id)));
+					return ToArrayIndex(System.Convert.ToDouble(id));
 				}
 			}
 			return -1;
@@ -797,14 +797,14 @@ again_break: ;
 			else
 			{
 				object arg0 = args[0];
-				if (args.Length > 1 || !(arg0 is Number))
+				if (args.Length > 1 || !(arg0.IsNumber()))
 				{
 					return new Rhino.NativeArray(args);
 				}
 				else
 				{
 					long len = ScriptRuntime.ToUint32(arg0);
-					if (len != System.Convert.ToDouble(((Number)arg0)))
+					if (len != System.Convert.ToDouble(arg0))
 					{
 						string msg = ScriptRuntime.GetMessage0("msg.arraylength.bad");
 						throw ScriptRuntime.ConstructError("RangeError", msg);

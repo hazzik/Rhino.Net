@@ -68,7 +68,7 @@ namespace Rhino
 			}
 			if (!IsJavaPrimitiveWrap())
 			{
-				if (obj is string || obj is Number || obj is bool)
+				if (obj is string || obj.IsNumber()|| obj is bool)
 				{
 					return obj;
 				}

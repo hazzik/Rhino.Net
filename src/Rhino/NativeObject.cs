@@ -546,9 +546,9 @@ namespace Rhino
 			}
 			else
 			{
-				if (key is Number)
+				if (key.IsNumber())
 				{
-					return Has(System.Convert.ToInt32(((Number)key)), this);
+					return Has(System.Convert.ToInt32(key), this);
 				}
 			}
 			return false;
@@ -575,9 +575,9 @@ namespace Rhino
 			}
 			else
 			{
-				if (key is Number)
+				if (key.IsNumber())
 				{
-					Delete(System.Convert.ToInt32(((Number)key)));
+					Delete(System.Convert.ToInt32(key));
 				}
 			}
 			return value;

@@ -471,9 +471,9 @@ namespace Rhino
 					string toISOString = "toISOString";
 					Scriptable o = ScriptRuntime.ToObject(cx, scope, thisObj);
 					object tv = ScriptRuntime.ToPrimitive(o, ScriptRuntime.NumberClass);
-					if (tv is Number)
+					if (tv.IsNumber())
 					{
-						double d = System.Convert.ToDouble(((Number)tv));
+						double d = System.Convert.ToDouble(tv);
 						if (d != d || System.Double.IsInfinity(d))
 						{
 							return null;

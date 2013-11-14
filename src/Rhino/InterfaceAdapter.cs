@@ -167,7 +167,7 @@ namespace Rhino
 				{
 					object arg = args[i];
 					// neutralize wrap factory java primitive wrap feature
-					if (!(arg is string || arg is Number || arg is bool))
+					if (!(arg is string || arg.IsNumber() || arg is bool))
 					{
 						args[i] = wf.Wrap(cx, topScope, arg, null);
 					}

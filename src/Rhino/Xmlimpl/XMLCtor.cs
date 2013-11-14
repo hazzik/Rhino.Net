@@ -68,7 +68,7 @@ namespace Rhino.Xmlimpl
 
 					case Id_prettyIndent:
 					{
-						if (!(value is Number))
+						if (!(value.IsNumber()))
 						{
 							continue;
 						}

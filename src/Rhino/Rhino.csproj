@@ -247,6 +247,7 @@
     <Compile Include="UintMap.cs" />
     <Compile Include="Undefined.cs" />
     <Compile Include="UniqueTag.cs" />
+    <Compile Include="Utils\NumberUtil.cs" />
     <Compile Include="V8dtoa\CachedPowers.cs" />
     <Compile Include="V8dtoa\DiyFp.cs" />
     <Compile Include="V8dtoa\DoubleHelper.cs" />

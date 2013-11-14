@@ -191,9 +191,9 @@ namespace Rhino
 		private static object Walk(Context cx, Scriptable scope, Callable reviver, Scriptable holder, object name)
 		{
 			object property;
-			if (name is Number)
+			if (name.IsNumber())
 			{
-				property = holder.Get(System.Convert.ToInt32(((Number)name)), holder);
+				property = holder.Get(System.Convert.ToInt32(name), holder);
 			}
 			else
 			{
@@ -244,9 +244,9 @@ namespace Rhino
 						object newElement = Walk(cx, scope, reviver, val, p);
 						if (newElement == Undefined.instance)
 						{
-							if (p is Number)
+							if (p.IsNumber())
 							{
-								val.Delete(System.Convert.ToInt32(((Number)p)));
+								val.Delete(System.Convert.ToInt32(p));
 							}
 							else
 							{
@@ -255,9 +255,9 @@ namespace Rhino
 						}
 						else
 						{
-							if (p is Number)
+							if (p.IsNumber())
 							{
-								val.Put(System.Convert.ToInt32(((Number)p)), val, newElement);
+								val.Put(System.Convert.ToInt32(p), val, newElement);
 							}
 							else
 							{
@@ -326,7 +326,7 @@ namespace Rhino
 					foreach (int i in replacerArray.GetIndexIds())
 					{
 						object v = replacerArray.Get(i, replacerArray);
-						if (v is string || v is Number)
+						if (v is string || v.IsNumber())
 						{
 							propertyList.Add(v);
 						}
@@ -351,7 +351,7 @@ namespace Rhino
 					space = ScriptRuntime.ToString(space);
 				}
 			}
-			if (space is Number)
+			if (space.IsNumber())
 			{
 				int gapLength = (int)ScriptRuntime.ToInteger(space);
 				gapLength = Math.Min(MAX_STRINGIFY_GAP_LENGTH, gapLength);
@@ -386,7 +386,7 @@ namespace Rhino
 			}
 			else
 			{
-				value = GetProperty(holder, System.Convert.ToInt32(((Number)key)));
+				value = GetProperty(holder, System.Convert.ToInt32(key));
 			}
 			if (value is Scriptable)
 			{
@@ -434,9 +434,9 @@ namespace Rhino
 			{
 				return Quote(value.ToString());
 			}
-			if (value is Number)
+			if (value.IsNumber())
 			{
-				double d = System.Convert.ToDouble(((Number)value));
+				double d = System.Convert.ToDouble(value);
 				if (d == d && d != double.PositiveInfinity && d != double.NegativeInfinity)
 				{
 					return ScriptRuntime.ToString(value);

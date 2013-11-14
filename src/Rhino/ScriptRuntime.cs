@@ -306,7 +306,7 @@ namespace Rhino
 			return Sharpen.Extensions.ValueOf(i);
 		}
 
-		public static Number WrapNumber(double x)
+		public static double WrapNumber(double x)
 		{
 			if (x != x)
 			{
@@ -336,9 +336,9 @@ namespace Rhino
 				{
 					return ((CharSequence)val).Length != 0;
 				}
-				if (val is Number)
+				if (val.IsNumber())
 				{
-					double d = System.Convert.ToDouble(((Number)val));
+					double d = System.Convert.ToDouble(val);
 					return (d == d && d != 0.0);
 				}
 				if (val is Scriptable)
@@ -374,9 +374,9 @@ namespace Rhino
 		{
 			for (; ; )
 			{
-				if (val is Number)
+				if (val.IsNumber())
 				{
-					return System.Convert.ToDouble(((Number)val));
+					return System.Convert.ToDouble(val);
 				}
 				if (val == null)
 				{
@@ -937,11 +937,11 @@ namespace Rhino
 				{
 					return val.ToString();
 				}
-				if (val is Number)
+				if (val.IsNumber())
 				{
 					// XXX should we just teach NativeNumber.stringValue()
 					// about Numbers?
-					return NumberToString(System.Convert.ToDouble(((Number)val)), 10);
+					return NumberToString(System.Convert.ToDouble(val), 10);
 				}
 				if (val is Scriptable)
 				{
@@ -1033,9 +1033,9 @@ namespace Rhino
 				sb.Append('\"');
 				return sb.ToString();
 			}
-			if (value is Number)
+			if (value.IsNumber())
 			{
-				double d = System.Convert.ToDouble(((Number)value));
+				double d = System.Convert.ToDouble(value);
 				if (d == 0 && 1 / d < 0)
 				{
 					return "-0";
@@ -1230,9 +1230,9 @@ namespace Rhino
 				SetBuiltinProtoAndParent(result, scope, TopLevel.Builtins.String);
 				return result;
 			}
-			if (val is Number)
+			if (val.IsNumber())
 			{
-				NativeNumber result = new NativeNumber(System.Convert.ToDouble(((Number)val)));
+				NativeNumber result = new NativeNumber(System.Convert.ToDouble(val));
 				SetBuiltinProtoAndParent(result, scope, TopLevel.Builtins.Number);
 				return result;
 			}
@@ -1655,9 +1655,9 @@ namespace Rhino
 		/// </remarks>
 		internal static string ToStringIdOrIndex(Context cx, object id)
 		{
-			if (id is Number)
+			if (id.IsNumber())
 			{
-				double d = System.Convert.ToDouble(((Number)id));
+				double d = System.Convert.ToDouble(id);
 				int index = (int)d;
 				if (index == d)
 				{
@@ -2406,7 +2406,7 @@ childScopesChecks_break: ;
 				}
 				else
 				{
-					int intId = System.Convert.ToInt32(((Number)id));
+					int intId = System.Convert.ToInt32(id);
 					if (!x.obj.Has(intId, x.obj))
 					{
 						continue;
@@ -2932,7 +2932,7 @@ childScopesChecks_break: ;
 			{
 				return "string";
 			}
-			if (value is Number)
+			if (value.IsNumber())
 			{
 				return "number";
 			}
@@ -2966,9 +2966,9 @@ childScopesChecks_break: ;
 		// as "~toInt32(val)"
 		public static object Add(object val1, object val2, Context cx)
 		{
-			if (val1 is Number && val2 is Number)
+			if (val1.IsNumber() && val2.IsNumber())
 			{
-				return WrapNumber(System.Convert.ToDouble(((Number)val1)) + System.Convert.ToDouble(((Number)val2)));
+				return WrapNumber(System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2));
 			}
 			if (val1 is XMLObject)
 			{
@@ -2996,9 +2996,9 @@ childScopesChecks_break: ;
 			}
 			if (!(val1 is CharSequence) && !(val2 is CharSequence))
 			{
-				if ((val1 is Number) && (val2 is Number))
+				if ((val1.IsNumber()) && (val2.IsNumber()))
 				{
-					return WrapNumber(System.Convert.ToDouble(((Number)val1)) + System.Convert.ToDouble(((Number)val2)));
+					return WrapNumber(System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2));
 				}
 				else
 				{
@@ -3086,9 +3086,9 @@ search_break: ;
 		{
 			bool post = ((incrDecrMask & Node.POST_FLAG) != 0);
 			double number;
-			if (value is Number)
+			if (value.IsNumber())
 			{
-				number = System.Convert.ToDouble(((Number)value));
+				number = System.Convert.ToDouble(value);
 			}
 			else
 			{
@@ -3107,7 +3107,7 @@ search_break: ;
 			{
 				--number;
 			}
-			Number result = WrapNumber(number);
+			double result = WrapNumber(number);
 			target.Put(id, protoChainStart, result);
 			if (post)
 			{
@@ -3124,9 +3124,9 @@ search_break: ;
 			object value = GetObjectElem(obj, index, cx);
 			bool post = ((incrDecrMask & Node.POST_FLAG) != 0);
 			double number;
-			if (value is Number)
+			if (value.IsNumber())
 			{
-				number = System.Convert.ToDouble(((Number)value));
+				number = System.Convert.ToDouble(value);
 			}
 			else
 			{
@@ -3145,7 +3145,7 @@ search_break: ;
 			{
 				--number;
 			}
-			Number result = WrapNumber(number);
+			double result = WrapNumber(number);
 			SetObjectElem(obj, index, result, cx);
 			if (post)
 			{
@@ -3162,9 +3162,9 @@ search_break: ;
 			object value = @ref.Get(cx);
 			bool post = ((incrDecrMask & Node.POST_FLAG) != 0);
 			double number;
-			if (value is Number)
+			if (value.IsNumber())
 			{
-				number = System.Convert.ToDouble(((Number)value));
+				number = System.Convert.ToDouble(value);
 			}
 			else
 			{
@@ -3183,7 +3183,7 @@ search_break: ;
 			{
 				--number;
 			}
-			Number result = WrapNumber(number);
+			double result = WrapNumber(number);
 			@ref.Set(cx, result);
 			if (post)
 			{
@@ -3239,9 +3239,9 @@ search_break: ;
 			}
 			else
 			{
-				if (x is Number)
+				if (x.IsNumber())
 				{
-					return EqNumber(System.Convert.ToDouble(((Number)x)), y);
+					return EqNumber(System.Convert.ToDouble(x), y);
 				}
 				else
 				{
@@ -3323,9 +3323,9 @@ search_break: ;
 										}
 										else
 										{
-											if (y is Number)
+											if (y.IsNumber())
 											{
-												return EqNumber(System.Convert.ToDouble(((Number)y)), x);
+												return EqNumber(System.Convert.ToDouble(y), x);
 											}
 											else
 											{
@@ -3353,7 +3353,7 @@ search_break: ;
 
 		public static bool IsPrimitive(object obj)
 		{
-			return obj == null || obj == Undefined.instance || (obj is Number) || (obj is string) || (obj is bool);
+			return obj == null || obj == Undefined.instance || (obj.IsNumber()) || (obj is string) || (obj is bool);
 		}
 
 		internal static bool EqNumber(double x, object y)
@@ -3366,9 +3366,9 @@ search_break: ;
 				}
 				else
 				{
-					if (y is Number)
+					if (y.IsNumber())
 					{
-						return x == System.Convert.ToDouble(((Number)y));
+						return x == System.Convert.ToDouble(y);
 					}
 					else
 					{
@@ -3426,9 +3426,9 @@ search_break: ;
 					}
 					else
 					{
-						if (y is Number)
+						if (y.IsNumber())
 						{
-							return ToNumber(x.ToString()) == System.Convert.ToDouble(((Number)y));
+							return ToNumber(x.ToString()) == System.Convert.ToDouble(y);
 						}
 						else
 						{
@@ -3467,12 +3467,12 @@ search_break: ;
 		{
 			if (x == y)
 			{
-				if (!(x is Number))
+				if (!(x.IsNumber()))
 				{
 					return true;
 				}
 				// NaN check
-				double d = System.Convert.ToDouble(((Number)x));
+				double d = System.Convert.ToDouble(x);
 				return d == d;
 			}
 			if (x == null || x == Undefined.instance)
@@ -3481,11 +3481,11 @@ search_break: ;
 			}
 			else
 			{
-				if (x is Number)
+				if (x.IsNumber())
 				{
-					if (y is Number)
+					if (y.IsNumber())
 					{
-						return System.Convert.ToDouble(((Number)x)) == System.Convert.ToDouble(((Number)y));
+						return System.Convert.ToDouble(x) == System.Convert.ToDouble(y);
 					}
 				}
 				else
@@ -3587,10 +3587,10 @@ search_break: ;
 		{
 			double d1;
 			double d2;
-			if (val1 is Number && val2 is Number)
+			if (val1.IsNumber() && val2.IsNumber())
 			{
-				d1 = System.Convert.ToDouble(((Number)val1));
-				d2 = System.Convert.ToDouble(((Number)val2));
+				d1 = System.Convert.ToDouble(val1);
+				d2 = System.Convert.ToDouble(val2);
 			}
 			else
 			{
@@ -3616,10 +3616,10 @@ search_break: ;
 		{
 			double d1;
 			double d2;
-			if (val1 is Number && val2 is Number)
+			if (val1.IsNumber() && val2.IsNumber())
 			{
-				d1 = System.Convert.ToDouble(((Number)val1));
-				d2 = System.Convert.ToDouble(((Number)val2));
+				d1 = System.Convert.ToDouble(val1);
+				d2 = System.Convert.ToDouble(val2);
 			}
 			else
 			{

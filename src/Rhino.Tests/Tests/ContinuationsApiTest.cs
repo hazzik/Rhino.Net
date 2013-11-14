@@ -117,7 +117,7 @@ namespace Rhino.Tests
 				NUnit.Framework.Assert.AreEqual(3, applicationState);
 				int saved = (int)applicationState;
 				object result = cx.ResumeContinuation(pending.GetContinuation(), globalScope, saved + 1);
-				NUnit.Framework.Assert.AreEqual(5, System.Convert.ToInt32(((Number)result)));
+				NUnit.Framework.Assert.AreEqual(5, System.Convert.ToInt32(result));
 			}
 			finally
 			{
@@ -153,7 +153,7 @@ namespace Rhino.Tests
 					NUnit.Framework.Assert.AreEqual(6, applicationState2);
 					int saved2 = (int)applicationState2;
 					object result2 = cx.ResumeContinuation(pending2.GetContinuation(), globalScope, saved2 + 1);
-					NUnit.Framework.Assert.AreEqual(13, System.Convert.ToInt32(((Number)result2)));
+					NUnit.Framework.Assert.AreEqual(13, System.Convert.ToInt32(result2));
 				}
 			}
 			finally
@@ -190,7 +190,7 @@ namespace Rhino.Tests
 					NUnit.Framework.Assert.AreEqual(4, applicationState2);
 					int saved2 = (int)applicationState2;
 					object result2 = cx.ResumeContinuation(pending2.GetContinuation(), globalScope, saved2 + 2);
-					NUnit.Framework.Assert.AreEqual(8, System.Convert.ToInt32(((Number)result2)));
+					NUnit.Framework.Assert.AreEqual(8, System.Convert.ToInt32(result2));
 				}
 			}
 			finally
@@ -216,10 +216,10 @@ namespace Rhino.Tests
 			catch (ContinuationPending pending)
 			{
 				object applicationState = pending.GetApplicationState();
-				NUnit.Framework.Assert.AreEqual(7, System.Convert.ToInt32(((Number)applicationState)));
+				NUnit.Framework.Assert.AreEqual(7, System.Convert.ToInt32(applicationState));
 				int saved = (int)applicationState;
 				object result = cx.ResumeContinuation(pending.GetContinuation(), globalScope, saved + 1);
-				NUnit.Framework.Assert.AreEqual(8, System.Convert.ToInt32(((Number)result)));
+				NUnit.Framework.Assert.AreEqual(8, System.Convert.ToInt32(result));
 			}
 			finally
 			{
@@ -297,7 +297,7 @@ namespace Rhino.Tests
 				sis.Close();
 				bais.Close();
 				object result = cx.ResumeContinuation(continuation, globalScope, 8);
-				NUnit.Framework.Assert.AreEqual(8, System.Convert.ToInt32(((Number)result)));
+				NUnit.Framework.Assert.AreEqual(8, System.Convert.ToInt32((result)));
 			}
 			finally
 			{
@@ -421,7 +421,7 @@ namespace Rhino.Tests
 				sis.Close();
 				bais.Close();
 				object result = cx.ResumeContinuation(continuation, globalScope, "2+3");
-				NUnit.Framework.Assert.AreEqual(5, System.Convert.ToInt32(((Number)result)));
+				NUnit.Framework.Assert.AreEqual(5, System.Convert.ToInt32((result)));
 			}
 			finally
 			{

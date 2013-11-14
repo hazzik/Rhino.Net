@@ -390,7 +390,7 @@ namespace Rhino.Json
 		}
 
 		/// <exception cref="Rhino.Json.JsonParser.ParseException"></exception>
-		private Number ReadNumber(char c)
+		private object ReadNumber(char c)
 		{
 			System.Diagnostics.Debug.Assert(c == '-' || (c >= '0' && c <= '9'));
 			int numberStart = pos - 1;

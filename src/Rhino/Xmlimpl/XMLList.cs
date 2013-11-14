@@ -685,9 +685,9 @@ namespace Rhino.Xmlimpl
 			}
 			else
 			{
-				if (name is Number)
+				if (name.IsNumber())
 				{
-					double x = System.Convert.ToDouble(((Number)name));
+					double x = System.Convert.ToDouble(name);
 					index = (long)x;
 					if (index != x)
 					{
