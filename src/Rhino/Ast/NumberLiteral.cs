@@ -77,7 +77,7 @@ namespace Rhino.Ast
 				type = Token.NUMBER;
 			}
 			SetDouble(number);
-			SetValue(double.ToString(number));
+			SetValue(number.ToString());
 		}
 
 		/// <summary>Returns the node's string value (the original source token)</summary>

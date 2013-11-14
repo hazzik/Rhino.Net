@@ -90,6 +90,7 @@
 -methodMapping java.lang.Double.isInfinite System.Double.IsInfinity
 -methodMapping java.lang.Double.parseDouble System.Double.Parse
 -methodMapping java.lang.Double.valueOf Sharpen.Extensions.ValueOf
+-methodMapping java.lang.Double.toString ToString
 -methodMapping java.lang.Integer.bitCount Sharpen.Extensions.BitCount
 -methodMapping java.lang.Integer.lowestOneBit Sharpen.Extensions.LowestOneBit
 -methodMapping java.lang.Integer.numberOfLeadingZeros Sharpen.Extensions.NumberOfLeadingZeros
