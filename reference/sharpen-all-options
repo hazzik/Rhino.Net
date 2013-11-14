@@ -34,6 +34,7 @@
 -typeMapping java.lang.Error System.Exception
 -typeMapping java.lang.IndexOutOfRangeException Sharpen.IndexOutOfRangeException
 -typeMapping java.lang.NoSuchMethodException System.MissingMethodException
+-typeMapping java.lang.NoSuchFieldException System.MissingFieldException
 -typeMapping java.lang.NumberFormatException System.FormatException
 -typeMapping java.lang.Package System.Reflection.Assembly
 -typeMapping java.lang.Process Sharpen.SystemProcess
@@ -48,7 +49,7 @@
 -typeMapping java.lang.Throwable System.Exception
 -typeMapping java.lang.ThreadLocal System.Threading.ThreadLocal
 -typeMapping java.lang.ThreadLocal<> System.Threading.ThreadLocal
--typeMapping java.math.BigInteger Mono.Math.BigInteger
+-typeMapping java.math.BigInteger System.Numerics.BigInteger
 -typeMapping java.net.InetAddress System.Net.IPAddress
 -typeMapping java.net.InetSocketAddress System.Net.IPEndPoint
 -typeMapping java.net.MalformedURLException System.UriFormatException
@@ -99,8 +100,8 @@
 -methodMapping java.lang.Character.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Double.isInfinite System.Double.IsInfinity
 -methodMapping java.lang.Double.parseDouble System.Double.Parse
--methodMapping java.lang.Double.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Double.toString ToString
+-methodMapping java.lang.Double.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Integer.bitCount Sharpen.Extensions.BitCount
 -methodMapping java.lang.Integer.lowestOneBit Sharpen.Extensions.LowestOneBit
 -methodMapping java.lang.Integer.numberOfLeadingZeros Sharpen.Extensions.NumberOfLeadingZeros
@@ -119,16 +120,18 @@
 -methodMapping java.lang.Number.intValue System.Convert.ToInt32
 -methodMapping java.lang.Number.longValue System.Convert.ToInt64
 -methodMapping java.lang.Number.shortValue System.Convert.ToInt16
-
 -methodMapping java.lang.Object.memberwiseClone Clone
 -methodMapping java.lang.ProcessBuilder.command SetCommand
+-methodMapping java.lang.String.concat System.String.Concat
 -methodMapping java.lang.System.gc System.GC.Collect
 -methodMapping java.lang.System.getenv() Sharpen.Runtime.GetEnv
 -methodMapping java.lang.System.getenv(String) System.Environment.GetEnvironmentVariable
 -methodMapping java.lang.System.runFinalization System.GC.WaitForPendingFinalizers
--methodMapping java.lang.String.concat System.String.Concat
 -methodMapping java.lang.Throwable.initCause Sharpen.Extensions.InitCause
--methodMapping java.math.BigInteger.toByteArray GetBytes
+-methodMapping java.math.BigInteger.valueOf Sharpen.Extensions.ValueOf
+-methodMapping java.math.BigInteger.multiply System.Numerics.BigInteger.Multiply
+-methodMapping java.math.BigInteger.pow System.Numerics.BigInteger.Pow
+-methodMapping java.math.BigInteger.subtract System.Numerics.BigInteger.Subtract
 
 -methodMapping java.net.InetAddress.getAddress GetAddressBytes
 -methodMapping java.net.InetAddress.getByName Sharpen.Extensions.GetAddressByName
@@ -196,6 +199,7 @@
 -propertyMapping java.util.zip.Inflater.getBytesRead TotalIn
 -propertyMapping java.util.zip.Inflater.getRemaining RemainingInput
 -propertyMapping java.util.zip.Inflater.needsInput IsNeedingInput
+-propertyMapping java.math.BigInteger.signum Sign
 -propertyMapping org.w3c.dom.Document.getDocumentElement DocumentElement
 -propertyMapping org.w3c.dom.Node.getChildNodes ChildNodes
 -propertyMapping org.w3c.dom.Node.getOwnerDocument OwnerDocument

@@ -132,7 +132,7 @@ namespace Rhino
 			return res;
 		}
 
-		/// <exception cref="Sharpen.NoSuchFieldException"></exception>
+		/// <exception cref="System.MissingFieldException"></exception>
 		/// <exception cref="System.MemberAccessException"></exception>
 		public static object GetAdapterSelf(Type adapterClass, object adapter)
 		{
@@ -272,7 +272,7 @@ namespace Rhino
 			catch (MemberAccessException)
 			{
 			}
-			catch (NoSuchFieldException)
+			catch (MissingFieldException)
 			{
 			}
 			throw new IOException();

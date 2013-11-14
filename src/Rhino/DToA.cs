@@ -7,8 +7,8 @@
  */
 
 using System;
+using System.Numerics;
 using System.Text;
-using Mono.Math;
 using Rhino;
 using Sharpen;
 
@@ -261,7 +261,7 @@ namespace Rhino
 				d = -d;
 			}
 			string intDigits;
-			double dfloor = System.Math.Floor(d);
+			double dfloor = Math.Floor(d);
 			long lfloor = (long)dfloor;
 			if (lfloor == dfloor)
 			{
@@ -287,7 +287,7 @@ namespace Rhino
 					mantissa = -mantissa;
 				}
 				exp -= 1075;
-				BigInteger x = BigInteger.ValueOf(mantissa);
+				BigInteger x = Sharpen.Extensions.ValueOf(mantissa);
 				if (exp > 0)
 				{
 					x = x.ShiftLeft(exp);
@@ -329,36 +329,36 @@ namespace Rhino
 				}
 				s2 += Bias + P;
 				//            JS_ASSERT(-s2 < e);
-				BigInteger mlo = BigInteger.ValueOf(1);
+				BigInteger mlo = Sharpen.Extensions.ValueOf(1);
 				BigInteger mhi = mlo;
 				if ((word1 == 0) && ((word0 & Bndry_mask) == 0) && ((word0 & (Exp_mask & Exp_mask << 1)) != 0))
 				{
 					s2 += Log2P;
-					mhi = BigInteger.ValueOf(1 << Log2P);
+					mhi = Sharpen.Extensions.ValueOf(1 << Log2P);
 				}
 				b = b.ShiftLeft(e[0] + s2);
-				BigInteger s = BigInteger.ValueOf(1);
+				BigInteger s = Sharpen.Extensions.ValueOf(1);
 				s = s.ShiftLeft(s2);
-				BigInteger bigBase = BigInteger.ValueOf(@base);
+				BigInteger bigBase = Sharpen.Extensions.ValueOf(@base);
 				bool done = false;
 				do
 				{
-					b = b.Multiply(bigBase);
+					b = System.Numerics.BigInteger.Multiply(b, bigBase);
 					BigInteger[] divResult = b.DivideAndRemainder(s);
 					b = divResult[1];
 					digit = (char)(System.Convert.ToInt32(divResult[0]));
 					if (mlo == mhi)
 					{
-						mlo = mhi = mlo.Multiply(bigBase);
+						mlo = mhi = System.Numerics.BigInteger.Multiply(mlo, bigBase);
 					}
 					else
 					{
-						mlo = mlo.Multiply(bigBase);
-						mhi = mhi.Multiply(bigBase);
+						mlo = System.Numerics.BigInteger.Multiply(mlo, bigBase);
+						mhi = System.Numerics.BigInteger.Multiply(mhi, bigBase);
 					}
 					int j = b.CompareTo(mlo);
-					BigInteger delta = s.Subtract(mhi);
-					int j1 = (delta.Signum() <= 0) ? 1 : b.CompareTo(delta);
+					BigInteger delta = System.Numerics.BigInteger.Subtract(s, mhi);
+					int j1 = (delta.Sign <= 0) ? 1 : b.CompareTo(delta);
 					if (j1 == 0 && ((word1 & 1) == 0))
 					{
 						if (j > 0)
@@ -421,7 +421,7 @@ namespace Rhino
 		// XXXX the C version built a cache of these
 		internal static BigInteger Pow5mult(BigInteger b, int k)
 		{
-			return b.Multiply(BigInteger.ValueOf(5).Pow(k));
+			return System.Numerics.BigInteger.Multiply(b, System.Numerics.BigInteger.Pow(Sharpen.Extensions.ValueOf(5), k));
 		}
 
 		internal static bool RoundOff(StringBuilder buf)
@@ -882,7 +882,7 @@ namespace Rhino
 				}
 				b2 += i;
 				s2 += i;
-				mhi = BigInteger.ValueOf(1);
+				mhi = Sharpen.Extensions.ValueOf(1);
 			}
 			if (m2 > 0 && s2 > 0)
 			{
@@ -898,7 +898,7 @@ namespace Rhino
 					if (m5 > 0)
 					{
 						mhi = Pow5mult(mhi, m5);
-						b1 = mhi.Multiply(b);
+						b1 = System.Numerics.BigInteger.Multiply(mhi, b);
 						b = b1;
 					}
 					if ((j = b5 - m5) != 0)
@@ -911,7 +911,7 @@ namespace Rhino
 					b = Pow5mult(b, b5);
 				}
 			}
-			S = BigInteger.ValueOf(1);
+			S = Sharpen.Extensions.ValueOf(1);
 			if (s5 > 0)
 			{
 				S = Pow5mult(S, s5);
@@ -926,7 +926,7 @@ namespace Rhino
 					spec_case = true;
 				}
 			}
-			byte[] S_bytes = S.GetBytes();
+			byte[] S_bytes = S.ToByteArray();
 			int S_hiWord = 0;
 			for (int idx = 0; idx < 4; idx++)
 			{
@@ -970,17 +970,17 @@ namespace Rhino
 				if (b.CompareTo(S) < 0)
 				{
 					k--;
-					b = b.Multiply(BigInteger.ValueOf(10));
+					b = System.Numerics.BigInteger.Multiply(b, Sharpen.Extensions.ValueOf(10));
 					if (leftright)
 					{
-						mhi = mhi.Multiply(BigInteger.ValueOf(10));
+						mhi = System.Numerics.BigInteger.Multiply(mhi, Sharpen.Extensions.ValueOf(10));
 					}
 					ilim = ilim1;
 				}
 			}
 			if (ilim <= 0 && mode > 2)
 			{
-				if ((ilim < 0) || ((i = b.CompareTo(S = S.Multiply(BigInteger.ValueOf(5)))) < 0) || ((i == 0 && !biasUp)))
+				if ((ilim < 0) || ((i = b.CompareTo(S = System.Numerics.BigInteger.Multiply(S, Sharpen.Extensions.ValueOf(5)))) < 0) || ((i == 0 && !biasUp)))
 				{
 					buf.Length = 0;
 					buf.Append('0');
@@ -1010,8 +1010,8 @@ namespace Rhino
 					b = divResult[1];
 					dig = (char)(System.Convert.ToInt32(divResult[0]) + '0');
 					j = b.CompareTo(mlo);
-					delta = S.Subtract(mhi);
-					j1 = (delta.Signum() <= 0) ? 1 : b.CompareTo(delta);
+					delta = System.Numerics.BigInteger.Subtract(S, mhi);
+					j1 = (delta.Sign <= 0) ? 1 : b.CompareTo(delta);
 					if ((j1 == 0) && (mode == 0) && ((Word1(d) & 1) == 0))
 					{
 						if (dig == '9')
@@ -1076,15 +1076,15 @@ namespace Rhino
 					{
 						break;
 					}
-					b = b.Multiply(BigInteger.ValueOf(10));
+					b = System.Numerics.BigInteger.Multiply(b, Sharpen.Extensions.ValueOf(10));
 					if (mlo == mhi)
 					{
-						mlo = mhi = mhi.Multiply(BigInteger.ValueOf(10));
+						mlo = mhi = System.Numerics.BigInteger.Multiply(mhi, Sharpen.Extensions.ValueOf(10));
 					}
 					else
 					{
-						mlo = mlo.Multiply(BigInteger.ValueOf(10));
-						mhi = mhi.Multiply(BigInteger.ValueOf(10));
+						mlo = System.Numerics.BigInteger.Multiply(mlo, Sharpen.Extensions.ValueOf(10));
+						mhi = System.Numerics.BigInteger.Multiply(mhi, Sharpen.Extensions.ValueOf(10));
 					}
 				}
 			}
@@ -1101,7 +1101,7 @@ namespace Rhino
 					{
 						break;
 					}
-					b = b.Multiply(BigInteger.ValueOf(10));
+					b = System.Numerics.BigInteger.Multiply(b, Sharpen.Extensions.ValueOf(10));
 				}
 			}
 			b = b.ShiftLeft(1);
