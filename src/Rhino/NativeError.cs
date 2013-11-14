@@ -146,7 +146,7 @@ namespace Rhino
 				{
 					DefineProperty("stack", null, typeof(NativeError).GetMethod("getStack"), typeof(NativeError).GetMethod("setStack", typeof(object)), 0);
 				}
-				catch (NoSuchMethodException nsm)
+				catch (MissingMethodException nsm)
 				{
 					// should not happen
 					throw new Exception(nsm);

@@ -317,7 +317,7 @@ namespace Rhino
 			catch (TargetInvocationException)
 			{
 			}
-			catch (NoSuchMethodException)
+			catch (MissingMethodException)
 			{
 			}
 			throw new TypeLoadException("adapter");
@@ -425,7 +425,7 @@ namespace Rhino
 							// bug 61226.
 							continue;
 						}
-						catch (NoSuchMethodException)
+						catch (MissingMethodException)
 						{
 						}
 					}

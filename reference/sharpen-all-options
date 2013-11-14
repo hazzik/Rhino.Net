@@ -100,6 +100,9 @@
 -methodMapping java.lang.Integer.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Long.signum Sharpen.Extensions.Signum
 -methodMapping java.lang.Long.valueOf Sharpen.Extensions.ValueOf
+-methodMapping java.lang.Math.ceil System.Math.Ceiling
+-methodMapping java.lang.Math.IEEEremainder System.Math.IEEERemainder
+
 -methodMapping java.lang.Object.memberwiseClone Clone
 -methodMapping java.lang.ProcessBuilder.command SetCommand
 -methodMapping java.lang.System.gc System.GC.Collect
@@ -109,6 +112,7 @@
 -methodMapping java.lang.String.concat System.String.Concat
 -methodMapping java.lang.Throwable.initCause Sharpen.Extensions.InitCause
 -methodMapping java.math.BigInteger.toByteArray GetBytes
+
 -methodMapping java.net.InetAddress.getAddress GetAddressBytes
 -methodMapping java.net.InetAddress.getByName Sharpen.Extensions.GetAddressByName
 -methodMapping java.net.InetAddress.getCanonicalHostName ToString
@@ -149,6 +153,7 @@
 -propertyMapping java.lang.reflect.Field.getType FieldType
 -propertyMapping java.lang.reflect.Member.getModifiers Attributes
 -propertyMapping java.lang.reflect.Method.getModifiers Attributes
+-propertyMapping java.lang.Class.getModifiers Attributes
 -propertyMapping java.net.InetSocketAddress.getAddress Address
 -propertyMapping java.net.InetSocketAddress.getPort Port
 -propertyMapping java.net.ServerSocket.getLocalSocketAddress LocalEndPoint

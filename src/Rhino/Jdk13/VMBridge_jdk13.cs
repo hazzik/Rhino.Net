@@ -85,7 +85,7 @@ namespace Rhino.Jdk13
 			{
 				c = cl.GetConstructor(new Type[] { typeof(InvocationHandler) });
 			}
-			catch (NoSuchMethodException ex)
+			catch (MissingMethodException ex)
 			{
 				// Should not happen
 				throw Kit.InitCause(new InvalidOperationException(), ex);

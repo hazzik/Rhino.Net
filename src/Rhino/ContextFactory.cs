@@ -369,7 +369,7 @@ namespace Rhino
 				nodeClass.GetMethod("getUserData", new Type[] { typeof(string) });
 				return true;
 			}
-			catch (NoSuchMethodException)
+			catch (MissingMethodException)
 			{
 				return false;
 			}

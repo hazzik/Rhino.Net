@@ -1117,7 +1117,7 @@ namespace Rhino
 						{
 							meth = value.GetType().GetMethod("doubleValue", (Type[])null);
 						}
-						catch (NoSuchMethodException)
+						catch (MissingMethodException)
 						{
 							meth = null;
 						}
@@ -1297,7 +1297,7 @@ namespace Rhino
 					sig2[1] = Kit.ClassOrNull("java.io.ObjectInputStream");
 					adapter_readAdapterObject = cl.GetMethod("readAdapterObject", sig2);
 				}
-				catch (NoSuchMethodException)
+				catch (MissingMethodException)
 				{
 					adapter_writeAdapterObject = null;
 					adapter_readAdapterObject = null;

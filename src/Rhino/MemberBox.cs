@@ -230,7 +230,7 @@ namespace Rhino
 							{
 								return intf.GetMethod(name, @params);
 							}
-							catch (NoSuchMethodException)
+							catch (MissingMethodException)
 							{
 							}
 							catch (SecurityException)
@@ -256,7 +256,7 @@ namespace Rhino
 									return m;
 								}
 							}
-							catch (NoSuchMethodException)
+							catch (MissingMethodException)
 							{
 							}
 							catch (SecurityException)
@@ -350,7 +350,7 @@ namespace Rhino
 					return declaring.GetConstructor(parms);
 				}
 			}
-			catch (NoSuchMethodException e)
+			catch (MissingMethodException e)
 			{
 				throw new IOException("Cannot find member: " + e);
 			}
