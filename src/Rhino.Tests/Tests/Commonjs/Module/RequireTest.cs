@@ -34,7 +34,7 @@ namespace Rhino.Tests.Commonjs.Module
 			try
 			{
 				require.RequireMain(cx, "blah");
-				Fail();
+				NUnit.Framework.Assert.Fail();
 			}
 			catch (InvalidOperationException)
 			{
@@ -91,7 +91,7 @@ namespace Rhino.Tests.Commonjs.Module
 			try
 			{
 				require.RequireMain(cx, "assert");
-				Fail();
+				NUnit.Framework.Assert.Fail();
 			}
 			catch (InvalidOperationException e)
 			{

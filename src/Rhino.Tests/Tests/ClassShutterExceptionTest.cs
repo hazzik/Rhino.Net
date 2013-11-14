@@ -59,7 +59,7 @@ namespace Rhino.Tests
 			try
 			{
 				Helper("java.lang.System.out.println('hi');");
-				Fail();
+				NUnit.Framework.Assert.Fail();
 			}
 			catch (RhinoException)
 			{
@@ -84,7 +84,7 @@ namespace Rhino.Tests
 				// JavaScript exceptions with no reference to Java
 				// should not be affected by the ClassShutter
 				Helper("friggin' syntax error!");
-				Fail("Should have thrown an exception");
+				NUnit.Framework.Assert.Fail("Should have thrown an exception");
 			}
 			catch (EvaluatorException)
 			{

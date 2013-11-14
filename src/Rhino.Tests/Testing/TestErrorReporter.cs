@@ -58,7 +58,7 @@ namespace Rhino.Testing
 			}
 			else
 			{
-				Fail("extra error: " + message);
+				NUnit.Framework.Assert.Fail("extra error: " + message);
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace Rhino.Testing
 			}
 			else
 			{
-				Fail("extra warning: " + message);
+				NUnit.Framework.Assert.Fail("extra warning: " + message);
 			}
 		}
 

@@ -43,7 +43,7 @@ namespace Rhino.Tests
 			catch (RhinoException e)
 			{
 				// Test that FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME is enabled
-				Fail(e.ToString());
+				NUnit.Framework.Assert.Fail(e.ToString());
 			}
 			finally
 			{

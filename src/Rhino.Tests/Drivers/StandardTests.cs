@@ -90,7 +90,7 @@ namespace Rhino.Drivers
 			//    do nothing
 			public sealed override void Failed(string s)
 			{
-				Assert.Fail(s);
+				NUnit.Framework.Assert.Fail(s);
 			}
 
 			public sealed override void ExitCodesWere(int expected, int actual)
@@ -106,7 +106,7 @@ namespace Rhino.Drivers
 			// tests.
 			public sealed override void Threw(Exception t)
 			{
-				Assert.Fail(ShellTest.GetStackTrace(t));
+				NUnit.Framework.Assert.Fail(ShellTest.GetStackTrace(t));
 			}
 
 			public sealed override void TimedOut()

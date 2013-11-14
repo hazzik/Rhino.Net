@@ -51,7 +51,7 @@ namespace Rhino.Tests
 				try
 				{
 					RunScript("({}.nonexistent);");
-					Fail();
+					NUnit.Framework.Assert.Fail();
 				}
 				catch (EvaluatorException e)
 				{

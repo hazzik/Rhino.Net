@@ -167,7 +167,7 @@ namespace Rhino.Tests
 				// to locate the test in a Parameterized JUnit test
 				string msg = "In \"" + file + "\":" + Runtime.GetProperty("line.separator") + s;
 				System.Console.Out.WriteLine(msg);
-				Assert.Fail(msg);
+				NUnit.Framework.Assert.Fail(msg);
 			}
 
 			public sealed override void ExitCodesWere(int expected, int actual)
@@ -183,7 +183,7 @@ namespace Rhino.Tests
 			// tests.
 			public sealed override void Threw(Exception t)
 			{
-				Assert.Fail(ShellTest.GetStackTrace(t));
+				NUnit.Framework.Assert.Fail(ShellTest.GetStackTrace(t));
 			}
 
 			public sealed override void TimedOut()

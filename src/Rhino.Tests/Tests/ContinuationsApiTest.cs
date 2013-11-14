@@ -109,7 +109,7 @@ namespace Rhino.Tests
 				// must use interpreter mode
 				Script script = cx.CompileString("myObject.f(3) + 1;", "test source", 1, null);
 				cx.ExecuteScriptWithContinuations(script, globalScope);
-				Fail("Should throw ContinuationPending");
+				NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 			}
 			catch (ContinuationPending pending)
 			{
@@ -135,7 +135,7 @@ namespace Rhino.Tests
 				// must use interpreter mode
 				Script script = cx.CompileString("myObject.f(3) + myObject.g(3) + 2;", "test source", 1, null);
 				cx.ExecuteScriptWithContinuations(script, globalScope);
-				Fail("Should throw ContinuationPending");
+				NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 			}
 			catch (ContinuationPending pending)
 			{
@@ -145,7 +145,7 @@ namespace Rhino.Tests
 					NUnit.Framework.Assert.AreEqual(3, applicationState);
 					int saved = (int)applicationState;
 					cx.ResumeContinuation(pending.GetContinuation(), globalScope, saved + 1);
-					Fail("Should throw another ContinuationPending");
+					NUnit.Framework.Assert.Fail("Should throw another ContinuationPending");
 				}
 				catch (ContinuationPending pending2)
 				{
@@ -172,7 +172,7 @@ namespace Rhino.Tests
 				// must use interpreter mode
 				Script script = cx.CompileString("myObject.g( myObject.f(1) ) + 2;", "test source", 1, null);
 				cx.ExecuteScriptWithContinuations(script, globalScope);
-				Fail("Should throw ContinuationPending");
+				NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 			}
 			catch (ContinuationPending pending)
 			{
@@ -182,7 +182,7 @@ namespace Rhino.Tests
 					NUnit.Framework.Assert.AreEqual(1, applicationState);
 					int saved = (int)applicationState;
 					cx.ResumeContinuation(pending.GetContinuation(), globalScope, saved + 1);
-					Fail("Should throw another ContinuationPending");
+					NUnit.Framework.Assert.Fail("Should throw another ContinuationPending");
 				}
 				catch (ContinuationPending pending2)
 				{
@@ -211,7 +211,7 @@ namespace Rhino.Tests
 				Function f = (Function)globalScope.Get("f", globalScope);
 				object[] args = new object[] { 7 };
 				cx.CallFunctionWithContinuations(f, globalScope, args);
-				Fail("Should throw ContinuationPending");
+				NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 			}
 			catch (ContinuationPending pending)
 			{
@@ -249,7 +249,7 @@ namespace Rhino.Tests
 				// must use interpreter mode
 				Script script = cx.CompileString("eval('myObject.f(3);');", "test source", 1, null);
 				cx.ExecuteScriptWithContinuations(script, globalScope);
-				Fail("Should throw IllegalStateException");
+				NUnit.Framework.Assert.Fail("Should throw IllegalStateException");
 			}
 			catch (WrappedException we)
 			{
@@ -277,7 +277,7 @@ namespace Rhino.Tests
 				Function f = (Function)globalScope.Get("f", globalScope);
 				object[] args = new object[] { 7 };
 				cx.CallFunctionWithContinuations(f, globalScope, args);
-				Fail("Should throw ContinuationPending");
+				NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 			}
 			catch (ContinuationPending pending)
 			{
@@ -334,7 +334,7 @@ namespace Rhino.Tests
 					Function f = (Function)globalScope.Get("f", globalScope);
 					object[] args = new object[] { 7 };
 					cx.CallFunctionWithContinuations(f, globalScope, args);
-					Fail("Should throw ContinuationPending");
+					NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 				}
 				catch (ContinuationPending pending)
 				{
@@ -401,7 +401,7 @@ namespace Rhino.Tests
 				Function f = (Function)globalScope.Get("f", globalScope);
 				object[] args = new object[] { 7 };
 				cx.CallFunctionWithContinuations(f, globalScope, args);
-				Fail("Should throw ContinuationPending");
+				NUnit.Framework.Assert.Fail("Should throw ContinuationPending");
 			}
 			catch (ContinuationPending pending)
 			{

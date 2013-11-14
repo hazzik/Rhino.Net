@@ -86,7 +86,7 @@ namespace Rhino.Tests
 			{
 				Scriptable globalScope = cx.InitStandardObjects();
 				cx.EvaluateString(globalScope, source, "test source", 1, null);
-				Fail();
+				NUnit.Framework.Assert.Fail();
 			}
 			catch (ObserveInstructionCountTest.QuotaExceeded)
 			{
@@ -94,7 +94,7 @@ namespace Rhino.Tests
 			catch (Exception e)
 			{
 				// expected
-				Fail(e.ToString());
+				NUnit.Framework.Assert.Fail(e.ToString());
 			}
 			finally
 			{
