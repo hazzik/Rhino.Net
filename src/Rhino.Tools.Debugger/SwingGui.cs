@@ -3148,8 +3148,8 @@ namespace Rhino.Tools.Debugger
 					{
 						return 1;
 					}
-					int lint = ((int)l);
-					int rint = ((int)r);
+					int lint = System.Convert.ToInt32(((int)l));
+					int rint = System.Convert.ToInt32(((int)r));
 					return lint - rint;
 				}
 			}
@@ -3200,7 +3200,7 @@ namespace Rhino.Tools.Debugger
 			/// <remarks>Returns a string representation of this node.</remarks>
 			public override string ToString()
 			{
-				return id is string ? (string)id : "[" + ((int)id) + "]";
+				return id is string ? (string)id : "[" + System.Convert.ToInt32(((int)id)) + "]";
 			}
 		}
 	}

@@ -520,7 +520,7 @@ again_break: ;
 			{
 				if (id is Number)
 				{
-					return ToArrayIndex(((Number)id));
+					return ToArrayIndex(System.Convert.ToDouble(((Number)id)));
 				}
 			}
 			return -1;
@@ -804,7 +804,7 @@ again_break: ;
 				else
 				{
 					long len = ScriptRuntime.ToUint32(arg0);
-					if (len != ((Number)arg0))
+					if (len != System.Convert.ToDouble(((Number)arg0)))
 					{
 						string msg = ScriptRuntime.GetMessage0("msg.arraylength.bad");
 						throw ScriptRuntime.ConstructError("RangeError", msg);
@@ -908,7 +908,7 @@ again_break: ;
 						}
 						else
 						{
-							int index = ((int)id);
+							int index = System.Convert.ToInt32(((int)id));
 							if (index >= longVal)
 							{
 								Delete(index);

@@ -384,7 +384,7 @@ L0_break: ;
 					object id = ids[i];
 					if (id is int)
 					{
-						int index = ((int)id);
+						int index = System.Convert.ToInt32(((int)id));
 						if (0 <= index && index < args.Length)
 						{
 							if (!present[index])

@@ -680,13 +680,13 @@ namespace Rhino.Xmlimpl
 			long index;
 			if (name is int)
 			{
-				index = ((int)name);
+				index = System.Convert.ToInt32(((int)name));
 			}
 			else
 			{
 				if (name is Number)
 				{
-					double x = ((Number)name);
+					double x = System.Convert.ToDouble(((Number)name));
 					index = (long)x;
 					if (index != x)
 					{

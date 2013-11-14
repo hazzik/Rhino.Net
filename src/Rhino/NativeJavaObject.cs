@@ -1088,7 +1088,7 @@ namespace Rhino
 		{
 			if (value is Number)
 			{
-				return ((Number)value);
+				return System.Convert.ToDouble(((Number)value));
 			}
 			else
 			{
@@ -1129,7 +1129,7 @@ namespace Rhino
 						{
 							try
 							{
-								return ((Number)meth.Invoke(value, (object[])null));
+								return System.Convert.ToDouble(((Number)meth.Invoke(value, (object[])null)));
 							}
 							catch (MemberAccessException)
 							{

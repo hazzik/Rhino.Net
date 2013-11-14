@@ -778,7 +778,7 @@ namespace Rhino.Tools.Shell
 							}
 							else
 							{
-								int ikey = ((Number)keyObj);
+								int ikey = System.Convert.ToInt32(((Number)keyObj));
 								key = Sharpen.Extensions.ToString(ikey);
 								val = ScriptableObject.GetProperty(envHash, ikey);
 							}

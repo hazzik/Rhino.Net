@@ -113,6 +113,12 @@
 -methodMapping java.lang.Long.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Math.ceil System.Math.Ceiling
 -methodMapping java.lang.Math.IEEEremainder System.Math.IEEERemainder
+-methodMapping java.lang.Number.byteValue System.Convert.ToByte
+-methodMapping java.lang.Number.doubleValue System.Convert.ToDouble
+-methodMapping java.lang.Number.floatValue System.Convert.ToSingle
+-methodMapping java.lang.Number.intValue System.Convert.ToInt32
+-methodMapping java.lang.Number.longValue System.Convert.ToInt64
+-methodMapping java.lang.Number.shortValue System.Convert.ToInt16
 
 -methodMapping java.lang.Object.memberwiseClone Clone
 -methodMapping java.lang.ProcessBuilder.command SetCommand

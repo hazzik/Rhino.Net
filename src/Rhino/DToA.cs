@@ -346,7 +346,7 @@ namespace Rhino
 					b = b.Multiply(bigBase);
 					BigInteger[] divResult = b.DivideAndRemainder(s);
 					b = divResult[1];
-					digit = (char)(divResult[0]);
+					digit = (char)(System.Convert.ToInt32(divResult[0]));
 					if (mlo == mhi)
 					{
 						mlo = mhi = mlo.Multiply(bigBase);
@@ -1008,7 +1008,7 @@ namespace Rhino
 				{
 					BigInteger[] divResult = b.DivideAndRemainder(S);
 					b = divResult[1];
-					dig = (char)(divResult[0] + '0');
+					dig = (char)(System.Convert.ToInt32(divResult[0]) + '0');
 					j = b.CompareTo(mlo);
 					delta = S.Subtract(mhi);
 					j1 = (delta.Signum() <= 0) ? 1 : b.CompareTo(delta);
@@ -1095,7 +1095,7 @@ namespace Rhino
 					//                (char)(dig = quorem(b,S) + '0');
 					BigInteger[] divResult = b.DivideAndRemainder(S);
 					b = divResult[1];
-					dig = (char)(divResult[0] + '0');
+					dig = (char)(System.Convert.ToInt32(divResult[0]) + '0');
 					buf.Append(dig);
 					if (i >= ilim)
 					{

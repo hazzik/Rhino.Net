@@ -473,7 +473,7 @@ namespace Rhino
 					object tv = ScriptRuntime.ToPrimitive(o, ScriptRuntime.NumberClass);
 					if (tv is Number)
 					{
-						double d = ((Number)tv);
+						double d = System.Convert.ToDouble(((Number)tv));
 						if (d != d || System.Double.IsInfinity(d))
 						{
 							return null;

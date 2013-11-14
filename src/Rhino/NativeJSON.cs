@@ -192,7 +192,7 @@ namespace Rhino
 			object property;
 			if (name is Number)
 			{
-				property = holder.Get(((Number)name), holder);
+				property = holder.Get(System.Convert.ToInt32(((Number)name)), holder);
 			}
 			else
 			{
@@ -245,7 +245,7 @@ namespace Rhino
 						{
 							if (p is Number)
 							{
-								val.Delete(((Number)p));
+								val.Delete(System.Convert.ToInt32(((Number)p)));
 							}
 							else
 							{
@@ -256,7 +256,7 @@ namespace Rhino
 						{
 							if (p is Number)
 							{
-								val.Put(((Number)p), val, newElement);
+								val.Put(System.Convert.ToInt32(((Number)p)), val, newElement);
 							}
 							else
 							{
@@ -385,7 +385,7 @@ namespace Rhino
 			}
 			else
 			{
-				value = GetProperty(holder, ((Number)key));
+				value = GetProperty(holder, System.Convert.ToInt32(((Number)key)));
 			}
 			if (value is Scriptable)
 			{
@@ -435,7 +435,7 @@ namespace Rhino
 			}
 			if (value is Number)
 			{
-				double d = ((Number)value);
+				double d = System.Convert.ToDouble(((Number)value));
 				if (d == d && d != double.PositiveInfinity && d != double.NegativeInfinity)
 				{
 					return ScriptRuntime.ToString(value);

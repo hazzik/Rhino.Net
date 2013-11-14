@@ -521,7 +521,7 @@ namespace Rhino.Tools.Shell
 		{
 			if (method.Equals(this.completeMethod))
 			{
-				int result = Complete((string)args[0], ((int)args[1]), (IList<string>)args[2]);
+				int result = Complete((string)args[0], System.Convert.ToInt32(((int)args[1])), (IList<string>)args[2]);
 				return Sharpen.Extensions.ValueOf(result);
 			}
 			throw new MissingMethodException(method.ToString());

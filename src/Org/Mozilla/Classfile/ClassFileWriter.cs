@@ -3279,7 +3279,7 @@ namespace Org.Mozilla.Classfile
 			offset = PutInt16(itsInterfaces.Size(), data, offset);
 			for (int i = 0; i < itsInterfaces.Size(); i++)
 			{
-				int interfaceIndex = ((short)(itsInterfaces.Get(i)));
+				int interfaceIndex = System.Convert.ToInt16(((short)(itsInterfaces.Get(i))));
 				offset = PutInt16(interfaceIndex, data, offset);
 			}
 			offset = PutInt16(itsFields.Size(), data, offset);

@@ -56,11 +56,11 @@ namespace Rhino.Tools.Shell
 
 		private static SecurityProxy securityImpl;
 
-		private static readonly Program.ScriptCache scriptCache = new Program.ScriptCache(32);
+		private static readonly Main.ScriptCache scriptCache = new Main.ScriptCache(32);
 
 		static Program()
 		{
-			global.InitQuitAction(new Program.IProxy(Main.IProxy.SYSTEM_EXIT));
+			global.InitQuitAction(new Main.IProxy(Main.IProxy.SYSTEM_EXIT));
 		}
 
 		/// <summary>Proxy class to avoid proliferation of anonymous classes.</summary>
@@ -162,7 +162,7 @@ namespace Rhino.Tools.Shell
 			{
 				global.Init(shellContextFactory);
 			}
-			Program.IProxy iproxy = new Program.IProxy(Main.IProxy.PROCESS_FILES);
+			Main.IProxy iproxy = new Main.IProxy(Main.IProxy.PROCESS_FILES);
 			iproxy.args = args;
 			shellContextFactory.Call(iproxy);
 			return exitCode;
@@ -393,7 +393,7 @@ namespace Rhino.Tools.Shell
 					{
 						global.Init(shellContextFactory);
 					}
-					Program.IProxy iproxy = new Program.IProxy(Main.IProxy.EVAL_INLINE_SCRIPT);
+					Main.IProxy iproxy = new Main.IProxy(Main.IProxy.EVAL_INLINE_SCRIPT);
 					iproxy.scriptText = args[i];
 					shellContextFactory.Call(iproxy);
 					continue;
@@ -671,7 +671,7 @@ goodUsage_break: ;
 			object source = ReadFileOrUrl(path, !isClass);
 			byte[] digest = GetDigest(source);
 			string key = path + "_" + cx.GetOptimizationLevel();
-			Program.ScriptReference @ref = scriptCache.Get(key, digest);
+			Main.ScriptReference @ref = scriptCache.Get(key, digest);
 			Script script = @ref != null ? @ref.Get() : null;
 			if (script == null)
 			{
@@ -847,7 +847,7 @@ goodUsage_break: ;
 		}
 
 		[System.Serializable]
-		internal class ScriptCache : LinkedHashMap<string, Program.ScriptReference>
+		internal class ScriptCache : LinkedHashMap<string, Main.ScriptReference>
 		{
 			internal ReferenceQueue<Script> queue;
 
@@ -859,15 +859,15 @@ goodUsage_break: ;
 				queue = new ReferenceQueue<Script>();
 			}
 
-			protected override bool RemoveEldestEntry(KeyValuePair<string, Program.ScriptReference> eldest)
+			protected override bool RemoveEldestEntry(KeyValuePair<string, Main.ScriptReference> eldest)
 			{
 				return Count > capacity;
 			}
 
-			internal virtual Program.ScriptReference Get(string path, byte[] digest)
+			internal virtual Main.ScriptReference Get(string path, byte[] digest)
 			{
-				Program.ScriptReference @ref;
-				while ((@ref = (Program.ScriptReference)queue.Poll()) != null)
+				Main.ScriptReference @ref;
+				while ((@ref = (Main.ScriptReference)queue.Poll()) != null)
 				{
 					Sharpen.Collections.Remove(this, @ref.path);
 				}
@@ -882,7 +882,7 @@ goodUsage_break: ;
 
 			internal virtual void Put(string path, byte[] digest, Script script)
 			{
-				Put(path, new Program.ScriptReference(path, digest, script, queue));
+				Put(path, new Main.ScriptReference(path, digest, script, queue));
 			}
 		}
 	}

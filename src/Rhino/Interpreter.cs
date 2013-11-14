@@ -3204,7 +3204,7 @@ object_compare_break: ;
 				{
 					if (lhs is Number)
 					{
-						ldbl = ((Number)lhs);
+						ldbl = System.Convert.ToDouble(((Number)lhs));
 					}
 					else
 					{
@@ -3219,7 +3219,7 @@ object_compare_break: ;
 					ldbl = sDbl[stackTop];
 					if (rhs is Number)
 					{
-						rdbl = ((Number)rhs);
+						rdbl = System.Convert.ToDouble(((Number)rhs));
 					}
 					else
 					{
@@ -3824,7 +3824,7 @@ object_compare_break: ;
 						{
 							if (x is Number)
 							{
-								double d = ((Number)x);
+								double d = System.Convert.ToDouble(((Number)x));
 								return (d == d && d != 0.0);
 							}
 							else
@@ -3886,8 +3886,8 @@ object_compare_break: ;
 						}
 						else
 						{
-							double lDbl = (lhs is Number) ? ((Number)lhs) : ScriptRuntime.ToNumber(lhs);
-							double rDbl = (rhs is Number) ? ((Number)rhs) : ScriptRuntime.ToNumber(rhs);
+							double lDbl = (lhs is Number) ? System.Convert.ToDouble(((Number)lhs)) : ScriptRuntime.ToNumber(lhs);
+							double rDbl = (rhs is Number) ? System.Convert.ToDouble(((Number)rhs)) : ScriptRuntime.ToNumber(rhs);
 							stack[stackTop] = UniqueTag.DOUBLE_MARK;
 							sDbl[stackTop] = lDbl + rDbl;
 						}
@@ -3924,7 +3924,7 @@ object_compare_break: ;
 				}
 				else
 				{
-					double lDbl = (lhs is Number) ? ((Number)lhs) : ScriptRuntime.ToNumber(lhs);
+					double lDbl = (lhs is Number) ? System.Convert.ToDouble(((Number)lhs)) : ScriptRuntime.ToNumber(lhs);
 					stack[stackTop] = UniqueTag.DOUBLE_MARK;
 					sDbl[stackTop] = lDbl + d;
 				}

@@ -476,13 +476,13 @@ namespace Rhino.Xmlimpl
 			bool result;
 			if (name is int)
 			{
-				result = (((int)name) == 0);
+				result = (System.Convert.ToInt32(((int)name)) == 0);
 			}
 			else
 			{
 				if (name is Number)
 				{
-					double x = ((Number)name);
+					double x = System.Convert.ToDouble(((Number)name));
 					// Check that number is positive 0
 					result = (x == 0.0 && 1.0 / x > 0);
 				}

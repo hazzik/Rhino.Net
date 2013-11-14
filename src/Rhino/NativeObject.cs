@@ -548,7 +548,7 @@ namespace Rhino
 			{
 				if (key is Number)
 				{
-					return Has(((Number)key), this);
+					return Has(System.Convert.ToInt32(((Number)key)), this);
 				}
 			}
 			return false;
@@ -577,7 +577,7 @@ namespace Rhino
 			{
 				if (key is Number)
 				{
-					Delete(((Number)key));
+					Delete(System.Convert.ToInt32(((Number)key)));
 				}
 			}
 			return value;

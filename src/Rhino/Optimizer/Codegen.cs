@@ -1685,7 +1685,7 @@ namespace Rhino.Optimizer
 							{
 								// generate gotos back to the JSR location
 								cfw.MarkTableSwitchCase(startSwitch, c);
-								cfw.Add(ByteCode.GOTO, ret.jsrPoints[i]);
+								cfw.Add(ByteCode.GOTO, System.Convert.ToInt32(ret.jsrPoints[i]));
 								c++;
 							}
 						}
@@ -3173,7 +3173,7 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-					cfw.AddPush(((int)id));
+					cfw.AddPush(System.Convert.ToInt32(((int)id)));
 					AddScriptRuntimeInvoke("wrapInt", "(I)Ljava/lang/Integer;");
 				}
 				cfw.Add(ByteCode.AASTORE);

@@ -2220,8 +2220,8 @@ namespace Rhino
 			// while zeroes with different signs are considered different.
 			if (currentValue is Number && newValue is Number)
 			{
-				double d1 = ((Number)currentValue);
-				double d2 = ((Number)newValue);
+				double d1 = System.Convert.ToDouble(((Number)currentValue));
+				double d2 = System.Convert.ToDouble(((Number)newValue));
 				if (double.IsNaN(d1) && double.IsNaN(d2))
 				{
 					return true;
@@ -3658,7 +3658,7 @@ namespace Rhino
 			{
 				if (key is Number)
 				{
-					value = Get(((Number)key), this);
+					value = Get(System.Convert.ToInt32(((Number)key)), this);
 				}
 			}
 			if (value == ScriptableConstants.NOT_FOUND || value == Undefined.instance)

@@ -293,7 +293,7 @@ namespace Rhino.Xmlimpl
 				{
 					if (value is Number)
 					{
-						double d = ((Number)value);
+						double d = System.Convert.ToDouble(((Number)value));
 						long l = (long)d;
 						if (l == d && 0 <= l && l <= unchecked((long)(0xFFFFFFFFL)))
 						{

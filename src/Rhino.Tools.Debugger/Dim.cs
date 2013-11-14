@@ -754,7 +754,7 @@ openStream_break: ;
 			}
 			else
 			{
-				int index = ((int)id);
+				int index = System.Convert.ToInt32(((int)id));
 				result = ScriptableObject.GetProperty(scriptable, index);
 				if (result == ScriptableObject.NOT_FOUND)
 				{

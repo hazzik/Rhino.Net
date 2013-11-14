@@ -242,7 +242,7 @@ namespace Rhino.Tools.Debugger
 		{
 			Program main = new Program("Rhino JavaScript Debugger");
 			main.DoBreak();
-			main.SetExitAction(new Program.IProxy(Main.IProxy.EXIT_ACTION));
+			main.SetExitAction(new Main.IProxy(Main.IProxy.EXIT_ACTION));
 			Runtime.SetIn(main.GetIn());
 			Runtime.SetOut(main.GetOut());
 			Runtime.SetErr(main.GetErr());
@@ -322,7 +322,7 @@ namespace Rhino.Tools.Debugger
 			}
 			Program main = new Program(title);
 			main.DoBreak();
-			main.SetExitAction(new Program.IProxy(Main.IProxy.EXIT_ACTION));
+			main.SetExitAction(new Main.IProxy(Main.IProxy.EXIT_ACTION));
 			main.AttachTo(factory);
 			if (scopeProvider is ScopeProvider)
 			{
@@ -424,7 +424,7 @@ namespace Rhino.Tools.Debugger
 			/// </summary>
 			public static ScopeProvider NewScopeProvider(Scriptable scope)
 			{
-				Program.IProxy scopeProvider = new Program.IProxy(SCOPE_PROVIDER);
+				Main.IProxy scopeProvider = new Main.IProxy(SCOPE_PROVIDER);
 				scopeProvider.scope = scope;
 				return scopeProvider;
 			}
