@@ -211,11 +211,9 @@ namespace Rhino.Tools.Jsc
 				{
 					// TODO: allow for multiple comma-separated interfaces.
 					string targetImplements = args[i];
-					StringTokenizer st = new StringTokenizer(targetImplements, ",");
-					IList<Type> list = new List<Type>();
-					while (st.HasMoreTokens())
+					List<Type> list = new List<Type>();
+					foreach (var className in targetImplements.Split(","))
 					{
-						string className = st.NextToken();
 						try
 						{
 							list.Add(Sharpen.Runtime.GetType(className));
@@ -226,7 +224,7 @@ namespace Rhino.Tools.Jsc
 						}
 					}
 					// TODO: better error
-					Type[] implementsClasses = Sharpen.Collections.ToArray(list, new Type[list.Count]);
+					Type[] implementsClasses = list.ToArray();
 					compiler.SetTargetImplements(implementsClasses);
 					continue;
 				}

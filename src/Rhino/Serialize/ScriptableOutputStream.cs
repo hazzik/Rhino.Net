@@ -166,12 +166,11 @@ namespace Rhino.Serialize
 
 		internal static object LookupQualifiedName(Scriptable scope, string qualifiedName)
 		{
-			StringTokenizer st = new StringTokenizer(qualifiedName, ".");
+			string[] names = qualifiedName.Split(".");
 			object result = scope;
-			while (st.HasMoreTokens())
+			foreach (string name in names)
 			{
-				string s = st.NextToken();
-				result = ScriptableObject.GetProperty((Scriptable)result, s);
+				result = ScriptableObject.GetProperty((Scriptable) result, name);
 				if (result == null || !(result is Scriptable))
 				{
 					break;

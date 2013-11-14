@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Linq;
 using Sharpen;
 
 namespace Rhino.Commonjs.Module.Provider
@@ -23,8 +24,6 @@ namespace Rhino.Commonjs.Module.Provider
 	[System.Serializable]
 	public sealed class ParsedContentType
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly string contentType;
 
 		private readonly string encoding;
@@ -41,27 +40,26 @@ namespace Rhino.Commonjs.Module.Provider
 			string encoding = null;
 			if (mimeType != null)
 			{
-				StringTokenizer tok = new StringTokenizer(mimeType, ";");
-				if (tok.HasMoreTokens())
+				string[] tokens = mimeType.Split(";");
+				if (tokens.Length > 0)
 				{
-					contentType = tok.NextToken().Trim();
-					while (tok.HasMoreTokens())
+					contentType = tokens[0].Trim();
+				}
+				foreach (var token in tokens.Skip(1))
+				{
+					string param = token.Trim();
+					if (param.StartsWith("charset="))
 					{
-						string param = tok.NextToken().Trim();
-						if (param.StartsWith("charset="))
+						encoding = param.Substring(8);
+						if (encoding.Length > 0)
 						{
-							encoding = Sharpen.Runtime.Substring(param, 8).Trim();
-							int l = encoding.Length;
-							if (l > 0)
+							if (encoding[0] == '"')
 							{
-								if (encoding[0] == '"')
-								{
-									encoding = Sharpen.Runtime.Substring(encoding, 1);
-								}
-								if (encoding[l - 1] == '"')
-								{
-									encoding = Sharpen.Runtime.Substring(encoding, 0, l - 1);
-								}
+								encoding = encoding.Substring(1);
+							}
+							if (encoding[encoding.Length - 1] == '"')
+							{
+								encoding = encoding.Substring(0, encoding.Length - 1);
 							}
 							break;
 						}
