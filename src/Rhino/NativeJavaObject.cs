@@ -793,7 +793,7 @@ namespace Rhino
 							// not other JS objects converted to strings
 							if (((CharSequence)value).Length == 1)
 							{
-								return char.ValueOf(((CharSequence)value)[0]);
+								return Sharpen.Extensions.ValueOf(((CharSequence)value)[0]);
 							}
 							else
 							{
@@ -993,7 +993,7 @@ namespace Rhino
 				{
 					return value;
 				}
-				return char.ValueOf((char)ToInteger(value, ScriptRuntime.CharacterClass, char.MinValue, char.MaxValue));
+				return Sharpen.Extensions.ValueOf((char)ToInteger(value, ScriptRuntime.CharacterClass, char.MinValue, char.MaxValue));
 			}
 			// Double, Float
 			if (type == ScriptRuntime.ObjectClass || type == ScriptRuntime.DoubleClass || type == typeof(double))

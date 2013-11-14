@@ -87,6 +87,7 @@
 -methodMapping java.lang.Character.isUpperCase System.Char.IsUpper
 -methodMapping java.lang.Character.toLowerCase System.Char.ToLower
 -methodMapping java.lang.Character.toUpperCase System.Char.ToUpper
+-methodMapping java.lang.Character.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Double.isInfinite System.Double.IsInfinity
 -methodMapping java.lang.Double.parseDouble System.Double.Parse
 -methodMapping java.lang.Double.valueOf Sharpen.Extensions.ValueOf
