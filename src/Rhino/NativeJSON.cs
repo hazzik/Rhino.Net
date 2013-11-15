@@ -155,6 +155,7 @@ namespace Rhino
 
 						case 0:
 						{
+							break;
 						}
 					}
 					return Stringify(cx, scope, value, replacer, space);

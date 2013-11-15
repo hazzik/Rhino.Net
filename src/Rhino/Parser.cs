@@ -4549,6 +4549,7 @@ commaLoop_break: ;
 						case Token.VAR:
 						{
 							ReportError("msg.bad.assign.left");
+							break;
 						}
 					}
 					comma.AddChildToBack(SimpleAssignment(left, CreateName(tempName)));

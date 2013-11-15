@@ -3410,6 +3410,7 @@ namespace Org.Mozilla.Classfile
 
 								case 'L':
 								{
+									break;
 								}
 							}
 							goto case 'L';

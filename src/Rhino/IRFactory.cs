@@ -2749,6 +2749,7 @@ namespace Rhino
 					{
 						return ALWAYS_FALSE_BOOLEAN;
 					}
+					break;
 				}
 			}
 			return 0;

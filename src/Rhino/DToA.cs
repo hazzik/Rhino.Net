@@ -609,6 +609,7 @@ namespace Rhino
 					{
 						i = 1;
 					}
+					break;
 				}
 			}
 			bool fast_failed = false;
