@@ -1368,7 +1368,7 @@ again_break: ;
 				}
 				string a = ScriptRuntime.ToString(x);
 				string b = ScriptRuntime.ToString(y);
-				return Sharpen.Runtime.CompareOrdinal(a, b);
+				return string.CompareOrdinal(a, b);
 			}
 		}
 

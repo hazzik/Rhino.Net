@@ -165,6 +165,7 @@
 -methodMapping java.util.zip.Inflater.end Finish
 -methodMapping System.out.println System.Console.WriteLine
 -methodMapping org.w3c.dom.NodeList.getParentNode Parent
+-methodMapping org.hamcrest.core.Is.is equalTo
 
 -propertyMapping java.lang.Class.getPackage Assembly
 -propertyMapping java.lang.Class.getSimpleName Name
@@ -237,3 +238,4 @@
 -namespaceMapping javax.crypto.spec Sharpen
 -namespaceMapping javax.net.ssl Sharpen
 -namespaceMapping org.ietf.jgss Sharpen
+-namespaceMapping org.hamcrest.core NUnit.Framework

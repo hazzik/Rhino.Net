@@ -3604,7 +3604,7 @@ search_break: ;
 				}
 				if (val1 is CharSequence && val2 is CharSequence)
 				{
-					return Sharpen.Runtime.CompareOrdinal(val1.ToString(), val2.ToString()) < 0;
+					return string.CompareOrdinal(val1.ToString(), val2.ToString()) < 0;
 				}
 				d1 = ToNumber(val1);
 				d2 = ToNumber(val2);
@@ -3633,7 +3633,7 @@ search_break: ;
 				}
 				if (val1 is CharSequence && val2 is CharSequence)
 				{
-					return Sharpen.Runtime.CompareOrdinal(val1.ToString(), val2.ToString()) <= 0;
+					return string.CompareOrdinal(val1.ToString(), val2.ToString()) <= 0;
 				}
 				d1 = ToNumber(val1);
 				d2 = ToNumber(val2);

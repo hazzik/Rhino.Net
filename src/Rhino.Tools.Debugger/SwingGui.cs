@@ -2836,6 +2836,7 @@ namespace Rhino.Tools.Debugger
 				{
 					// just reset column 2; ignore edits
 					FireTableDataChanged();
+					break;
 				}
 			}
 		}

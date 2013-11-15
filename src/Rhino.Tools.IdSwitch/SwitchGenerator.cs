@@ -554,7 +554,7 @@ namespace Rhino.Tools.Idswitch
 				{
 					return diff > 0;
 				}
-				return Sharpen.Runtime.CompareOrdinal(a.id, b.id) > 0;
+				return string.CompareOrdinal(a.id, b.id) > 0;
 			}
 			else
 			{
