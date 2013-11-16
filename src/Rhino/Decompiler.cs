@@ -148,7 +148,7 @@ namespace Rhino
 			{
 				// if it's floating point, save as a Double bit pattern.
 				// (12/15/97 our scanner only returns Double for f.p.)
-				lbits = double.DoubleToLongBits(n);
+				lbits = System.BitConverter.DoubleToInt64Bits(n);
 				Append('D');
 				Append((char)(lbits >> 48));
 				Append((char)(lbits >> 32));
@@ -1093,7 +1093,7 @@ namespace Rhino
 						}
 						else
 						{
-							number = double.LongBitsToDouble(lbits);
+							number = System.BitConverter.Int64BitsToDouble(lbits);
 						}
 					}
 					offset += 4;

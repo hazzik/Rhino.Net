@@ -103,6 +103,11 @@
 -methodMapping java.lang.Double.parseDouble System.Double.Parse
 -methodMapping java.lang.Double.toString ToString
 -methodMapping java.lang.Double.valueOf Sharpen.Extensions.ValueOf
+-methodMapping java.lang.Double.doubleToLongBits Sharpen.Runtime.DoubleToLongBits
+-methodMapping java.lang.Double.longBitsToDouble Sharpen.Runtime.LongBitsToDouble
+-methodMapping java.lang.Float.floatToIntBits Sharpen.Runtime.FloatToIntBits
+-methodMapping java.lang.Float.intBitsToFloat Sharpen.Runtime.IntBitsToFloat
+-methodMapping java.lang.Float.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Integer.bitCount Sharpen.Extensions.BitCount
 -methodMapping java.lang.Integer.lowestOneBit Sharpen.Extensions.LowestOneBit
 -methodMapping java.lang.Integer.numberOfLeadingZeros Sharpen.Extensions.NumberOfLeadingZeros

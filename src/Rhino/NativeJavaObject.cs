@@ -1054,8 +1054,8 @@ namespace Rhino
 				}
 				else
 				{
-					double max = double.LongBitsToDouble(unchecked((long)(0x43dfffffffffffffL)));
-					double min = double.LongBitsToDouble(unchecked((long)(0xc3e0000000000000L)));
+					double max = System.BitConverter.Int64BitsToDouble(unchecked((long)(0x43dfffffffffffffL)));
+					double min = System.BitConverter.Int64BitsToDouble(unchecked((long)(0xc3e0000000000000L)));
 					return Sharpen.Extensions.ValueOf(ToInteger(value, ScriptRuntime.LongClass, min, max));
 				}
 			}

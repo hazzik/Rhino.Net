@@ -176,7 +176,7 @@ namespace Rhino
 			int y;
 			int z;
 			int de;
-			long dBits = double.DoubleToLongBits(d);
+			long dBits = System.BitConverter.DoubleToInt64Bits(d);
 			int d0 = (int)((long)(((ulong)dBits) >> 32));
 			int d1 = (int)(dBits);
 			z = d0 & Frac_mask;
@@ -271,7 +271,7 @@ namespace Rhino
 			else
 			{
 				// BigInteger should be used
-				long floorBits = double.DoubleToLongBits(dfloor);
+				long floorBits = System.BitConverter.DoubleToInt64Bits(dfloor);
 				int exp = (int)(floorBits >> Exp_shiftL) & Exp_mask_shifted;
 				long mantissa;
 				if (exp == 0)
@@ -315,7 +315,7 @@ namespace Rhino
 				buffer = new StringBuilder();
 				buffer.Append(intDigits).Append('.');
 				df = d - dfloor;
-				long dBits = double.DoubleToLongBits(d);
+				long dBits = System.BitConverter.DoubleToInt64Bits(d);
 				int word0 = (int)(dBits >> 32);
 				int word1 = (int)(dBits);
 				int[] e = new int[1];
@@ -401,20 +401,20 @@ namespace Rhino
 
 		internal static int Word0(double d)
 		{
-			long dBits = double.DoubleToLongBits(d);
+			long dBits = System.BitConverter.DoubleToInt64Bits(d);
 			return (int)(dBits >> 32);
 		}
 
 		internal static double SetWord0(double d, int i)
 		{
-			long dBits = double.DoubleToLongBits(d);
+			long dBits = System.BitConverter.DoubleToInt64Bits(d);
 			dBits = ((long)i << 32) | (dBits & unchecked((long)(0x0FFFFFFFFL)));
-			return double.LongBitsToDouble(dBits);
+			return System.BitConverter.Int64BitsToDouble(dBits);
 		}
 
 		internal static int Word1(double d)
 		{
-			long dBits = double.DoubleToLongBits(d);
+			long dBits = System.BitConverter.DoubleToInt64Bits(d);
 			return (int)(dBits);
 		}
 

@@ -507,7 +507,7 @@ namespace Rhino.V8dtoa
 		// computed.
 		internal static bool Grisu3(double v, FastDtoaBuilder buffer)
 		{
-			long bits = double.DoubleToLongBits(v);
+			long bits = System.BitConverter.DoubleToInt64Bits(v);
 			DiyFp w = DoubleHelper.AsNormalizedDiyFp(bits);
 			// boundary_minus and boundary_plus are the boundaries between v and its
 			// closest floating-point neighbors. Any number strictly between

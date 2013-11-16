@@ -2226,7 +2226,7 @@ namespace Rhino
 				{
 					return true;
 				}
-				if (d1 == 0.0 && double.DoubleToLongBits(d1) != double.DoubleToLongBits(d2))
+				if (d1 == 0.0 && System.BitConverter.DoubleToInt64Bits(d1) != System.BitConverter.DoubleToInt64Bits(d2))
 				{
 					return false;
 				}

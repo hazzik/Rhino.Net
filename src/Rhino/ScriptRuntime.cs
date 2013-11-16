@@ -417,9 +417,9 @@ namespace Rhino
 			return (index < args.Length) ? ToNumber(args[index]) : NaN;
 		}
 
-		public static readonly double NaN = double.LongBitsToDouble(unchecked((long)(0x7ff8000000000000L)));
+		public static readonly double NaN = System.BitConverter.Int64BitsToDouble(unchecked((long)(0x7ff8000000000000L)));
 
-		public static readonly double negativeZero = double.LongBitsToDouble(unchecked((long)(0x8000000000000000L)));
+		public static readonly double negativeZero = System.BitConverter.Int64BitsToDouble(unchecked((long)(0x8000000000000000L)));
 
 		public static readonly double NaNobj = NaN;
 

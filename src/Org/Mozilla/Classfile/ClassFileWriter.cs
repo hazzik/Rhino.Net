@@ -5701,7 +5701,7 @@ stringLoop_break: ;
 		{
 			Ensure(5);
 			itsPool[itsTop++] = CONSTANT_Float;
-			int bits = Sharpen.Runtime.FloatToIntBits(k);
+			int bits = System.BitConverter.FloatToIntBits(k);
 			itsTop = ClassFileWriter.PutInt32(bits, itsPool, itsTop);
 			itsPoolTypes.Put(itsTopIndex, CONSTANT_Float);
 			return itsTopIndex++;
@@ -5711,7 +5711,7 @@ stringLoop_break: ;
 		{
 			Ensure(9);
 			itsPool[itsTop++] = CONSTANT_Double;
-			long bits = double.DoubleToLongBits(k);
+			long bits = System.BitConverter.DoubleToInt64Bits(k);
 			itsTop = ClassFileWriter.PutInt64(bits, itsPool, itsTop);
 			int index = itsTopIndex;
 			itsTopIndex += 2;
