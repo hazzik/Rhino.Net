@@ -215,18 +215,7 @@ namespace Rhino.Optimizer
 
 		public static void Main(Script script, string[] args)
 		{
-			ContextFactory.GetGlobal().Call(new _ContextAction_206(args, script));
-		}
-
-		private sealed class _ContextAction_206 : ContextAction
-		{
-			public _ContextAction_206(string[] args, Script script)
-			{
-				this.args = args;
-				this.script = script;
-			}
-
-			public object Run(Context cx)
+			ContextFactory.GetGlobal().Call(cx =>
 			{
 				ScriptableObject global = ScriptRuntime.GetGlobal(cx);
 				// get the command line arguments and define "arguments"
@@ -237,11 +226,7 @@ namespace Rhino.Optimizer
 				global.DefineProperty("arguments", argsObj, ScriptableObject.DONTENUM);
 				script.Exec(cx, global);
 				return null;
-			}
-
-			private readonly string[] args;
-
-			private readonly Script script;
+			});
 		}
 
 		public static void ThrowStopIteration(object obj)

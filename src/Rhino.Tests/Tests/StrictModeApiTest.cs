@@ -66,25 +66,7 @@ namespace Rhino.Tests
 
 		private object RunScript(string scriptSourceText)
 		{
-			return this.contextFactory.Call(new _ContextAction_56(this, scriptSourceText));
-		}
-
-		private sealed class _ContextAction_56 : ContextAction
-		{
-			public _ContextAction_56(StrictModeApiTest _enclosing, string scriptSourceText)
-			{
-				this._enclosing = _enclosing;
-				this.scriptSourceText = scriptSourceText;
-			}
-
-			public object Run(Context context)
-			{
-				return context.EvaluateString(this._enclosing.global, scriptSourceText, "test source", 1, null);
-			}
-
-			private readonly StrictModeApiTest _enclosing;
-
-			private readonly string scriptSourceText;
+			return contextFactory.Call(cx => cx.EvaluateString(global, scriptSourceText, "test source", 1, null));
 		}
 	}
 }

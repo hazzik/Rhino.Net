@@ -84,42 +84,15 @@ namespace Rhino.Tests
 			TestIt("function f() {\n null.method(); \n}\n try { f() } catch (e) { e.stack }", expectedStack);
 		}
 
-		private void TestIt(string script, object expected)
+		private static void TestIt(string script, object expected)
 		{
-			ContextAction action = new _ContextAction_78(script, expected);
-			Utils.RunWithAllOptimizationLevels(action);
-		}
-
-		private sealed class _ContextAction_78 : ContextAction
-		{
-			public _ContextAction_78(string script, object expected)
+			Utils.RunWithAllOptimizationLevels(cx =>
 			{
-				this.script = script;
-				this.expected = expected;
-			}
-
-			public object Run(Context cx)
-			{
-				try
-				{
-					ScriptableObject scope = cx.InitStandardObjects();
-					object o = cx.EvaluateString(scope, script, "myScript.js", 1, null);
-					NUnit.Framework.Assert.AreEqual(expected, o);
-					return o;
-				}
-				catch (Exception e)
-				{
-					throw;
-				}
-				catch (Exception e)
-				{
-					throw new Exception(e);
-				}
-			}
-
-			private readonly string script;
-
-			private readonly object expected;
+				ScriptableObject scope = cx.InitStandardObjects();
+				object o = cx.EvaluateString(scope, script, "myScript.js", 1, null);
+				Assert.AreEqual(expected, o);
+				return o;
+			});
 		}
 	}
 }

@@ -56,66 +56,18 @@ namespace Rhino.Tools.Shell
 
 		private static SecurityProxy securityImpl;
 
-		private static readonly Main.ScriptCache scriptCache = new Main.ScriptCache(32);
+		private static readonly ScriptCache scriptCache = new ScriptCache(32);
 
 		static Program()
 		{
-			global.InitQuitAction(new Main.IProxy(Main.IProxy.SYSTEM_EXIT));
+			global.InitQuitAction(new IProxy());
 		}
 
-		/// <summary>Proxy class to avoid proliferation of anonymous classes.</summary>
-		/// <remarks>Proxy class to avoid proliferation of anonymous classes.</remarks>
-		private class IProxy : ContextAction, QuitAction
+		private class IProxy : QuitAction
 		{
-			private const int PROCESS_FILES = 1;
-
-			private const int EVAL_INLINE_SCRIPT = 2;
-
-			private const int SYSTEM_EXIT = 3;
-
-			private int type;
-
-			internal string[] args;
-
-			internal string scriptText;
-
-			internal IProxy(int type)
-			{
-				this.type = type;
-			}
-
-			public virtual object Run(Context cx)
-			{
-				if (useRequire)
-				{
-					require = global.InstallRequire(cx, modulePath, sandboxed);
-				}
-				if (type == PROCESS_FILES)
-				{
-					ProcessFiles(cx, args);
-				}
-				else
-				{
-					if (type == EVAL_INLINE_SCRIPT)
-					{
-						EvalInlineScript(cx, scriptText);
-					}
-					else
-					{
-						throw Kit.CodeBug();
-					}
-				}
-				return null;
-			}
-
 			public virtual void Quit(Context cx, int exitCode)
 			{
-				if (type == SYSTEM_EXIT)
-				{
-					System.Environment.Exit(exitCode);
-					return;
-				}
-				throw Kit.CodeBug();
+				System.Environment.Exit(exitCode);
 			}
 		}
 
@@ -162,9 +114,14 @@ namespace Rhino.Tools.Shell
 			{
 				global.Init(shellContextFactory);
 			}
-			Main.IProxy iproxy = new Main.IProxy(Main.IProxy.PROCESS_FILES);
-			iproxy.args = args;
-			shellContextFactory.Call(iproxy);
+			shellContextFactory.Call(cx =>
+			{
+				if (useRequire)
+					require = global.InstallRequire(cx, modulePath, sandboxed);
+
+				ProcessFiles(cx, args);
+				return null;
+			});
 			return exitCode;
 		}
 
@@ -393,9 +350,14 @@ namespace Rhino.Tools.Shell
 					{
 						global.Init(shellContextFactory);
 					}
-					Main.IProxy iproxy = new Main.IProxy(Main.IProxy.EVAL_INLINE_SCRIPT);
-					iproxy.scriptText = args[i];
-					shellContextFactory.Call(iproxy);
+					shellContextFactory.Call(cx =>
+					{
+						if (useRequire)
+							require = global.InstallRequire(cx, modulePath, sandboxed);
+
+						EvalInlineScript(cx, args[i]);
+						return null;
+					});
 					continue;
 				}
 				if (arg.Equals("-require"))
@@ -481,8 +443,8 @@ goodUsage_break: ;
 			Exception exObj;
 			try
 			{
-				Type cl = Sharpen.Runtime.GetType("org.mozilla.javascript.tools.shell.JavaPolicySecurity");
-				securityImpl = (SecurityProxy)System.Activator.CreateInstance(cl);
+				Type cl = Runtime.GetType("org.mozilla.javascript.tools.shell.JavaPolicySecurity");
+				securityImpl = (SecurityProxy)Activator.CreateInstance(cl);
 				SecurityController.InitGlobal(securityImpl);
 				return;
 			}
@@ -523,7 +485,7 @@ goodUsage_break: ;
 				string charEnc = shellContextFactory.GetCharacterEncoding();
 				if (charEnc != null)
 				{
-					cs = Sharpen.Extensions.GetEncoding(charEnc);
+					cs = Extensions.GetEncoding(charEnc);
 				}
 				else
 				{
@@ -603,7 +565,7 @@ goodUsage_break: ;
 					catch (VirtualMachineError ex)
 					{
 						// Treat StackOverflow and OutOfMemory as runtime errors
-						Sharpen.Runtime.PrintStackTrace(ex);
+						Runtime.PrintStackTrace(ex);
 						string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 						Context.ReportError(msg);
 						exitCode = EXITCODE_RUNTIME_ERROR;
@@ -644,7 +606,7 @@ goodUsage_break: ;
 			catch (VirtualMachineError ex)
 			{
 				// Treat StackOverflow and OutOfMemory as runtime errors
-				Sharpen.Runtime.PrintStackTrace(ex);
+				Runtime.PrintStackTrace(ex);
 				string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 				Context.ReportError(msg);
 				exitCode = EXITCODE_RUNTIME_ERROR;
@@ -671,7 +633,7 @@ goodUsage_break: ;
 			object source = ReadFileOrUrl(path, !isClass);
 			byte[] digest = GetDigest(source);
 			string key = path + "_" + cx.GetOptimizationLevel();
-			Main.ScriptReference @ref = scriptCache.Get(key, digest);
+			ScriptReference @ref = scriptCache.Get(key, digest);
 			Script script = @ref != null ? @ref.Get() : null;
 			if (script == null)
 			{
@@ -692,7 +654,7 @@ goodUsage_break: ;
 							int c = strSrc[i];
 							if (c == '\n' || c == '\r')
 							{
-								strSrc = Sharpen.Runtime.Substring(strSrc, i);
+								strSrc = Runtime.Substring(strSrc, i);
 								break;
 							}
 						}
@@ -717,11 +679,11 @@ goodUsage_break: ;
 				{
 					try
 					{
-						bytes = Sharpen.Runtime.GetBytesForString(((string)source), "UTF-8");
+						bytes = Runtime.GetBytesForString(((string)source), "UTF-8");
 					}
 					catch (UnsupportedEncodingException)
 					{
-						bytes = Sharpen.Runtime.GetBytesForString(((string)source));
+						bytes = Runtime.GetBytesForString(((string)source));
 					}
 				}
 				else
@@ -736,7 +698,7 @@ goodUsage_break: ;
 				catch (NoSuchAlgorithmException nsa)
 				{
 					// Should not happen
-					throw new Exception(nsa);
+					throw new Exception("Algorithm not found", nsa);
 				}
 			}
 			return digest;
@@ -777,17 +739,17 @@ goodUsage_break: ;
 				{
 					throw Context.ReportRuntimeError("msg.must.implement.Script");
 				}
-				return (Script)System.Activator.CreateInstance(clazz);
+				return (Script)Activator.CreateInstance(clazz);
 			}
 			catch (MemberAccessException iaex)
 			{
 				Context.ReportError(iaex.ToString());
-				throw new Exception(iaex);
+				throw new Exception("", iaex);
 			}
 			catch (InstantiationException inex)
 			{
 				Context.ReportError(inex.ToString());
-				throw new Exception(inex);
+				throw new Exception("", inex);
 			}
 		}
 
@@ -846,8 +808,8 @@ goodUsage_break: ;
 			}
 		}
 
-		[System.Serializable]
-		internal class ScriptCache : LinkedHashMap<string, Main.ScriptReference>
+		[Serializable]
+		internal class ScriptCache : LinkedHashMap<string, ScriptReference>
 		{
 			internal ReferenceQueue<Script> queue;
 
@@ -859,22 +821,22 @@ goodUsage_break: ;
 				queue = new ReferenceQueue<Script>();
 			}
 
-			protected override bool RemoveEldestEntry(KeyValuePair<string, Main.ScriptReference> eldest)
+			protected override bool RemoveEldestEntry(KeyValuePair<string, ScriptReference> eldest)
 			{
 				return Count > capacity;
 			}
 
-			internal virtual Main.ScriptReference Get(string path, byte[] digest)
+			internal virtual ScriptReference Get(string path, byte[] digest)
 			{
-				Main.ScriptReference @ref;
-				while ((@ref = (Main.ScriptReference)queue.Poll()) != null)
+				ScriptReference @ref;
+				while ((@ref = (ScriptReference)queue.Poll()) != null)
 				{
-					Sharpen.Collections.Remove(this, @ref.path);
+					Collections.Remove(this, @ref.path);
 				}
 				@ref = Get(path);
 				if (@ref != null && !Arrays.Equals(digest, @ref.digest))
 				{
-					Sharpen.Collections.Remove(this, @ref.path);
+					Collections.Remove(this, @ref.path);
 					@ref = null;
 				}
 				return @ref;
@@ -882,7 +844,7 @@ goodUsage_break: ;
 
 			internal virtual void Put(string path, byte[] digest, Script script)
 			{
-				Put(path, new Main.ScriptReference(path, digest, script, queue));
+				Put(path, new ScriptReference(path, digest, script, queue));
 			}
 		}
 	}

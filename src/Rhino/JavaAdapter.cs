@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Org.Mozilla.Classfile;
 using Rhino;
 using Sharpen;
 
@@ -631,35 +630,8 @@ namespace Rhino
 			}
 			else
 			{
-				return factory.Call(new _ContextAction_583(scope, thisObj, f, args, argsToWrap));
+				return factory.Call(c => DoCall(c, scope, thisObj, f, args, argsToWrap));
 			}
-		}
-
-		private sealed class _ContextAction_583 : ContextAction
-		{
-			public _ContextAction_583(Scriptable scope, Scriptable thisObj, Function f, object[] args, long argsToWrap)
-			{
-				this.scope = scope;
-				this.thisObj = thisObj;
-				this.f = f;
-				this.args = args;
-				this.argsToWrap = argsToWrap;
-			}
-
-			public object Run(Context cx)
-			{
-				return JavaAdapter.DoCall(cx, scope, thisObj, f, args, argsToWrap);
-			}
-
-			private readonly Scriptable scope;
-
-			private readonly Scriptable thisObj;
-
-			private readonly Function f;
-
-			private readonly object[] args;
-
-			private readonly long argsToWrap;
 		}
 
 		private static object DoCall(Context cx, Scriptable scope, Scriptable thisObj, Function f, object[] args, long argsToWrap)
@@ -681,24 +653,12 @@ namespace Rhino
 
 		public static Scriptable RunScript(Script script)
 		{
-			return (Scriptable)ContextFactory.GetGlobal().Call(new _ContextAction_612(script));
-		}
-
-		private sealed class _ContextAction_612 : ContextAction
-		{
-			public _ContextAction_612(Script script)
-			{
-				this.script = script;
-			}
-
-			public object Run(Context cx)
+			return (Scriptable) ContextFactory.GetGlobal().Call(cx =>
 			{
 				ScriptableObject global = ScriptRuntime.GetGlobal(cx);
 				script.Exec(cx, global);
 				return global;
-			}
-
-			private readonly Script script;
+			);
 		}
 
 		private static void GenerateCtor<_T0>(ClassFileWriter cfw, string adapterName, string superName, ConstructorInfo superCtor)

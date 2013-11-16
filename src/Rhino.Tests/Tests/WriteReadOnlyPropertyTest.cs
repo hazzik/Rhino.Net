@@ -55,30 +55,14 @@ namespace Rhino.Tests
 			WriteReadOnlyPropertyTest.Foo foo = new WriteReadOnlyPropertyTest.Foo("hello");
 			foo.DefineProperty("myProp", null, readMethod, null, ScriptableObject.EMPTY);
 			string script = "foo.myProp = 123; foo.myProp";
-			ContextAction action = new _ContextAction_55(foo, script);
 			ContextFactory contextFactory = new _ContextFactory_66(acceptWriteReadOnly);
-			contextFactory.Call(action);
-		}
-
-		private sealed class _ContextAction_55 : ContextAction
-		{
-			public _ContextAction_55(WriteReadOnlyPropertyTest.Foo foo, string script)
-			{
-				this.foo = foo;
-				this.script = script;
-			}
-
-			public object Run(Context cx)
+			contextFactory.Call(cx =>
 			{
 				ScriptableObject top = cx.InitStandardObjects();
 				ScriptableObject.PutProperty(top, "foo", foo);
 				cx.EvaluateString(top, script, "script", 0, null);
 				return null;
-			}
-
-			private readonly WriteReadOnlyPropertyTest.Foo foo;
-
-			private readonly string script;
+			});
 		}
 
 		private sealed class _ContextFactory_66 : ContextFactory

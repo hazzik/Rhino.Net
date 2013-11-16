@@ -46,7 +46,7 @@ namespace Rhino.Tests
 			try
 			{
 				cx.SetOptimizationLevel(optimizationLevel);
-				action.Run(cx);
+				action(cx);
 			}
 			finally
 			{
@@ -59,24 +59,11 @@ namespace Rhino.Tests
 		/// <param name="script">the script code</param>
 		internal static void ExecuteScript(string script, int optimizationLevel)
 		{
-			ContextAction action = new _ContextAction_70(script);
-			Utils.RunWithOptimizationLevel(action, optimizationLevel);
-		}
-
-		private sealed class _ContextAction_70 : ContextAction
-		{
-			public _ContextAction_70(string script)
-			{
-				this.script = script;
-			}
-
-			public object Run(Context cx)
+			RunWithOptimizationLevel(cx =>
 			{
 				Scriptable scope = cx.InitStandardObjects();
 				return cx.EvaluateString(scope, script, "myScript.js", 1, null);
-			}
-
-			private readonly string script;
+			}, optimizationLevel);
 		}
 	}
 }

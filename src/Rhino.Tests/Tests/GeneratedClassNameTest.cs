@@ -43,25 +43,10 @@ namespace Rhino.Tests
 		/// <exception cref="System.Exception"></exception>
 		private void DoTest(string expectedName, string scriptName)
 		{
-			Script script = (Script)ContextFactory.GetGlobal().Call(new _ContextAction_38(scriptName));
+			Script script = (Script)ContextFactory.GetGlobal().Call(cx => cx.CompileString("var f = 1", scriptName, 1, null));
 			// remove serial number
 			string name = script.GetType().Name;
 			NUnit.Framework.Assert.AreEqual(expectedName, Sharpen.Runtime.Substring(name, 0, name.LastIndexOf('_')));
-		}
-
-		private sealed class _ContextAction_38 : ContextAction
-		{
-			public _ContextAction_38(string scriptName)
-			{
-				this.scriptName = scriptName;
-			}
-
-			public object Run(Context context)
-			{
-				return context.CompileString("var f = 1", scriptName, 1, null);
-			}
-
-			private readonly string scriptName;
 		}
 	}
 }

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Rhino;
 using Rhino.Drivers;
 using Rhino.Tools.Shell;
@@ -424,7 +425,29 @@ namespace Rhino.Drivers
 			{
 				try
 				{
-					shellContextFactory.Call(new _ContextAction_280(status, jsFile, testState, global));
+					shellContextFactory.Call(cx =>
+					{
+						status.Running(jsFile);
+						testState.errors = new ShellTest.ErrorReporterWrapper(cx.GetErrorReporter());
+						cx.SetErrorReporter(testState.errors);
+						global.Init(cx);
+						try
+						{
+							ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile().GetParentFile().GetParentFile(), "shell.js"));
+							ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile().GetParentFile(), "shell.js"));
+							ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile(), "shell.js"));
+							ShellTest.RunFileIfExists(cx, global, jsFile);
+							status.HadErrors(jsFile, Sharpen.Collections.ToArray(testState.errors.errors, new ShellTest.Status.JsError[0]));
+						}
+						catch (ThreadAbortException)
+						{
+						}
+						catch (Exception t)
+						{
+							status.Threw(t);
+						}
+						return null;
+					});
 				}
 				catch (Exception t)
 				{
@@ -441,49 +464,6 @@ namespace Rhino.Drivers
 						testState.finished = true;
 					}
 				}
-			}
-
-			private sealed class _ContextAction_280 : ContextAction
-			{
-				public _ContextAction_280(ShellTest.Status status, FilePath jsFile, ShellTest.TestState testState, Global global)
-				{
-					this.status = status;
-					this.jsFile = jsFile;
-					this.testState = testState;
-					this.global = global;
-				}
-
-				public object Run(Context cx)
-				{
-					status.Running(jsFile);
-					testState.errors = new ShellTest.ErrorReporterWrapper(cx.GetErrorReporter());
-					cx.SetErrorReporter(testState.errors);
-					global.Init(cx);
-					try
-					{
-						ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile().GetParentFile().GetParentFile(), "shell.js"));
-						ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile().GetParentFile(), "shell.js"));
-						ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile(), "shell.js"));
-						ShellTest.RunFileIfExists(cx, global, jsFile);
-						status.HadErrors(jsFile, Sharpen.Collections.ToArray(testState.errors.errors, new ShellTest.Status.JsError[0]));
-					}
-					catch (ThreadDeath)
-					{
-					}
-					catch (Exception t)
-					{
-						status.Threw(t);
-					}
-					return null;
-				}
-
-				private readonly ShellTest.Status status;
-
-				private readonly FilePath jsFile;
-
-				private readonly ShellTest.TestState testState;
-
-				private readonly Global global;
 			}
 
 			private readonly ShellContextFactory shellContextFactory;

@@ -49,30 +49,14 @@ namespace Rhino.Tests
 
 		private void TestWithTwoScopes(string scriptScope1, string scriptScope2)
 		{
-			ContextAction action = new _ContextAction_68(scriptScope2, scriptScope1);
-			Utils.RunWithAllOptimizationLevels(action);
-		}
-
-		private sealed class _ContextAction_68 : ContextAction
-		{
-			public _ContextAction_68(string scriptScope2, string scriptScope1)
-			{
-				this.scriptScope2 = scriptScope2;
-				this.scriptScope1 = scriptScope1;
-			}
-
-			public object Run(Context cx)
+			Utils.RunWithAllOptimizationLevels(cx =>
 			{
 				Scriptable scope1 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope1"));
 				Scriptable scope2 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope2"));
 				cx.EvaluateString(scope2, scriptScope2, "source2", 1, null);
 				scope1.Put("scope2", scope1, scope2);
 				return cx.EvaluateString(scope1, scriptScope1, "source1", 1, null);
-			}
-
-			private readonly string scriptScope2;
-
-			private readonly string scriptScope1;
+			});
 		}
 
 		/// <summary>Simple utility allowing to better see the concerned scope while debugging</summary>
@@ -129,20 +113,7 @@ namespace Rhino.Tests
 			string[] functionNames = new string[] { "readPropFoo" };
 			myObject.DefineFunctionProperties(functionNames, typeof(PrimitiveTypeScopeResolutionTest.MyObject), ScriptableObject.EMPTY);
 			string scriptScope1 = "String.prototype.foo = 'from 1'; scope2.f()";
-			ContextAction action = new _ContextAction_148(myObject, scriptScope2, scriptScope1);
-			Utils.RunWithAllOptimizationLevels(action);
-		}
-
-		private sealed class _ContextAction_148 : ContextAction
-		{
-			public _ContextAction_148(PrimitiveTypeScopeResolutionTest.MyObject myObject, string scriptScope2, string scriptScope1)
-			{
-				this.myObject = myObject;
-				this.scriptScope2 = scriptScope2;
-				this.scriptScope1 = scriptScope1;
-			}
-
-			public object Run(Context cx)
+			Utils.RunWithAllOptimizationLevels(cx =>
 			{
 				Scriptable scope1 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope1"));
 				Scriptable scope2 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope2"));
@@ -150,13 +121,7 @@ namespace Rhino.Tests
 				cx.EvaluateString(scope2, scriptScope2, "source2", 1, null);
 				scope1.Put("scope2", scope1, scope2);
 				return cx.EvaluateString(scope1, scriptScope1, "source1", 1, null);
-			}
-
-			private readonly PrimitiveTypeScopeResolutionTest.MyObject myObject;
-
-			private readonly string scriptScope2;
-
-			private readonly string scriptScope1;
+			});
 		}
 	}
 }

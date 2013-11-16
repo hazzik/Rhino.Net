@@ -59,61 +59,31 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void Test0()
 		{
-			Function f = new _BaseFunction_62();
-			ContextAction action = new _ContextAction_71(f);
-			DoTest("function", action);
+			Function f = new Test0Function();
+			DoTest("function", cx =>
+			{
+				Scriptable scope = cx.InitStandardObjects();
+				scope.Put("myObj", scope, f);
+				return cx.EvaluateString(scope, "typeof myObj", "test script", 1, null);
+			});
 		}
 
-		private sealed class _BaseFunction_62 : BaseFunction
+		private sealed class Test0Function : BaseFunction
 		{
-			public _BaseFunction_62()
-			{
-			}
-
 			public override object Call(Context _cx, Scriptable _scope, Scriptable _thisObj, object[] _args)
 			{
 				return _args[0].GetType().FullName;
 			}
 		}
 
-		private sealed class _ContextAction_71 : ContextAction
-		{
-			public _ContextAction_71(Function f)
-			{
-				this.f = f;
-			}
-
-			public object Run(Context context)
-			{
-				Scriptable scope = context.InitStandardObjects();
-				scope.Put("myObj", scope, f);
-				return context.EvaluateString(scope, "typeof myObj", "test script", 1, null);
-			}
-
-			private readonly Function f;
-		}
-
 		private void TestCustomizeTypeOf(string expected, Scriptable obj)
 		{
-			ContextAction action = new _ContextAction_85(obj);
-			DoTest(expected, action);
-		}
-
-		private sealed class _ContextAction_85 : ContextAction
-		{
-			public _ContextAction_85(Scriptable obj)
+			DoTest(expected, cx =>
 			{
-				this.obj = obj;
-			}
-
-			public object Run(Context context)
-			{
-				Scriptable scope = context.InitStandardObjects();
+				Scriptable scope = cx.InitStandardObjects();
 				scope.Put("myObj", scope, obj);
-				return context.EvaluateString(scope, "typeof myObj", "test script", 1, null);
-			}
-
-			private readonly Scriptable obj;
+				return cx.EvaluateString(scope, "typeof myObj", "test script", 1, null);
+			});
 		}
 
 		/// <summary>See https://bugzilla.mozilla.org/show_bug.cgi?id=453360</summary>
@@ -127,24 +97,11 @@ namespace Rhino.Tests
 
 		private void DoTest(string expected, string script)
 		{
-			ContextAction action = new _ContextAction_108(script);
-			DoTest(expected, action);
-		}
-
-		private sealed class _ContextAction_108 : ContextAction
-		{
-			public _ContextAction_108(string script)
+			DoTest(expected, cx =>
 			{
-				this.script = script;
-			}
-
-			public object Run(Context context)
-			{
-				Scriptable scope = context.InitStandardObjects();
-				return context.EvaluateString(scope, script, "test script", 1, null);
-			}
-
-			private readonly string script;
+				Scriptable scope = cx.InitStandardObjects();
+				return cx.EvaluateString(scope, script, "test script", 1, null);
+			});
 		}
 
 		private void DoTest(string expected, ContextAction action)
@@ -156,27 +113,12 @@ namespace Rhino.Tests
 
 		private void DoTest(int optimizationLevel, string expected, ContextAction action)
 		{
-			object o = new ContextFactory().Call(new _ContextAction_128(optimizationLevel, action));
+			object o = new ContextFactory().Call(cx =>
+			{
+				cx.SetOptimizationLevel(optimizationLevel);
+				return Context.ToString(action(cx));
+			});
 			NUnit.Framework.Assert.AreEqual(expected, o);
-		}
-
-		private sealed class _ContextAction_128 : ContextAction
-		{
-			public _ContextAction_128(int optimizationLevel, ContextAction action)
-			{
-				this.optimizationLevel = optimizationLevel;
-				this.action = action;
-			}
-
-			public object Run(Context context)
-			{
-				context.SetOptimizationLevel(optimizationLevel);
-				return Context.ToString(action.Run(context));
-			}
-
-			private readonly int optimizationLevel;
-
-			private readonly ContextAction action;
 		}
 	}
 }

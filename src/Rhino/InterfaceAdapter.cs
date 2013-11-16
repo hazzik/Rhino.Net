@@ -88,38 +88,7 @@ namespace Rhino
 
 		public virtual object Invoke(ContextFactory cf, object target, Scriptable topScope, object thisObject, MethodInfo method, object[] args)
 		{
-			ContextAction action = new _ContextAction_80(this, target, topScope, thisObject, method, args);
-			return cf.Call(action);
-		}
-
-		private sealed class _ContextAction_80 : ContextAction
-		{
-			public _ContextAction_80(InterfaceAdapter _enclosing, object target, Scriptable topScope, object thisObject, MethodInfo method, object[] args)
-			{
-				this._enclosing = _enclosing;
-				this.target = target;
-				this.topScope = topScope;
-				this.thisObject = thisObject;
-				this.method = method;
-				this.args = args;
-			}
-
-			public object Run(Context cx)
-			{
-				return this._enclosing.InvokeImpl(cx, target, topScope, thisObject, method, args);
-			}
-
-			private readonly InterfaceAdapter _enclosing;
-
-			private readonly object target;
-
-			private readonly Scriptable topScope;
-
-			private readonly object thisObject;
-
-			private readonly MethodInfo method;
-
-			private readonly object[] args;
+			return cf.Call(cx => InvokeImpl(cx, target, topScope, thisObject, method, args));
 		}
 
 		internal virtual object InvokeImpl(Context cx, object target, Scriptable topScope, object thisObject, MethodInfo method, object[] args)

@@ -12,7 +12,6 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Security;
-using Java.Beans;
 using Rhino;
 using Rhino.Ast;
 using Rhino.Debug;
@@ -507,31 +506,7 @@ namespace Rhino
 			{
 				factory = ContextFactory.GetGlobal();
 			}
-			return Call(factory, new _ContextAction_476(callable, scope, thisObj, args));
-		}
-
-		private sealed class _ContextAction_476 : ContextAction
-		{
-			public _ContextAction_476(Callable callable, Scriptable scope, Scriptable thisObj, object[] args)
-			{
-				this.callable = callable;
-				this.scope = scope;
-				this.thisObj = thisObj;
-				this.args = args;
-			}
-
-			public object Run(Rhino.Context cx)
-			{
-				return callable.Call(cx, scope, thisObj, args);
-			}
-
-			private readonly Callable callable;
-
-			private readonly Scriptable scope;
-
-			private readonly Scriptable thisObj;
-
-			private readonly object[] args;
+			return Call(factory, cx => callable.Call(cx, scope, thisObj, args));
 		}
 
 		/// <summary>
@@ -544,7 +519,7 @@ namespace Rhino
 			Rhino.Context cx = Enter(null, factory);
 			try
 			{
-				return action.Run(cx);
+				return action(cx);
 			}
 			finally
 			{
@@ -552,7 +527,7 @@ namespace Rhino
 			}
 		}
 
-		/// <seealso cref="ContextFactory.AddListener(Listener)">ContextFactory.AddListener(Listener)</seealso>
+		/// <seealso cref="ContextFactory.AddListener(ContextFactory.Listener)">ContextFactory.AddListener(Listener)</seealso>
 		/// <seealso cref="ContextFactory.GetGlobal()">ContextFactory.GetGlobal()</seealso>
 		[System.ObsoleteAttribute]
 		public static void AddContextListener(ContextListener listener)

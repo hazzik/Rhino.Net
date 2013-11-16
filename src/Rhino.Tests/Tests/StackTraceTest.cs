@@ -38,38 +38,23 @@ namespace Rhino.Tests
 			RunWithExpectedStackTrace(source3, result);
 		}
 
-		private void RunWithExpectedStackTrace(string _source, string _expectedStackTrace)
+		private static void RunWithExpectedStackTrace(string source, string expectedStackTrace)
 		{
-			ContextAction action = new _ContextAction_42(_source, _expectedStackTrace);
-			Utils.RunWithOptimizationLevel(action, -1);
-		}
+			Utils.RunWithOptimizationLevel(cx =>
 
-		private sealed class _ContextAction_42 : ContextAction
-		{
-			public _ContextAction_42(string _source, string _expectedStackTrace)
-			{
-				this._source = _source;
-				this._expectedStackTrace = _expectedStackTrace;
-			}
-
-			public object Run(Context cx)
 			{
 				Scriptable scope = cx.InitStandardObjects();
 				try
 				{
-					cx.EvaluateString(scope, _source, "test.js", 0, null);
+					cx.EvaluateString(scope, source, "test.js", 0, null);
 				}
 				catch (JavaScriptException e)
 				{
-					NUnit.Framework.Assert.AreEqual(_expectedStackTrace, e.GetScriptStackTrace());
+					Assert.AreEqual(expectedStackTrace, e.GetScriptStackTrace());
 					return null;
 				}
 				throw new Exception("Exception expected!");
-			}
-
-			private readonly string _source;
-
-			private readonly string _expectedStackTrace;
+			}, -1);
 		}
 	}
 }

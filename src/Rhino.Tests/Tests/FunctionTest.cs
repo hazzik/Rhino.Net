@@ -37,31 +37,15 @@ namespace Rhino.Tests
 			AssertEvaluates(true, "new Function('return true//;').call()");
 		}
 
-		private void AssertEvaluates(object expected, string source)
+		private static void AssertEvaluates(object expected, string source)
 		{
-			ContextAction action = new _ContextAction_33(source, expected);
-			Utils.RunWithAllOptimizationLevels(action);
-		}
-
-		private sealed class _ContextAction_33 : ContextAction
-		{
-			public _ContextAction_33(string source, object expected)
-			{
-				this.source = source;
-				this.expected = expected;
-			}
-
-			public object Run(Context cx)
+			Utils.RunWithAllOptimizationLevels(cx =>
 			{
 				Scriptable scope = cx.InitStandardObjects();
 				object rep = cx.EvaluateString(scope, source, "test.js", 0, null);
 				NUnit.Framework.Assert.AreEqual(expected, rep);
 				return null;
-			}
-
-			private readonly string source;
-
-			private readonly object expected;
+			});
 		}
 	}
 }

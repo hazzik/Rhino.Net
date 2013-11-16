@@ -84,23 +84,11 @@ namespace Rhino.Tools.Shell
 
 		public virtual void Init(ContextFactory factory)
 		{
-			factory.Call(new _ContextAction_77(this));
-		}
-
-		private sealed class _ContextAction_77 : ContextAction
-		{
-			public _ContextAction_77(Global _enclosing)
+			factory.Call(cx =>
 			{
-				this._enclosing = _enclosing;
-			}
-
-			public object Run(Context cx)
-			{
-				this._enclosing.Init(cx);
+				Init(cx);
 				return null;
-			}
-
-			private readonly Global _enclosing;
+			});
 		}
 
 		public virtual void Init(Context cx)
@@ -1411,7 +1399,7 @@ namespace Rhino.Tools.Shell
 		}
 	}
 
-	internal class Runner : Runnable, ContextAction
+	internal class Runner : Runnable
 	{
 		internal Runner(Scriptable scope, Function func, object[] args)
 		{
@@ -1428,19 +1416,17 @@ namespace Rhino.Tools.Shell
 
 		public virtual void Run()
 		{
-			factory.Call(this);
-		}
-
-		public virtual object Run(Context cx)
-		{
-			if (f != null)
+			factory.Call(cx =>
 			{
-				return f.Call(cx, scope, scope, args);
-			}
-			else
-			{
-				return s.Exec(cx, scope);
-			}
+				if (f != null)
+				{
+					return f.Call(cx, scope, scope, args);
+				}
+				else
+				{
+					return s.Exec(cx, scope);
+				}
+			});
 		}
 
 		internal ContextFactory factory;

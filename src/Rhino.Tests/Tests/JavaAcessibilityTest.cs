@@ -122,26 +122,11 @@ namespace Rhino.Tests
 
 		private object RunScript(string scriptSourceText)
 		{
-			return contextFactory.Call(new _ContextAction_125(this, scriptSourceText));
-		}
-
-		private sealed class _ContextAction_125 : ContextAction
-		{
-			public _ContextAction_125(JavaAcessibilityTest _enclosing, string scriptSourceText)
+			return contextFactory.Call(cx =>
 			{
-				this._enclosing = _enclosing;
-				this.scriptSourceText = scriptSourceText;
-			}
-
-			public object Run(Context context)
-			{
-				Script script = context.CompileString(scriptSourceText, string.Empty, 1, null);
-				return script.Exec(context, this._enclosing.global);
-			}
-
-			private readonly JavaAcessibilityTest _enclosing;
-
-			private readonly string scriptSourceText;
+				Script script = cx.CompileString(scriptSourceText, string.Empty, 1, null);
+				return script.Exec(cx, this.global);
+			});
 		}
 	}
 }

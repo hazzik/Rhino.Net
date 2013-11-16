@@ -7,9 +7,6 @@
  */
 
 using NUnit.Framework;
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
 
 namespace Rhino.Tests
 {
@@ -19,34 +16,21 @@ namespace Rhino.Tests
 	/// Test for bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=466661">466661</a>.
 	/// </remarks>
 	/// <author>Marc Guillemot</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class ApplyOnPrimitiveNumberTest
 	{
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestIt()
 		{
-			string script = "var fn = function() { return this; }\n" + "fn.apply(1)";
-			ContextAction action = new _ContextAction_27(script);
-			Utils.RunWithAllOptimizationLevels(action);
-		}
-
-		private sealed class _ContextAction_27 : ContextAction
-		{
-			public _ContextAction_27(string script)
+			const string script = "var fn = function() { return this; }\n" + "fn.apply(1)";
+			Utils.RunWithAllOptimizationLevels(cx =>
 			{
-				this.script = script;
-			}
-
-			public object Run(Context _cx)
-			{
-				ScriptableObject scope = _cx.InitStandardObjects();
-				object result = _cx.EvaluateString(scope, script, "test script", 0, null);
-				NUnit.Framework.Assert.AreEqual("object", ScriptRuntime.Typeof(result));
-				NUnit.Framework.Assert.AreEqual("1", Context.ToString(result));
+				ScriptableObject scope = cx.InitStandardObjects();
+				object result = cx.EvaluateString(scope, script, "test script", 0, null);
+				Assert.AreEqual("object", ScriptRuntime.Typeof(result));
+				Assert.AreEqual("1", Context.ToString(result));
 				return null;
-			}
-
-			private readonly string script;
+			});
 		}
 	}
 }

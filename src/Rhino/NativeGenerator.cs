@@ -82,9 +82,9 @@ namespace Rhino
 			return "Generator";
 		}
 
-		private class CloseGeneratorAction : ContextAction
+		private class CloseGeneratorAction
 		{
-			private NativeGenerator generator;
+			private readonly NativeGenerator generator;
 
 			internal CloseGeneratorAction(NativeGenerator generator)
 			{
@@ -93,17 +93,13 @@ namespace Rhino
 
 			public virtual object Run(Context cx)
 			{
-				Scriptable scope = ScriptableObject.GetTopLevelScope(generator);
+				Scriptable scope = GetTopLevelScope(generator);
 				Callable closeGenerator = new _Callable_84();
 				return ScriptRuntime.DoTopCall(closeGenerator, cx, scope, generator, null);
 			}
 
 			private sealed class _Callable_84 : Callable
 			{
-				public _Callable_84()
-				{
-				}
-
 				public object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 				{
 					return ((NativeGenerator)thisObj).Resume(cx, scope, NativeGenerator.GENERATOR_CLOSE, new NativeGenerator.GeneratorClosedException());

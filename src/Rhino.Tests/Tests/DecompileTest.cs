@@ -7,9 +7,6 @@
  */
 
 using NUnit.Framework;
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
 
 namespace Rhino.Tests
 {
@@ -19,35 +16,22 @@ namespace Rhino.Tests
 	/// .
 	/// </summary>
 	/// <author>Marc Guillemot</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class DecompileTest
 	{
 		/// <summary>As of head of trunk on 30.09.09, decompile of "new Date()" returns "new Date" without parentheses.</summary>
 		/// <remarks>As of head of trunk on 30.09.09, decompile of "new Date()" returns "new Date" without parentheses.</remarks>
 		/// <seealso><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=519692">Bug 519692</a></seealso>
-		[NUnit.Framework.Test]
-		public virtual void NewObject0Arg()
+		[Test]
+		public void NewObject0Arg()
 		{
-			string source = "var x = new Date().getTime();";
-			ContextAction action = new _ContextAction_28(source);
-			Utils.RunWithAllOptimizationLevels(action);
-		}
-
-		private sealed class _ContextAction_28 : ContextAction
-		{
-			public _ContextAction_28(string source)
-			{
-				this.source = source;
-			}
-
-			public object Run(Context cx)
+			const string source = "var x = new Date().getTime();";
+			Utils.RunWithAllOptimizationLevels(cx =>
 			{
 				Script script = cx.CompileString(source, "my script", 0, null);
-				NUnit.Framework.Assert.AreEqual(source, cx.DecompileScript(script, 4).Trim());
+				Assert.AreEqual(source, cx.DecompileScript(script, 4).Trim());
 				return null;
-			}
-
-			private readonly string source;
+			});
 		}
 	}
 }

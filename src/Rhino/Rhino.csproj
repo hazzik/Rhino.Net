@@ -40,6 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Org\Mozilla\Classfile\ByteCode.cs">
+      <Link>ByteCode.cs</Link>
+    </Compile>
+    <Compile Include="..\Org\Mozilla\Classfile\ClassFileWriter.cs">
+      <Link>ClassFileWriter.cs</Link>
+    </Compile>
     <Compile Include="Annotations\JSConstructor.cs" />
     <Compile Include="Annotations\JSFunction.cs" />
     <Compile Include="Annotations\JSGetter.cs" />

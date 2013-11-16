@@ -7,13 +7,10 @@
  */
 
 using NUnit.Framework;
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
 
 namespace Rhino.Tests
 {
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class Bug496585Test
 	{
 		public virtual string Method(string one, Function function)
@@ -26,25 +23,16 @@ namespace Rhino.Tests
 			return "string[]";
 		}
 
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void CallOverloadedFunction()
 		{
-			new ContextFactory().Call(new _ContextAction_25());
-		}
-
-		private sealed class _ContextAction_25 : ContextAction
-		{
-			public _ContextAction_25()
-			{
-			}
-
-			public object Run(Context cx)
+			new ContextFactory().Call(cx =>
 			{
 				cx.GetWrapFactory().SetJavaPrimitiveWrap(false);
-				NUnit.Framework.Assert.AreEqual("string[]", cx.EvaluateString(cx.InitStandardObjects(), "new org.mozilla.javascript.tests.Bug496585Test().method('one', 'two', 'three')", "<test>", 1, null));
-				NUnit.Framework.Assert.AreEqual("string+function", cx.EvaluateString(cx.InitStandardObjects(), "new org.mozilla.javascript.tests.Bug496585Test().method('one', function() {})", "<test>", 1, null));
+				Assert.AreEqual("string[]", cx.EvaluateString(cx.InitStandardObjects(), "new org.mozilla.javascript.tests.Bug496585Test().method('one', 'two', 'three')", "<test>", 1, null));
+				Assert.AreEqual("string+function", cx.EvaluateString(cx.InitStandardObjects(), "new org.mozilla.javascript.tests.Bug496585Test().method('one', function() {})", "<test>", 1, null));
 				return null;
-			}
+			});
 		}
 	}
 }
