@@ -201,7 +201,7 @@ namespace Rhino.Tools.Shell
 			if (global.quitAction != null)
 			{
 				int exitCode = (args.Length == 0 ? 0 : ScriptRuntime.ToInt32(args[0]));
-				global.quitAction.Quit(cx, exitCode);
+				global.quitAction(cx, exitCode);
 			}
 		}
 

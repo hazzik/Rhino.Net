@@ -60,15 +60,7 @@ namespace Rhino.Tools.Shell
 
 		static Program()
 		{
-			global.InitQuitAction(new IProxy());
-		}
-
-		private class IProxy : QuitAction
-		{
-			public virtual void Quit(Context cx, int exitCode)
-			{
-				System.Environment.Exit(exitCode);
-			}
+			global.InitQuitAction((cx, exitCode) => System.Environment.Exit(exitCode));
 		}
 
 		/// <summary>Main entry point.</summary>
