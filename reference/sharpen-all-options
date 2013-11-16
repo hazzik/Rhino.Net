@@ -81,6 +81,7 @@
 -typeMapping org.w3c.dom.Element System.Xml.XmlElement
 -typeMapping org.w3c.dom.Node System.Xml.XmlNode
 -typeMapping org.w3c.dom.NodeList System.Xml.XmlNodeList
+-typeMapping org.w3c.dom.NamedNodeMap System.Xml.XmlNamedNodeMap
 -typeMapping org.w3c.dom.Text System.Xml.XmlText
 
 -methodMapping com.db4o.ObjectSet.hasNext Db4objects.Db4o.IObjectSet.HasNext 
@@ -123,6 +124,7 @@
 -methodMapping java.lang.Object.memberwiseClone Clone
 -methodMapping java.lang.ProcessBuilder.command SetCommand
 -methodMapping java.lang.String.concat System.String.Concat
+-methodMapping java.lang.Short.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.System.gc System.GC.Collect
 -methodMapping java.lang.System.getenv() Sharpen.Runtime.GetEnv
 -methodMapping java.lang.System.getenv(String) System.Environment.GetEnvironmentVariable
@@ -165,7 +167,7 @@
 -methodMapping java.util.zip.Inflater.end Finish
 -methodMapping System.out.println System.Console.WriteLine
 -methodMapping org.w3c.dom.NodeList.getParentNode Parent
--methodMapping org.hamcrest.core.Is.is equalTo
+-methodMapping org.hamcrest.core.Is.is Is.EqualTo
 
 -propertyMapping java.lang.Class.getPackage Assembly
 -propertyMapping java.lang.Class.getSimpleName Name
@@ -208,6 +210,12 @@
 -propertyMapping org.w3c.dom.Node.getTextContent InnerText
 -propertyMapping org.w3c.dom.Node.setParentNode ParentNode
 -propertyMapping org.w3c.dom.Node.setTextContent InnerText
+-propertyMapping org.w3c.dom.Node.getPrefix Prefix
+-propertyMapping org.w3c.dom.Node.getNodeType NodeType
+-propertyMapping org.w3c.dom.Node.getAttributes Attributes
+-propertyMapping org.w3c.dom.Node.getLocalName LocalName
+-propertyMapping org.w3c.dom.Node.getNamespaceURI NamespaceURI
+-propertyMapping org.w3c.dom.NamedNodeMap.getLength Count
 -propertyMapping org.w3c.dom.NodeList.getLength Count
 
 -fieldMapping java.util.Locale.ENGLISH Sharpen.Extensions.GetEnglishCulture()

@@ -1067,7 +1067,7 @@ namespace Rhino
 				}
 				else
 				{
-					return short.ValueOf((short)ToInteger(value, ScriptRuntime.ShortClass, short.MinValue, short.MaxValue));
+					return Sharpen.Extensions.ValueOf((short)ToInteger(value, ScriptRuntime.ShortClass, short.MinValue, short.MaxValue));
 				}
 			}
 			if (type == ScriptRuntime.ByteClass || type == typeof(byte))

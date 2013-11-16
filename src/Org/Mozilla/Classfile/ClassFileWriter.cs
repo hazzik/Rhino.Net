@@ -98,7 +98,7 @@ namespace Org.Mozilla.Classfile
 		public virtual void AddInterface(string interfaceName)
 		{
 			short interfaceIndex = itsConstantPool.AddClass(interfaceName);
-			itsInterfaces.Add(short.ValueOf(interfaceIndex));
+			itsInterfaces.Add(Sharpen.Extensions.ValueOf(interfaceIndex));
 		}
 
 		public const short ACC_PUBLIC = unchecked((int)(0x0001));
