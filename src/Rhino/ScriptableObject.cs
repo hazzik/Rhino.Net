@@ -1370,7 +1370,11 @@ namespace Rhino
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
 		internal static BaseFunction BuildClassCtor<T>(Scriptable scope, bool @sealed, bool mapInheritance) where T:Scriptable
 		{
-			System.Type clazz = typeof(T);
+			return BuildClassCtor(scope, typeof(T), @sealed, mapInheritance);
+		}
+
+		internal static BaseFunction BuildClassCtor(Scriptable scope, Type clazz, bool @sealed, bool mapInheritance)
+		{
 			MethodInfo[] methods = FunctionObject.GetMethodList(clazz);
 			for (int i = 0; i < methods.Length; i++)
 			{
