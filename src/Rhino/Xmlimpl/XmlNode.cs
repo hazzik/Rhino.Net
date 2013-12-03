@@ -216,7 +216,7 @@ namespace Rhino.Xmlimpl
 				{
 					if (IsProcessingInstructionType())
 					{
-						return ((ProcessingInstruction)dom).GetData();
+						return ((XmlProcessingInstruction)dom).GetData();
 					}
 					else
 					{
@@ -643,14 +643,14 @@ namespace Rhino.Xmlimpl
 		//    the argument namespace is not declared in this scope, so do nothing.
 		private void SetProcessingInstructionName(string localName)
 		{
-			ProcessingInstruction pi = (ProcessingInstruction)this.dom;
+			XmlProcessingInstruction pi = (XmlProcessingInstruction)this.dom;
 			//    We cannot set the node name; Document.renameNode() only supports elements and attributes.  So we replace it
 			pi.ParentNode.ReplaceChild(pi, pi.OwnerDocument.CreateProcessingInstruction(localName, pi.GetData()));
 		}
 
 		internal void SetLocalName(string localName)
 		{
-			if (dom is ProcessingInstruction)
+			if (dom is XmlProcessingInstruction)
 			{
 				SetProcessingInstructionName(localName);
 			}
@@ -1186,8 +1186,8 @@ namespace Rhino.Xmlimpl
 				{
 					if (node.NodeType == NodeConstants.PROCESSING_INSTRUCTION_NODE)
 					{
-						ProcessingInstruction pi = (ProcessingInstruction)node;
-						return name.MatchesLocalName(pi.GetTarget());
+						XmlProcessingInstruction pi = (XmlProcessingInstruction)node;
+						return name.MatchesLocalName(pi.Target);
 					}
 					return false;
 				}

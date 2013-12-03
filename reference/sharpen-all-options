@@ -83,6 +83,7 @@
 -typeMapping org.w3c.dom.NodeList System.Xml.XmlNodeList
 -typeMapping org.w3c.dom.NamedNodeMap System.Xml.XmlNamedNodeMap
 -typeMapping org.w3c.dom.Text System.Xml.XmlText
+-typeMapping org.w3c.dom.ProcessingInstruction System.Xml.XmlProcessingInstruction
 
 -methodMapping com.db4o.ObjectSet.hasNext Db4objects.Db4o.IObjectSet.HasNext 
 -methodMapping com.db4o.ObjectSet.next Db4objects.Db4o.IObjectSet.Next  
@@ -223,6 +224,7 @@
 -propertyMapping org.w3c.dom.Node.getNamespaceURI NamespaceURI
 -propertyMapping org.w3c.dom.NamedNodeMap.getLength Count
 -propertyMapping org.w3c.dom.NodeList.getLength Count
+-propertyMapping org.w3c.dom.ProcessingInstruction.getTarget Target
 
 -fieldMapping java.util.Locale.ENGLISH Sharpen.Extensions.GetEnglishCulture()
 -fieldMapping java.util.Locale.GERMAN Sharpen.Extensions.GetGermanCulture()

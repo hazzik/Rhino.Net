@@ -219,7 +219,7 @@ namespace Rhino.Xmlimpl
 		// document builders that don't support reset() can't be pooled
 		private void AddProcessingInstructionsTo(IList<System.Xml.XmlNode> list, System.Xml.XmlNode node)
 		{
-			if (node is ProcessingInstruction)
+			if (node is XmlProcessingInstruction)
 			{
 				list.AddItem(node);
 			}
@@ -490,10 +490,10 @@ namespace Rhino.Xmlimpl
 				s.Append("<!--" + ((XmlComment)node).GetNodeValue() + "-->");
 				return s.ToString();
 			}
-			if (node is ProcessingInstruction)
+			if (node is XmlProcessingInstruction)
 			{
-				ProcessingInstruction pi = (ProcessingInstruction)node;
-				s.Append("<?" + pi.GetTarget() + " " + pi.GetData() + "?>");
+				XmlProcessingInstruction pi = (XmlProcessingInstruction)node;
+				s.Append("<?" + pi.Target + " " + pi.GetData() + "?>");
 				return s.ToString();
 			}
 			s.Append(ElementToXmlString((XmlElement)node));
