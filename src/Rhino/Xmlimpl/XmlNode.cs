@@ -204,19 +204,19 @@ namespace Rhino.Xmlimpl
 			//    TODO    See ECMA 357 Section 9.1
 			if (IsTextType())
 			{
-				return ((XmlText)dom).GetData();
+				return ((XmlText)dom).Data;
 			}
 			else
 			{
 				if (IsAttributeType())
 				{
-					return ((Attr)dom).GetValue();
+					return ((XmlAttribute)dom).Value;
 				}
 				else
 				{
 					if (IsProcessingInstructionType())
 					{
-						return ((XmlProcessingInstruction)dom).Data;
+						return ((XmlProcessingInstruction)dom).GetData();
 					}
 					else
 					{
@@ -242,10 +242,10 @@ namespace Rhino.Xmlimpl
 
 		internal virtual void DeleteMe()
 		{
-			if (dom is Attr)
+			if (dom is XmlAttribute)
 			{
-				Attr attr = (Attr)this.dom;
-				attr.GetOwnerElement().Attributes.RemoveNamedItemNS(attr.NamespaceURI, attr.LocalName);
+				XmlAttribute attr = (XmlAttribute)this.dom;
+				attr.OwnerElement.Attributes.RemoveNamedItemNS(attr.NamespaceURI, attr.LocalName);
 			}
 			else
 			{
@@ -340,10 +340,10 @@ namespace Rhino.Xmlimpl
 			XmlNamedNodeMap attributes = element.Attributes;
 			for (int i = 0; i < attributes.Count; i++)
 			{
-				Attr attr = (Attr)attributes.Item(i);
+				XmlAttribute attr = (XmlAttribute)attributes.Item(i);
 				if (attr.Prefix != null && attr.Prefix.Equals("xmlns"))
 				{
-					rv.Declare(Rhino.Xmlimpl.XmlNode.Namespace.Create(attr.LocalName, attr.GetValue()));
+					rv.Declare(Rhino.Xmlimpl.XmlNode.Namespace.Create(attr.LocalName, attr.Value));
 				}
 			}
 		}
@@ -352,9 +352,9 @@ namespace Rhino.Xmlimpl
 		{
 			Rhino.Xmlimpl.XmlNode.Namespaces rv = new Rhino.Xmlimpl.XmlNode.Namespaces();
 			System.Xml.XmlNode target = this.dom;
-			if (target is Attr)
+			if (target is XmlAttribute)
 			{
-				target = ((Attr)target).GetOwnerElement();
+				target = ((XmlAttribute)target).OwnerElement;
 			}
 			while (target != null)
 			{
@@ -392,7 +392,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespaceDeclaration(string prefix)
 		{
-			if (prefix.Equals(string.Empty) && dom is Attr)
+			if (prefix.Equals(string.Empty) && dom is XmlAttribute)
 			{
 				//    Default namespaces do not apply to attributes; see XML Namespaces section 5.2
 				return Rhino.Xmlimpl.XmlNode.Namespace.Create(string.Empty, string.Empty);
@@ -645,7 +645,7 @@ namespace Rhino.Xmlimpl
 		{
 			XmlProcessingInstruction pi = (XmlProcessingInstruction)this.dom;
 			//    We cannot set the node name; Document.renameNode() only supports elements and attributes.  So we replace it
-			pi.ParentNode.ReplaceChild(pi, pi.OwnerDocument.CreateProcessingInstruction(localName, pi.Data));
+			pi.ParentNode.ReplaceChild(pi, pi.OwnerDocument.CreateProcessingInstruction(localName, pi.GetData()));
 		}
 
 		internal void SetLocalName(string localName)
@@ -720,7 +720,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual string GetAttributeValue()
 		{
-			return ((Attr)dom).GetValue();
+			return ((XmlAttribute)dom).Value;
 		}
 
 		internal virtual void SetAttribute(Rhino.Xmlimpl.XmlNode.QName name, string value)

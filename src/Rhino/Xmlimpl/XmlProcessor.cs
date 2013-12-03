@@ -15,7 +15,6 @@ using Javax.Xml.Parsers;
 using Javax.Xml.Transform;
 using Javax.Xml.Transform.Dom;
 using Javax.Xml.Transform.Stream;
-using Org.W3c.Dom;
 using Org.Xml.Sax;
 using Rhino;
 using Rhino.Xmlimpl;
@@ -255,16 +254,16 @@ namespace Rhino.Xmlimpl
 				bool BUG_369394_IS_VALID = false;
 				if (!BUG_369394_IS_VALID)
 				{
-					text.SetData(text.GetData().Trim());
+					text.Data = text.Data.Trim();
 				}
 				else
 				{
-					if (text.GetData().Trim().Length == 0)
+					if (text.Data.Trim().Length == 0)
 					{
-						text.SetData(string.Empty);
+						text.Data = string.Empty;
 					}
 				}
-				if (text.GetData().Length == 0)
+				if (text.Data.Length == 0)
 				{
 					toRemove.AddItem(node);
 				}
@@ -473,15 +472,15 @@ namespace Rhino.Xmlimpl
 			}
 			if (node is XmlText)
 			{
-				string data = ((XmlText)node).GetData();
+				string data = ((XmlText)node).Data;
 				//    TODO Does Java trim() work same as XMLWhitespace?
 				string v = (prettyPrint) ? data.Trim() : data;
 				s.Append(EscapeElementValue(v));
 				return s.ToString();
 			}
-			if (node is Attr)
+			if (node is XmlAttribute)
 			{
-				string value = ((Attr)node).GetValue();
+				string value = ((XmlAttribute)node).Value;
 				s.Append(EscapeAttributeValue(value));
 				return s.ToString();
 			}
@@ -493,7 +492,7 @@ namespace Rhino.Xmlimpl
 			if (node is XmlProcessingInstruction)
 			{
 				XmlProcessingInstruction pi = (XmlProcessingInstruction)node;
-				s.Append("<?" + pi.Target + " " + pi.Data + "?>");
+				s.Append("<?" + pi.Target + " " + pi.GetData() + "?>");
 				return s.ToString();
 			}
 			s.Append(ElementToXmlString((XmlElement)node));

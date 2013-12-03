@@ -76,6 +76,9 @@
 -typeMapping java.util.zip.Deflater ICSharpCode.SharpZipLib.Zip.Compression.Deflater
 -typeMapping java.util.zip.Inflater ICSharpCode.SharpZipLib.Zip.Compression.Inflater
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
+
+-typeMapping org.w3c.dom.Attr System.Xml.XmlAttribute
+-typeMapping org.w3c.dom.CharacterData System.Xml.XmlCharacterData
 -typeMapping org.w3c.dom.Comment System.Xml.XmlComment
 -typeMapping org.w3c.dom.Document System.Xml.XmlDocument
 -typeMapping org.w3c.dom.Element System.Xml.XmlElement
@@ -210,6 +213,8 @@
 -propertyMapping java.util.zip.Inflater.getRemaining RemainingInput
 -propertyMapping java.util.zip.Inflater.needsInput IsNeedingInput
 -propertyMapping java.math.BigInteger.signum Sign
+-propertyMapping org.w3c.dom.Attr.getOwnerElement OwnerElement
+-propertyMapping org.w3c.dom.Attr.getValue Value
 -propertyMapping org.w3c.dom.Document.getDocumentElement DocumentElement
 -propertyMapping org.w3c.dom.Node.getChildNodes ChildNodes
 -propertyMapping org.w3c.dom.Node.getOwnerDocument OwnerDocument
@@ -225,8 +230,8 @@
 -propertyMapping org.w3c.dom.NamedNodeMap.getLength Count
 -propertyMapping org.w3c.dom.NodeList.getLength Count
 -propertyMapping org.w3c.dom.ProcessingInstruction.getTarget Target
--propertyMapping org.w3c.dom.ProcessingInstruction.getData Data
--propertyMapping org.w3c.dom.Text.getData Data
+-propertyMapping org.w3c.dom.CharacterData.getData Data
+-propertyMapping org.w3c.dom.CharacterData.setData Data
 
 -fieldMapping java.util.Locale.ENGLISH Sharpen.Extensions.GetEnglishCulture()
 -fieldMapping java.util.Locale.GERMAN Sharpen.Extensions.GetGermanCulture()
