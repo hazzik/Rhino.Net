@@ -73,9 +73,9 @@ namespace Rhino
 
 		private const int n_bigtens = 5;
 
-		private static readonly double tens = new double[] { 1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19, 1e20, 1e21, 1e22 };
+		private static readonly double[] tens = new double[] { 1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19, 1e20, 1e21, 1e22 };
 
-		private static readonly double bigtens = new double[] { 1e16, 1e32, 1e64, 1e128, 1e256 };
+		private static readonly double[] bigtens = new double[] { 1e16, 1e32, 1e64, 1e128, 1e256 };
 
 		private static int Lo0bits(int y)
 		{
@@ -1155,7 +1155,7 @@ namespace Rhino
 			buf.Length = bl + 1;
 		}
 
-		private static readonly int dtoaModes = new int[] { 0, 0, 3, 2, 2 };
+		private static readonly int[] dtoaModes = new int[] { 0, 0, 3, 2, 2 };
 
 		internal static void JS_dtostr(StringBuilder buffer, int mode, int precision, double d)
 		{

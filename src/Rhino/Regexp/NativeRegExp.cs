@@ -3432,7 +3432,7 @@ L0_break: ;
 
 		internal Context cx;
 
-		internal char cpbegin;
+		internal char[] cpbegin;
 
 		internal int cpend;
 

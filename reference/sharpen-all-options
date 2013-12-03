@@ -93,6 +93,7 @@
 -methodMapping java.lang.ArrayIndexOutOfBoundsException.ArrayIndexOutOfBoundsException(int) Sharpen.Extensions.CreateIndexOutOfRangeException
 -methodMapping java.lang.Boolean.parseBoolean System.Boolean.Parse
 -methodMapping java.lang.Boolean.valueOf Sharpen.Extensions.ValueOf
+-methodMapping java.lang.Byte.valueOf Sharpen.Extensions.ValueOf
 -methodMapping java.lang.Character.isLowerCase System.Char.IsLower
 -methodMapping java.lang.Character.isSpaceChar System.Char.IsWhiteSpace
 -methodMapping java.lang.Character.isUpperCase System.Char.IsUpper
@@ -103,8 +104,8 @@
 -methodMapping java.lang.Double.parseDouble System.Double.Parse
 -methodMapping java.lang.Double.toString ToString
 -methodMapping java.lang.Double.valueOf Sharpen.Extensions.ValueOf
--methodMapping java.lang.Double.doubleToLongBits Sharpen.Runtime.DoubleToLongBits
--methodMapping java.lang.Double.longBitsToDouble Sharpen.Runtime.LongBitsToDouble
+-methodMapping java.lang.Double.doubleToLongBits System.BitConverter.DoubleToInt64Bits
+-methodMapping java.lang.Double.longBitsToDouble System.BitConverter.Int64BitsToDouble
 -methodMapping java.lang.Float.floatToIntBits Sharpen.Runtime.FloatToIntBits
 -methodMapping java.lang.Float.intBitsToFloat Sharpen.Runtime.IntBitsToFloat
 -methodMapping java.lang.Float.valueOf Sharpen.Extensions.ValueOf

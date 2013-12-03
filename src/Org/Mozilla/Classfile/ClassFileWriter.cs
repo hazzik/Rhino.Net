@@ -5422,11 +5422,11 @@ stringLoop_break: ;
 
 		private string generatedClassName;
 
-		private ExceptionTableEntry itsExceptionTable;
+		private ExceptionTableEntry[] itsExceptionTable;
 
 		private int itsExceptionTableTop;
 
-		private int itsLineNumberTable;
+		private int[] itsLineNumberTable;
 
 		private int itsLineNumberTableTop;
 
@@ -5701,7 +5701,7 @@ stringLoop_break: ;
 		{
 			Ensure(5);
 			itsPool[itsTop++] = CONSTANT_Float;
-			int bits = System.BitConverter.FloatToIntBits(k);
+			int bits = Sharpen.Runtime.FloatToIntBits(k);
 			itsTop = ClassFileWriter.PutInt32(bits, itsPool, itsTop);
 			itsPoolTypes.Put(itsTopIndex, CONSTANT_Float);
 			return itsTopIndex++;
@@ -6015,7 +6015,7 @@ stringLoop_break: ;
 
 		private UintMap itsPoolTypes = new UintMap();
 
-		private byte itsPool;
+		private byte[] itsPool;
 	}
 
 	internal sealed class FieldOrMethodRef

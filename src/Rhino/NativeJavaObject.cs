@@ -1078,7 +1078,7 @@ namespace Rhino
 				}
 				else
 				{
-					return byte.ValueOf(unchecked((byte)ToInteger(value, ScriptRuntime.ByteClass, byte.MinValue, byte.MaxValue)));
+					return Sharpen.Extensions.ValueOf(unchecked((byte)ToInteger(value, ScriptRuntime.ByteClass, byte.MinValue, byte.MaxValue)));
 				}
 			}
 			return ToDouble(value);
