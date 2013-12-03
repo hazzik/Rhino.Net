@@ -225,6 +225,8 @@
 -propertyMapping org.w3c.dom.NamedNodeMap.getLength Count
 -propertyMapping org.w3c.dom.NodeList.getLength Count
 -propertyMapping org.w3c.dom.ProcessingInstruction.getTarget Target
+-propertyMapping org.w3c.dom.ProcessingInstruction.getData Data
+-propertyMapping org.w3c.dom.Text.getData Data
 
 -fieldMapping java.util.Locale.ENGLISH Sharpen.Extensions.GetEnglishCulture()
 -fieldMapping java.util.Locale.GERMAN Sharpen.Extensions.GetGermanCulture()

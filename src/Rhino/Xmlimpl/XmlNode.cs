@@ -216,7 +216,7 @@ namespace Rhino.Xmlimpl
 				{
 					if (IsProcessingInstructionType())
 					{
-						return ((XmlProcessingInstruction)dom).GetData();
+						return ((XmlProcessingInstruction)dom).Data;
 					}
 					else
 					{
@@ -645,7 +645,7 @@ namespace Rhino.Xmlimpl
 		{
 			XmlProcessingInstruction pi = (XmlProcessingInstruction)this.dom;
 			//    We cannot set the node name; Document.renameNode() only supports elements and attributes.  So we replace it
-			pi.ParentNode.ReplaceChild(pi, pi.OwnerDocument.CreateProcessingInstruction(localName, pi.GetData()));
+			pi.ParentNode.ReplaceChild(pi, pi.OwnerDocument.CreateProcessingInstruction(localName, pi.Data));
 		}
 
 		internal void SetLocalName(string localName)

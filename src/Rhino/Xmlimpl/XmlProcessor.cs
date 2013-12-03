@@ -493,7 +493,7 @@ namespace Rhino.Xmlimpl
 			if (node is XmlProcessingInstruction)
 			{
 				XmlProcessingInstruction pi = (XmlProcessingInstruction)node;
-				s.Append("<?" + pi.Target + " " + pi.GetData() + "?>");
+				s.Append("<?" + pi.Target + " " + pi.Data + "?>");
 				return s.ToString();
 			}
 			s.Append(ElementToXmlString((XmlElement)node));
