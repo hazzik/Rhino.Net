@@ -6,13 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System;
 using System.IO;
-using Java.Awt;
-using Javax.Swing;
 using Rhino;
 using Rhino.Tools.Debugger;
-using Rhino.Tools.Shell;
 using Sharpen;
 
 namespace Rhino.Tools.Debugger
@@ -344,42 +340,6 @@ namespace Rhino.Tools.Debugger
 			main.SetSize(600, 460);
 			main.SetVisible(true);
 			return main;
-		}
-
-		// Deprecated methods
-		[System.ObsoleteAttribute(@"Use SetSize(int, int) instead.")]
-		public virtual void SetSize(Dimension dimension)
-		{
-			debugGui.SetSize(dimension.width, dimension.height);
-		}
-
-		[System.ObsoleteAttribute(@"The method does nothing and is only present for compatibility.")]
-		public virtual void SetOptimizationLevel(int level)
-		{
-		}
-
-		[System.ObsoleteAttribute(@"The method is only present for compatibility and should not be called.")]
-		public virtual void ContextEntered(Context cx)
-		{
-			throw new InvalidOperationException();
-		}
-
-		[System.ObsoleteAttribute(@"The method is only present for compatibility and should not be called.")]
-		public virtual void ContextExited(Context cx)
-		{
-			throw new InvalidOperationException();
-		}
-
-		[System.ObsoleteAttribute(@"The method is only present for compatibility and should not be called.")]
-		public virtual void ContextCreated(Context cx)
-		{
-			throw new InvalidOperationException();
-		}
-
-		[System.ObsoleteAttribute(@"The method is only present for compatibility and should not be called.")]
-		public virtual void ContextReleased(Context cx)
-		{
-			throw new InvalidOperationException();
 		}
 
 		/// <summary>

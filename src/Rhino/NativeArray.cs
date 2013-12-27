@@ -819,12 +819,6 @@ again_break: ;
 			return length;
 		}
 
-		[System.ObsoleteAttribute(@"Use GetLength() instead.")]
-		public virtual long JsGet_length()
-		{
-			return GetLength();
-		}
-
 		/// <summary>
 		/// Change the value of the internal flag that determines whether all
 		/// storage is handed by a dense backing array rather than an associative

@@ -53,12 +53,6 @@ namespace Rhino
 			return exception;
 		}
 
-		[System.ObsoleteAttribute(@"Use GetWrappedException() instead.")]
-		public virtual object Unwrap()
-		{
-			return GetWrappedException();
-		}
-
 		private Exception exception;
 	}
 }

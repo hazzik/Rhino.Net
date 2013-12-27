@@ -52,7 +52,6 @@
     <Compile Include="SecurityProxy.cs" />
     <Compile Include="ShellConsole.cs" />
     <Compile Include="ShellContextFactory.cs" />
-    <Compile Include="ShellLine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

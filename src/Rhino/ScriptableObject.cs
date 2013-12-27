@@ -663,30 +663,6 @@ namespace Rhino
 			return (slot.GetAttributes() & (PERMANENT | READONLY)) == (PERMANENT | READONLY);
 		}
 
-		[System.ObsoleteAttribute(@"Use GetAttributes(string) . The engine always ignored the start argument.")]
-		public int GetAttributes(string name, Scriptable start)
-		{
-			return GetAttributes(name);
-		}
-
-		[System.ObsoleteAttribute(@"Use GetAttributes(int) . The engine always ignored the start argument.")]
-		public int GetAttributes(int index, Scriptable start)
-		{
-			return GetAttributes(index);
-		}
-
-		[System.ObsoleteAttribute(@"Use SetAttributes(string, int) . The engine always ignored the start argument.")]
-		public void SetAttributes(string name, Scriptable start, int attributes)
-		{
-			SetAttributes(name, attributes);
-		}
-
-		[System.ObsoleteAttribute(@"Use SetAttributes(int, int) . The engine always ignored the start argument.")]
-		public virtual void SetAttributes(int index, Scriptable start, int attributes)
-		{
-			SetAttributes(index, attributes);
-		}
-
 		/// <summary>Get the attributes of a named property.</summary>
 		/// <remarks>
 		/// Get the attributes of a named property.

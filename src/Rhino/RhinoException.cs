@@ -256,17 +256,6 @@ namespace Rhino
 			return buffer.ToString();
 		}
 
-		/// <summary>Get a string representing the script stack of this exception.</summary>
-		/// <remarks>Get a string representing the script stack of this exception.</remarks>
-		/// <param name="filter">ignored</param>
-		/// <returns>a script stack dump</returns>
-		/// <since>1.6R6</since>
-		[System.ObsoleteAttribute(@"the filter argument is ignored as we are able to recognize script stack elements by our own. Use #getScriptStackTrace() instead.")]
-		public virtual string GetScriptStackTrace(FilenameFilter filter)
-		{
-			return GetScriptStackTrace();
-		}
-
 		/// <summary>
 		/// Get the script stack of this exception as an array of
 		/// <see cref="ScriptStackElement">ScriptStackElement</see>

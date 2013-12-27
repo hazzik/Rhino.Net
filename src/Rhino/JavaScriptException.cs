@@ -7,8 +7,6 @@
  */
 
 using System;
-using Rhino;
-using Sharpen;
 
 namespace Rhino
 {
@@ -22,11 +20,6 @@ namespace Rhino
 	public class JavaScriptException : RhinoException
 	{
 		internal const long serialVersionUID = -7666130513694669293L;
-
-		[System.ObsoleteAttribute(@"Use WrappedException.WrappedException(System.Exception) to report exceptions in Java code.")]
-		public JavaScriptException(object value) : this(value, string.Empty, 0)
-		{
-		}
 
 		/// <summary>Create a JavaScript exception wrapping the given JavaScript value</summary>
 		/// <param name="value">the JavaScript value thrown.</param>
@@ -88,18 +81,6 @@ namespace Rhino
 		public virtual object GetValue()
 		{
 			return value;
-		}
-
-		[System.ObsoleteAttribute(@"Use RhinoException.SourceName() from the super class.")]
-		public virtual string GetSourceName()
-		{
-			return SourceName();
-		}
-
-		[System.ObsoleteAttribute(@"Use RhinoException.LineNumber() from the super class.")]
-		public virtual int GetLineNumber()
-		{
-			return LineNumber();
 		}
 
 		private object value;

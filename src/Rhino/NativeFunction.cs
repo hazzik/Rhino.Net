@@ -66,12 +66,6 @@ namespace Rhino
 			return GetParamCount();
 		}
 
-		[System.ObsoleteAttribute(@"Use BaseFunction.GetFunctionName() instead. For backwards compatibility keep an old method name used by Batik and possibly others.")]
-		public virtual string JsGet_name()
-		{
-			return GetFunctionName();
-		}
-
 		/// <summary>Get encoded source string.</summary>
 		/// <remarks>Get encoded source string.</remarks>
 		public virtual string GetEncodedSource()

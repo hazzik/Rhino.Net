@@ -150,7 +150,6 @@
     <Compile Include="Context.cs" />
     <Compile Include="ContextAction.cs" />
     <Compile Include="ContextFactory.cs" />
-    <Compile Include="ContextListener.cs" />
     <Compile Include="ContinuationPending.cs" />
     <Compile Include="Debug\DebugFrame.cs" />
     <Compile Include="Debug\DebuggableObject.cs" />

@@ -194,33 +194,6 @@ namespace Rhino
 		/// </summary>
 		public virtual object CallWithDomain(object securityDomain, Context cx, Callable callable, Scriptable scope, Scriptable thisObj, object[] args)
 		{
-			return ExecWithDomain(cx, scope, new _Script_157(callable, thisObj, args), securityDomain);
-		}
-
-		private sealed class _Script_157 : Script
-		{
-			public _Script_157(Callable callable, Scriptable thisObj, object[] args)
-			{
-				this.callable = callable;
-				this.thisObj = thisObj;
-				this.args = args;
-			}
-
-			public object Exec(Context cx, Scriptable scope)
-			{
-				return callable.Call(cx, scope, thisObj, args);
-			}
-
-			private readonly Callable callable;
-
-			private readonly Scriptable thisObj;
-
-			private readonly object[] args;
-		}
-
-		[System.ObsoleteAttribute(@"The application should not override this method and instead overrideCallWithDomain(object, Context, Callable, Scriptable, Scriptable, object[]) .")]
-		public virtual object ExecWithDomain(Context cx, Scriptable scope, Script script, object securityDomain)
-		{
 			throw new InvalidOperationException("callWithDomain should be overridden");
 		}
 	}

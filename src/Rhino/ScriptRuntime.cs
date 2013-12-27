@@ -1202,16 +1202,6 @@ namespace Rhino
 			return null;
 		}
 
-		[System.ObsoleteAttribute(@"Use ToObject(Scriptable, object) instead.")]
-		public static Scriptable ToObject(Scriptable scope, object val, Type staticClass)
-		{
-			if (val is Scriptable)
-			{
-				return (Scriptable)val;
-			}
-			return ToObject(Context.GetContext(), scope, val);
-		}
-
 		/// <summary>Convert the value to an object.</summary>
 		/// <remarks>
 		/// Convert the value to an object.
@@ -1257,28 +1247,6 @@ namespace Rhino
 				return (Scriptable)wrapped;
 			}
 			throw ErrorWithClassName("msg.invalid.type", val);
-		}
-
-		[System.ObsoleteAttribute(@"Use ToObject(Context, Scriptable, object) instead.")]
-		public static Scriptable ToObject(Context cx, Scriptable scope, object val, Type staticClass)
-		{
-			return ToObject(cx, scope, val);
-		}
-
-		[System.ObsoleteAttribute(@"The method is only present for compatibility.")]
-		public static object Call(Context cx, object fun, object thisArg, object[] args, Scriptable scope)
-		{
-			if (!(fun is Function))
-			{
-				throw NotFunctionError(ToString(fun));
-			}
-			Function function = (Function)fun;
-			Scriptable thisObj = ToObjectOrNull(cx, thisArg);
-			if (thisObj == null)
-			{
-				throw UndefCallError(thisObj, "function");
-			}
-			return function.Call(cx, scope, thisObj, args);
 		}
 
 		public static Scriptable NewObject(Context cx, Scriptable scope, string constructorName, object[] args)
@@ -1942,12 +1910,6 @@ namespace Rhino
 		public static Ref SpecialRef(object obj, string specialProperty, Context cx)
 		{
 			return SpecialRef.CreateSpecial(cx, obj, specialProperty);
-		}
-
-		[System.ObsoleteAttribute]
-		public static object Delete(object obj, object id, Context cx)
-		{
-			return Delete(obj, id, cx, false);
 		}
 
 		/// <summary>
@@ -3016,12 +2978,6 @@ childScopesChecks_break: ;
 		public static CharSequence Add(object val1, CharSequence val2)
 		{
 			return new ConsString(ToCharSequence(val1), val2);
-		}
-
-		[System.ObsoleteAttribute(@"The method is only present for compatibility.")]
-		public static object NameIncrDecr(Scriptable scopeChain, string id, int incrDecrMask)
-		{
-			return NameIncrDecr(scopeChain, id, Context.GetContext(), incrDecrMask);
 		}
 
 		public static object NameIncrDecr(Scriptable scopeChain, string id, Context cx, int incrDecrMask)
@@ -4142,19 +4098,6 @@ search_break: ;
 				++j_1;
 			}
 			return array;
-		}
-
-		/// <summary>This method is here for backward compat with existing compiled code.</summary>
-		/// <remarks>
-		/// This method is here for backward compat with existing compiled code.  It
-		/// is called when an object literal is compiled.  The next instance will be
-		/// the version called from new code.
-		/// </remarks>
-		[System.ObsoleteAttribute(@"This method only present for compatibility.")]
-		public static Scriptable NewObjectLiteral(object[] propertyIds, object[] propertyValues, Context cx, Scriptable scope)
-		{
-			// Passing null for getterSetters means no getters or setters
-			return NewObjectLiteral(propertyIds, propertyValues, null, cx, scope);
 		}
 
 		public static Scriptable NewObjectLiteral(object[] propertyIds, object[] propertyValues, int[] getterSetters, Context cx, Scriptable scope)

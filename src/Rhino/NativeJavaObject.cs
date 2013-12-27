@@ -162,13 +162,6 @@ namespace Rhino
 			return members.GetIds(false);
 		}
 
-		[System.ObsoleteAttribute(@"Use Context.GetWrapFactory() together with calling WrapFactory.Wrap(Context, Scriptable, object, System.Type{T})")]
-		public static object Wrap(Scriptable scope, object obj, Type staticType)
-		{
-			Context cx = Context.GetContext();
-			return cx.GetWrapFactory().Wrap(cx, scope, obj, staticType);
-		}
-
 		public virtual object Unwrap()
 		{
 			return javaObject;
@@ -679,18 +672,6 @@ namespace Rhino
 					}
 				}
 			}
-		}
-
-		/// <summary>Not intended for public use.</summary>
-		/// <remarks>
-		/// Not intended for public use. Callers should use the
-		/// public API Context.toType.
-		/// </remarks>
-		/// <seealso cref="Context.JsToJava(object, System.Type{T})">Context.JsToJava(object, System.Type&lt;T&gt;)</seealso>
-		[System.ObsoleteAttribute(@"as of 1.5 Release 4")]
-		public static object CoerceType(Type type, object value)
-		{
-			return CoerceTypeImpl(type, value);
 		}
 
 		/// <summary>Type-munging for field setting and method invocation.</summary>

@@ -674,19 +674,6 @@ namespace Rhino
 			return EnterContext(null);
 		}
 
-		/// <returns>a Context associated with the current thread</returns>
-		[System.ObsoleteAttribute(@"use EnterContext() instead")]
-		public Context Enter()
-		{
-			return EnterContext(null);
-		}
-
-		[System.ObsoleteAttribute(@"Use Context.Exit() instead.")]
-		public void Exit()
-		{
-			Context.Exit();
-		}
-
 		/// <summary>
 		/// Get a Context associated with the current thread, using the given
 		/// Context if need be.

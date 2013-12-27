@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Rhino;
 using Sharpen;
 
 namespace Rhino
@@ -35,16 +33,6 @@ namespace Rhino
 		{
 			this.packageName = packageName;
 			this.classLoader = classLoader;
-		}
-
-		[System.ObsoleteAttribute(@"NativeJavaPackage is an internal class, do not use it directly.")]
-		public NativeJavaPackage(string packageName, ClassLoader classLoader) : this(false, packageName, classLoader)
-		{
-		}
-
-		[System.ObsoleteAttribute(@"NativeJavaPackage is an internal class, do not use it directly.")]
-		public NativeJavaPackage(string packageName) : this(false, packageName, Context.GetCurrentContext().GetApplicationClassLoader())
-		{
 		}
 
 		public override string GetClassName()

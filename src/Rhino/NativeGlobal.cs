@@ -626,18 +626,6 @@ namespace Rhino
 			return false;
 		}
 
-		[System.ObsoleteAttribute(@"Use ScriptRuntime.ConstructError(string, string) instead.")]
-		public static EcmaError ConstructError(Context cx, string error, string message, Scriptable scope)
-		{
-			return ScriptRuntime.ConstructError(error, message);
-		}
-
-		[System.ObsoleteAttribute(@"UseScriptRuntime.ConstructError(string, string, string, int, string, int) instead.")]
-		public static EcmaError ConstructError(Context cx, string error, string message, Scriptable scope, string sourceName, int lineNumber, int columnNumber, string lineSource)
-		{
-			return ScriptRuntime.ConstructError(error, message, sourceName, lineNumber, lineSource, columnNumber);
-		}
-
 		private static string Encode(string str, bool fullUri)
 		{
 			byte[] utf8buf = null;

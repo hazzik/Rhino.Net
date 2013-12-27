@@ -400,17 +400,6 @@ namespace Rhino
 			SetParentScope(scope);
 		}
 
-		[System.ObsoleteAttribute(@"Use GetTypeTag(System.Type{T}) and ConvertArg(Context, Scriptable, object, int) for type conversion.")]
-		public static object ConvertArg(Context cx, Scriptable scope, object arg, Type desired)
-		{
-			int tag = GetTypeTag(desired);
-			if (tag == JAVA_UNSUPPORTED_TYPE)
-			{
-				throw Context.ReportRuntimeError1("msg.cant.convert", desired.FullName);
-			}
-			return ConvertArg(cx, scope, arg, tag);
-		}
-
 		/// <summary>
 		/// Performs conversions on argument types if needed and
 		/// invokes the underlying Java method or constructor.

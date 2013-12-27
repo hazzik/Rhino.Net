@@ -164,9 +164,6 @@ namespace Rhino
 		/// </remarks>
 		public const int FEATURE_PARENT_PROTO_PROPERTIES = 5;
 
-		[System.ObsoleteAttribute(@"In previous releases, this name was given to FEATURE_PARENT_PROTO_PROPERTIES.")]
-		public const int FEATURE_PARENT_PROTO_PROPRTIES = 5;
-
 		/// <summary>Control if support for E4X(ECMAScript for XML) extension is available.</summary>
 		/// <remarks>
 		/// Control if support for E4X(ECMAScript for XML) extension is available.
@@ -298,19 +295,6 @@ namespace Rhino
 		/// <summary>Convenient value to use as zero-length array of objects.</summary>
 		/// <remarks>Convenient value to use as zero-length array of objects.</remarks>
 		public static readonly object[] emptyArgs = ScriptRuntime.emptyArgs;
-
-		/// <summary>Creates a new Context.</summary>
-		/// <remarks>
-		/// Creates a new Context. The context will be associated with the
-		/// <see cref="ContextFactory.GetGlobal()">global context factory</see>
-		/// .
-		/// Note that the Context must be associated with a thread before
-		/// it can be used to execute a script.
-		/// </remarks>
-		[System.ObsoleteAttribute(@"this constructor is deprecated because it creates a dependency on a static singleton context factory. UseContextFactory.Enter() orContextFactory.Call(ContextAction) instead. If you subclass this class, consider using Context(ContextFactory) constructor instead in the subclasses' constructors.")]
-		public Context() : this(ContextFactory.GetGlobal())
-		{
-		}
 
 		/// <summary>Creates a new context.</summary>
 		/// <remarks>
@@ -463,28 +447,6 @@ namespace Rhino
 
 		/// <summary>
 		/// Call
-		/// <see cref="ContextAction.Run(Context)">ContextAction.Run(Context)</see>
-		/// using the Context instance associated with the current thread.
-		/// If no Context is associated with the thread, then
-		/// <tt>ContextFactory.getGlobal().makeContext()</tt> will be called to
-		/// construct new Context instance. The instance will be temporary
-		/// associated with the thread during call to
-		/// <see cref="ContextAction.Run(Context)">ContextAction.Run(Context)</see>
-		/// .
-		/// </summary>
-		/// <returns>
-		/// The result of
-		/// <see cref="ContextAction.Run(Context)">ContextAction.Run(Context)</see>
-		/// .
-		/// </returns>
-		[System.ObsoleteAttribute(@"use ContextFactory.Call(ContextAction) instead as this method relies on usage of a static singleton ""global"" ContextFactory.")]
-		public static object Call(ContextAction action)
-		{
-			return Call(ContextFactory.GetGlobal(), action);
-		}
-
-		/// <summary>
-		/// Call
 		/// <see cref="Callable.Call(Context, Scriptable, Scriptable, object[])">Callable.Call(Context, Scriptable, Scriptable, object[])</see>
 		/// using the Context instance associated with the current thread.
 		/// If no Context is associated with the thread, then
@@ -525,43 +487,6 @@ namespace Rhino
 			{
 				Exit();
 			}
-		}
-
-		/// <seealso cref="ContextFactory.AddListener(ContextFactory.Listener)">ContextFactory.AddListener(Listener)</seealso>
-		/// <seealso cref="ContextFactory.GetGlobal()">ContextFactory.GetGlobal()</seealso>
-		[System.ObsoleteAttribute]
-		public static void AddContextListener(ContextListener listener)
-		{
-			// Special workaround for the debugger
-			string DBG = "org.mozilla.javascript.tools.debugger.Main";
-			if (DBG.Equals(listener.GetType().FullName))
-			{
-				Type cl = listener.GetType();
-				Type factoryClass = Kit.ClassOrNull("org.mozilla.javascript.ContextFactory");
-				Type[] sig = new Type[] { factoryClass };
-				object[] args = new object[] { ContextFactory.GetGlobal() };
-				try
-				{
-					MethodInfo m = cl.GetMethod("attachTo", sig);
-					m.Invoke(listener, args);
-				}
-				catch (Exception ex)
-				{
-					Exception rex = new Exception();
-					Kit.InitCause(rex, ex);
-					throw rex;
-				}
-				return;
-			}
-			ContextFactory.GetGlobal().AddListener(listener);
-		}
-
-		/// <seealso cref="ContextFactory.RemoveListener(Listener)">ContextFactory.RemoveListener(Listener)</seealso>
-		/// <seealso cref="ContextFactory.GetGlobal()">ContextFactory.GetGlobal()</seealso>
-		[System.ObsoleteAttribute]
-		public static void RemoveContextListener(ContextListener listener)
-		{
-			ContextFactory.GetGlobal().AddListener(listener);
 		}
 
 		/// <summary>
@@ -1155,7 +1080,7 @@ namespace Rhino
 		/// <exception cref="System.IO.IOException"></exception>
 		public object EvaluateReader(Scriptable scope, TextReader @in, string sourceName, int lineno, object securityDomain)
 		{
-			Script script = CompileReader(scope, @in, sourceName, lineno, securityDomain);
+			Script script = CompileReader(@in, sourceName, lineno, securityDomain);
 			if (script != null)
 			{
 				return script.Exec(this, scope);
@@ -1330,14 +1255,6 @@ namespace Rhino
 			{
 				return true;
 			}
-		}
-
-		/// <seealso cref="CompileReader(System.IO.TextReader, string, int, object)">CompileReader(System.IO.TextReader, string, int, object)</seealso>
-		/// <exception cref="System.IO.IOException"></exception>
-		[System.ObsoleteAttribute]
-		public Script CompileReader(Scriptable scope, TextReader @in, string sourceName, int lineno, object securityDomain)
-		{
-			return CompileReader(@in, sourceName, lineno, securityDomain);
 		}
 
 		/// <summary>Compiles the source in the given reader.</summary>
@@ -1715,13 +1632,6 @@ namespace Rhino
 			return ScriptRuntime.ToObject(scope, value);
 		}
 
-		/// <seealso cref="ToObject(object, Scriptable)">ToObject(object, Scriptable)</seealso>
-		[System.ObsoleteAttribute]
-		public static Scriptable ToObject(object value, Scriptable scope, Type staticType)
-		{
-			return ScriptRuntime.ToObject(scope, value);
-		}
-
 		/// <summary>
 		/// Convenient method to convert java value to its closest representation
 		/// in JavaScript.
@@ -1792,30 +1702,6 @@ namespace Rhino
 		public static object JsToJava(object value, Type desiredType)
 		{
 			return NativeJavaObject.CoerceTypeImpl(desiredType, value);
-		}
-
-		/// <seealso cref="JsToJava(object, System.Type{T})">JsToJava(object, System.Type&lt;T&gt;)</seealso>
-		/// <exception cref="System.ArgumentException">
-		/// if the conversion cannot be performed.
-		/// Note that
-		/// <see cref="JsToJava(object, System.Type{T})">JsToJava(object, System.Type&lt;T&gt;)</see>
-		/// throws
-		/// <see cref="EvaluatorException">EvaluatorException</see>
-		/// instead.
-		/// </exception>
-		[System.ObsoleteAttribute]
-		public static object ToType(object value, Type desiredType)
-		{
-			try
-			{
-				return JsToJava(value, desiredType);
-			}
-			catch (EvaluatorException ex)
-			{
-				ArgumentException ex2 = new ArgumentException(ex.Message);
-				Kit.InitCause(ex2, ex);
-				throw ex2;
-			}
 		}
 
 		/// <summary>Rethrow the exception wrapping it as the script runtime exception.</summary>
@@ -2232,13 +2118,6 @@ namespace Rhino
 			Sharpen.Collections.Remove(threadLocalMap, key);
 		}
 
-		/// <seealso cref="ClassCache.Get(Scriptable)">ClassCache.Get(Scriptable)</seealso>
-		/// <seealso cref="ClassCache.SetCachingEnabled(bool)">ClassCache.SetCachingEnabled(bool)</seealso>
-		[System.ObsoleteAttribute]
-		public static void SetCachingEnabled(bool cachingEnabled)
-		{
-		}
-
 		/// <summary>Set a WrapFactory for this Context.</summary>
 		/// <remarks>
 		/// Set a WrapFactory for this Context.
@@ -2344,7 +2223,7 @@ namespace Rhino
 		/// <seealso cref="FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME">FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME</seealso>
 		/// <seealso cref="FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER">FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER</seealso>
 		/// <seealso cref="FEATURE_TO_STRING_AS_SOURCE">FEATURE_TO_STRING_AS_SOURCE</seealso>
-		/// <seealso cref="FEATURE_PARENT_PROTO_PROPRTIES">FEATURE_PARENT_PROTO_PROPRTIES</seealso>
+		/// <seealso cref="FEATURE_PARENT_PROTO_PROPERTIES">FEATURE_PARENT_PROTO_PROPERTIES</seealso>
 		/// <seealso cref="FEATURE_E4X">FEATURE_E4X</seealso>
 		/// <seealso cref="FEATURE_DYNAMIC_SCOPE">FEATURE_DYNAMIC_SCOPE</seealso>
 		/// <seealso cref="FEATURE_STRICT_VARS">FEATURE_STRICT_VARS</seealso>

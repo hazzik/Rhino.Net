@@ -56,29 +56,5 @@ namespace Rhino
 		{
 			RecordErrorOrigin(sourceName, lineNumber, lineSource, columnNumber);
 		}
-
-		[System.ObsoleteAttribute(@"Use RhinoException.SourceName() from the super class.")]
-		public virtual string GetSourceName()
-		{
-			return SourceName();
-		}
-
-		[System.ObsoleteAttribute(@"Use RhinoException.LineNumber() from the super class.")]
-		public virtual int GetLineNumber()
-		{
-			return LineNumber();
-		}
-
-		[System.ObsoleteAttribute(@"Use RhinoException.ColumnNumber() from the super class.")]
-		public virtual int GetColumnNumber()
-		{
-			return ColumnNumber();
-		}
-
-		[System.ObsoleteAttribute(@"Use RhinoException.LineSource() from the super class.")]
-		public virtual string GetLineSource()
-		{
-			return LineSource();
-		}
 	}
 }

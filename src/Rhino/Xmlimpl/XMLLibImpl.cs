@@ -7,7 +7,6 @@
  */
 
 using System;
-using Org.Xml.Sax;
 using Rhino;
 using Rhino.Xml;
 using Rhino.Xmlimpl;
@@ -114,18 +113,6 @@ namespace Rhino.Xmlimpl
 		private XMLLibImpl(Scriptable globalScope)
 		{
 			this.globalScope = globalScope;
-		}
-
-		[System.ObsoleteAttribute(@"")]
-		internal QName QnamePrototype()
-		{
-			return qnamePrototype;
-		}
-
-		[System.ObsoleteAttribute(@"")]
-		internal Scriptable GlobalScope()
-		{
-			return globalScope;
 		}
 
 		internal XmlProcessor GetProcessor()

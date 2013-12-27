@@ -141,12 +141,6 @@ namespace Rhino
 			return result;
 		}
 
-		[System.ObsoleteAttribute(@"Kept only for compatibility.")]
-		public virtual void ImportPackage(Context cx, Scriptable thisObj, object[] args, Function funObj)
-		{
-			Js_importPackage(args);
-		}
-
 		private object Js_construct(Scriptable scope, object[] args)
 		{
 			Rhino.ImporterTopLevel result = new Rhino.ImporterTopLevel();

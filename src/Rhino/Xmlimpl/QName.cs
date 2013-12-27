@@ -100,12 +100,6 @@ namespace Rhino.Xmlimpl
 			return delegate_.GetNamespace().GetUri();
 		}
 
-		[System.ObsoleteAttribute(@"")]
-		internal Rhino.Xmlimpl.XmlNode.QName ToNodeQname()
-		{
-			return delegate_;
-		}
-
 		internal Rhino.Xmlimpl.XmlNode.QName GetDelegate()
 		{
 			return delegate_;

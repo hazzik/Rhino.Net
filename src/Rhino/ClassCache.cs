@@ -175,21 +175,6 @@ namespace Rhino
 			return classAdapterCache;
 		}
 
-		/// <seealso cref="SetInvokerOptimizationEnabled(bool)">SetInvokerOptimizationEnabled(bool)</seealso>
-		[System.ObsoleteAttribute(@"The method always returns false.")]
-		public virtual bool IsInvokerOptimizationEnabled()
-		{
-			return false;
-		}
-
-		[System.ObsoleteAttribute(@"The method does nothing. Invoker optimization is no longer used by Rhino. On modern JDK like 1.4 or 1.5 the disadvantages of the optimization like increased memory usage or longer initialization time overweight small speed increase that can be gained using generated proxy class to replace reflection.")]
-		public virtual void SetInvokerOptimizationEnabled(bool enabled)
-		{
-			lock (this)
-			{
-			}
-		}
-
 		/// <summary>
 		/// Internal engine method to return serial number for generated classes
 		/// to ensure name uniqueness.
