@@ -801,7 +801,7 @@ namespace Rhino
 
 		public string GetPatchedStack(RhinoException ex, string nativeStackTrace)
 		{
-			string tag = "org.mozilla.javascript.Interpreter.interpretLoop";
+			string tag = "Rhino.Interpreter.interpretLoop";
 			StringBuilder sb = new StringBuilder(nativeStackTrace.Length + 1000);
 			string lineSeparator = SecurityUtilities.GetSystemProperty("line.separator");
 			Interpreter.CallFrame[] array = (Interpreter.CallFrame[])ex.interpreterStackInfo;

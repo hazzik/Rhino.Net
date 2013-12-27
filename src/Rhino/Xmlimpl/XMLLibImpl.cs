@@ -9,10 +9,10 @@
 using System;
 using Rhino;
 using Rhino.Xml;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	public sealed class XMLLibImpl : XMLLib
@@ -40,7 +40,7 @@ namespace Rhino.Xmlimpl
 
 		public static void Init(Context cx, Scriptable scope, bool @sealed)
 		{
-			Rhino.Xmlimpl.XMLLibImpl lib = new Rhino.Xmlimpl.XMLLibImpl(scope);
+			XMLLibImpl lib = new XMLLibImpl(scope);
 			XMLLib bound = lib.BindToScope(scope);
 			if (bound == lib)
 			{
@@ -122,17 +122,17 @@ namespace Rhino.Xmlimpl
 
 		private void ExportToScope(bool @sealed)
 		{
-			xmlPrototype = NewXML(Rhino.Xmlimpl.XmlNode.CreateText(options, string.Empty));
+			xmlPrototype = NewXML(XmlNode.CreateText(options, string.Empty));
 			xmlListPrototype = NewXMLList();
-			namespacePrototype = Namespace.Create(this.globalScope, null, Rhino.Xmlimpl.XmlNode.Namespace.GLOBAL);
-			qnamePrototype = QName.Create(this, this.globalScope, null, Rhino.Xmlimpl.XmlNode.QName.Create(Rhino.Xmlimpl.XmlNode.Namespace.Create(string.Empty), string.Empty));
+			namespacePrototype = Namespace.Create(this.globalScope, null, XmlNode.Namespace.GLOBAL);
+			qnamePrototype = QName.Create(this, this.globalScope, null, XmlNode.QName.Create(XmlNode.Namespace.Create(string.Empty), string.Empty));
 			xmlPrototype.ExportAsJSClass(@sealed);
 			xmlListPrototype.ExportAsJSClass(@sealed);
 			namespacePrototype.ExportAsJSClass(@sealed);
 			qnamePrototype.ExportAsJSClass(@sealed);
 		}
 
-		[System.ObsoleteAttribute(@"")]
+		[Obsolete(@"")]
 		internal XMLName ToAttributeName(Context cx, object nameValue)
 		{
 			if (nameValue is XMLName)
@@ -168,7 +168,7 @@ namespace Rhino.Xmlimpl
 						{
 							localName = null;
 						}
-						return XMLName.Create(Rhino.Xmlimpl.XmlNode.QName.Create(Rhino.Xmlimpl.XmlNode.Namespace.Create(string.Empty), localName), true, false);
+						return XMLName.Create(XmlNode.QName.Create(XmlNode.Namespace.Create(string.Empty), localName), true, false);
 					}
 				}
 			}
@@ -464,7 +464,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal Namespace[] CreateNamespaces(Rhino.Xmlimpl.XmlNode.Namespace[] declarations)
+		internal Namespace[] CreateNamespaces(XmlNode.Namespace[] declarations)
 		{
 			Namespace[] rv = new Namespace[declarations.Length];
 			for (int i = 0; i < declarations.Length; i++)
@@ -496,12 +496,12 @@ namespace Rhino.Xmlimpl
 			return this.qnamePrototype.CastToQName(this, cx, qnameValue);
 		}
 
-		internal QName NewQName(Rhino.Xmlimpl.XmlNode.QName qname)
+		internal QName NewQName(XmlNode.QName qname)
 		{
 			return QName.Create(this, this.globalScope, this.qnamePrototype, qname);
 		}
 
-		internal XML NewXML(Rhino.Xmlimpl.XmlNode node)
+		internal XML NewXML(XmlNode node)
 		{
 			return new XML(this, this.globalScope, this.xmlPrototype, node);
 		}
@@ -532,7 +532,7 @@ namespace Rhino.Xmlimpl
 			if (frag.IndexOf("<") == -1)
 			{
 				//    Solo text node
-				return NewXML(Rhino.Xmlimpl.XmlNode.CreateText(options, frag));
+				return NewXML(XmlNode.CreateText(options, frag));
 			}
 			return Parse(frag);
 		}
@@ -541,7 +541,7 @@ namespace Rhino.Xmlimpl
 		{
 			try
 			{
-				return NewXML(Rhino.Xmlimpl.XmlNode.CreateElement(options, GetDefaultNamespaceURI(Context.GetCurrentContext()), frag));
+				return NewXML(XmlNode.CreateElement(options, GetDefaultNamespaceURI(Context.GetCurrentContext()), frag));
 			}
 			catch (SAXException e)
 			{
@@ -583,7 +583,7 @@ namespace Rhino.Xmlimpl
 			if (@object is System.Xml.XmlNode)
 			{
 				System.Xml.XmlNode node = (System.Xml.XmlNode)@object;
-				return NewXML(Rhino.Xmlimpl.XmlNode.CreateElementFromNode(node));
+				return NewXML(XmlNode.CreateElementFromNode(node));
 			}
 			//    Instead we just blindly cast to a String and let them convert anything.
 			string s = ScriptRuntime.ToString(@object);
@@ -594,13 +594,13 @@ namespace Rhino.Xmlimpl
 			}
 			else
 			{
-				return NewXML(Rhino.Xmlimpl.XmlNode.CreateText(options, s));
+				return NewXML(XmlNode.CreateText(options, s));
 			}
 		}
 
-		internal XML NewTextElementXML(Rhino.Xmlimpl.XmlNode reference, Rhino.Xmlimpl.XmlNode.QName qname, string value)
+		internal XML NewTextElementXML(XmlNode reference, XmlNode.QName qname, string value)
 		{
-			return NewXML(Rhino.Xmlimpl.XmlNode.NewElementWithText(options, reference, qname, value));
+			return NewXML(XmlNode.NewElementWithText(options, reference, qname, value));
 		}
 
 		internal XMLList NewXMLList()
@@ -658,7 +658,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.QName ToNodeQName(Context cx, object namespaceValue, object nameValue)
+		internal XmlNode.QName ToNodeQName(Context cx, object namespaceValue, object nameValue)
 		{
 			// This is duplication of constructQName(cx, namespaceValue, nameValue)
 			// but for XMLName
@@ -672,7 +672,7 @@ namespace Rhino.Xmlimpl
 			{
 				localName = ScriptRuntime.ToString(nameValue);
 			}
-			Rhino.Xmlimpl.XmlNode.Namespace ns;
+			XmlNode.Namespace ns;
 			if (namespaceValue == Undefined.instance)
 			{
 				if ("*".Equals(localName))
@@ -706,30 +706,30 @@ namespace Rhino.Xmlimpl
 			{
 				localName = null;
 			}
-			return Rhino.Xmlimpl.XmlNode.QName.Create(ns, localName);
+			return XmlNode.QName.Create(ns, localName);
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.QName ToNodeQName(Context cx, string name, bool attribute)
+		internal XmlNode.QName ToNodeQName(Context cx, string name, bool attribute)
 		{
-			Rhino.Xmlimpl.XmlNode.Namespace defaultNamespace = GetDefaultNamespace(cx).GetDelegate();
+			XmlNode.Namespace defaultNamespace = GetDefaultNamespace(cx).GetDelegate();
 			if (name != null && name.Equals("*"))
 			{
-				return Rhino.Xmlimpl.XmlNode.QName.Create(null, null);
+				return XmlNode.QName.Create(null, null);
 			}
 			else
 			{
 				if (attribute)
 				{
-					return Rhino.Xmlimpl.XmlNode.QName.Create(Rhino.Xmlimpl.XmlNode.Namespace.GLOBAL, name);
+					return XmlNode.QName.Create(XmlNode.Namespace.GLOBAL, name);
 				}
 				else
 				{
-					return Rhino.Xmlimpl.XmlNode.QName.Create(defaultNamespace, name);
+					return XmlNode.QName.Create(defaultNamespace, name);
 				}
 			}
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.QName ToNodeQName(Context cx, object nameValue, bool attribute)
+		internal XmlNode.QName ToNodeQName(Context cx, object nameValue, bool attribute)
 		{
 			if (nameValue is XMLName)
 			{

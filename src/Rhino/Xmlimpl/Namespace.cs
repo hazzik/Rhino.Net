@@ -9,10 +9,10 @@
 using System;
 using System.Text;
 using Rhino;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	/// <summary>Class Namespace</summary>
 	[System.Serializable]
@@ -22,17 +22,17 @@ namespace Rhino.Xmlimpl
 
 		private static readonly object NAMESPACE_TAG = "Namespace";
 
-		private Rhino.Xmlimpl.Namespace prototype;
+		private Namespace prototype;
 
-		private Rhino.Xmlimpl.XmlNode.Namespace ns;
+		private XmlNode.Namespace ns;
 
 		private Namespace()
 		{
 		}
 
-		internal static Rhino.Xmlimpl.Namespace Create(Scriptable scope, Rhino.Xmlimpl.Namespace prototype, Rhino.Xmlimpl.XmlNode.Namespace @namespace)
+		internal static Namespace Create(Scriptable scope, Namespace prototype, XmlNode.Namespace @namespace)
 		{
-			Rhino.Xmlimpl.Namespace rv = new Rhino.Xmlimpl.Namespace();
+			Namespace rv = new Namespace();
 			rv.SetParentScope(scope);
 			rv.prototype = prototype;
 			rv.SetPrototype(prototype);
@@ -40,7 +40,7 @@ namespace Rhino.Xmlimpl
 			return rv;
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.Namespace GetDelegate()
+		internal XmlNode.Namespace GetDelegate()
 		{
 			return ns;
 		}
@@ -70,18 +70,18 @@ namespace Rhino.Xmlimpl
 			return ToString();
 		}
 
-		private bool Equals(Rhino.Xmlimpl.Namespace n)
+		private bool Equals(Namespace n)
 		{
 			return Uri().Equals(n.Uri());
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Rhino.Xmlimpl.Namespace))
+			if (!(obj is Namespace))
 			{
 				return false;
 			}
-			return Equals((Rhino.Xmlimpl.Namespace)obj);
+			return Equals((Namespace)obj);
 		}
 
 		public override int GetHashCode()
@@ -91,11 +91,11 @@ namespace Rhino.Xmlimpl
 
 		protected internal override object EquivalentValues(object value)
 		{
-			if (!(value is Rhino.Xmlimpl.Namespace))
+			if (!(value is Namespace))
 			{
 				return ScriptableConstants.NOT_FOUND;
 			}
-			bool result = Equals((Rhino.Xmlimpl.Namespace)value);
+			bool result = Equals((Namespace)value);
 			return result ? true : false;
 		}
 
@@ -324,38 +324,38 @@ L0_break: ;
 			throw new ArgumentException(id.ToString());
 		}
 
-		private Rhino.Xmlimpl.Namespace RealThis(Scriptable thisObj, IdFunctionObject f)
+		private Namespace RealThis(Scriptable thisObj, IdFunctionObject f)
 		{
-			if (!(thisObj is Rhino.Xmlimpl.Namespace))
+			if (!(thisObj is Namespace))
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (Rhino.Xmlimpl.Namespace)thisObj;
+			return (Namespace)thisObj;
 		}
 
-		internal virtual Rhino.Xmlimpl.Namespace NewNamespace(string uri)
+		internal virtual Namespace NewNamespace(string uri)
 		{
-			Rhino.Xmlimpl.Namespace prototype = (this.prototype == null) ? this : this.prototype;
-			return Create(this.GetParentScope(), prototype, Rhino.Xmlimpl.XmlNode.Namespace.Create(uri));
+			Namespace prototype = (this.prototype == null) ? this : this.prototype;
+			return Create(this.GetParentScope(), prototype, XmlNode.Namespace.Create(uri));
 		}
 
-		internal virtual Rhino.Xmlimpl.Namespace NewNamespace(string prefix, string uri)
+		internal virtual Namespace NewNamespace(string prefix, string uri)
 		{
 			if (prefix == null)
 			{
 				return NewNamespace(uri);
 			}
-			Rhino.Xmlimpl.Namespace prototype = (this.prototype == null) ? this : this.prototype;
-			return Create(this.GetParentScope(), prototype, Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri));
+			Namespace prototype = (this.prototype == null) ? this : this.prototype;
+			return Create(this.GetParentScope(), prototype, XmlNode.Namespace.Create(prefix, uri));
 		}
 
-		internal virtual Rhino.Xmlimpl.Namespace ConstructNamespace(object uriValue)
+		internal virtual Namespace ConstructNamespace(object uriValue)
 		{
 			string prefix;
 			string uri;
-			if (uriValue is Rhino.Xmlimpl.Namespace)
+			if (uriValue is Namespace)
 			{
-				Rhino.Xmlimpl.Namespace ns = (Rhino.Xmlimpl.Namespace)uriValue;
+				Namespace ns = (Namespace)uriValue;
 				prefix = ns.Prefix();
 				uri = ns.Uri();
 			}
@@ -385,16 +385,16 @@ L0_break: ;
 			return NewNamespace(prefix, uri);
 		}
 
-		internal virtual Rhino.Xmlimpl.Namespace CastToNamespace(object namespaceObj)
+		internal virtual Namespace CastToNamespace(object namespaceObj)
 		{
-			if (namespaceObj is Rhino.Xmlimpl.Namespace)
+			if (namespaceObj is Namespace)
 			{
-				return (Rhino.Xmlimpl.Namespace)namespaceObj;
+				return (Namespace)namespaceObj;
 			}
 			return ConstructNamespace(namespaceObj);
 		}
 
-		private Rhino.Xmlimpl.Namespace ConstructNamespace(object prefixValue, object uriValue)
+		private Namespace ConstructNamespace(object prefixValue, object uriValue)
 		{
 			string prefix;
 			string uri;
@@ -447,7 +447,7 @@ L0_break: ;
 			return NewNamespace(prefix, uri);
 		}
 
-		private Rhino.Xmlimpl.Namespace ConstructNamespace()
+		private Namespace ConstructNamespace()
 		{
 			return NewNamespace(string.Empty, string.Empty);
 		}

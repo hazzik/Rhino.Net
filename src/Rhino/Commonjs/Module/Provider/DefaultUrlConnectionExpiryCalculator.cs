@@ -7,10 +7,10 @@
  */
 
 using System;
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>The default heuristic for calculating cache expiry of URL-based resources.</summary>
 	/// <remarks>

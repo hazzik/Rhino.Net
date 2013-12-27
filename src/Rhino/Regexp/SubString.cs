@@ -8,7 +8,7 @@
 
 using Sharpen;
 
-namespace Rhino.Regexp
+namespace Rhino.RegExp
 {
 	/// <summary>A utility class for lazily instantiated substrings.</summary>
 	/// <remarks>A utility class for lazily instantiated substrings.</remarks>
@@ -37,7 +37,7 @@ namespace Rhino.Regexp
 			return str == null ? string.Empty : Sharpen.Runtime.Substring(str, index, index + length);
 		}
 
-		public static readonly Rhino.Regexp.SubString emptySubString = new Rhino.Regexp.SubString();
+		public static readonly SubString emptySubString = new SubString();
 
 		internal string str;
 

@@ -12,7 +12,7 @@ using System.IO;
 using System.Security;
 using System.Text;
 using Rhino;
-using Rhino.Commonjs.Module;
+using Rhino.CommonJS.Module;
 using Rhino.Tools;
 using Rhino.Tools.Shell;
 using Sharpen;
@@ -435,7 +435,7 @@ goodUsage_break: ;
 			Exception exObj;
 			try
 			{
-				Type cl = Runtime.GetType("org.mozilla.javascript.tools.shell.JavaPolicySecurity");
+				Type cl = Runtime.GetType("Rhino.Tools.Shell.JavaPolicySecurity");
 				securityImpl = (SecurityProxy)Activator.CreateInstance(cl);
 				SecurityController.InitGlobal(securityImpl);
 				return;

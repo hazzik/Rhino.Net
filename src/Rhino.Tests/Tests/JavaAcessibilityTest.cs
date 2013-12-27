@@ -19,7 +19,7 @@ namespace Rhino.Tests
 	{
 		protected internal readonly Global global = new Global();
 
-		internal string importClass = "importClass(Packages.org.mozilla.javascript.tests.PrivateAccessClass)\n";
+		internal string importClass = "importClass(Packages.Rhino.Tests.PrivateAccessClass)\n";
 
 		public JavaAcessibilityTest()
 		{

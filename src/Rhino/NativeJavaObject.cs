@@ -1266,7 +1266,7 @@ namespace Rhino
 		{
 			// Reflection in java is verbose
 			Type[] sig2 = new Type[2];
-			Type cl = Kit.ClassOrNull("org.mozilla.javascript.JavaAdapter");
+			Type cl = Kit.ClassOrNull("Rhino.JavaAdapter");
 			if (cl != null)
 			{
 				try

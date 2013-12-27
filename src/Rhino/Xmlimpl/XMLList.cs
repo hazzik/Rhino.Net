@@ -10,34 +10,34 @@ using System.Collections.Generic;
 using System.Text;
 using Rhino;
 using Rhino.Xml;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	internal class XMLList : XMLObjectImpl, Function
 	{
 		internal const long serialVersionUID = -4543618751670781135L;
 
-		private Rhino.Xmlimpl.XmlNode.InternalList _annos;
+		private XmlNode.InternalList _annos;
 
 		private XMLObjectImpl targetObject = null;
 
-		private Rhino.Xmlimpl.XmlNode.QName targetProperty = null;
+		private XmlNode.QName targetProperty = null;
 
 		internal XMLList(XMLLibImpl lib, Scriptable scope, XMLObject prototype) : base(lib, scope, prototype)
 		{
-			_annos = new Rhino.Xmlimpl.XmlNode.InternalList();
+			_annos = new XmlNode.InternalList();
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode.InternalList GetNodeList()
+		internal virtual XmlNode.InternalList GetNodeList()
 		{
 			return _annos;
 		}
 
 		//    TODO    Should be XMLObjectImpl, XMLName?
-		internal virtual void SetTargets(XMLObjectImpl @object, Rhino.Xmlimpl.XmlNode.QName property)
+		internal virtual void SetTargets(XMLObjectImpl @object, XmlNode.QName property)
 		{
 			targetObject = @object;
 			targetProperty = property;
@@ -66,7 +66,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (index < Length())
 			{
-				Rhino.Xmlimpl.XmlNode.InternalList newAnnoList = new Rhino.Xmlimpl.XmlNode.InternalList();
+				XmlNode.InternalList newAnnoList = new XmlNode.InternalList();
 				newAnnoList.Add(_annos, 0, index);
 				newAnnoList.Add(xml);
 				newAnnoList.Add(_annos, index + 1, Length());
@@ -78,7 +78,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (index < Length())
 			{
-				Rhino.Xmlimpl.XmlNode.InternalList newAnnoList = new Rhino.Xmlimpl.XmlNode.InternalList();
+				XmlNode.InternalList newAnnoList = new XmlNode.InternalList();
 				newAnnoList.Add(_annos, 0, index);
 				newAnnoList.Add(xml);
 				newAnnoList.Add(_annos, index, Length());
@@ -278,10 +278,10 @@ namespace Rhino.Xmlimpl
 					}
 					else
 					{
-						if (xmlValue is Rhino.Xmlimpl.XMLList)
+						if (xmlValue is XMLList)
 						{
 							// Replace the first one, and add the rest on the list.
-							Rhino.Xmlimpl.XMLList list = (Rhino.Xmlimpl.XMLList)xmlValue;
+							XMLList list = (XMLList)xmlValue;
 							if (list.Length() > 0)
 							{
 								int lastIndexAdded = xmlNode.ChildIndex();
@@ -317,10 +317,10 @@ namespace Rhino.Xmlimpl
 					}
 					else
 					{
-						if (xmlValue is Rhino.Xmlimpl.XMLList)
+						if (xmlValue is XMLList)
 						{
 							// Replace the first one, and add the rest on the list.
-							Rhino.Xmlimpl.XMLList list = (Rhino.Xmlimpl.XMLList)xmlValue;
+							XMLList list = (XMLList)xmlValue;
 							if (list.Length() > 0)
 							{
 								ReplaceNode(xmlNode, list.Item(0));
@@ -340,7 +340,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		private XML GetXML(Rhino.Xmlimpl.XmlNode.InternalList _annos, int index)
+		private XML GetXML(XmlNode.InternalList _annos, int index)
 		{
 			if (index >= 0 && index < Length())
 			{
@@ -436,9 +436,9 @@ namespace Rhino.Xmlimpl
 		// Methods from section 12.4.4 in the spec
 		//
 		//
-		internal override Rhino.Xmlimpl.XMLList Child(int index)
+		internal override XMLList Child(int index)
 		{
-			Rhino.Xmlimpl.XMLList result = NewXMLList();
+			XMLList result = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				result.AddToList(GetXmlFromAnnotation(i).Child(index));
@@ -446,9 +446,9 @@ namespace Rhino.Xmlimpl
 			return result;
 		}
 
-		internal override Rhino.Xmlimpl.XMLList Child(XMLName xmlName)
+		internal override XMLList Child(XMLName xmlName)
 		{
-			Rhino.Xmlimpl.XMLList result = NewXMLList();
+			XMLList result = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				result.AddToList(GetXmlFromAnnotation(i).Child(xmlName));
@@ -456,7 +456,7 @@ namespace Rhino.Xmlimpl
 			return result;
 		}
 
-		internal override void AddMatches(Rhino.Xmlimpl.XMLList rv, XMLName name)
+		internal override void AddMatches(XMLList rv, XMLName name)
 		{
 			for (int i = 0; i < Length(); i++)
 			{
@@ -464,7 +464,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal override Rhino.Xmlimpl.XMLList Children()
+		internal override XMLList Children()
 		{
 			List<XML> list = new List<XML>();
 			for (int i = 0; i < Length(); i++)
@@ -472,7 +472,7 @@ namespace Rhino.Xmlimpl
 				XML xml = GetXmlFromAnnotation(i);
 				if (xml != null)
 				{
-					Rhino.Xmlimpl.XMLList childList = xml.Children();
+					XMLList childList = xml.Children();
 					int cChildren = childList.Length();
 					for (int j = 0; j < cChildren; j++)
 					{
@@ -480,7 +480,7 @@ namespace Rhino.Xmlimpl
 					}
 				}
 			}
-			Rhino.Xmlimpl.XMLList allChildren = NewXMLList();
+			XMLList allChildren = NewXMLList();
 			int sz = list.Count;
 			for (int i_1 = 0; i_1 < sz; i_1++)
 			{
@@ -489,9 +489,9 @@ namespace Rhino.Xmlimpl
 			return allChildren;
 		}
 
-		internal override Rhino.Xmlimpl.XMLList Comments()
+		internal override XMLList Comments()
 		{
-			Rhino.Xmlimpl.XMLList result = NewXMLList();
+			XMLList result = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				XML xml = GetXmlFromAnnotation(i);
@@ -500,9 +500,9 @@ namespace Rhino.Xmlimpl
 			return result;
 		}
 
-		internal override Rhino.Xmlimpl.XMLList Elements(XMLName name)
+		internal override XMLList Elements(XMLName name)
 		{
-			Rhino.Xmlimpl.XMLList rv = NewXMLList();
+			XMLList rv = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				XML xml = GetXmlFromAnnotation(i);
@@ -528,7 +528,7 @@ namespace Rhino.Xmlimpl
 
 		internal override XMLObjectImpl Copy()
 		{
-			Rhino.Xmlimpl.XMLList result = NewXMLList();
+			XMLList result = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				XML xml = GetXmlFromAnnotation(i);
@@ -665,9 +665,9 @@ namespace Rhino.Xmlimpl
 			return candidateParent;
 		}
 
-		internal override Rhino.Xmlimpl.XMLList ProcessingInstructions(XMLName xmlName)
+		internal override XMLList ProcessingInstructions(XMLName xmlName)
 		{
-			Rhino.Xmlimpl.XMLList result = NewXMLList();
+			XMLList result = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				XML xml = GetXmlFromAnnotation(i);
@@ -708,9 +708,9 @@ namespace Rhino.Xmlimpl
 			return (0 <= index && index < Length());
 		}
 
-		internal override Rhino.Xmlimpl.XMLList Text()
+		internal override XMLList Text()
 		{
-			Rhino.Xmlimpl.XMLList result = NewXMLList();
+			XMLList result = NewXMLList();
 			for (int i = 0; i < Length(); i++)
 			{
 				result.AddToList(GetXmlFromAnnotation(i).Text());
@@ -788,9 +788,9 @@ namespace Rhino.Xmlimpl
 				}
 				else
 				{
-					if (target is Rhino.Xmlimpl.XMLList)
+					if (target is XMLList)
 					{
-						Rhino.Xmlimpl.XMLList otherList = (Rhino.Xmlimpl.XMLList)target;
+						XMLList otherList = (XMLList)target;
 						if (otherList.Length() == Length())
 						{
 							result = true;
@@ -809,10 +809,10 @@ namespace Rhino.Xmlimpl
 			return result;
 		}
 
-		private Rhino.Xmlimpl.XMLList GetPropertyList(XMLName name)
+		private XMLList GetPropertyList(XMLName name)
 		{
-			Rhino.Xmlimpl.XMLList propertyList = NewXMLList();
-			Rhino.Xmlimpl.XmlNode.QName qname = null;
+			XMLList propertyList = NewXMLList();
+			XmlNode.QName qname = null;
 			if (!name.IsDescendants() && !name.IsAttributeName())
 			{
 				// Only set the targetProperty if this is a regular child get
@@ -830,7 +830,7 @@ namespace Rhino.Xmlimpl
 		private object ApplyOrCall(bool isApply, Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 		{
 			string methodName = isApply ? "apply" : "call";
-			if (!(thisObj is Rhino.Xmlimpl.XMLList) || ((Rhino.Xmlimpl.XMLList)thisObj).targetProperty == null)
+			if (!(thisObj is XMLList) || ((XMLList)thisObj).targetProperty == null)
 			{
 				throw ScriptRuntime.TypeError1("msg.isnt.function", methodName);
 			}
@@ -846,7 +846,7 @@ namespace Rhino.Xmlimpl
 			else
 			{
 				object arg0 = args[0];
-				if (!inNewExpr && arg0 is Rhino.Xmlimpl.XMLList)
+				if (!inNewExpr && arg0 is XMLList)
 				{
 					// XMLList(XMLList) returns the same object.
 					return arg0;

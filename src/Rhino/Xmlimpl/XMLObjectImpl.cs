@@ -9,10 +9,10 @@
 using System;
 using Rhino;
 using Rhino.Xml;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	/// <summary>
 	/// This abstract class describes what all XML objects (XML, XMLList) should
@@ -55,12 +55,12 @@ namespace Rhino.Xmlimpl
 			return lib;
 		}
 
-		internal XML NewXML(Rhino.Xmlimpl.XmlNode node)
+		internal XML NewXML(XmlNode node)
 		{
 			return lib.NewXML(node);
 		}
 
-		internal virtual XML XmlFromNode(Rhino.Xmlimpl.XmlNode node)
+		internal virtual XML XmlFromNode(XmlNode node)
 		{
 			if (node.GetXml() == null)
 			{
@@ -89,21 +89,21 @@ namespace Rhino.Xmlimpl
 			return lib.NewQName(uri, localName, prefix);
 		}
 
-		internal QName NewQName(Rhino.Xmlimpl.XmlNode.QName name)
+		internal QName NewQName(XmlNode.QName name)
 		{
 			return lib.NewQName(name);
 		}
 
-		internal Namespace CreateNamespace(Rhino.Xmlimpl.XmlNode.Namespace declaration)
+		internal Namespace CreateNamespace(XmlNode.Namespace declaration)
 		{
 			if (declaration == null)
 			{
 				return null;
 			}
-			return lib.CreateNamespaces(new Rhino.Xmlimpl.XmlNode.Namespace[] { declaration })[0];
+			return lib.CreateNamespaces(new XmlNode.Namespace[] { declaration })[0];
 		}
 
-		internal Namespace[] CreateNamespaces(Rhino.Xmlimpl.XmlNode.Namespace[] declarations)
+		internal Namespace[] CreateNamespaces(XmlNode.Namespace[] declarations)
 		{
 			return lib.CreateNamespaces(declarations);
 		}
@@ -204,7 +204,7 @@ namespace Rhino.Xmlimpl
 
 		internal abstract bool Contains(object xml);
 
-		internal abstract Rhino.Xmlimpl.XMLObjectImpl Copy();
+		internal abstract XMLObjectImpl Copy();
 
 		internal abstract XMLList Elements(XMLName xmlName);
 
@@ -406,7 +406,7 @@ namespace Rhino.Xmlimpl
 				// or DESCENDANTS_FLAG has to be set
 				throw Kit.CodeBug();
 			}
-			Rhino.Xmlimpl.XmlNode.QName qname = lib.ToNodeQName(cx, elem, attribute);
+			XmlNode.QName qname = lib.ToNodeQName(cx, elem, attribute);
 			XMLName rv = XMLName.Create(qname, attribute, descendants);
 			rv.InitXMLObject(this);
 			return rv;
@@ -1271,11 +1271,11 @@ L0_break: ;
 				return JsConstructor(cx, thisObj == null, args);
 			}
 			// All (XML|XMLList).prototype methods require thisObj to be XML
-			if (!(thisObj is Rhino.Xmlimpl.XMLObjectImpl))
+			if (!(thisObj is XMLObjectImpl))
 			{
 				throw IncompatibleCallError(f);
 			}
-			Rhino.Xmlimpl.XMLObjectImpl realThis = (Rhino.Xmlimpl.XMLObjectImpl)thisObj;
+			XMLObjectImpl realThis = (XMLObjectImpl)thisObj;
 			XML xml = realThis.GetXML();
 			switch (id)
 			{
@@ -1500,7 +1500,7 @@ L0_break: ;
 
 				case Id_attributes:
 				{
-					return realThis.GetMatches(XMLName.Create(Rhino.Xmlimpl.XmlNode.QName.Create(null, null), true, false));
+					return realThis.GetMatches(XMLName.Create(XmlNode.QName.Create(null, null), true, false));
 				}
 
 				case Id_child:
@@ -1541,7 +1541,7 @@ L0_break: ;
 
 				case Id_descendants:
 				{
-					Rhino.Xmlimpl.XmlNode.QName qname = (args.Length == 0) ? Rhino.Xmlimpl.XmlNode.QName.Create(null, null) : lib.ToNodeQName(cx, args[0], false);
+					XmlNode.QName qname = (args.Length == 0) ? XmlNode.QName.Create(null, null) : lib.ToNodeQName(cx, args[0], false);
 					return realThis.GetMatches(XMLName.Create(qname, false, true));
 				}
 
@@ -1628,7 +1628,7 @@ L0_break: ;
 			return (i < args.Length) ? args[i] : Undefined.instance;
 		}
 
-		internal XML NewTextElementXML(Rhino.Xmlimpl.XmlNode reference, Rhino.Xmlimpl.XmlNode.QName qname, string value)
+		internal XML NewTextElementXML(XmlNode reference, XmlNode.QName qname, string value)
 		{
 			return lib.NewTextElementXML(reference, qname, value);
 		}
@@ -1652,7 +1652,7 @@ L0_break: ;
 
 		internal XML CreateEmptyXML()
 		{
-			return NewXML(Rhino.Xmlimpl.XmlNode.CreateEmpty(GetProcessor()));
+			return NewXML(XmlNode.CreateEmpty(GetProcessor()));
 		}
 	}
 }

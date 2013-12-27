@@ -45,7 +45,7 @@ namespace Rhino
 	/// scripts running more then 10 seconds and to provide better compatibility
 	/// with JavaScript code using MSIE-specific features.
 	/// <pre>
-	/// import org.mozilla.javascript.*;
+	/// import Rhino.*;
 	/// class MyFactory extends ContextFactory
 	/// {
 	/// // Custom
@@ -395,13 +395,13 @@ namespace Rhino
 			// neither have XMLBeans nor a DOM3 implementation present.
 			if (IsDom3Present())
 			{
-				return XMLLib.Factory.Create("org.mozilla.javascript.xmlimpl.XMLLibImpl");
+				return XMLLib.Factory.Create("Rhino.XmlImpl.XMLLibImpl");
 			}
 			else
 			{
 				if (Kit.ClassOrNull("org.apache.xmlbeans.XmlCursor") != null)
 				{
-					return XMLLib.Factory.Create("org.mozilla.javascript.xml.impl.xmlbeans.XMLLibImpl");
+					return XMLLib.Factory.Create("Rhino.Xml.impl.xmlbeans.XMLLibImpl");
 				}
 				else
 				{

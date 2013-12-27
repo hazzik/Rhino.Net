@@ -9,12 +9,12 @@
 using System;
 using NUnit.Framework;
 using Rhino;
-using Rhino.Commonjs.Module;
-using Rhino.Commonjs.Module.Provider;
-using Rhino.Tests.Commonjs.Module;
+using Rhino.CommonJS.Module;
+using Rhino.CommonJS.Module.Provider;
+using Rhino.Tests.CommonJS.Module;
 using Sharpen;
 
-namespace Rhino.Tests.Commonjs.Module
+namespace Rhino.Tests.CommonJS.Module
 {
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: ComplianceTest.java,v 1.1 2011/04/07 22:24:37 hannes%helma.at Exp $</version>
@@ -92,7 +92,7 @@ namespace Rhino.Tests.Commonjs.Module
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		private static Require CreateRequire(FilePath dir, Context cx, Scriptable scope)
 		{
-			return new Require(cx, scope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections.Singleton(dir.GetAbsoluteFile().ToURI()), Collections.Singleton(new Uri(typeof(ComplianceTest).GetResource(".").ToExternalForm() + "/")))), null, null, false);
+			return new Require(cx, scope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections<>.Singleton(dir.GetAbsoluteFile().ToURI()), Collections<>.Singleton(new Uri(typeof(ComplianceTest).GetResource(".").ToExternalForm() + "/")))), null, null, false);
 		}
 
 		[System.Serializable]

@@ -26,7 +26,7 @@ namespace Rhino.Drivers
 		private const bool DISABLE = true;
 
 		// Disable this suite in favor of
-		// org.mozilla.javascript.tests.MozillaSuiteTest
+		// Rhino.Tests.MozillaSuiteTest
 		/// <exception cref="System.Exception"></exception>
 		public static TestSuite Suite()
 		{

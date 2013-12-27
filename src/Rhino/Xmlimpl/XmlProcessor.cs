@@ -17,10 +17,10 @@ using Javax.Xml.Transform.Dom;
 using Javax.Xml.Transform.Stream;
 using Org.Xml.Sax;
 using Rhino;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	internal class XmlProcessor
@@ -48,7 +48,7 @@ namespace Rhino.Xmlimpl
 
 		private XmlProcessor.RhinoSAXErrorHandler errorHandler = new XmlProcessor.RhinoSAXErrorHandler();
 
-		//    Disambiguate from org.mozilla.javascript.Node
+		//    Disambiguate from Rhino.Node
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
 		private void ReadObject(ObjectInputStream stream)

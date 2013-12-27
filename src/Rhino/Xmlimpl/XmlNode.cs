@@ -11,41 +11,41 @@ using System.Collections.Generic;
 using System.Xml;
 using Org.W3c.Dom;
 using Rhino;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	internal class XmlNode
 	{
 		private const string XML_NAMESPACES_NAMESPACE_URI = "http://www.w3.org/2000/xmlns/";
 
-		private static readonly string USER_DATA_XMLNODE_KEY = typeof(Rhino.Xmlimpl.XmlNode).FullName;
+		private static readonly string USER_DATA_XMLNODE_KEY = typeof(XmlNode).FullName;
 
 		private const bool DOM_LEVEL_3 = true;
 
-		private static Rhino.Xmlimpl.XmlNode GetUserData(System.Xml.XmlNode node)
+		private static XmlNode GetUserData(System.Xml.XmlNode node)
 		{
-			return (Rhino.Xmlimpl.XmlNode)node.GetUserData(USER_DATA_XMLNODE_KEY);
+			return (XmlNode)node.GetUserData(USER_DATA_XMLNODE_KEY);
 			return null;
 		}
 
-		private static void SetUserData(System.Xml.XmlNode node, Rhino.Xmlimpl.XmlNode wrap)
+		private static void SetUserData(System.Xml.XmlNode node, XmlNode wrap)
 		{
 			node.SetUserData(USER_DATA_XMLNODE_KEY, wrap, wrap.events);
 		}
 
-		private static Rhino.Xmlimpl.XmlNode CreateImpl(System.Xml.XmlNode node)
+		private static XmlNode CreateImpl(System.Xml.XmlNode node)
 		{
 			if (node is XmlDocument)
 			{
 				throw new ArgumentException();
 			}
-			Rhino.Xmlimpl.XmlNode rv = null;
+			XmlNode rv = null;
 			if (GetUserData(node) == null)
 			{
-				rv = new Rhino.Xmlimpl.XmlNode();
+				rv = new XmlNode();
 				rv.dom = node;
 				SetUserData(node, rv);
 			}
@@ -56,7 +56,7 @@ namespace Rhino.Xmlimpl
 			return rv;
 		}
 
-		internal static Rhino.Xmlimpl.XmlNode NewElementWithText(XmlProcessor processor, Rhino.Xmlimpl.XmlNode reference, Rhino.Xmlimpl.XmlNode.QName qname, string value)
+		internal static XmlNode NewElementWithText(XmlProcessor processor, XmlNode reference, XmlNode.QName qname, string value)
 		{
 			if (reference is XmlDocument)
 			{
@@ -72,21 +72,21 @@ namespace Rhino.Xmlimpl
 				document = processor.NewDocument();
 			}
 			System.Xml.XmlNode referenceDom = (reference != null) ? reference.dom : null;
-			Rhino.Xmlimpl.XmlNode.Namespace ns = qname.GetNamespace();
+			XmlNode.Namespace ns = qname.GetNamespace();
 			XmlElement e = (ns == null || ns.GetUri().Length == 0) ? document.CreateElementNS(null, qname.GetLocalName()) : document.CreateElementNS(ns.GetUri(), qname.Qualify(referenceDom));
 			if (value != null)
 			{
 				e.AppendChild(document.CreateTextNode(value));
 			}
-			return Rhino.Xmlimpl.XmlNode.CreateImpl(e);
+			return XmlNode.CreateImpl(e);
 		}
 
-		internal static Rhino.Xmlimpl.XmlNode CreateText(XmlProcessor processor, string value)
+		internal static XmlNode CreateText(XmlProcessor processor, string value)
 		{
 			return CreateImpl(processor.NewDocument().CreateTextNode(value));
 		}
 
-		internal static Rhino.Xmlimpl.XmlNode CreateElementFromNode(System.Xml.XmlNode node)
+		internal static XmlNode CreateElementFromNode(System.Xml.XmlNode node)
 		{
 			if (node is XmlDocument)
 			{
@@ -96,24 +96,24 @@ namespace Rhino.Xmlimpl
 		}
 
 		/// <exception cref="Org.Xml.Sax.SAXException"></exception>
-		internal static Rhino.Xmlimpl.XmlNode CreateElement(XmlProcessor processor, string namespaceUri, string xml)
+		internal static XmlNode CreateElement(XmlProcessor processor, string namespaceUri, string xml)
 		{
 			return CreateImpl(processor.ToXml(namespaceUri, xml));
 		}
 
-		internal static Rhino.Xmlimpl.XmlNode CreateEmpty(XmlProcessor processor)
+		internal static XmlNode CreateEmpty(XmlProcessor processor)
 		{
 			return CreateText(processor, string.Empty);
 		}
 
-		private static Rhino.Xmlimpl.XmlNode Copy(Rhino.Xmlimpl.XmlNode other)
+		private static XmlNode Copy(XmlNode other)
 		{
 			return CreateImpl(other.dom.CloneNode(true));
 		}
 
 		private const long serialVersionUID = 1L;
 
-		private UserDataHandler events = new Rhino.Xmlimpl.XmlNode.XmlNodeUserDataHandler();
+		private UserDataHandler events = new XmlNode.XmlNodeUserDataHandler();
 
 		private System.Xml.XmlNode dom;
 
@@ -153,7 +153,7 @@ namespace Rhino.Xmlimpl
 			return this.dom.ChildNodes.Count;
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode Parent()
+		internal virtual XmlNode Parent()
 		{
 			System.Xml.XmlNode domParent = dom.ParentNode;
 			if (domParent is XmlDocument)
@@ -263,7 +263,7 @@ namespace Rhino.Xmlimpl
 			this.dom.Normalize();
 		}
 
-		internal virtual void InsertChildAt(int index, Rhino.Xmlimpl.XmlNode node)
+		internal virtual void InsertChildAt(int index, XmlNode node)
 		{
 			System.Xml.XmlNode parent = this.dom;
 			System.Xml.XmlNode child = parent.OwnerDocument.ImportNode(node.dom, true);
@@ -282,7 +282,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal virtual void InsertChildrenAt(int index, Rhino.Xmlimpl.XmlNode[] nodes)
+		internal virtual void InsertChildrenAt(int index, XmlNode[] nodes)
 		{
 			for (int i = 0; i < nodes.Length; i++)
 			{
@@ -290,7 +290,7 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode GetChild(int index)
+		internal virtual XmlNode GetChild(int index)
 		{
 			System.Xml.XmlNode child = dom.ChildNodes.Item(index);
 			return CreateImpl(child);
@@ -310,7 +310,7 @@ namespace Rhino.Xmlimpl
 			return false;
 		}
 
-		internal virtual bool IsSameNode(Rhino.Xmlimpl.XmlNode other)
+		internal virtual bool IsSameNode(XmlNode other)
 		{
 			//    TODO    May need to be changed if we allow XmlNode to refer to several Node objects
 			return this.dom == other.dom;
@@ -321,7 +321,7 @@ namespace Rhino.Xmlimpl
 			return (ns == null) ? string.Empty : ns;
 		}
 
-		private void AddNamespaces(Rhino.Xmlimpl.XmlNode.Namespaces rv, XmlElement element)
+		private void AddNamespaces(XmlNode.Namespaces rv, XmlElement element)
 		{
 			if (element == null)
 			{
@@ -335,7 +335,7 @@ namespace Rhino.Xmlimpl
 			}
 			if (!myDefaultNamespace.Equals(parentDefaultNamespace) || !(element.ParentNode is XmlElement))
 			{
-				rv.Declare(Rhino.Xmlimpl.XmlNode.Namespace.Create(string.Empty, myDefaultNamespace));
+				rv.Declare(XmlNode.Namespace.Create(string.Empty, myDefaultNamespace));
 			}
 			XmlNamedNodeMap attributes = element.Attributes;
 			for (int i = 0; i < attributes.Count; i++)
@@ -343,14 +343,14 @@ namespace Rhino.Xmlimpl
 				XmlAttribute attr = (XmlAttribute)attributes.Item(i);
 				if (attr.Prefix != null && attr.Prefix.Equals("xmlns"))
 				{
-					rv.Declare(Rhino.Xmlimpl.XmlNode.Namespace.Create(attr.LocalName, attr.Value));
+					rv.Declare(XmlNode.Namespace.Create(attr.LocalName, attr.Value));
 				}
 			}
 		}
 
-		private Rhino.Xmlimpl.XmlNode.Namespaces GetAllNamespaces()
+		private XmlNode.Namespaces GetAllNamespaces()
 		{
-			Rhino.Xmlimpl.XmlNode.Namespaces rv = new Rhino.Xmlimpl.XmlNode.Namespaces();
+			XmlNode.Namespaces rv = new XmlNode.Namespaces();
 			System.Xml.XmlNode target = this.dom;
 			if (target is XmlAttribute)
 			{
@@ -365,43 +365,43 @@ namespace Rhino.Xmlimpl
 				target = target.ParentNode;
 			}
 			//    Fallback in case no namespace was declared
-			rv.Declare(Rhino.Xmlimpl.XmlNode.Namespace.Create(string.Empty, string.Empty));
+			rv.Declare(XmlNode.Namespace.Create(string.Empty, string.Empty));
 			return rv;
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode.Namespace[] GetInScopeNamespaces()
+		internal virtual XmlNode.Namespace[] GetInScopeNamespaces()
 		{
-			Rhino.Xmlimpl.XmlNode.Namespaces rv = GetAllNamespaces();
+			XmlNode.Namespaces rv = GetAllNamespaces();
 			return rv.GetNamespaces();
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode.Namespace[] GetNamespaceDeclarations()
+		internal virtual XmlNode.Namespace[] GetNamespaceDeclarations()
 		{
 			//    ECMA357 13.4.4.24
 			if (this.dom is XmlElement)
 			{
-				Rhino.Xmlimpl.XmlNode.Namespaces rv = new Rhino.Xmlimpl.XmlNode.Namespaces();
+				XmlNode.Namespaces rv = new XmlNode.Namespaces();
 				AddNamespaces(rv, (XmlElement)this.dom);
 				return rv.GetNamespaces();
 			}
 			else
 			{
-				return new Rhino.Xmlimpl.XmlNode.Namespace[0];
+				return new XmlNode.Namespace[0];
 			}
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespaceDeclaration(string prefix)
+		internal virtual XmlNode.Namespace GetNamespaceDeclaration(string prefix)
 		{
 			if (prefix.Equals(string.Empty) && dom is XmlAttribute)
 			{
 				//    Default namespaces do not apply to attributes; see XML Namespaces section 5.2
-				return Rhino.Xmlimpl.XmlNode.Namespace.Create(string.Empty, string.Empty);
+				return XmlNode.Namespace.Create(string.Empty, string.Empty);
 			}
-			Rhino.Xmlimpl.XmlNode.Namespaces rv = GetAllNamespaces();
+			XmlNode.Namespaces rv = GetAllNamespaces();
 			return rv.GetNamespace(prefix);
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespaceDeclaration()
+		internal virtual XmlNode.Namespace GetNamespaceDeclaration()
 		{
 			if (dom.Prefix == null)
 			{
@@ -430,7 +430,7 @@ namespace Rhino.Xmlimpl
 			{
 			}
 
-			internal virtual void Declare(Rhino.Xmlimpl.XmlNode.Namespace n)
+			internal virtual void Declare(XmlNode.Namespace n)
 			{
 				if (map.Get(n.prefix) == null)
 				{
@@ -444,41 +444,41 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespaceByUri(string uri)
+			internal virtual XmlNode.Namespace GetNamespaceByUri(string uri)
 			{
 				if (uriToPrefix.Get(uri) == null)
 				{
 					return null;
 				}
-				return Rhino.Xmlimpl.XmlNode.Namespace.Create(uri, uriToPrefix.Get(uri));
+				return XmlNode.Namespace.Create(uri, uriToPrefix.Get(uri));
 			}
 
-			internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespace(string prefix)
+			internal virtual XmlNode.Namespace GetNamespace(string prefix)
 			{
 				if (map.Get(prefix) == null)
 				{
 					return null;
 				}
-				return Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, map.Get(prefix));
+				return XmlNode.Namespace.Create(prefix, map.Get(prefix));
 			}
 
-			internal virtual Rhino.Xmlimpl.XmlNode.Namespace[] GetNamespaces()
+			internal virtual XmlNode.Namespace[] GetNamespaces()
 			{
-				List<Rhino.Xmlimpl.XmlNode.Namespace> rv = new List<Rhino.Xmlimpl.XmlNode.Namespace>();
+				List<XmlNode.Namespace> rv = new List<XmlNode.Namespace>();
 				foreach (string prefix in map.Keys)
 				{
 					string uri = map.Get(prefix);
-					Rhino.Xmlimpl.XmlNode.Namespace n = Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri);
+					XmlNode.Namespace n = XmlNode.Namespace.Create(prefix, uri);
 					if (!n.IsEmpty())
 					{
 						rv.Add(n);
 					}
 				}
-				return Sharpen.Collections.ToArray(rv, new Rhino.Xmlimpl.XmlNode.Namespace[rv.Count]);
+				return Sharpen.Collections.ToArray(rv, new XmlNode.Namespace[rv.Count]);
 			}
 		}
 
-		internal Rhino.Xmlimpl.XmlNode Copy()
+		internal XmlNode Copy()
 		{
 			return Copy(this);
 		}
@@ -514,7 +514,7 @@ namespace Rhino.Xmlimpl
 			return dom.NodeType == NodeConstants.ELEMENT_NODE;
 		}
 
-		internal void RenameNode(Rhino.Xmlimpl.XmlNode.QName qname)
+		internal void RenameNode(XmlNode.QName qname)
 		{
 			this.dom = dom.OwnerDocument.RenameNode(dom, qname.GetNamespace().GetUri(), qname.Qualify(dom));
 		}
@@ -526,14 +526,14 @@ namespace Rhino.Xmlimpl
 				throw new InvalidOperationException();
 			}
 			string prefix = this.dom.Prefix;
-			Rhino.Xmlimpl.XmlNode.QName after = Rhino.Xmlimpl.XmlNode.QName.Create(this.dom.NamespaceURI, this.dom.LocalName, null);
+			XmlNode.QName after = XmlNode.QName.Create(this.dom.NamespaceURI, this.dom.LocalName, null);
 			RenameNode(after);
 			XmlNamedNodeMap attrs = this.dom.Attributes;
 			for (int i = 0; i < attrs.Count; i++)
 			{
 				if (attrs.Item(i).Prefix.Equals(prefix))
 				{
-					CreateImpl(attrs.Item(i)).RenameNode(Rhino.Xmlimpl.XmlNode.QName.Create(attrs.Item(i).NamespaceURI, attrs.Item(i).LocalName, null));
+					CreateImpl(attrs.Item(i)).RenameNode(XmlNode.QName.Create(attrs.Item(i).NamespaceURI, attrs.Item(i).LocalName, null));
 				}
 			}
 		}
@@ -567,14 +567,14 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		private Rhino.Xmlimpl.XmlNode.Namespace GetDefaultNamespace()
+		private XmlNode.Namespace GetDefaultNamespace()
 		{
 			string prefix = string.Empty;
 			string uri = (dom.LookupNamespaceURI(null) == null) ? string.Empty : dom.LookupNamespaceURI(null);
-			return Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri);
+			return XmlNode.Namespace.Create(prefix, uri);
 		}
 
-		private string GetExistingPrefixFor(Rhino.Xmlimpl.XmlNode.Namespace @namespace)
+		private string GetExistingPrefixFor(XmlNode.Namespace @namespace)
 		{
 			if (GetDefaultNamespace().GetUri().Equals(@namespace.GetUri()))
 			{
@@ -583,7 +583,7 @@ namespace Rhino.Xmlimpl
 			return dom.LookupPrefix(@namespace.GetUri());
 		}
 
-		private Rhino.Xmlimpl.XmlNode.Namespace GetNodeNamespace()
+		private XmlNode.Namespace GetNodeNamespace()
 		{
 			string uri = dom.NamespaceURI;
 			string prefix = dom.Prefix;
@@ -595,17 +595,17 @@ namespace Rhino.Xmlimpl
 			{
 				prefix = string.Empty;
 			}
-			return Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri);
+			return XmlNode.Namespace.Create(prefix, uri);
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespace()
+		internal virtual XmlNode.Namespace GetNamespace()
 		{
 			return GetNodeNamespace();
 		}
 
-		internal virtual void RemoveNamespace(Rhino.Xmlimpl.XmlNode.Namespace @namespace)
+		internal virtual void RemoveNamespace(XmlNode.Namespace @namespace)
 		{
-			Rhino.Xmlimpl.XmlNode.Namespace current = GetNodeNamespace();
+			XmlNode.Namespace current = GetNodeNamespace();
 			//    Do not remove in-use namespace
 			if (@namespace.Is(current))
 			{
@@ -614,7 +614,7 @@ namespace Rhino.Xmlimpl
 			XmlNamedNodeMap attrs = this.dom.Attributes;
 			for (int i = 0; i < attrs.Count; i++)
 			{
-				Rhino.Xmlimpl.XmlNode attr = Rhino.Xmlimpl.XmlNode.CreateImpl(attrs.Item(i));
+				XmlNode attr = XmlNode.CreateImpl(attrs.Item(i));
 				if (@namespace.Is(attr.GetNodeNamespace()))
 				{
 					return;
@@ -661,25 +661,25 @@ namespace Rhino.Xmlimpl
 				{
 					prefix = string.Empty;
 				}
-				this.dom = dom.OwnerDocument.RenameNode(dom, dom.NamespaceURI, Rhino.Xmlimpl.XmlNode.QName.Qualify(prefix, localName));
+				this.dom = dom.OwnerDocument.RenameNode(dom, dom.NamespaceURI, XmlNode.QName.Qualify(prefix, localName));
 			}
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.QName GetQname()
+		internal XmlNode.QName GetQname()
 		{
 			string uri = (dom.NamespaceURI) == null ? string.Empty : dom.NamespaceURI;
 			string prefix = (dom.Prefix == null) ? string.Empty : dom.Prefix;
-			return Rhino.Xmlimpl.XmlNode.QName.Create(uri, dom.LocalName, prefix);
+			return XmlNode.QName.Create(uri, dom.LocalName, prefix);
 		}
 
-		internal virtual void AddMatchingChildren(XMLList result, Rhino.Xmlimpl.XmlNode.Filter filter)
+		internal virtual void AddMatchingChildren(XMLList result, XmlNode.Filter filter)
 		{
 			System.Xml.XmlNode node = this.dom;
 			XmlNodeList children = node.ChildNodes;
 			for (int i = 0; i < children.Count; i++)
 			{
 				System.Xml.XmlNode childnode = children.Item(i);
-				Rhino.Xmlimpl.XmlNode child = Rhino.Xmlimpl.XmlNode.CreateImpl(childnode);
+				XmlNode child = XmlNode.CreateImpl(childnode);
 				if (filter.Accept(childnode))
 				{
 					result.AddToList(child);
@@ -687,9 +687,9 @@ namespace Rhino.Xmlimpl
 			}
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode[] GetMatchingChildren(Rhino.Xmlimpl.XmlNode.Filter filter)
+		internal virtual XmlNode[] GetMatchingChildren(XmlNode.Filter filter)
 		{
-			List<Rhino.Xmlimpl.XmlNode> rv = new List<Rhino.Xmlimpl.XmlNode>();
+			List<XmlNode> rv = new List<XmlNode>();
 			XmlNodeList nodes = this.dom.ChildNodes;
 			for (int i = 0; i < nodes.Count; i++)
 			{
@@ -699,10 +699,10 @@ namespace Rhino.Xmlimpl
 					rv.Add(CreateImpl(node));
 				}
 			}
-			return Sharpen.Collections.ToArray(rv, new Rhino.Xmlimpl.XmlNode[rv.Count]);
+			return Sharpen.Collections.ToArray(rv, new XmlNode[rv.Count]);
 		}
 
-		internal virtual Rhino.Xmlimpl.XmlNode[] GetAttributes()
+		internal virtual XmlNode[] GetAttributes()
 		{
 			XmlNamedNodeMap attrs = this.dom.Attributes;
 			//    TODO    Or could make callers handle null?
@@ -710,7 +710,7 @@ namespace Rhino.Xmlimpl
 			{
 				throw new InvalidOperationException("Must be element.");
 			}
-			Rhino.Xmlimpl.XmlNode[] rv = new Rhino.Xmlimpl.XmlNode[attrs.Count];
+			XmlNode[] rv = new XmlNode[attrs.Count];
 			for (int i = 0; i < attrs.Count; i++)
 			{
 				rv[i] = CreateImpl(attrs.Item(i));
@@ -723,7 +723,7 @@ namespace Rhino.Xmlimpl
 			return ((XmlAttribute)dom).Value;
 		}
 
-		internal virtual void SetAttribute(Rhino.Xmlimpl.XmlNode.QName name, string value)
+		internal virtual void SetAttribute(XmlNode.QName name, string value)
 		{
 			if (!(dom is XmlElement))
 			{
@@ -732,7 +732,7 @@ namespace Rhino.Xmlimpl
 			name.SetAttribute((XmlElement)dom, value);
 		}
 
-		internal virtual void ReplaceWith(Rhino.Xmlimpl.XmlNode other)
+		internal virtual void ReplaceWith(XmlNode other)
 		{
 			System.Xml.XmlNode replacement = other.dom;
 			if (replacement.OwnerDocument != this.dom.OwnerDocument)
@@ -747,7 +747,7 @@ namespace Rhino.Xmlimpl
 			if (this.IsElementType())
 			{
 				XmlElement copy = (XmlElement)this.dom.CloneNode(true);
-				Rhino.Xmlimpl.XmlNode.Namespace[] inScope = this.GetInScopeNamespaces();
+				XmlNode.Namespace[] inScope = this.GetInScopeNamespaces();
 				for (int i = 0; i < inScope.Length; i++)
 				{
 					DeclareNamespace(copy, inScope[i].GetPrefix(), inScope[i].GetUri());
@@ -766,7 +766,7 @@ namespace Rhino.Xmlimpl
 			/// <summary>Serial version id for Namespace with fields prefix and uri</summary>
 			private const long serialVersionUID = 4073904386884677090L;
 
-			internal static Rhino.Xmlimpl.XmlNode.Namespace Create(string prefix, string uri)
+			internal static XmlNode.Namespace Create(string prefix, string uri)
 			{
 				if (prefix == null)
 				{
@@ -776,15 +776,15 @@ namespace Rhino.Xmlimpl
 				{
 					throw new ArgumentException("Namespace may not lack a URI");
 				}
-				Rhino.Xmlimpl.XmlNode.Namespace rv = new Rhino.Xmlimpl.XmlNode.Namespace();
+				XmlNode.Namespace rv = new XmlNode.Namespace();
 				rv.prefix = prefix;
 				rv.uri = uri;
 				return rv;
 			}
 
-			internal static Rhino.Xmlimpl.XmlNode.Namespace Create(string uri)
+			internal static XmlNode.Namespace Create(string uri)
 			{
-				Rhino.Xmlimpl.XmlNode.Namespace rv = new Rhino.Xmlimpl.XmlNode.Namespace();
+				XmlNode.Namespace rv = new XmlNode.Namespace();
 				rv.uri = uri;
 				// Avoid null prefix for "" namespace
 				if (uri == null || uri.Length == 0)
@@ -794,7 +794,7 @@ namespace Rhino.Xmlimpl
 				return rv;
 			}
 
-			internal static readonly Rhino.Xmlimpl.XmlNode.Namespace GLOBAL = Create(string.Empty, string.Empty);
+			internal static readonly XmlNode.Namespace GLOBAL = Create(string.Empty, string.Empty);
 
 			private string prefix;
 
@@ -818,7 +818,7 @@ namespace Rhino.Xmlimpl
 				return prefix == null;
 			}
 
-			internal virtual bool Is(Rhino.Xmlimpl.XmlNode.Namespace other)
+			internal virtual bool Is(XmlNode.Namespace other)
 			{
 				return this.prefix != null && other.prefix != null && this.prefix.Equals(other.prefix) && this.uri.Equals(other.uri);
 			}
@@ -866,7 +866,7 @@ namespace Rhino.Xmlimpl
 			private const long serialVersionUID = -6587069811691451077L;
 
 			//    TODO    Where is this class used?  No longer using it in QName implementation
-			internal static Rhino.Xmlimpl.XmlNode.QName Create(Rhino.Xmlimpl.XmlNode.Namespace @namespace, string localName)
+			internal static XmlNode.QName Create(XmlNode.Namespace @namespace, string localName)
 			{
 				//    A null namespace indicates a wild-card match for any namespace
 				//    A null localName indicates "*" from the point of view of ECMA357
@@ -874,16 +874,16 @@ namespace Rhino.Xmlimpl
 				{
 					throw new Exception("* is not valid localName");
 				}
-				Rhino.Xmlimpl.XmlNode.QName rv = new Rhino.Xmlimpl.XmlNode.QName();
+				XmlNode.QName rv = new XmlNode.QName();
 				rv.@namespace = @namespace;
 				rv.localName = localName;
 				return rv;
 			}
 
-			[System.ObsoleteAttribute(@"")]
-			internal static Rhino.Xmlimpl.XmlNode.QName Create(string uri, string localName, string prefix)
+			[Obsolete(@"")]
+			internal static XmlNode.QName Create(string uri, string localName, string prefix)
 			{
-				return Create(Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri), localName);
+				return Create(XmlNode.Namespace.Create(prefix, uri), localName);
 			}
 
 			internal static string Qualify(string prefix, string localName)
@@ -899,7 +899,7 @@ namespace Rhino.Xmlimpl
 				return localName;
 			}
 
-			private Rhino.Xmlimpl.XmlNode.Namespace @namespace;
+			private XmlNode.Namespace @namespace;
 
 			private string localName;
 
@@ -925,7 +925,7 @@ namespace Rhino.Xmlimpl
 				return one.Equals(two);
 			}
 
-			private bool NamespacesEqual(Rhino.Xmlimpl.XmlNode.Namespace one, Rhino.Xmlimpl.XmlNode.Namespace two)
+			private bool NamespacesEqual(XmlNode.Namespace one, XmlNode.Namespace two)
 			{
 				if (one == null && two == null)
 				{
@@ -938,7 +938,7 @@ namespace Rhino.Xmlimpl
 				return Equals(one.GetUri(), two.GetUri());
 			}
 
-			internal bool Equals(Rhino.Xmlimpl.XmlNode.QName other)
+			internal bool Equals(XmlNode.QName other)
 			{
 				if (!NamespacesEqual(this.@namespace, other.@namespace))
 				{
@@ -953,11 +953,11 @@ namespace Rhino.Xmlimpl
 
 			public override bool Equals(object obj)
 			{
-				if (!(obj is Rhino.Xmlimpl.XmlNode.QName))
+				if (!(obj is XmlNode.QName))
 				{
 					return false;
 				}
-				return Equals((Rhino.Xmlimpl.XmlNode.QName)obj);
+				return Equals((XmlNode.QName)obj);
 			}
 
 			public override int GetHashCode()
@@ -1039,7 +1039,7 @@ namespace Rhino.Xmlimpl
 				element.SetAttributeNS(@namespace.GetUri(), Qualify(@namespace.GetPrefix(), localName), value);
 			}
 
-			internal virtual Rhino.Xmlimpl.XmlNode.Namespace GetNamespace()
+			internal virtual XmlNode.Namespace GetNamespace()
 			{
 				return @namespace;
 			}
@@ -1055,19 +1055,19 @@ namespace Rhino.Xmlimpl
 		{
 			private const long serialVersionUID = -3633151157292048978L;
 
-			private IList<Rhino.Xmlimpl.XmlNode> list;
+			private IList<XmlNode> list;
 
 			internal InternalList()
 			{
-				list = new List<Rhino.Xmlimpl.XmlNode>();
+				list = new List<XmlNode>();
 			}
 
-			private void _add(Rhino.Xmlimpl.XmlNode n)
+			private void _add(XmlNode n)
 			{
 				list.Add(n);
 			}
 
-			internal virtual Rhino.Xmlimpl.XmlNode Item(int index)
+			internal virtual XmlNode Item(int index)
 			{
 				return list[index];
 			}
@@ -1077,7 +1077,7 @@ namespace Rhino.Xmlimpl
 				list.Remove(index);
 			}
 
-			internal virtual void Add(Rhino.Xmlimpl.XmlNode.InternalList other)
+			internal virtual void Add(XmlNode.InternalList other)
 			{
 				for (int i = 0; i < other.Length(); i++)
 				{
@@ -1085,7 +1085,7 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal virtual void Add(Rhino.Xmlimpl.XmlNode.InternalList from, int startInclusive, int endExclusive)
+			internal virtual void Add(XmlNode.InternalList from, int startInclusive, int endExclusive)
 			{
 				for (int i = startInclusive; i < endExclusive; i++)
 				{
@@ -1093,7 +1093,7 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal virtual void Add(Rhino.Xmlimpl.XmlNode node)
+			internal virtual void Add(XmlNode node)
 			{
 				_add(node);
 			}
@@ -1126,9 +1126,9 @@ namespace Rhino.Xmlimpl
 					}
 					else
 					{
-						if (toAdd is Rhino.Xmlimpl.XmlNode)
+						if (toAdd is XmlNode)
 						{
-							this._add((Rhino.Xmlimpl.XmlNode)toAdd);
+							this._add((XmlNode)toAdd);
 						}
 					}
 				}
@@ -1142,7 +1142,7 @@ namespace Rhino.Xmlimpl
 
 		internal abstract class Filter
 		{
-			private sealed class _Filter_839 : Rhino.Xmlimpl.XmlNode.Filter
+			private sealed class _Filter_839 : XmlNode.Filter
 			{
 				public _Filter_839()
 				{
@@ -1154,9 +1154,9 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal static readonly Rhino.Xmlimpl.XmlNode.Filter COMMENT = new _Filter_839();
+			internal static readonly XmlNode.Filter COMMENT = new _Filter_839();
 
-			private sealed class _Filter_845 : Rhino.Xmlimpl.XmlNode.Filter
+			private sealed class _Filter_845 : XmlNode.Filter
 			{
 				public _Filter_845()
 				{
@@ -1168,14 +1168,14 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal static readonly Rhino.Xmlimpl.XmlNode.Filter TEXT = new _Filter_845();
+			internal static readonly XmlNode.Filter TEXT = new _Filter_845();
 
-			internal static Rhino.Xmlimpl.XmlNode.Filter PROCESSING_INSTRUCTION(XMLName name)
+			internal static XmlNode.Filter PROCESSING_INSTRUCTION(XMLName name)
 			{
 				return new _Filter_852(name);
 			}
 
-			private sealed class _Filter_852 : Rhino.Xmlimpl.XmlNode.Filter
+			private sealed class _Filter_852 : XmlNode.Filter
 			{
 				public _Filter_852(XMLName name)
 				{
@@ -1195,7 +1195,7 @@ namespace Rhino.Xmlimpl
 				private readonly XMLName name;
 			}
 
-			private sealed class _Filter_863 : Rhino.Xmlimpl.XmlNode.Filter
+			private sealed class _Filter_863 : XmlNode.Filter
 			{
 				public _Filter_863()
 				{
@@ -1207,9 +1207,9 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal static Rhino.Xmlimpl.XmlNode.Filter ELEMENT = new _Filter_863();
+			internal static XmlNode.Filter ELEMENT = new _Filter_863();
 
-			private sealed class _Filter_869 : Rhino.Xmlimpl.XmlNode.Filter
+			private sealed class _Filter_869 : XmlNode.Filter
 			{
 				public _Filter_869()
 				{
@@ -1221,7 +1221,7 @@ namespace Rhino.Xmlimpl
 				}
 			}
 
-			internal static Rhino.Xmlimpl.XmlNode.Filter TRUE = new _Filter_869();
+			internal static XmlNode.Filter TRUE = new _Filter_869();
 
 			internal abstract bool Accept(System.Xml.XmlNode node);
 		}

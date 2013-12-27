@@ -8,10 +8,10 @@
 
 using System;
 using Rhino;
-using Rhino.Commonjs.Module;
+using Rhino.CommonJS.Module;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module
+namespace Rhino.CommonJS.Module
 {
 	/// <summary>
 	/// Should be implemented by Rhino embeddings to allow the require() function to

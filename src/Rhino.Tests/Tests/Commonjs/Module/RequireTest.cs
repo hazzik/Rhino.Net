@@ -9,12 +9,12 @@
 using System;
 using System.IO;
 using Rhino;
-using Rhino.Commonjs.Module;
-using Rhino.Commonjs.Module.Provider;
-using Rhino.Tests.Commonjs.Module;
+using Rhino.CommonJS.Module;
+using Rhino.CommonJS.Module.Provider;
+using Rhino.Tests.CommonJS.Module;
 using Sharpen;
 
-namespace Rhino.Tests.Commonjs.Module
+namespace Rhino.Tests.CommonJS.Module
 {
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: RequireTest.java,v 1.1 2011/04/07 22:24:37 hannes%helma.at Exp $</version>
@@ -120,7 +120,7 @@ namespace Rhino.Tests.Commonjs.Module
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		private Require GetSandboxedRequire(Context cx, Scriptable scope, bool sandboxed)
 		{
-			return new Require(cx, cx.InitStandardObjects(), new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections.Singleton(GetDirectory()), null)), null, null, true);
+			return new Require(cx, cx.InitStandardObjects(), new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections<>.Singleton(GetDirectory()), null)), null, null, true);
 		}
 
 		/// <exception cref="Sharpen.URISyntaxException"></exception>

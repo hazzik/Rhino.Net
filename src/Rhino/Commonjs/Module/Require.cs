@@ -10,10 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Rhino;
-using Rhino.Commonjs.Module;
+using Rhino.CommonJS.Module;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module
+namespace Rhino.CommonJS.Module
 {
 	/// <summary>
 	/// Implements the require() function as defined by

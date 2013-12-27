@@ -10,7 +10,7 @@ using System;
 using System.IO;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>
 	/// Represents the source text of the module as a tuple of a reader, a URI, a

@@ -34,11 +34,11 @@ namespace Rhino.Tools
 
 		/// <summary>
 		/// Look up the message corresponding to messageId in the
-		/// org.mozilla.javascript.tools.shell.resources.Messages property file.
+		/// Rhino.Tools.Shell.resources.Messages property file.
 		/// </summary>
 		/// <remarks>
 		/// Look up the message corresponding to messageId in the
-		/// org.mozilla.javascript.tools.shell.resources.Messages property file.
+		/// Rhino.Tools.Shell.resources.Messages property file.
 		/// For internationalization support.
 		/// </remarks>
 		public static string GetMessage(string messageId)
@@ -63,7 +63,7 @@ namespace Rhino.Tools
 			Context cx = Context.GetCurrentContext();
 			CultureInfo locale = cx == null ? CultureInfo.CurrentCulture : cx.GetLocale();
 			// ResourceBundle does caching.
-			ResourceBundle rb = ResourceBundle.GetBundle("org.mozilla.javascript.tools.resources.Messages", locale);
+			ResourceBundle rb = ResourceBundle.GetBundle("Rhino.Tools.resources.Messages", locale);
 			string formatString;
 			try
 			{

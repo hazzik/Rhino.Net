@@ -298,7 +298,7 @@ namespace Rhino
 				}
 				else
 				{
-					if ("org.mozilla.javascript.Interpreter".Equals(e.GetClassName()) && "interpretLoop".Equals(e.GetMethodName()) && interpreterStack != null && interpreterStack.Length > interpreterStackIndex)
+					if ("Rhino.Interpreter".Equals(e.GetClassName()) && "interpretLoop".Equals(e.GetMethodName()) && interpreterStack != null && interpreterStack.Length > interpreterStackIndex)
 					{
 						foreach (ScriptStackElement elem in interpreterStack[interpreterStackIndex++])
 						{

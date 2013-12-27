@@ -8,10 +8,10 @@
 
 using Rhino;
 using Rhino.Xml;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	internal sealed class XMLWithScope : NativeWith

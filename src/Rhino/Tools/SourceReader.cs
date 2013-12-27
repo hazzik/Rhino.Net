@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using Rhino;
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module.Provider;
 using Rhino.Tools;
 using Sharpen;
 

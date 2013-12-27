@@ -8,10 +8,10 @@
 
 using System;
 using Rhino;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	internal class XMLCtor : IdFunctionObject

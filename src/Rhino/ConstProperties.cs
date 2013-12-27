@@ -42,7 +42,7 @@ namespace Rhino
 		/// <LI>java.lang.Boolean objects</LI>
 		/// <LI>java.lang.String objects</LI>
 		/// <LI>java.lang.Number objects</LI>
-		/// <LI>org.mozilla.javascript.Scriptable objects</LI>
+		/// <LI>Rhino.Scriptable objects</LI>
 		/// <LI>null</LI>
 		/// <LI>The value returned by Context.getUndefinedValue()</LI>
 		/// </UL><p>

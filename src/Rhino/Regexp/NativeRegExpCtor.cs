@@ -7,10 +7,10 @@
  */
 
 using Rhino;
-using Rhino.Regexp;
+using Rhino.RegExp;
 using Sharpen;
 
-namespace Rhino.Regexp
+namespace Rhino.RegExp
 {
 	/// <summary>This class implements the RegExp constructor native object.</summary>
 	/// <remarks>

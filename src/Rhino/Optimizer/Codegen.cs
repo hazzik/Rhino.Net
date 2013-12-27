@@ -66,7 +66,7 @@ namespace Rhino.Optimizer
 					baseName = "_" + baseName;
 				}
 			}
-			string mainClassName = "org.mozilla.javascript.gen." + baseName + "_" + serial;
+			string mainClassName = "Rhino.Gen." + baseName + "_" + serial;
 			byte[] mainClassBytes = CompileToClassFile(compilerEnv, mainClassName, tree, encodedSource, returnFunction);
 			return new object[] { mainClassName, mainClassBytes };
 		}
@@ -1161,9 +1161,9 @@ namespace Rhino.Optimizer
 			mainMethodClass = className;
 		}
 
-		internal const string DEFAULT_MAIN_METHOD_CLASS = "org.mozilla.javascript.optimizer.OptRuntime";
+		internal const string DEFAULT_MAIN_METHOD_CLASS = "Rhino.Optimizer.OptRuntime";
 
-		private const string SUPER_CLASS_NAME = "org.mozilla.javascript.NativeFunction";
+		private const string SUPER_CLASS_NAME = "Rhino.NativeFunction";
 
 		internal const string ID_FIELD_NAME = "_id";
 
@@ -5329,7 +5329,7 @@ namespace Rhino.Optimizer
 
 		private void AddScriptRuntimeInvoke(string methodName, string methodSignature)
 		{
-			cfw.AddInvoke(ByteCode.INVOKESTATIC, "org.mozilla.javascript.ScriptRuntime", methodName, methodSignature);
+			cfw.AddInvoke(ByteCode.INVOKESTATIC, "Rhino.ScriptRuntime", methodName, methodSignature);
 		}
 
 		private void AddOptRuntimeInvoke(string methodName, string methodSignature)

@@ -2560,9 +2560,9 @@ namespace Rhino
 			}
 		}
 
-		private static Type codegenClass = Kit.ClassOrNull("org.mozilla.javascript.optimizer.Codegen");
+		private static Type codegenClass = Kit.ClassOrNull("Rhino.Optimizer.Codegen");
 
-		private static Type interpreterClass = Kit.ClassOrNull("org.mozilla.javascript.Interpreter");
+		private static Type interpreterClass = Kit.ClassOrNull("Rhino.Interpreter");
 
 		private Evaluator CreateCompiler()
 		{
@@ -2659,7 +2659,7 @@ namespace Rhino
 		{
 			if (regExpProxy == null)
 			{
-				Type cl = Kit.ClassOrNull("org.mozilla.javascript.regexp.RegExpImpl");
+				Type cl = Kit.ClassOrNull("Rhino.RegExp.RegExpImpl");
 				if (cl != null)
 				{
 					regExpProxy = (RegExpProxy)Kit.NewInstanceOrNull(cl);

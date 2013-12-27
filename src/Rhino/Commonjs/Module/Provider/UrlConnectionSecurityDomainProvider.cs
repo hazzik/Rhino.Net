@@ -6,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>Interface for URL connection based security domain providers.</summary>
 	/// <remarks>

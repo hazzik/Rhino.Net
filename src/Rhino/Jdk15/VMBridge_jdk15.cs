@@ -32,7 +32,7 @@ namespace Rhino.Jdk15
 			catch (MissingMethodException e)
 			{
 				// Throw a fitting exception that is handled by
-				// org.mozilla.javascript.Kit.newInstanceOrNull:
+				// Rhino.Kit.newInstanceOrNull:
 				throw new InstantiationException(e.Message);
 			}
 		}

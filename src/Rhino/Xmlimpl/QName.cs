@@ -9,10 +9,10 @@
 using System;
 using System.Text;
 using Rhino;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	/// <summary>Class QName</summary>
 	[System.Serializable]
@@ -24,17 +24,17 @@ namespace Rhino.Xmlimpl
 
 		private XMLLibImpl lib;
 
-		private Rhino.Xmlimpl.QName prototype;
+		private QName prototype;
 
-		private Rhino.Xmlimpl.XmlNode.QName delegate_;
+		private XmlNode.QName delegate_;
 
 		private QName()
 		{
 		}
 
-		internal static Rhino.Xmlimpl.QName Create(XMLLibImpl lib, Scriptable scope, Rhino.Xmlimpl.QName prototype, Rhino.Xmlimpl.XmlNode.QName delegate_)
+		internal static QName Create(XMLLibImpl lib, Scriptable scope, QName prototype, XmlNode.QName delegate_)
 		{
-			Rhino.Xmlimpl.QName rv = new Rhino.Xmlimpl.QName();
+			QName rv = new QName();
 			rv.lib = lib;
 			rv.SetParentScope(scope);
 			rv.prototype = prototype;
@@ -100,18 +100,18 @@ namespace Rhino.Xmlimpl
 			return delegate_.GetNamespace().GetUri();
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.QName GetDelegate()
+		internal XmlNode.QName GetDelegate()
 		{
 			return delegate_;
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Rhino.Xmlimpl.QName))
+			if (!(obj is QName))
 			{
 				return false;
 			}
-			return Equals((Rhino.Xmlimpl.QName)obj);
+			return Equals((QName)obj);
 		}
 
 		public override int GetHashCode()
@@ -121,15 +121,15 @@ namespace Rhino.Xmlimpl
 
 		protected internal override object EquivalentValues(object value)
 		{
-			if (!(value is Rhino.Xmlimpl.QName))
+			if (!(value is QName))
 			{
 				return ScriptableConstants.NOT_FOUND;
 			}
-			bool result = Equals((Rhino.Xmlimpl.QName)value);
+			bool result = Equals((QName)value);
 			return result ? true : false;
 		}
 
-		private bool Equals(Rhino.Xmlimpl.QName q)
+		private bool Equals(QName q)
 		{
 			return this.delegate_.Equals(q.delegate_);
 		}
@@ -355,32 +355,32 @@ L0_break: ;
 			throw new ArgumentException(id.ToString());
 		}
 
-		private Rhino.Xmlimpl.QName RealThis(Scriptable thisObj, IdFunctionObject f)
+		private QName RealThis(Scriptable thisObj, IdFunctionObject f)
 		{
-			if (!(thisObj is Rhino.Xmlimpl.QName))
+			if (!(thisObj is QName))
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (Rhino.Xmlimpl.QName)thisObj;
+			return (QName)thisObj;
 		}
 
-		internal Rhino.Xmlimpl.QName NewQName(XMLLibImpl lib, string q_uri, string q_localName, string q_prefix)
+		internal QName NewQName(XMLLibImpl lib, string q_uri, string q_localName, string q_prefix)
 		{
-			Rhino.Xmlimpl.QName prototype = this.prototype;
+			QName prototype = this.prototype;
 			if (prototype == null)
 			{
 				prototype = this;
 			}
-			Rhino.Xmlimpl.XmlNode.Namespace ns = null;
+			XmlNode.Namespace ns = null;
 			if (q_prefix != null)
 			{
-				ns = Rhino.Xmlimpl.XmlNode.Namespace.Create(q_prefix, q_uri);
+				ns = XmlNode.Namespace.Create(q_prefix, q_uri);
 			}
 			else
 			{
 				if (q_uri != null)
 				{
-					ns = Rhino.Xmlimpl.XmlNode.Namespace.Create(q_uri);
+					ns = XmlNode.Namespace.Create(q_uri);
 				}
 				else
 				{
@@ -391,22 +391,22 @@ L0_break: ;
 			{
 				q_localName = null;
 			}
-			return Create(lib, this.GetParentScope(), prototype, Rhino.Xmlimpl.XmlNode.QName.Create(ns, q_localName));
+			return Create(lib, this.GetParentScope(), prototype, XmlNode.QName.Create(ns, q_localName));
 		}
 
 		//    See ECMA357 13.3.2
-		internal Rhino.Xmlimpl.QName ConstructQName(XMLLibImpl lib, Context cx, object @namespace, object name)
+		internal QName ConstructQName(XMLLibImpl lib, Context cx, object @namespace, object name)
 		{
 			string nameString = null;
-			if (name is Rhino.Xmlimpl.QName)
+			if (name is QName)
 			{
 				if (@namespace == Undefined.instance)
 				{
-					return (Rhino.Xmlimpl.QName)name;
+					return (QName)name;
 				}
 				else
 				{
-					nameString = ((Rhino.Xmlimpl.QName)name).LocalName();
+					nameString = ((QName)name).LocalName();
 				}
 			}
 			if (name == Undefined.instance)
@@ -461,16 +461,16 @@ L0_break: ;
 			return NewQName(lib, q_uri, q_localName, q_prefix);
 		}
 
-		internal Rhino.Xmlimpl.QName ConstructQName(XMLLibImpl lib, Context cx, object nameValue)
+		internal QName ConstructQName(XMLLibImpl lib, Context cx, object nameValue)
 		{
 			return ConstructQName(lib, cx, Undefined.instance, nameValue);
 		}
 
-		internal Rhino.Xmlimpl.QName CastToQName(XMLLibImpl lib, Context cx, object qnameValue)
+		internal QName CastToQName(XMLLibImpl lib, Context cx, object qnameValue)
 		{
-			if (qnameValue is Rhino.Xmlimpl.QName)
+			if (qnameValue is QName)
 			{
-				return (Rhino.Xmlimpl.QName)qnameValue;
+				return (QName)qnameValue;
 			}
 			return ConstructQName(lib, cx, qnameValue);
 		}

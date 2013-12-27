@@ -93,9 +93,9 @@
     <Compile Include="Tests\Bug708801Test.cs" />
     <Compile Include="Tests\Bug714204Test.cs" />
     <Compile Include="Tests\ClassShutterExceptionTest.cs" />
-    <Compile Include="Tests\Commonjs\Module\ComplianceTest.cs" />
-    <Compile Include="Tests\Commonjs\Module\RequireJarTest.cs" />
-    <Compile Include="Tests\Commonjs\Module\RequireTest.cs" />
+    <Compile Include="Tests\CommonJS\Module\ComplianceTest.cs" />
+    <Compile Include="Tests\CommonJS\Module\RequireJarTest.cs" />
+    <Compile Include="Tests\CommonJS\Module\RequireTest.cs" />
     <Compile Include="Tests\ContextFactoryTest.cs" />
     <Compile Include="Tests\ContinuationsApiTest.cs" />
     <Compile Include="Tests\CustomSetterAcceptNullScriptableTest.cs" />

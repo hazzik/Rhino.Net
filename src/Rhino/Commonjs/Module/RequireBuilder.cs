@@ -7,10 +7,10 @@
  */
 
 using Rhino;
-using Rhino.Commonjs.Module;
+using Rhino.CommonJS.Module;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module
+namespace Rhino.CommonJS.Module
 {
 	/// <summary>
 	/// A builder for

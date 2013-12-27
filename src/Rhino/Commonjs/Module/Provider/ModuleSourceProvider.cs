@@ -8,10 +8,10 @@
 
 using System;
 using Rhino;
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>Implemented by objects that can provide the source text for the script.</summary>
 	/// <remarks>

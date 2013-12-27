@@ -9,10 +9,10 @@
 using System;
 using System.Text;
 using Rhino;
-using Rhino.Xmlimpl;
+using Rhino.XmlImpl;
 using Sharpen;
 
-namespace Rhino.Xmlimpl
+namespace Rhino.XmlImpl
 {
 	[System.Serializable]
 	internal class XMLName : Ref
@@ -129,7 +129,7 @@ namespace Rhino.Xmlimpl
 			return false;
 		}
 
-		private Rhino.Xmlimpl.XmlNode.QName qname;
+		private XmlNode.QName qname;
 
 		private bool isAttributeName;
 
@@ -141,33 +141,33 @@ namespace Rhino.Xmlimpl
 		{
 		}
 
-		internal static Rhino.Xmlimpl.XMLName FormStar()
+		internal static XMLName FormStar()
 		{
-			Rhino.Xmlimpl.XMLName rv = new Rhino.Xmlimpl.XMLName();
-			rv.qname = Rhino.Xmlimpl.XmlNode.QName.Create(null, null);
+			XMLName rv = new XMLName();
+			rv.qname = XmlNode.QName.Create(null, null);
 			return rv;
 		}
 
-		[System.ObsoleteAttribute(@"")]
-		internal static Rhino.Xmlimpl.XMLName FormProperty(Rhino.Xmlimpl.XmlNode.Namespace @namespace, string localName)
+		[Obsolete(@"")]
+		internal static XMLName FormProperty(XmlNode.Namespace @namespace, string localName)
 		{
 			if (localName != null && localName.Equals("*"))
 			{
 				localName = null;
 			}
-			Rhino.Xmlimpl.XMLName rv = new Rhino.Xmlimpl.XMLName();
-			rv.qname = Rhino.Xmlimpl.XmlNode.QName.Create(@namespace, localName);
+			XMLName rv = new XMLName();
+			rv.qname = XmlNode.QName.Create(@namespace, localName);
 			return rv;
 		}
 
 		/// <summary>TODO: marked deprecated by original author</summary>
-		internal static Rhino.Xmlimpl.XMLName FormProperty(string uri, string localName)
+		internal static XMLName FormProperty(string uri, string localName)
 		{
-			return FormProperty(Rhino.Xmlimpl.XmlNode.Namespace.Create(uri), localName);
+			return FormProperty(XmlNode.Namespace.Create(uri), localName);
 		}
 
 		/// <summary>TODO: marked deprecated by original implementor</summary>
-		internal static Rhino.Xmlimpl.XMLName Create(string defaultNamespaceUri, string name)
+		internal static XMLName Create(string defaultNamespaceUri, string name)
 		{
 			if (name == null)
 			{
@@ -181,33 +181,33 @@ namespace Rhino.Xmlimpl
 				{
 					if (l == 1)
 					{
-						return Rhino.Xmlimpl.XMLName.FormStar();
+						return XMLName.FormStar();
 					}
 				}
 				else
 				{
 					if (firstChar == '@')
 					{
-						Rhino.Xmlimpl.XMLName xmlName = Rhino.Xmlimpl.XMLName.FormProperty(string.Empty, Sharpen.Runtime.Substring(name, 1));
+						XMLName xmlName = XMLName.FormProperty(string.Empty, Sharpen.Runtime.Substring(name, 1));
 						xmlName.SetAttributeName();
 						return xmlName;
 					}
 				}
 			}
-			return Rhino.Xmlimpl.XMLName.FormProperty(defaultNamespaceUri, name);
+			return XMLName.FormProperty(defaultNamespaceUri, name);
 		}
 
-		internal static Rhino.Xmlimpl.XMLName Create(Rhino.Xmlimpl.XmlNode.QName qname, bool attribute, bool descendants)
+		internal static XMLName Create(XmlNode.QName qname, bool attribute, bool descendants)
 		{
-			Rhino.Xmlimpl.XMLName rv = new Rhino.Xmlimpl.XMLName();
+			XMLName rv = new XMLName();
 			rv.qname = qname;
 			rv.isAttributeName = attribute;
 			rv.isDescendants = descendants;
 			return rv;
 		}
 
-		[System.ObsoleteAttribute(@"")]
-		internal static Rhino.Xmlimpl.XMLName Create(Rhino.Xmlimpl.XmlNode.QName qname)
+		[Obsolete(@"")]
+		internal static XMLName Create(XmlNode.QName qname)
 		{
 			return Create(qname, false, false);
 		}
@@ -245,7 +245,7 @@ namespace Rhino.Xmlimpl
 
 		private void AddDescendantChildren(XMLList list, XML target)
 		{
-			Rhino.Xmlimpl.XMLName xmlName = this;
+			XMLName xmlName = this;
 			if (target.IsElement())
 			{
 				XML[] children = target.GetChildren();
@@ -262,7 +262,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual void AddMatchingAttributes(XMLList list, XML target)
 		{
-			Rhino.Xmlimpl.XMLName name = this;
+			XMLName name = this;
 			if (target.IsElement())
 			{
 				XML[] attributes = target.GetAttributes();
@@ -305,7 +305,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual void AddDescendants(XMLList rv, XML target)
 		{
-			Rhino.Xmlimpl.XMLName xmlName = this;
+			XMLName xmlName = this;
 			if (xmlName.IsAttributeName())
 			{
 				MatchDescendantAttributes(rv, target);
@@ -372,7 +372,7 @@ namespace Rhino.Xmlimpl
 					value = "undefined";
 				}
 			}
-			Rhino.Xmlimpl.XMLName xmlName = this;
+			XMLName xmlName = this;
 			// Get the named property
 			if (xmlName.IsAttributeName())
 			{
@@ -507,7 +507,7 @@ namespace Rhino.Xmlimpl
 			return buff.ToString();
 		}
 
-		internal Rhino.Xmlimpl.XmlNode.QName ToQname()
+		internal XmlNode.QName ToQname()
 		{
 			return this.qname;
 		}
@@ -517,7 +517,7 @@ namespace Rhino.Xmlimpl
 			return LocalName().Equals("*") || LocalName().Equals(localName);
 		}
 
-		internal bool MatchesElement(Rhino.Xmlimpl.XmlNode.QName qname)
+		internal bool MatchesElement(XmlNode.QName qname)
 		{
 			if (this.Uri() == null || this.Uri().Equals(qname.GetNamespace().GetUri()))
 			{
@@ -531,7 +531,7 @@ namespace Rhino.Xmlimpl
 
 		internal bool Matches(XML node)
 		{
-			Rhino.Xmlimpl.XmlNode.QName qname = node.GetNodeQname();
+			XmlNode.QName qname = node.GetNodeQname();
 			string nodeUri = null;
 			if (qname.GetNamespace() != null)
 			{
@@ -596,7 +596,7 @@ namespace Rhino.Xmlimpl
 		}
 
 		//    TODO    Fix whether this is an descendant XMLName at construction?
-		[System.ObsoleteAttribute(@"")]
+		[Obsolete(@"")]
 		internal virtual void SetIsDescendants()
 		{
 			//        if (isDescendants) throw new IllegalStateException();

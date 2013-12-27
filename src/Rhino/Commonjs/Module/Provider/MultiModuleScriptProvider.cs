@@ -9,10 +9,10 @@
 using System;
 using System.Collections.Generic;
 using Rhino;
-using Rhino.Commonjs.Module;
+using Rhino.CommonJS.Module;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>A multiplexer for module script providers.</summary>
 	/// <remarks>A multiplexer for module script providers.</remarks>

@@ -10,10 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>
 	/// A URL-based script provider that can load modules against a set of base

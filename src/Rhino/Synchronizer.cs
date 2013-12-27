@@ -20,7 +20,7 @@ namespace Rhino
 	/// methods in Javascript.
 	/// Synchronized functions are created from ordinary Javascript
 	/// functions by the <code>Synchronizer</code> constructor, e.g.
-	/// <code>new Packages.org.mozilla.javascript.Synchronizer(fun)</code>.
+	/// <code>new Packages.Rhino.Synchronizer(fun)</code>.
 	/// The resulting object is a function that establishes an exclusive
 	/// lock on the <code>this</code> object of its invocation.
 	/// The Rhino shell provides a short-cut for the creation of

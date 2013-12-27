@@ -22,7 +22,7 @@ namespace Rhino
 		// API class
 		private static VMBridge MakeInstance()
 		{
-			string[] classNames = new string[] { "org.mozilla.javascript.VMBridge_custom", "org.mozilla.javascript.jdk15.VMBridge_jdk15", "org.mozilla.javascript.jdk13.VMBridge_jdk13", "org.mozilla.javascript.jdk11.VMBridge_jdk11" };
+			string[] classNames = new string[] { "Rhino.VMBridge_custom", "Rhino.Jdk15.VMBridge_jdk15", "Rhino.Jdk13.VMBridge_jdk13", "Rhino.Jdk11.VMBridge_jdk11" };
 			for (int i = 0; i != classNames.Length; ++i)
 			{
 				string className = classNames[i];

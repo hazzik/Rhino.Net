@@ -9,11 +9,11 @@
 using System;
 using System.IO;
 using Rhino;
-using Rhino.Commonjs.Module;
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module;
+using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>Abstract base class that implements caching of loaded module scripts.</summary>
 	/// <remarks>
@@ -127,7 +127,7 @@ namespace Rhino.Commonjs.Module.Provider
 
 		/// <summary>
 		/// Retrieves an already loaded moduleScript stored using
-		/// <see cref="PutLoadedModule(string, Rhino.Commonjs.Module.ModuleScript, object)">PutLoadedModule(string, Rhino.Commonjs.Module.ModuleScript, object)</see>
+		/// <see cref="PutLoadedModule(string, ModuleScript, object)">PutLoadedModule(string, Rhino.Commonjs.Module.ModuleScript, object)</see>
 		/// .
 		/// </summary>
 		/// <param name="moduleId">the ID of the module</param>

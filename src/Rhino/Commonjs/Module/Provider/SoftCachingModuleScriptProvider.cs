@@ -11,11 +11,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Rhino;
-using Rhino.Commonjs.Module;
-using Rhino.Commonjs.Module.Provider;
+using Rhino.CommonJS.Module;
+using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>
 	/// A module script provider that uses a module source provider to load modules

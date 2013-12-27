@@ -9,7 +9,7 @@
 using System.Linq;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module.Provider
+namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>
 	/// Breaks a "contentType; charset=encoding" MIME type into content type and

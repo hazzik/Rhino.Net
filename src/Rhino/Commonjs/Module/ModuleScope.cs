@@ -10,7 +10,7 @@ using System;
 using Rhino;
 using Sharpen;
 
-namespace Rhino.Commonjs.Module
+namespace Rhino.CommonJS.Module
 {
 	/// <summary>A top-level module scope.</summary>
 	/// <remarks>

@@ -8,10 +8,10 @@
 
 using System.Text;
 using Rhino;
-using Rhino.Regexp;
+using Rhino.RegExp;
 using Sharpen;
 
-namespace Rhino.Regexp
+namespace Rhino.RegExp
 {
 	public class RegExpImpl : RegExpProxy
 	{

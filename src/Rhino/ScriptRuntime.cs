@@ -121,13 +121,13 @@ namespace Rhino
 
 		public static readonly Type DateClass = Kit.ClassOrNull("java.util.Date");
 
-		public static readonly Type ContextClass = Kit.ClassOrNull("org.mozilla.javascript.Context");
+		public static readonly Type ContextClass = Kit.ClassOrNull("Rhino.Context");
 
-		public static readonly Type ContextFactoryClass = Kit.ClassOrNull("org.mozilla.javascript.ContextFactory");
+		public static readonly Type ContextFactoryClass = Kit.ClassOrNull("Rhino.ContextFactory");
 
-		public static readonly Type FunctionClass = Kit.ClassOrNull("org.mozilla.javascript.Function");
+		public static readonly Type FunctionClass = Kit.ClassOrNull("Rhino.Function");
 
-		public static readonly Type ScriptableObjectClass = Kit.ClassOrNull("org.mozilla.javascript.ScriptableObject");
+		public static readonly Type ScriptableObjectClass = Kit.ClassOrNull("Rhino.ScriptableObject");
 
 		public static readonly Type ScriptableClass = typeof(Scriptable);
 
@@ -191,15 +191,15 @@ namespace Rhino
 			// Also initializes NativeGenerator
 			bool withXml = cx.HasFeature(Context.FEATURE_E4X) && cx.GetE4xImplementationFactory() != null;
 			// define lazy-loaded properties using their class name
-			new LazilyLoadedCtor(scope, "RegExp", "org.mozilla.javascript.regexp.NativeRegExp", @sealed, true);
-			new LazilyLoadedCtor(scope, "Packages", "org.mozilla.javascript.NativeJavaTopPackage", @sealed, true);
-			new LazilyLoadedCtor(scope, "getClass", "org.mozilla.javascript.NativeJavaTopPackage", @sealed, true);
-			new LazilyLoadedCtor(scope, "JavaAdapter", "org.mozilla.javascript.JavaAdapter", @sealed, true);
-			new LazilyLoadedCtor(scope, "JavaImporter", "org.mozilla.javascript.ImporterTopLevel", @sealed, true);
-			new LazilyLoadedCtor(scope, "Continuation", "org.mozilla.javascript.NativeContinuation", @sealed, true);
+			new LazilyLoadedCtor(scope, "RegExp", "Rhino.RegExp.NativeRegExp", @sealed, true);
+			new LazilyLoadedCtor(scope, "Packages", "Rhino.NativeJavaTopPackage", @sealed, true);
+			new LazilyLoadedCtor(scope, "getClass", "Rhino.NativeJavaTopPackage", @sealed, true);
+			new LazilyLoadedCtor(scope, "JavaAdapter", "Rhino.JavaAdapter", @sealed, true);
+			new LazilyLoadedCtor(scope, "JavaImporter", "Rhino.ImporterTopLevel", @sealed, true);
+			new LazilyLoadedCtor(scope, "Continuation", "Rhino.NativeContinuation", @sealed, true);
 			foreach (string packageName in GetTopPackageNames())
 			{
-				new LazilyLoadedCtor(scope, packageName, "org.mozilla.javascript.NativeJavaTopPackage", @sealed, true);
+				new LazilyLoadedCtor(scope, packageName, "Rhino.NativeJavaTopPackage", @sealed, true);
 			}
 			if (withXml)
 			{
@@ -3602,7 +3602,7 @@ search_break: ;
 		// ------------------
 		public static ScriptableObject GetGlobal(Context cx)
 		{
-			string GLOBAL_CLASS = "org.mozilla.javascript.tools.shell.Global";
+			string GLOBAL_CLASS = "Rhino.Tools.Shell.Global";
 			Type globalClass = Kit.ClassOrNull(GLOBAL_CLASS);
 			if (globalClass != null)
 			{
@@ -4247,7 +4247,7 @@ search_break: ;
 		{
 			public virtual string GetMessage(string messageId, object[] arguments)
 			{
-				string defaultResource = "org.mozilla.javascript.resources.Messages";
+				string defaultResource = "Rhino.resources.Messages";
 				Context cx = Context.GetCurrentContext();
 				CultureInfo locale = cx != null ? cx.GetLocale() : CultureInfo.CurrentCulture;
 				// ResourceBundle does caching.

@@ -9,10 +9,10 @@
 using System;
 using System.Text;
 using Rhino;
-using Rhino.Regexp;
+using Rhino.RegExp;
 using Sharpen;
 
-namespace Rhino.Regexp
+namespace Rhino.RegExp
 {
 	/// <summary>This class implements the RegExp native object.</summary>
 	/// <remarks>
@@ -155,7 +155,7 @@ namespace Rhino.Regexp
 		//    private static final byte REOP_ENDALT        = 56; /* end of final alternate */
 		public static void Init(Context cx, Scriptable scope, bool @sealed)
 		{
-			Rhino.Regexp.NativeRegExp proto = new Rhino.Regexp.NativeRegExp();
+			NativeRegExp proto = new NativeRegExp();
 			proto.re = CompileRE(cx, string.Empty, null, false);
 			proto.ActivatePrototypeMap(MAX_PROTOTYPE_ID);
 			proto.SetParentScope(scope);
@@ -207,14 +207,14 @@ namespace Rhino.Regexp
 
 		internal virtual Scriptable Compile(Context cx, Scriptable scope, object[] args)
 		{
-			if (args.Length > 0 && args[0] is Rhino.Regexp.NativeRegExp)
+			if (args.Length > 0 && args[0] is NativeRegExp)
 			{
 				if (args.Length > 1 && args[1] != Undefined.instance)
 				{
 					// report error
 					throw ScriptRuntime.TypeError0("msg.bad.regexp.compile");
 				}
-				Rhino.Regexp.NativeRegExp thatObj = (Rhino.Regexp.NativeRegExp)args[0];
+				NativeRegExp thatObj = (NativeRegExp)args[0];
 				this.re = thatObj.re;
 				this.lastIndex = thatObj.lastIndex;
 				return this;
@@ -3246,13 +3246,13 @@ L0_break: ;
 			throw new ArgumentException(id.ToString());
 		}
 
-		private static Rhino.Regexp.NativeRegExp RealThis(Scriptable thisObj, IdFunctionObject f)
+		private static NativeRegExp RealThis(Scriptable thisObj, IdFunctionObject f)
 		{
-			if (!(thisObj is Rhino.Regexp.NativeRegExp))
+			if (!(thisObj is NativeRegExp))
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (Rhino.Regexp.NativeRegExp)thisObj;
+			return (NativeRegExp)thisObj;
 		}
 
 		// #string_id_map#
@@ -3383,11 +3383,11 @@ L0_break: ;
 
 		internal byte op;
 
-		internal Rhino.Regexp.RENode next;
+		internal RENode next;
 
-		internal Rhino.Regexp.RENode kid;
+		internal RENode kid;
 
-		internal Rhino.Regexp.RENode kid2;
+		internal RENode kid2;
 
 		internal int parenIndex;
 
@@ -3453,7 +3453,7 @@ L0_break: ;
 
 	internal class REProgState
 	{
-		internal REProgState(Rhino.Regexp.REProgState previous, int min, int max, int index, REBackTrackData backTrack, int continuationOp, int continuationPc)
+		internal REProgState(REProgState previous, int min, int max, int index, REBackTrackData backTrack, int continuationOp, int continuationPc)
 		{
 			this.previous = previous;
 			this.min = min;
@@ -3464,7 +3464,7 @@ L0_break: ;
 			this.backTrack = backTrack;
 		}
 
-		internal readonly Rhino.Regexp.REProgState previous;
+		internal readonly REProgState previous;
 
 		internal readonly int min;
 
@@ -3495,7 +3495,7 @@ L0_break: ;
 			stateStackTop = gData.stateStackTop;
 		}
 
-		internal readonly Rhino.Regexp.REBackTrackData previous;
+		internal readonly REBackTrackData previous;
 
 		internal readonly int op;
 
