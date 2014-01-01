@@ -84,56 +84,56 @@ namespace Rhino.Ast
 
 		protected internal Rhino.Ast.AstNode parent;
 
-		private static IDictionary<int, string> operatorNames = new Dictionary<int, string>();
+		private static readonly IDictionary<int, string> operatorNames = new Dictionary<int, string>();
 
 		static AstNode()
 		{
-			operatorNames [Token.IN] = "in";
-			operatorNames [Token.TYPEOF] = "typeof";
-			operatorNames [Token.INSTANCEOF] = "instanceof";
-			operatorNames [Token.DELPROP] = "delete";
-			operatorNames [Token.COMMA] = ",";
-			operatorNames [Token.COLON] = ":";
-			operatorNames [Token.OR] = "||";
-			operatorNames [Token.AND] = "&&";
-			operatorNames [Token.INC] = "++";
-			operatorNames [Token.DEC] = "--";
-			operatorNames [Token.BITOR] = "|";
-			operatorNames [Token.BITXOR] = "^";
-			operatorNames [Token.BITAND] = "&";
-			operatorNames [Token.EQ] = "==";
-			operatorNames [Token.NE] = "!=";
-			operatorNames [Token.LT] = "<";
-			operatorNames [Token.GT] = ">";
-			operatorNames [Token.LE] = "<=";
-			operatorNames [Token.GE] = ">=";
-			operatorNames [Token.LSH] = "<<";
-			operatorNames [Token.RSH] = ">>";
-			operatorNames [Token.URSH] = ">>>";
-			operatorNames [Token.ADD] = "+";
-			operatorNames [Token.SUB] = "-";
-			operatorNames [Token.MUL] = "*";
-			operatorNames [Token.DIV] = "/";
-			operatorNames [Token.MOD] = "%";
-			operatorNames [Token.NOT] = "!";
-			operatorNames [Token.BITNOT] = "~";
-			operatorNames [Token.POS] = "+";
-			operatorNames [Token.NEG] = "-";
-			operatorNames [Token.SHEQ] = "===";
-			operatorNames [Token.SHNE] = "!==";
-			operatorNames [Token.ASSIGN] = "=";
-			operatorNames [Token.ASSIGN_BITOR] = "|=";
-			operatorNames [Token.ASSIGN_BITAND] = "&=";
-			operatorNames [Token.ASSIGN_LSH] = "<<=";
-			operatorNames [Token.ASSIGN_RSH] = ">>=";
-			operatorNames [Token.ASSIGN_URSH] = ">>>=";
-			operatorNames [Token.ASSIGN_ADD] = "+=";
-			operatorNames [Token.ASSIGN_SUB] = "-=";
-			operatorNames [Token.ASSIGN_MUL] = "*=";
-			operatorNames [Token.ASSIGN_DIV] = "/=";
-			operatorNames [Token.ASSIGN_MOD] = "%=";
-			operatorNames [Token.ASSIGN_BITXOR] = "^=";
-			operatorNames [Token.VOID] = "void";
+			operatorNames[Token.IN] = "in";
+			operatorNames[Token.TYPEOF] = "typeof";
+			operatorNames[Token.INSTANCEOF] = "instanceof";
+			operatorNames[Token.DELPROP] = "delete";
+			operatorNames[Token.COMMA] = ",";
+			operatorNames[Token.COLON] = ":";
+			operatorNames[Token.OR] = "||";
+			operatorNames[Token.AND] = "&&";
+			operatorNames[Token.INC] = "++";
+			operatorNames[Token.DEC] = "--";
+			operatorNames[Token.BITOR] = "|";
+			operatorNames[Token.BITXOR] = "^";
+			operatorNames[Token.BITAND] = "&";
+			operatorNames[Token.EQ] = "==";
+			operatorNames[Token.NE] = "!=";
+			operatorNames[Token.LT] = "<";
+			operatorNames[Token.GT] = ">";
+			operatorNames[Token.LE] = "<=";
+			operatorNames[Token.GE] = ">=";
+			operatorNames[Token.LSH] = "<<";
+			operatorNames[Token.RSH] = ">>";
+			operatorNames[Token.URSH] = ">>>";
+			operatorNames[Token.ADD] = "+";
+			operatorNames[Token.SUB] = "-";
+			operatorNames[Token.MUL] = "*";
+			operatorNames[Token.DIV] = "/";
+			operatorNames[Token.MOD] = "%";
+			operatorNames[Token.NOT] = "!";
+			operatorNames[Token.BITNOT] = "~";
+			operatorNames[Token.POS] = "+";
+			operatorNames[Token.NEG] = "-";
+			operatorNames[Token.SHEQ] = "===";
+			operatorNames[Token.SHNE] = "!==";
+			operatorNames[Token.ASSIGN] = "=";
+			operatorNames[Token.ASSIGN_BITOR] = "|=";
+			operatorNames[Token.ASSIGN_BITAND] = "&=";
+			operatorNames[Token.ASSIGN_LSH] = "<<=";
+			operatorNames[Token.ASSIGN_RSH] = ">>=";
+			operatorNames[Token.ASSIGN_URSH] = ">>>=";
+			operatorNames[Token.ASSIGN_ADD] = "+=";
+			operatorNames[Token.ASSIGN_SUB] = "-=";
+			operatorNames[Token.ASSIGN_MUL] = "*=";
+			operatorNames[Token.ASSIGN_DIV] = "/=";
+			operatorNames[Token.ASSIGN_MOD] = "%=";
+			operatorNames[Token.ASSIGN_BITXOR] = "^=";
+			operatorNames[Token.VOID] = "void";
 		}
 
 		[System.Serializable]
@@ -381,9 +381,9 @@ namespace Rhino.Ast
 		/// </remarks>
 		public virtual string ShortName()
 		{
-			string classname = GetType().FullName;
+			string classname = ((object) this).GetType().FullName;
 			int last = classname.LastIndexOf(".");
-			return Sharpen.Runtime.Substring(classname, last + 1);
+			return classname.Substring(last + 1);
 		}
 
 		/// <summary>Returns the string name for this operator.</summary>
@@ -397,8 +397,8 @@ namespace Rhino.Ast
 		/// <returns>the source operator string, such as "+" or "typeof"</returns>
 		public static string OperatorToString(int op)
 		{
-			string result = operatorNames.Get(op);
-			if (result == null)
+			string result;
+			if (!operatorNames.TryGetValue(op, out result))
 			{
 				throw new ArgumentException("Invalid operator: " + op);
 			}

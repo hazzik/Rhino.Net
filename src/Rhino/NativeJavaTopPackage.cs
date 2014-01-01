@@ -69,8 +69,8 @@ namespace Rhino
 
 		public static void Init(Context cx, Scriptable scope, bool @sealed)
 		{
-			ClassLoader loader = cx.GetApplicationClassLoader();
-			Rhino.NativeJavaTopPackage top = new Rhino.NativeJavaTopPackage(loader);
+//			ClassLoader loader = cx.GetApplicationClassLoader();
+			Rhino.NativeJavaTopPackage top = new Rhino.NativeJavaTopPackage(new ClassLoader());
 			top.SetPrototype(GetObjectPrototype(scope));
 			top.SetParentScope(scope);
 			for (int i = 0; i != commonPackages.Length; i++)
@@ -132,7 +132,7 @@ namespace Rhino
 				for (; ; )
 				{
 					int index = name.IndexOf('.', offset);
-					string propName = index == -1 ? Sharpen.Runtime.Substring(name, offset) : Sharpen.Runtime.Substring(name, offset, index);
+					string propName = index == -1 ? name.Substring(offset) : name.Substring(offset, index - offset);
 					object prop = result.Get(propName, result);
 					if (!(prop is Scriptable))
 					{

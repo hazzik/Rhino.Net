@@ -8,174 +8,124 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using Rhino;
+using System.Threading;
 using Sharpen;
+using Thread = System.Threading.Thread;
 
 namespace Rhino
 {
-	public abstract class VMBridge
+	public class VMBridge
 	{
-		internal static readonly VMBridge instance = MakeInstance();
+		private static readonly ThreadLocal<object[]> context = new ThreadLocal<object[]>(() => new object[1]);
 
-		// API class
-		private static VMBridge MakeInstance()
+		internal static Context Context
 		{
-			string[] classNames = new string[] { "Rhino.VMBridge_custom", "Rhino.Jdk15.VMBridge_jdk15", "Rhino.Jdk13.VMBridge_jdk13", "Rhino.Jdk11.VMBridge_jdk11" };
-			for (int i = 0; i != classNames.Length; ++i)
+			get { return (Context) context.Value [0]; }
+			set { context.Value [0] = value; }
+		}
+
+#if ENCHANCED_SECURITY
+		internal static ClassLoader GetCurrentThreadClassLoader()
+		{
+			return Thread.CurrentThread.GetContextClassLoader();
+		}
+#endif
+
+#if INTERFACE_ADAPTER
+		private sealed class _InvocationHandler_107 : InvocationHandler
+		{
+			public _InvocationHandler_107(object target, InterfaceAdapter adapter, ContextFactory cf, Scriptable topScope)
 			{
-				string className = classNames[i];
-				Type cl = Kit.ClassOrNull(className);
-				if (cl != null)
+				this.target = target;
+				this.adapter = adapter;
+				this.cf = cf;
+				this.topScope = topScope;
+			}
+
+			public object Invoke(object proxy, MethodInfo method, object[] args)
+			{
+				if (method.DeclaringType == typeof(object))
 				{
-					VMBridge bridge = (VMBridge)Kit.NewInstanceOrNull(cl);
-					if (bridge != null)
+					string methodName = method.Name;
+					if (methodName.Equals("equals"))
 					{
-						return bridge;
+						object other = args[0];
+						return proxy == other;
+					}
+					if (methodName.Equals("hashCode"))
+					{
+						return target.GetHashCode();
+					}
+					if (methodName.Equals("toString"))
+					{
+						return "Proxy[" + target + "]";
 					}
 				}
+				return adapter.Invoke(cf, target, topScope, proxy, method, args);
 			}
-			throw new InvalidOperationException("Failed to create VMBridge instance");
+
+			private readonly object target;
+
+			private readonly InterfaceAdapter adapter;
+
+			private readonly ContextFactory cf;
+
+			private readonly Scriptable topScope;
 		}
 
-		/// <summary>
-		/// Return a helper object to optimize
-		/// <see cref="Context">Context</see>
-		/// access.
-		/// <p>
-		/// The runtime will pass the resulting helper object to the subsequent
-		/// calls to
-		/// <see cref="GetContext(object)">GetContext(object)</see>
-		/// and
-		/// <see cref="SetContext(object, Context)">SetContext(object, Context)</see>
-		/// methods.
-		/// In this way the implementation can use the helper to cache
-		/// information about current thread to make
-		/// <see cref="Context">Context</see>
-		/// access faster.
-		/// </summary>
-		protected internal abstract object GetThreadContextHelper();
-
-		/// <summary>
-		/// Get
-		/// <see cref="Context">Context</see>
-		/// instance associated with the current thread
-		/// or null if none.
-		/// </summary>
-		/// <param name="contextHelper">
-		/// The result of
-		/// <see cref="GetThreadContextHelper()">GetThreadContextHelper()</see>
-		/// called from the current thread.
-		/// </param>
-		protected internal abstract Context GetContext(object contextHelper);
-
-		/// <summary>
-		/// Associate
-		/// <see cref="Context">Context</see>
-		/// instance with the current thread or remove
-		/// the current association if <tt>cx</tt> is null.
-		/// </summary>
-		/// <param name="contextHelper">
-		/// The result of
-		/// <see cref="GetThreadContextHelper()">GetThreadContextHelper()</see>
-		/// called from the current thread.
-		/// </param>
-		protected internal abstract void SetContext(object contextHelper, Context cx);
-
-		/// <summary>Return the ClassLoader instance associated with the current thread.</summary>
-		/// <remarks>Return the ClassLoader instance associated with the current thread.</remarks>
-		protected internal abstract ClassLoader GetCurrentThreadClassLoader();
-
-		/// <summary>
-		/// In many JVMSs, public methods in private
-		/// classes are not accessible by default (Sun Bug #4071593).
-		/// </summary>
-		/// <remarks>
-		/// In many JVMSs, public methods in private
-		/// classes are not accessible by default (Sun Bug #4071593).
-		/// VMBridge instance should try to workaround that via, for example,
-		/// calling method.setAccessible(true) when it is available.
-		/// The implementation is responsible to catch all possible exceptions
-		/// like SecurityException if the workaround is not available.
-		/// </remarks>
-		/// <returns>
-		/// true if it was possible to make method accessible
-		/// or false otherwise.
-		/// </returns>
-		protected internal abstract bool TryToMakeAccessible(object accessibleObject);
-
-		/// <summary>
-		/// Create helper object to create later proxies implementing the specified
-		/// interfaces later.
-		/// </summary>
-		/// <remarks>
-		/// Create helper object to create later proxies implementing the specified
-		/// interfaces later. Under JDK 1.3 the implementation can look like:
-		/// <pre>
-		/// return java.lang.reflect.Proxy.getProxyClass(..., interfaces).
-		/// getConstructor(new Class[] {
-		/// java.lang.reflect.InvocationHandler.class });
-		/// </pre>
-		/// </remarks>
-		/// <param name="interfaces">Array with one or more interface class objects.</param>
-		protected internal virtual object GetInterfaceProxyHelper(ContextFactory cf, Type[] interfaces)
+		internal static object GetInterfaceProxyHelper(ContextFactory cf, Type[] interfaces)
 		{
-			throw Context.ReportRuntimeError("VMBridge.getInterfaceProxyHelper is not supported");
-		}
-
-		/// <summary>
-		/// Create proxy object for
-		/// <see cref="InterfaceAdapter">InterfaceAdapter</see>
-		/// . The proxy should call
-		/// <see cref="InterfaceAdapter.Invoke(ContextFactory, object, Scriptable, object, System.Reflection.MethodInfo, object[])">InterfaceAdapter.Invoke(ContextFactory, object, Scriptable, object, System.Reflection.MethodInfo, object[])</see>
-		/// as implementation of interface methods associated with
-		/// <tt>proxyHelper</tt>.
-		/// </summary>
-		/// <param name="proxyHelper">
-		/// The result of the previous call to
-		/// <see cref="GetInterfaceProxyHelper(ContextFactory, System.Type{T}[])">GetInterfaceProxyHelper(ContextFactory, System.Type&lt;T&gt;[])</see>
-		/// .
-		/// </param>
-		protected internal virtual object NewInterfaceProxy(object proxyHelper, ContextFactory cf, InterfaceAdapter adapter, object target, Scriptable topScope)
-		{
-			throw Context.ReportRuntimeError("VMBridge.newInterfaceProxy is not supported");
-		}
-
-		/// <summary>
-		/// Returns whether or not a given member (method or constructor)
-		/// has variable arguments.
-		/// </summary>
-		/// <remarks>
-		/// Returns whether or not a given member (method or constructor)
-		/// has variable arguments.
-		/// Variable argument methods have only been supported in Java since
-		/// JDK 1.5.
-		/// </remarks>
-		protected internal abstract bool IsVarArgs(MemberInfo member);
-
-		/// <summary>
-		/// If "obj" is a java.util.Iterator or a java.lang.Iterable, return a
-		/// wrapping as a JavaScript Iterator.
-		/// </summary>
-		/// <remarks>
-		/// If "obj" is a java.util.Iterator or a java.lang.Iterable, return a
-		/// wrapping as a JavaScript Iterator. Otherwise, return null.
-		/// This method is in VMBridge since Iterable is a JDK 1.5 addition.
-		/// </remarks>
-		public virtual IEnumerator<object> GetJavaIterator(Context cx, Scriptable scope, object obj)
-		{
-			if (obj is Wrapper)
+			// XXX: How to handle interfaces array withclasses from different
+			// class loaders? Using cf.getApplicationClassLoader() ?
+			ClassLoader loader = interfaces[0].GetClassLoader();
+			Type cl = Proxy.GetProxyClass(loader, interfaces);
+			ConstructorInfo c;
+			try
 			{
-				object unwrapped = ((Wrapper)obj).Unwrap();
-				IEnumerator<object> iterator = null;
-				if (unwrapped is IEnumerator)
-				{
-					iterator = (IEnumerator<object>)unwrapped;
-				}
-				return iterator;
+				c = cl.GetConstructor(new Type[] { typeof(InvocationHandler) });
 			}
-			return null;
+			catch (MissingMethodException ex)
+			{
+				// Should not happen
+				throw Kit.InitCause(new InvalidOperationException(), ex);
+			}
+			return c;
 		}
+
+		internal static object NewInterfaceProxy(object proxyHelper, ContextFactory cf, InterfaceAdapter adapter, object target, Scriptable topScope)
+		{
+			ConstructorInfo c = (ConstructorInfo)proxyHelper;
+			InvocationHandler handler = new _InvocationHandler_107(target, adapter, cf, topScope);
+			// In addition to methods declared in the interface, proxies
+			// also route some java.lang.Object methods through the
+			// invocation handler.
+			// Note: we could compare a proxy and its wrapped function
+			// as equal here but that would break symmetry of equal().
+			// The reason == suffices here is that proxies are cached
+			// in ScriptableObject (see NativeJavaObject.coerceType())
+			object proxy;
+			try
+			{
+				proxy = c.NewInstance(handler);
+			}
+			catch (TargetInvocationException ex)
+			{
+				throw Context.ThrowAsScriptRuntimeEx(ex);
+			}
+			catch (MemberAccessException ex)
+			{
+				// Should not happen
+				throw Kit.InitCause(new InvalidOperationException(), ex);
+			}
+			catch (InstantiationException ex)
+			{
+				// Should not happen
+				throw Kit.InitCause(new InvalidOperationException(), ex);
+			}
+			return proxy;
+		}
+#endif
 	}
 }

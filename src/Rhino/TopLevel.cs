@@ -6,6 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Rhino;
 using Sharpen;
 
@@ -43,7 +46,7 @@ namespace Rhino
 	/// to initialize the class cache for each top-level
 	/// scope.</p>
 	/// </remarks>
-	[System.Serializable]
+	[Serializable]
 	public class TopLevel : IdScriptableObject
 	{
 		internal const long serialVersionUID = -4648046356662472260L;
@@ -62,7 +65,7 @@ namespace Rhino
 			Error
 		}
 
-		private EnumMap<TopLevel.Builtins, BaseFunction> ctors;
+		private Dictionary<Builtins, BaseFunction> ctors;
 
 		public override string GetClassName()
 		{
@@ -83,13 +86,14 @@ namespace Rhino
 		/// </remarks>
 		public virtual void CacheBuiltins()
 		{
-			ctors = new EnumMap<TopLevel.Builtins, BaseFunction>(typeof(TopLevel.Builtins));
-			foreach (TopLevel.Builtins builtin in TopLevel.Builtins.Values())
+			ctors = new Dictionary<Builtins, BaseFunction>();
+			foreach (Builtins builtin in Enum.GetValues(typeof(Builtins)))
 			{
-				object value = ScriptableObject.GetProperty(this, builtin.ToString());
-				if (value is BaseFunction)
+				object value = GetProperty(this, builtin.ToString());
+				var function = value as BaseFunction;
+				if (function != null)
 				{
-					ctors.Put(builtin, (BaseFunction)value);
+					ctors[builtin] = function;
 				}
 			}
 		}
@@ -108,7 +112,7 @@ namespace Rhino
 		/// <param name="scope">the top-level scope</param>
 		/// <param name="type">the built-in type</param>
 		/// <returns>the built-in constructor</returns>
-		public static Function GetBuiltinCtor(Context cx, Scriptable scope, TopLevel.Builtins type)
+		public static Function GetBuiltinCtor(Context cx, Scriptable scope, Builtins type)
 		{
 			// must be called with top level scope
 			System.Diagnostics.Debug.Assert(scope.GetParentScope() == null);
@@ -137,7 +141,7 @@ namespace Rhino
 		/// <param name="scope">the top-level scope</param>
 		/// <param name="type">the built-in type</param>
 		/// <returns>the built-in prototype</returns>
-		public static Scriptable GetBuiltinPrototype(Scriptable scope, TopLevel.Builtins type)
+		public static Scriptable GetBuiltinPrototype(Scriptable scope, Builtins type)
 		{
 			// must be called with top level scope
 			System.Diagnostics.Debug.Assert(scope.GetParentScope() == null);
@@ -150,7 +154,7 @@ namespace Rhino
 				}
 			}
 			// fall back to normal prototype lookup
-			return ScriptableObject.GetClassPrototype(scope, type.ToString());
+			return GetClassPrototype(scope, type.ToString());
 		}
 
 		/// <summary>
@@ -166,7 +170,7 @@ namespace Rhino
 		/// </remarks>
 		/// <param name="type">the built-in type</param>
 		/// <returns>the built-in constructor</returns>
-		public virtual BaseFunction GetBuiltinCtor(TopLevel.Builtins type)
+		public virtual BaseFunction GetBuiltinCtor(Builtins type)
 		{
 			return ctors != null ? ctors.Get(type) : null;
 		}
@@ -184,7 +188,7 @@ namespace Rhino
 		/// </remarks>
 		/// <param name="type">the built-in type</param>
 		/// <returns>the built-in prototype</returns>
-		public virtual Scriptable GetBuiltinPrototype(TopLevel.Builtins type)
+		public virtual Scriptable GetBuiltinPrototype(Builtins type)
 		{
 			BaseFunction func = GetBuiltinCtor(type);
 			object proto = func != null ? func.GetPrototypeProperty() : null;

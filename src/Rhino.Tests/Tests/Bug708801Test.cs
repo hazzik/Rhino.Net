@@ -38,7 +38,7 @@ namespace Rhino.Tests
 		public virtual void TestIncDec()
 		{
 			factory.Call(cx =>
-			{
+		{
 				cx.InitStandardObjects(null, true);
 				// pre-inc
 				AssertNumberVars(cx, "var b; ++b");
@@ -66,13 +66,13 @@ namespace Rhino.Tests
 				AssertNumberVars(cx, "var b; [1][b=0,b--]--", "b");
 				return null;
 			});
-		}
+			}
 
 		[Test]
 		public virtual void TestTypeofName()
 		{
 			factory.Call(cx =>
-			{
+		{
 				cx.InitStandardObjects(null, true);
 				// Token.TYPEOFNAME
 				AssertNumberVars(cx, "var b; typeof b");
@@ -84,13 +84,13 @@ namespace Rhino.Tests
 				AssertNumberVars(cx, "var b; if(new Date()<0){b=0} typeof (b,b)");
 				return null;
 			});
-		}
+			}
 
 		[Test]
 		public virtual void TestEval()
 		{
 			factory.Call(cx =>
-			{
+		{
 				cx.InitStandardObjects(null, true);
 				// direct eval => requires activation
 				AssertNumberVars(cx, "var b; eval('typeof b')");
@@ -102,13 +102,13 @@ namespace Rhino.Tests
 				AssertNumberVars(cx, "var b; if(new Date()<0){b=0} (1,eval)('typeof b')", "b");
 				return null;
 			});
-		}
+			}
 
 		[Test]
 		public virtual void TestRelOp()
 		{
 			factory.Call(cx =>
-			{
+		{
 				cx.InitStandardObjects(null, true);
 				// relational operators: <, <=, >, >=
 				AssertNumberVars(cx, "var b = 1 < 1");
@@ -122,13 +122,13 @@ namespace Rhino.Tests
 				AssertNumberVars(cx, "var b = 1 !== 1");
 				return null;
 			});
-		}
+			}
 
 		[Test]
 		public virtual void TestMore()
 		{
 			factory.Call(cx =>
-			{
+		{
 				cx.InitStandardObjects(null, true);
 				// simple assignment:
 				AssertNumberVars(cx, "var b");
@@ -217,7 +217,7 @@ namespace Rhino.Tests
 				AssertNumberVars(cx, "var b=[j*j for each (j in [1,2,3]) if (j>1)]");
 				return null;
 			});
-		}
+			}
 
 		/// <summary>
 		/// Compiles
@@ -236,9 +236,11 @@ namespace Rhino.Tests
 			AstRoot ast = p.Parse(source.ToString(), "<eval>", 1);
 			IRFactory irf = new IRFactory(compilerEnv);
 			ScriptNode tree = irf.TransformTree(ast);
+#if COMPILATION
 			Codegen codegen = new Codegen();
 			codegen.SetMainMethodClass(mainMethodClassName);
 			codegen.CompileToClassFile(compilerEnv, scriptClassName, tree, tree.GetEncodedSource(), false);
+#endif
 			return tree;
 		}
 
@@ -272,13 +274,13 @@ namespace Rhino.Tests
 				Assert.IsTrue(opt.IsParameter(i));
 				Assert.IsFalse(opt.IsNumberVar(i));
 			}
-			ICollection<string> set = new HashSet<string>(Arrays.AsList(numbers));
-			for (int i_1 = fnode.GetParamCount(), c_1 = fnode.GetParamAndVarCount(); i_1 < c_1; ++i_1)
+			ICollection<string> set = new HashSet<string>(numbers);
+			for (int i = fnode.GetParamCount(), count = fnode.GetParamAndVarCount(); i < count; ++i)
 			{
-				Assert.IsFalse(opt.IsParameter(i_1));
-				string name = fnode.GetParamOrVarName(i_1);
-				string msg = String.Format("{%s -> number? = %b}", name, opt.IsNumberVar(i_1));
-				Assert.AreEqual(set.Contains(name), opt.IsNumberVar(i_1), msg);
+				Assert.IsFalse(opt.IsParameter(i));
+				string name = fnode.GetParamOrVarName(i);
+				string msg = String.Format("{%s -> number? = %b}", name, opt.IsNumberVar(i));
+				Assert.AreEqual(set.Contains(name), opt.IsNumberVar(i), msg);
 			}
 		}
 	}

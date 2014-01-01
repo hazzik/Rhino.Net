@@ -389,7 +389,7 @@ namespace Rhino
 
 				case Id_random:
 				{
-					x = Math.Random();
+					x = new Random().Next();
 					break;
 				}
 
@@ -399,7 +399,7 @@ namespace Rhino
 					if (!Double.IsNaN(x) && x != double.PositiveInfinity && x != double.NegativeInfinity)
 					{
 						// Round only finite x
-						long l = Math.Round(x);
+						long l = (long) Math.Round(x);
 						if (l != 0)
 						{
 							x = l;

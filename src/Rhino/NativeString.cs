@@ -480,7 +480,7 @@ namespace Rhino
 							}
 							else
 							{
-								return ScriptRuntime.NaNobj;
+								return ScriptRuntime.NaN;
 							}
 						}
 						char c = target[(int)pos];
@@ -612,7 +612,7 @@ namespace Rhino
 					{
 						string s1 = ScriptRuntime.ToString(thisObj);
 						string s2 = ScriptRuntime.ToString(args, 0);
-						return ScriptRuntime.WrapBoolean((id == Id_equals) ? s1.Equals(s2) : Sharpen.Runtime.EqualsIgnoreCase(s1, s2));
+						return ScriptRuntime.WrapBoolean((id == Id_equals) ? s1.Equals(s2) : s1.Equals(s2, StringComparison.CurrentCultureIgnoreCase));
 					}
 
 					case Id_match:
@@ -641,14 +641,7 @@ namespace Rhino
 					case Id_localeCompare:
 					{
 						// ECMA-262 1 5.5.4.9
-						// For now, create and configure a collator instance. I can't
-						// actually imagine that this'd be slower than caching them
-						// a la ClassCache, so we aren't trying to outsmart ourselves
-						// with a caching mechanism for now.
-						Collator collator = Collator.GetInstance(cx.GetLocale());
-						collator.SetStrength(Collator.IDENTICAL);
-						collator.SetDecomposition(Collator.CANONICAL_DECOMPOSITION);
-						return ScriptRuntime.WrapNumber(collator.Compare(ScriptRuntime.ToString(thisObj), ScriptRuntime.ToString(args, 0)));
+						return (double) string.Compare(ScriptRuntime.ToString(thisObj), ScriptRuntime.ToString(args, 0), StringComparison.CurrentCulture);
 					}
 
 					case Id_toLocaleLowerCase:
@@ -675,7 +668,7 @@ namespace Rhino
 						{
 							end--;
 						}
-						return Sharpen.Runtime.Substring(str, start, end);
+						return str.Substring(start, end - start);
 					}
 				}
 				throw new ArgumentException(id.ToString());
@@ -829,7 +822,7 @@ again_break: ;
 					}
 				}
 			}
-			return target.SubSequence((int)start, (int)end);
+			return target.Substring((int) start, (int) end - (int) start);
 		}
 
 		internal int GetLength()
@@ -878,7 +871,7 @@ again_break: ;
 					end = length;
 				}
 			}
-			return target.SubSequence((int)begin, (int)end);
+			return target.Substring((int)begin, (int)end - (int)begin);
 		}
 
 		private static string Js_concat(string target, object[] args)
@@ -964,7 +957,7 @@ again_break: ;
 						end = begin;
 					}
 				}
-				return target.SubSequence((int)begin, (int)end);
+				return target.Substring((int) begin, (int) end - (int) begin);
 			}
 			return target;
 		}

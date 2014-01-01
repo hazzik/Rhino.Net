@@ -8,9 +8,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Rhino;
 using Rhino.Json;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -272,9 +274,7 @@ namespace Rhino
 
 		private static string Repeat(char c, int count)
 		{
-			char[] chars = new char[count];
-			Arrays.Fill(chars, c);
-			return new string(chars);
+			return new string(c, count);
 		}
 
 		private class StringifyState
@@ -365,7 +365,7 @@ namespace Rhino
 					gap = (string)space;
 					if (gap.Length > MAX_STRINGIFY_GAP_LENGTH)
 					{
-						gap = Sharpen.Runtime.Substring(gap, 0, MAX_STRINGIFY_GAP_LENGTH);
+						gap = gap.Substring(0, MAX_STRINGIFY_GAP_LENGTH);
 					}
 				}
 			}
@@ -459,26 +459,12 @@ namespace Rhino
 
 		private static string Join(ICollection<object> objs, string delimiter)
 		{
-			if (objs == null || objs.IsEmpty())
-			{
-				return string.Empty;
-			}
-			IEnumerator<object> iter = objs.GetEnumerator();
-			if (!iter.HasNext())
-			{
-				return string.Empty;
-			}
-			StringBuilder builder = new StringBuilder(iter.Next().ToString());
-			while (iter.HasNext())
-			{
-				builder.Append(delimiter).Append(iter.Next().ToString());
-			}
-			return builder.ToString();
+			return string.Join(delimiter, objs);
 		}
 
 		private static string Jo(Scriptable value, NativeJSON.StringifyState state)
 		{
-			if (state.stack.Search(value) != -1)
+			if (state.stack.Contains(value))
 			{
 				throw ScriptRuntime.TypeError0("msg.cyclic.value");
 			}
@@ -488,7 +474,7 @@ namespace Rhino
 			object[] k = null;
 			if (state.propertyList != null)
 			{
-				k = Sharpen.Collections.ToArray(state.propertyList);
+				k = state.propertyList.ToArray();
 			}
 			else
 			{
@@ -534,7 +520,7 @@ namespace Rhino
 
 		private static string Ja(NativeArray value, NativeJSON.StringifyState state)
 		{
-			if (state.stack.Search(value) != -1)
+			if (state.stack.Contains(value))
 			{
 				throw ScriptRuntime.TypeError0("msg.cyclic.value");
 			}

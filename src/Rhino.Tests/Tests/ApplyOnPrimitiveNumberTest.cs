@@ -17,17 +17,17 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <author>Marc Guillemot</author>
 	[TestFixture]
-	public class ApplyOnPrimitiveNumberTest
+	public sealed class ApplyOnPrimitiveNumberTest
 	{
 		[Test]
-		public virtual void TestIt()
+		public void TestIt()
 		{
 			const string script = "var fn = function() { return this; }\n" + "fn.apply(1)";
 			Utils.RunWithAllOptimizationLevels(cx =>
 			{
 				ScriptableObject scope = cx.InitStandardObjects();
 				object result = cx.EvaluateString(scope, script, "test script", 0, null);
-				Assert.AreEqual("object", ScriptRuntime.Typeof(result));
+				Assert.AreEqual("object", ScriptRuntime.TypeOf(result));
 				Assert.AreEqual("1", Context.ToString(result));
 				return null;
 			});

@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using Rhino;
 using Rhino.Ast;
+using Rhino.Utils;
 using Rhino.V8dtoa;
 using Rhino.Xml;
 using Sharpen;
@@ -49,10 +50,7 @@ namespace Rhino
 		{
 			public _BaseFunction_41()
 			{
-				this.serialVersionUID = -5891740962154902286L;
 			}
-
-			internal const long serialVersionUID;
 
 			public override object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 			{
@@ -95,39 +93,39 @@ namespace Rhino
 			}
 		}
 
-		public static readonly Type BooleanClass = Kit.ClassOrNull("java.lang.Boolean");
+		public static readonly Type BooleanClass = typeof (Boolean);
 
-		public static readonly Type ByteClass = Kit.ClassOrNull("java.lang.Byte");
+		public static readonly Type ByteClass = typeof(Byte) ;
 
-		public static readonly Type CharacterClass = Kit.ClassOrNull("java.lang.Character");
+		public static readonly Type CharacterClass = typeof(Char);
 
-		public static readonly Type ClassClass = Kit.ClassOrNull("java.lang.Class");
+		public static readonly Type ClassClass = typeof(Type);
 
-		public static readonly Type DoubleClass = Kit.ClassOrNull("java.lang.Double");
+		public static readonly Type DoubleClass = typeof(Double);
 
-		public static readonly Type FloatClass = Kit.ClassOrNull("java.lang.Float");
+		public static readonly Type FloatClass = typeof(float);
 
-		public static readonly Type IntegerClass = Kit.ClassOrNull("java.lang.Integer");
+		public static readonly Type IntegerClass = typeof(int);
 
-		public static readonly Type LongClass = Kit.ClassOrNull("java.lang.Long");
+		public static readonly Type LongClass = typeof(long);
 
-		public static readonly Type NumberClass = Kit.ClassOrNull("java.lang.Number");
+		public static readonly Type NumberClass = typeof(Double);
 
-		public static readonly Type ObjectClass = Kit.ClassOrNull("java.lang.Object");
+		public static readonly Type ObjectClass = typeof(Object);
 
-		public static readonly Type ShortClass = Kit.ClassOrNull("java.lang.Short");
+		public static readonly Type ShortClass = typeof(short);
 
-		public static readonly Type StringClass = Kit.ClassOrNull("java.lang.String");
+		public static readonly Type StringClass = typeof(String);
 
-		public static readonly Type DateClass = Kit.ClassOrNull("java.util.Date");
+		public static readonly Type DateClass = typeof(DateTime);
 
-		public static readonly Type ContextClass = Kit.ClassOrNull("Rhino.Context");
+		public static readonly Type ContextClass = typeof(Context);
 
-		public static readonly Type ContextFactoryClass = Kit.ClassOrNull("Rhino.ContextFactory");
+		public static readonly Type ContextFactoryClass = typeof (ContextFactory);
 
-		public static readonly Type FunctionClass = Kit.ClassOrNull("Rhino.Function");
+		public static readonly Type FunctionClass = typeof (Function);
 
-		public static readonly Type ScriptableObjectClass = Kit.ClassOrNull("Rhino.ScriptableObject");
+		public static readonly Type ScriptableObjectClass = typeof(ScriptableObject);
 
 		public static readonly Type ScriptableClass = typeof(Scriptable);
 
@@ -176,7 +174,7 @@ namespace Rhino
 				// When optimizing, attempt to fulfill all requests for new Array(N)
 				// with a higher threshold before switching to a sparse
 				// representation
-				NativeArray.SetMaximumInitialCapacity(200000);
+				NativeArray.MaximumInitialCapacity = 200000;
 			}
 			NativeString.Init(scope, @sealed);
 			NativeBoolean.Init(scope, @sealed);
@@ -219,7 +217,7 @@ namespace Rhino
 		internal static string[] GetTopPackageNames()
 		{
 			// Include "android" top package if running on Android
-			return "Dalvik".Equals(Runtime.GetProperty("java.vm.name")) ? new string[] { "java", "javax", "org", "com", "edu", "net", "android" } : new string[] { "java", "javax", "org", "com", "edu", "net" };
+			return "Dalvik".Equals(Runtime.GetProperty("java.vm.name")) ? new string[] { "java", "javax", "org", "com", "edu", "net", "android", "Rhino", "System" } : new string[] { "java", "javax", "org", "com", "edu", "net", "Rhino", "System" };
 		}
 
 		public static ScriptableObject GetLibraryScopeOrNull(Scriptable scope)
@@ -291,14 +289,14 @@ namespace Rhino
 
 				default:
 				{
-					return char.GetType(c) == char.SPACE_SEPARATOR;
+					return char.GetUnicodeCategory((char) c) == UnicodeCategory.SpaceSeparator;
 				}
 			}
 		}
 
 		public static bool WrapBoolean(bool b)
 		{
-			return b ? true : false;
+			return b;
 		}
 
 		public static int WrapInt(int i)
@@ -308,10 +306,6 @@ namespace Rhino
 
 		public static double WrapNumber(double x)
 		{
-			if (x != x)
-			{
-				return ScriptRuntime.NaNobj;
-			}
 			return x;
 		}
 
@@ -417,11 +411,9 @@ namespace Rhino
 			return (index < args.Length) ? ToNumber(args[index]) : NaN;
 		}
 
-		public static readonly double NaN = System.BitConverter.Int64BitsToDouble(unchecked((long)(0x7ff8000000000000L)));
+		public static readonly double NaN = Double.NaN;
 
-		public static readonly double negativeZero = System.BitConverter.Int64BitsToDouble(unchecked((long)(0x8000000000000000L)));
-
-		public static readonly double NaNobj = NaN;
+		public static readonly double negativeZero = System.BitConverter.Int64BitsToDouble(unchecked((long) (0x8000000000000000L)));
 
 		// Can not use Double.NaN defined as 0.0d / 0.0 as under the Microsoft VM,
 		// versions 2.01 and 3.0P1, that causes some uses (returns at least) of
@@ -483,7 +475,7 @@ namespace Rhino
 				{
 					try
 					{
-						return System.Double.Parse(Sharpen.Runtime.Substring(s, start, end));
+						return System.Double.Parse(s.Substring(start, end - start));
 					}
 					catch (FormatException)
 					{
@@ -496,11 +488,11 @@ namespace Rhino
 					{
 						int bitShiftInChar = 1;
 						int digit = 0;
-						int SKIP_LEADING_ZEROS = 0;
-						int FIRST_EXACT_53_BITS = 1;
-						int AFTER_BIT_53 = 2;
-						int ZEROS_AFTER_54 = 3;
-						int MIXED_AFTER_54 = 4;
+						const int SKIP_LEADING_ZEROS = 0;
+						const int FIRST_EXACT_53_BITS = 1;
+						const int AFTER_BIT_53 = 2;
+						const int ZEROS_AFTER_54 = 3;
+						const int MIXED_AFTER_54 = 4;
 						int state = SKIP_LEADING_ZEROS;
 						int exactBitsLimit = 53;
 						double factor = 0.0;
@@ -706,7 +698,7 @@ namespace Rhino
 			}
 			// A non-hexadecimal, non-infinity number:
 			// just try a normal floating point conversion
-			string sub = Sharpen.Runtime.Substring(s, start, end + 1);
+			string sub = s.Substring(start, end + 1 - start);
 			// Quick test to check string contains only valid characters because
 			// Double.parseDouble() can be slow and accept input we want to reject
 			for (int i = sub.Length - 1; i >= 0; i--)
@@ -889,13 +881,13 @@ namespace Rhino
 			{
 				return false;
 			}
-			if (!char.IsJavaIdentifierStart(s[0]))
+			if (!CharEx.IsJavaIdentifierStart(s[0]))
 			{
 				return false;
 			}
 			for (int i = 1; i != L; ++i)
 			{
-				if (!char.IsJavaIdentifierPart(s[i]))
+				if (!CharEx.IsJavaIdentifierPart(s[i]))
 				{
 					return false;
 				}
@@ -1347,7 +1339,7 @@ namespace Rhino
 		/// <summary>See ECMA 9.6.</summary>
 		/// <remarks>See ECMA 9.6.</remarks>
 		/// <returns>long value representing 32 bits unsigned integer</returns>
-		public static long ToUint32(double d)
+		public static long ToUInt32(double d)
 		{
 			long l = (long)d;
 			if (l == d)
@@ -1366,9 +1358,9 @@ namespace Rhino
 			return l & unchecked((long)(0xffffffffL));
 		}
 
-		public static long ToUint32(object val)
+		public static long ToUInt32(object val)
 		{
-			return ToUint32(ToNumber(val));
+			return ToUInt32(ToNumber(val));
 		}
 
 		/// <summary>See ECMA 9.7.</summary>
@@ -1383,7 +1375,7 @@ namespace Rhino
 			}
 			if (Double.IsNaN(d) || d == double.PositiveInfinity || d == double.NegativeInfinity)
 			{
-				return 0;
+				return (char) 0;
 			}
 			d = (d >= 0) ? Math.Floor(d) : System.Math.Ceiling(d);
 			int int16 = unchecked((int)(0x10000));
@@ -1909,7 +1901,7 @@ namespace Rhino
 
 		public static Ref SpecialRef(object obj, string specialProperty, Context cx)
 		{
-			return SpecialRef.CreateSpecial(cx, obj, specialProperty);
+			return Rhino.SpecialRef.CreateSpecial(cx, obj, specialProperty);
 		}
 
 		/// <summary>
@@ -2660,9 +2652,9 @@ childScopesChecks_break: ;
 		/// </remarks>
 		public static Ref CallRef(Callable function, Scriptable thisObj, object[] args, Context cx)
 		{
-			if (function is RefCallable)
+			var rfunction = function as RefCallable;
+			if (rfunction != null)
 			{
-				RefCallable rfunction = (RefCallable)function;
 				Ref @ref = rfunction.RefCall(cx, thisObj, args);
 				if (@ref == null)
 				{
@@ -2872,7 +2864,7 @@ childScopesChecks_break: ;
 		}
 
 		/// <summary>The typeof operator</summary>
-		public static string Typeof(object value)
+		public static string TypeOf(object value)
 		{
 			if (value == null)
 			{
@@ -2906,7 +2898,7 @@ childScopesChecks_break: ;
 		}
 
 		/// <summary>The typeof operator that correctly handles the undefined case</summary>
-		public static string TypeofName(Scriptable scope, string id)
+		public static string TypeOfName(Scriptable scope, string id)
 		{
 			Context cx = Context.GetContext();
 			Scriptable val = Bind(cx, scope, id);
@@ -2914,7 +2906,7 @@ childScopesChecks_break: ;
 			{
 				return "undefined";
 			}
-			return Typeof(GetObjectProp(val, id, cx));
+			return TypeOf(GetObjectProp(val, id, cx));
 		}
 
 		// neg:
@@ -3032,8 +3024,8 @@ search_break: ;
 				target = target.GetPrototype();
 			}
 			while (target != null);
-			start.Put(id, start, NaNobj);
-			return NaNobj;
+			start.Put(id, start, NaN);
+			return NaN;
 search_break: ;
 			return DoScriptableIncrDecr(target, id, start, value, incrDecrMask);
 		}
@@ -3606,20 +3598,7 @@ search_break: ;
 			Type globalClass = Kit.ClassOrNull(GLOBAL_CLASS);
 			if (globalClass != null)
 			{
-				try
-				{
-					Type[] parm = new Type[] { ScriptRuntime.ContextClass };
-					ConstructorInfo globalClassCtor = globalClass.GetConstructor(parm);
-					object[] arg = new object[] { cx };
-					return (ScriptableObject)globalClassCtor.NewInstance(arg);
-				}
-				catch (Exception e)
-				{
-					throw;
-				}
-				catch (Exception)
-				{
-				}
+				return (ScriptableObject) Activator.CreateInstance(globalClass, cx);
 			}
 			// fall through...
 			return new ImporterTopLevel(cx);
@@ -4261,8 +4240,7 @@ search_break: ;
 				{
 					throw new Exception("no message resource found for message property " + messageId);
 				}
-				MessageFormat formatter = new MessageFormat(formatString);
-				return formatter.Format(arguments);
+				return string.Format(formatString, arguments ?? new object[0]);
 			}
 		}
 
@@ -4358,7 +4336,7 @@ search_break: ;
 			{
 				return TypeError1("msg.function.not.found", msg);
 			}
-			return TypeError2("msg.isnt.function", msg, Typeof(value));
+			return TypeError2("msg.isnt.function", msg, TypeOf(value));
 		}
 
 		public static Exception NotFunctionError(object obj, object value, string propertyName)
@@ -4372,14 +4350,14 @@ search_break: ;
 				int curly = objString.IndexOf('{', paren);
 				if (curly > -1)
 				{
-					objString = Sharpen.Runtime.Substring(objString, 0, curly + 1) + "...}";
+					objString = objString.Substring(0, curly + 1) + "...}";
 				}
 			}
 			if (value == ScriptableConstants.NOT_FOUND)
 			{
 				return TypeError2("msg.function.not.found.in", propertyName, objString);
 			}
-			return TypeError3("msg.isnt.function.in", propertyName, objString, Typeof(value));
+			return TypeError3("msg.isnt.function.in", propertyName, objString, TypeOf(value));
 		}
 
 		private static Exception NotXmlError(object value)

@@ -7,8 +7,9 @@
  */
 
 using System;
+using System.Globalization;
 using System.Text;
-using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -19,30 +20,23 @@ namespace Rhino
 	/// See ECMA 15.9.
 	/// </remarks>
 	/// <author>Mike McCabe</author>
-	[System.Serializable]
+	[Serializable]
 	internal sealed class NativeDate : IdScriptableObject
 	{
-		internal const long serialVersionUID = -8307438915861678966L;
-
 		private static readonly object DATE_TAG = "Date";
 
 		private const string js_NaN_date_str = "Invalid Date";
 
-		private static readonly DateFormat isoFormat;
+		private const string isoFormat = "yyyy-MM-ddTHH:mm:ss.SSSZ";
 
 		static NativeDate()
 		{
-			isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			isoFormat.SetTimeZone(new SimpleTimeZone(0, "UTC"));
-			isoFormat.SetLenient(false);
 		}
 
 		internal static void Init(Scriptable scope, bool @sealed)
 		{
-			Rhino.NativeDate obj = new Rhino.NativeDate();
 			// Set the value of the prototype Date to NaN ('invalid date');
-			obj.date = ScriptRuntime.NaN;
-			obj.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
+			new NativeDate { date = ScriptRuntime.NaN }.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
 		}
 
 		private NativeDate()
@@ -51,8 +45,8 @@ namespace Rhino
 			{
 				// j.u.TimeZone is synchronized, so setting class statics from it
 				// should be OK.
-				thisTimeZone = System.TimeZoneInfo.Local;
-				LocalTZA = thisTimeZone.GetRawOffset();
+				thisTimeZone = TimeZoneInfo.Local;
+				LocalTZA = thisTimeZone.BaseUtcOffset;
 			}
 		}
 
@@ -464,9 +458,10 @@ namespace Rhino
 
 				case Id_toJSON:
 				{
-					if (thisObj is Rhino.NativeDate)
+					var nativeDate = thisObj as NativeDate;
+					if (nativeDate != null)
 					{
-						return ((Rhino.NativeDate)thisObj).ToISOString();
+						return nativeDate.ToISOString();
 					}
 					string toISOString = "toISOString";
 					Scriptable o = ScriptRuntime.ToObject(cx, scope, thisObj);
@@ -497,11 +492,11 @@ namespace Rhino
 				}
 			}
 			// The rest of Date.prototype methods require thisObj to be Date
-			if (!(thisObj is Rhino.NativeDate))
+			if (!(thisObj is NativeDate))
 			{
 				throw IncompatibleCallError(f);
 			}
-			Rhino.NativeDate realThis = (Rhino.NativeDate)thisObj;
+			NativeDate realThis = (NativeDate)thisObj;
 			double t = realThis.date;
 			switch (id)
 			{
@@ -764,7 +759,7 @@ namespace Rhino
 			{
 				lock (isoFormat)
 				{
-					return isoFormat.Format(Sharpen.Extensions.CreateDate((long)date));
+					return Extensions.CreateDate((long) date).ToUniversalTime().ToString(isoFormat);
 				}
 			}
 			string msg = ScriptRuntime.GetMessage0("msg.invalid.date");
@@ -800,8 +795,7 @@ namespace Rhino
 
 		private static double TimeWithinDay(double t)
 		{
-			double result;
-			result = t % msPerDay;
+			double result = t % msPerDay;
 			if (result < 0)
 			{
 				result += msPerDay;
@@ -1103,7 +1097,7 @@ namespace Rhino
 
 		private static double Now()
 		{
-			return Runtime.CurrentTimeMillis();
+			return DateTime.UtcNow.ToMillisecondsSinceEpoch();
 		}
 
 		private static double DaylightSavingTA(double t)
@@ -1118,8 +1112,8 @@ namespace Rhino
 				double day = MakeDay(year, MonthFromTime(t), DateFromTime(t));
 				t = MakeDate(day, TimeWithinDay(t));
 			}
-			DateTime date = Sharpen.Extensions.CreateDate((long)t);
-			if (thisTimeZone.InDaylightTime(date))
+			DateTime date = Extensions.CreateDate((long)t);
+			if (thisTimeZone.IsDaylightSavingTime(date))
 			{
 				return msPerHour;
 			}
@@ -1224,12 +1218,12 @@ namespace Rhino
 
 		private static double LocalTime(double t)
 		{
-			return t + LocalTZA + DaylightSavingTA(t);
+			return t + LocalTZA.TotalMilliseconds + DaylightSavingTA(t);
 		}
 
 		private static double InternalUTC(double t)
 		{
-			return t - LocalTZA - DaylightSavingTA(t - LocalTZA);
+			return t - LocalTZA.TotalMilliseconds - DaylightSavingTA(t - LocalTZA.TotalMilliseconds);
 		}
 
 		private static int HourFromTime(double t)
@@ -1307,11 +1301,11 @@ namespace Rhino
 			}
 			if (d > 0.0)
 			{
-				return Math.Floor(d + 0.);
+				return Math.Floor(d + 0.0);
 			}
 			else
 			{
-				return System.Math.Ceiling(d + 0.);
+				return Math.Ceiling(d + 0.0);
 			}
 		}
 
@@ -1377,7 +1371,7 @@ namespace Rhino
 					DateTime d;
 					lock (isoFormat)
 					{
-						d = isoFormat.Parse(s);
+						d = DateTime.ParseExact(s, isoFormat, DateTimeFormatInfo.CurrentInfo);
 					}
 					return d.GetTime();
 				}
@@ -1391,12 +1385,12 @@ namespace Rhino
 			int hour = -1;
 			int min = -1;
 			int sec = -1;
-			char c = 0;
-			char si = 0;
+			char c = (char) 0;
+			char si = (char) 0;
 			int i = 0;
 			int n = -1;
 			double tzoffset = -1;
-			char prevc = 0;
+			char prevc = (char) 0;
 			int limit = 0;
 			bool seenplusminus = false;
 			limit = s.Length;
@@ -1809,7 +1803,7 @@ namespace Rhino
 				Append0PaddedUint(result, SecFromTime(local), 2);
 				// offset from GMT in minutes.  The offset includes daylight
 				// savings, if it applies.
-				int minutes = (int)Math.Floor((LocalTZA + DaylightSavingTA(t)) / msPerMinute);
+				int minutes = (int)Math.Floor((LocalTZA.TotalMilliseconds + DaylightSavingTA(t)) / msPerMinute);
 				// map 510 minutes to 0830 hours
 				int offset = (minutes / 60) * 100 + minutes % 60;
 				if (offset > 0)
@@ -1835,7 +1829,7 @@ namespace Rhino
 					t = MakeDate(day, TimeWithinDay(t));
 				}
 				result.Append(" (");
-				DateTime date = Sharpen.Extensions.CreateDate((long)t);
+				DateTime date = Extensions.CreateDate((long)t);
 				lock (timeZoneFormatter)
 				{
 					result.Append(timeZoneFormatter.Format(date));
@@ -1847,7 +1841,7 @@ namespace Rhino
 
 		private static object JsConstructor(object[] args)
 		{
-			Rhino.NativeDate obj = new Rhino.NativeDate();
+			NativeDate obj = new NativeDate();
 			// if called as a constructor with no args,
 			// return a new Date with the current time.
 			if (args.Length == 0)
@@ -1878,7 +1872,7 @@ namespace Rhino
 				return obj;
 			}
 			double time = Date_msecFromArgs(args);
-			if (!double.IsNaN(time) && !System.Double.IsInfinity(time))
+			if (!double.IsNaN(time) && !Double.IsInfinity(time))
 			{
 				time = TimeClip(InternalUTC(time));
 			}
@@ -1888,49 +1882,28 @@ namespace Rhino
 
 		private static string ToLocale_helper(double t, int methodId)
 		{
-			DateFormat formatter;
 			switch (methodId)
 			{
 				case Id_toLocaleString:
 				{
-					if (localeDateTimeFormatter == null)
-					{
-						localeDateTimeFormatter = DateFormat.GetDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
-				}
-					formatter = localeDateTimeFormatter;
-					break;
+					return Extensions.CreateDate((long) t).ToString("G");
 				}
 
 				case Id_toLocaleTimeString:
 				{
-					if (localeTimeFormatter == null)
-					{
-						localeTimeFormatter = DateFormat.GetTimeInstance(DateFormat.LONG);
-				}
-					formatter = localeTimeFormatter;
-					break;
+					return Extensions.CreateDate((long) t).ToString("T");
 				}
 
 				case Id_toLocaleDateString:
 				{
-					if (localeDateFormatter == null)
-					{
-						localeDateFormatter = DateFormat.GetDateInstance(DateFormat.LONG);
+					return Extensions.CreateDate((long) t).ToString("D");
 				}
-					formatter = localeDateFormatter;
-					break;
-				}
-
 				default:
 				{
 					throw new Exception();
 				}
 			}
 			// unreachable
-			lock (formatter)
-			{
-				return formatter.Format(Sharpen.Extensions.CreateDate((long)t));
-		}
 		}
 
 		private static string Js_toUTCString(double date)
@@ -2896,15 +2869,9 @@ L0_break: ;
 
 		private static TimeZoneInfo thisTimeZone;
 
-		private static double LocalTZA;
+		private static TimeSpan LocalTZA;
 
 		private static DateFormat timeZoneFormatter;
-
-		private static DateFormat localeDateTimeFormatter;
-
-		private static DateFormat localeDateFormatter;
-
-		private static DateFormat localeTimeFormatter;
 
 		private double date;
 		// Alias, see Ecma B.2.6

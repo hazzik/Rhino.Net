@@ -9,10 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Rhino;
 using Rhino.Annotations;
 using Rhino.Debug;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -30,7 +32,7 @@ namespace Rhino
 	/// </remarks>
 	/// <seealso cref="Scriptable">Scriptable</seealso>
 	/// <author>Norris Boyd</author>
-	[System.Serializable]
+	[Serializable]
 	public abstract class ScriptableObject : Scriptable, DebuggableObject, ConstProperties
 	{
 		internal const long serialVersionUID = 2829861078851942586L;
@@ -89,16 +91,16 @@ namespace Rhino
 		/// <remarks>The parent scope of this object.</remarks>
 		private Scriptable parentScopeObject;
 
-		[System.NonSerialized]
-		private ScriptableObject.Slot[] slots;
+		[NonSerialized]
+		private Slot[] slots;
 
 		private int count;
 
-		[System.NonSerialized]
-		private ScriptableObject.Slot firstAdded;
+		[NonSerialized]
+		private Slot firstAdded;
 
-		[System.NonSerialized]
-		private ScriptableObject.Slot lastAdded;
+		[NonSerialized]
+		private Slot lastAdded;
 
 		private volatile IDictionary<object, object> associatedValues;
 
@@ -116,8 +118,8 @@ namespace Rhino
 
 		private bool isExtensible = true;
 
-		[System.Serializable]
-		private class Slot
+		[Serializable]
+		public class Slot
 		{
 			private const long serialVersionUID = -6090581677123995491L;
 
@@ -125,18 +127,18 @@ namespace Rhino
 
 			internal int indexOrHash;
 
-			private volatile short attributes;
+			internal volatile short attributes;
 
-			[System.NonSerialized]
+			[NonSerialized]
 			internal volatile bool wasDeleted;
 
 			internal volatile object value;
 
-			[System.NonSerialized]
-			internal ScriptableObject.Slot next;
+			[NonSerialized]
+			internal Slot next;
 
-			[System.NonSerialized]
-			internal volatile ScriptableObject.Slot orderedNext;
+			[NonSerialized]
+			internal volatile Slot orderedNext;
 
 			internal Slot(string name, int indexOrHash, int attributes)
 			{
@@ -224,8 +226,8 @@ namespace Rhino
 			return desc;
 		}
 
-		[System.Serializable]
-		private sealed class GetterSlot : ScriptableObject.Slot
+		[Serializable]
+		private sealed class GetterSlot : Slot
 		{
 			internal const long serialVersionUID = -4900574849788797588L;
 
@@ -342,7 +344,7 @@ namespace Rhino
 						}
 					}
 				}
-				object val = this.value;
+				object val = value;
 				if (val is LazilyLoadedCtor)
 				{
 					LazilyLoadedCtor initializer = (LazilyLoadedCtor)val;
@@ -352,7 +354,7 @@ namespace Rhino
 					}
 					finally
 					{
-						this.value = val = initializer.GetValue();
+						value = val = initializer.GetValue();
 					}
 				}
 				return val;
@@ -378,12 +380,12 @@ namespace Rhino
 		/// In a multi-threaded environment, these slots may still be accessed
 		/// through their old slot table. See bug 688458.
 		/// </remarks>
-		[System.Serializable]
-		private class RelinkedSlot : ScriptableObject.Slot
+		[Serializable]
+		private class RelinkedSlot : Slot
 		{
-			internal readonly ScriptableObject.Slot slot;
+			internal readonly Slot slot;
 
-			internal RelinkedSlot(ScriptableObject.Slot slot) : base(slot.name, slot.indexOrHash, slot.attributes)
+			internal RelinkedSlot(Slot slot) : base(slot.name, slot.indexOrHash, slot.attributes)
 			{
 				// Make sure we always wrap the actual slot, not another relinked one
 				this.slot = UnwrapSlot(slot);
@@ -504,7 +506,7 @@ namespace Rhino
 		/// <returns>the value of the property (may be null), or NOT_FOUND</returns>
 		public virtual object Get(string name, Scriptable start)
 		{
-			ScriptableObject.Slot slot = GetSlot(name, 0, SLOT_QUERY);
+			Slot slot = GetSlot(name, 0, SLOT_QUERY);
 			if (slot == null)
 			{
 				return ScriptableConstants.NOT_FOUND;
@@ -519,7 +521,7 @@ namespace Rhino
 		/// <returns>the value of the property (may be null), or NOT_FOUND</returns>
 		public virtual object Get(int index, Scriptable start)
 		{
-			ScriptableObject.Slot slot = GetSlot(null, index, SLOT_QUERY);
+			Slot slot = GetSlot(null, index, SLOT_QUERY);
 			if (slot == null)
 			{
 				return ScriptableConstants.NOT_FOUND;
@@ -655,7 +657,7 @@ namespace Rhino
 		/// </returns>
 		public virtual bool IsConst(string name)
 		{
-			ScriptableObject.Slot slot = GetSlot(name, 0, SLOT_QUERY);
+			Slot slot = GetSlot(name, 0, SLOT_QUERY);
 			if (slot == null)
 			{
 				return false;
@@ -721,7 +723,7 @@ namespace Rhino
 		/// EvaluatorException
 		/// if the named property is not found
 		/// </exception>
-		/// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
 		/// <seealso cref="READONLY">READONLY</seealso>
 		/// <seealso cref="DONTENUM">DONTENUM</seealso>
 		/// <seealso cref="PERMANENT">PERMANENT</seealso>
@@ -740,7 +742,7 @@ namespace Rhino
 		/// EvaluatorException
 		/// if the named property is not found
 		/// </exception>
-		/// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
 		/// <seealso cref="READONLY">READONLY</seealso>
 		/// <seealso cref="DONTENUM">DONTENUM</seealso>
 		/// <seealso cref="PERMANENT">PERMANENT</seealso>
@@ -768,19 +770,19 @@ namespace Rhino
 			{
 				CheckNotSealed(name, index);
 			}
-			ScriptableObject.GetterSlot gslot;
+			GetterSlot gslot;
 			if (IsExtensible())
 			{
-				gslot = (ScriptableObject.GetterSlot)GetSlot(name, index, SLOT_MODIFY_GETTER_SETTER);
+				gslot = (GetterSlot)GetSlot(name, index, SLOT_MODIFY_GETTER_SETTER);
 			}
 			else
 			{
-				ScriptableObject.Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
-				if (!(slot is ScriptableObject.GetterSlot))
+				Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
+				if (!(slot is GetterSlot))
 				{
 					return;
 				}
-				gslot = (ScriptableObject.GetterSlot)slot;
+				gslot = (GetterSlot)slot;
 			}
 			if (!force)
 			{
@@ -825,14 +827,14 @@ namespace Rhino
 			{
 				throw new ArgumentException(name);
 			}
-			ScriptableObject.Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
+			Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
 			if (slot == null)
 			{
 				return null;
 			}
-			if (slot is ScriptableObject.GetterSlot)
+			if (slot is GetterSlot)
 			{
-				ScriptableObject.GetterSlot gslot = (ScriptableObject.GetterSlot)slot;
+				GetterSlot gslot = (GetterSlot)slot;
 				object result = isSetter ? gslot.setter : gslot.getter;
 				return result != null ? result : Undefined.instance;
 			}
@@ -849,14 +851,14 @@ namespace Rhino
 		/// <returns>whether the property is a getter or a setter</returns>
 		protected internal virtual bool IsGetterOrSetter(string name, int index, bool setter)
 		{
-			ScriptableObject.Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
-			if (slot is ScriptableObject.GetterSlot)
+			Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
+			if (slot is GetterSlot)
 			{
-				if (setter && ((ScriptableObject.GetterSlot)slot).setter != null)
+				if (setter && ((GetterSlot)slot).setter != null)
 				{
 					return true;
 				}
-				if (!setter && ((ScriptableObject.GetterSlot)slot).getter != null)
+				if (!setter && ((GetterSlot)slot).getter != null)
 				{
 					return true;
 				}
@@ -871,7 +873,7 @@ namespace Rhino
 				throw new ArgumentException(name);
 			}
 			CheckNotSealed(name, index);
-			ScriptableObject.GetterSlot gslot = (ScriptableObject.GetterSlot)GetSlot(name, index, SLOT_MODIFY_GETTER_SETTER);
+			GetterSlot gslot = (GetterSlot)GetSlot(name, index, SLOT_MODIFY_GETTER_SETTER);
 			gslot.SetAttributes(attributes);
 			gslot.getter = null;
 			gslot.setter = null;
@@ -1229,8 +1231,110 @@ namespace Rhino
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
 		public static void DefineClass<T>(Scriptable scope) where T:Scriptable
 		{
-			System.Type clazz = typeof(T);
-			DefineClass(scope, clazz, false, false);
+			DefineClass<T>(scope, false, false);
+		}
+		
+		/// <summary>Defines JavaScript objects from a Java class that implements Scriptable.</summary>
+		/// <remarks>
+		/// Defines JavaScript objects from a Java class that implements Scriptable.
+		/// If the given class has a method
+		/// <pre>
+		/// static void init(Context cx, Scriptable scope, boolean sealed);</pre>
+		/// or its compatibility form
+		/// <pre>
+		/// static void init(Scriptable scope);</pre>
+		/// then it is invoked and no further initialization is done.<p>
+		/// However, if no such a method is found, then the class's constructors and
+		/// methods are used to initialize a class in the following manner.<p>
+		/// First, the zero-parameter constructor of the class is called to
+		/// create the prototype. If no such constructor exists,
+		/// a
+		/// <see cref="EvaluatorException">EvaluatorException</see>
+		/// is thrown. <p>
+		/// Next, all methods are scanned for special prefixes that indicate that they
+		/// have special meaning for defining JavaScript objects.
+		/// These special prefixes are
+		/// <ul>
+		/// <li><code>jsFunction_</code> for a JavaScript function
+		/// <li><code>jsStaticFunction_</code> for a JavaScript function that
+		/// is a property of the constructor
+		/// <li><code>jsGet_</code> for a getter of a JavaScript property
+		/// <li><code>jsSet_</code> for a setter of a JavaScript property
+		/// <li><code>jsConstructor</code> for a JavaScript function that
+		/// is the constructor
+		/// </ul><p>
+		/// If the method's name begins with "jsFunction_", a JavaScript function
+		/// is created with a name formed from the rest of the Java method name
+		/// following "jsFunction_". So a Java method named "jsFunction_foo" will
+		/// define a JavaScript method "foo". Calling this JavaScript function
+		/// will cause the Java method to be called. The parameters of the method
+		/// must be of number and types as defined by the FunctionObject class.
+		/// The JavaScript function is then added as a property
+		/// of the prototype. <p>
+		/// If the method's name begins with "jsStaticFunction_", it is handled
+		/// similarly except that the resulting JavaScript function is added as a
+		/// property of the constructor object. The Java method must be static.
+		/// If the method's name begins with "jsGet_" or "jsSet_", the method is
+		/// considered to define a property. Accesses to the defined property
+		/// will result in calls to these getter and setter methods. If no
+		/// setter is defined, the property is defined as READONLY.<p>
+		/// If the method's name is "jsConstructor", the method is
+		/// considered to define the body of the constructor. Only one
+		/// method of this name may be defined. You may use the varargs forms
+		/// for constructors documented in
+		/// <see cref="FunctionObject.FunctionObject(string, System.Reflection.MemberInfo, Scriptable)">FunctionObject.FunctionObject(string, System.Reflection.MemberInfo, Scriptable)</see>
+		/// If no method is found that can serve as constructor, a Java
+		/// constructor will be selected to serve as the JavaScript
+		/// constructor in the following manner. If the class has only one
+		/// Java constructor, that constructor is used to define
+		/// the JavaScript constructor. If the the class has two constructors,
+		/// one must be the zero-argument constructor (otherwise an
+		/// <see cref="EvaluatorException">EvaluatorException</see>
+		/// would have already been thrown
+		/// when the prototype was to be created). In this case
+		/// the Java constructor with one or more parameters will be used
+		/// to define the JavaScript constructor. If the class has three
+		/// or more constructors, an
+		/// <see cref="EvaluatorException">EvaluatorException</see>
+		/// will be thrown.<p>
+		/// Finally, if there is a method
+		/// <pre>
+		/// static void finishInit(Scriptable scope, FunctionObject constructor,
+		/// Scriptable prototype)</pre>
+		/// it will be called to finish any initialization. The <code>scope</code>
+		/// argument will be passed, along with the newly created constructor and
+		/// the newly created prototype.<p>
+		/// </remarks>
+		/// <param name="scope">The scope in which to define the constructor.</param>
+		/// <param name="clazz">
+		/// The Java class to use to define the JavaScript objects
+		/// and properties.
+		/// </param>
+		/// <exception>
+		/// IllegalAccessException
+		/// if access is not available
+		/// to a reflected class member
+		/// </exception>
+		/// <exception>
+		/// InstantiationException
+		/// if unable to instantiate
+		/// the named class
+		/// </exception>
+		/// <exception>
+		/// InvocationTargetException
+		/// if an exception is thrown
+		/// during execution of methods of the named class
+		/// </exception>
+		/// <seealso cref="Function">Function</seealso>
+		/// <seealso cref="FunctionObject">FunctionObject</seealso>
+		/// <seealso cref="READONLY">READONLY</seealso>
+		/// <seealso cref="DefineProperty(string, System.Type, int)">DefineProperty(string, System.Type&lt;T&gt;, int)</seealso>
+		/// <exception cref="System.MemberAccessException"></exception>
+		/// <exception cref="Sharpen.InstantiationException"></exception>
+		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
+		public static void DefineClass(Scriptable scope, Type type)
+		{
+			DefineClass(scope, type, false, false);
 		}
 
 		/// <summary>
@@ -1276,8 +1380,7 @@ namespace Rhino
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
 		public static void DefineClass<T>(Scriptable scope, bool @sealed) where T:Scriptable
 		{
-			System.Type clazz = typeof(T);
-			DefineClass(scope, clazz, @sealed, false);
+			DefineClass<T>(scope, @sealed, false);
 		}
 
 		/// <summary>
@@ -1330,23 +1433,67 @@ namespace Rhino
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
 		public static string DefineClass<T>(Scriptable scope, bool @sealed, bool mapInheritance) where T:Scriptable
 		{
-			System.Type clazz = typeof(T);
+			return DefineClass(scope, typeof (T), @sealed, mapInheritance);
+		}
+
+		/// <summary>
+		/// Defines JavaScript objects from a Java class, optionally
+		/// allowing sealing and mapping of Java inheritance to JavaScript
+		/// prototype-based inheritance.
+		/// </summary>
+		/// <remarks>
+		/// Defines JavaScript objects from a Java class, optionally
+		/// allowing sealing and mapping of Java inheritance to JavaScript
+		/// prototype-based inheritance.
+		/// Similar to <code>defineClass(Scriptable scope, Class clazz)</code>
+		/// except that sealing and inheritance mapping are allowed. An object
+		/// that is sealed cannot have properties added or removed. Note that
+		/// sealing is not allowed in the current ECMA/ISO language specification,
+		/// but is likely for the next version.
+		/// </remarks>
+		/// <param name="scope">The scope in which to define the constructor.</param>
+		/// <param name="clazz">
+		/// The Java class to use to define the JavaScript objects
+		/// and properties. The class must implement Scriptable.
+		/// </param>
+		/// <param name="sealed">
+		/// Whether or not to create sealed standard objects that
+		/// cannot be modified.
+		/// </param>
+		/// <param name="mapInheritance">
+		/// Whether or not to map Java inheritance to
+		/// JavaScript prototype-based inheritance.
+		/// </param>
+		/// <returns>the class name for the prototype of the specified class</returns>
+		/// <exception>
+		/// IllegalAccessException
+		/// if access is not available
+		/// to a reflected class member
+		/// </exception>
+		/// <exception>
+		/// InstantiationException
+		/// if unable to instantiate
+		/// the named class
+		/// </exception>
+		/// <exception>
+		/// InvocationTargetException
+		/// if an exception is thrown
+		/// during execution of methods of the named class
+		/// </exception>
+		/// <since>1.6R2</since>
+		/// <exception cref="System.MemberAccessException"></exception>
+		/// <exception cref="Sharpen.InstantiationException"></exception>
+		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
+		public static string DefineClass(Scriptable scope, Type clazz, bool @sealed, bool mapInheritance)
+		{
 			BaseFunction ctor = BuildClassCtor(scope, clazz, @sealed, mapInheritance);
 			if (ctor == null)
 			{
 				return null;
 			}
 			string name = ctor.GetClassPrototype().GetClassName();
-			DefineProperty(scope, name, ctor, ScriptableObject.DONTENUM);
+			DefineProperty(scope, name, ctor, DONTENUM);
 			return name;
-		}
-
-		/// <exception cref="System.MemberAccessException"></exception>
-		/// <exception cref="Sharpen.InstantiationException"></exception>
-		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
-		internal static BaseFunction BuildClassCtor<T>(Scriptable scope, bool @sealed, bool mapInheritance) where T:Scriptable
-		{
-			return BuildClassCtor(scope, typeof(T), @sealed, mapInheritance);
 		}
 
 		internal static BaseFunction BuildClassCtor(Scriptable scope, Type clazz, bool @sealed, bool mapInheritance)
@@ -1355,11 +1502,11 @@ namespace Rhino
 			for (int i = 0; i < methods.Length; i++)
 			{
 				MethodInfo method = methods[i];
-				if (!method.Name.Equals("init"))
+				if (!method.Name.Equals("Init"))
 				{
 					continue;
 				}
-				Type[] parmTypes = Sharpen.Runtime.GetParameterTypes(method);
+				Type[] parmTypes = method.GetParameterTypes();
 				if (parmTypes.Length == 3 && parmTypes[0] == ScriptRuntime.ContextClass && parmTypes[1] == ScriptRuntime.ScriptableClass && parmTypes[2] == typeof(bool) && method.IsStatic)
 				{
 					object[] args = new object[] { Context.GetContext(), scope, @sealed };
@@ -1396,7 +1543,7 @@ namespace Rhino
 			if (existing is BaseFunction)
 			{
 				object existingProto = ((BaseFunction)existing).GetPrototypeProperty();
-				if (existingProto != null && clazz.Equals(existingProto.GetType()))
+				if (existingProto != null && clazz == existingProto.GetType())
 				{
 					return (BaseFunction)existing;
 				}
@@ -1410,16 +1557,16 @@ namespace Rhino
 				if (ScriptRuntime.ScriptableClass.IsAssignableFrom(superClass) && !superClass.IsAbstract)
 				{
 					Type superScriptable = ExtendsScriptable(superClass);
-					string name = ScriptableObject.DefineClass(scope, superScriptable, @sealed, mapInheritance);
+					string name = DefineClass(scope, superScriptable, @sealed, mapInheritance);
 					if (name != null)
 					{
-						superProto = ScriptableObject.GetClassPrototype(scope, name);
+						superProto = GetClassPrototype(scope, name);
 					}
 				}
 			}
 			if (superProto == null)
 			{
-				superProto = ScriptableObject.GetObjectPrototype(scope);
+				superProto = GetObjectPrototype(scope);
 			}
 			proto.SetPrototype(superProto);
 			// Find out whether there are any methods that begin with
@@ -1430,7 +1577,7 @@ namespace Rhino
 			string getterPrefix = "jsGet_";
 			string setterPrefix = "jsSet_";
 			string ctorName = "jsConstructor";
-			MemberInfo ctorMember = FindAnnotatedMember(methods, typeof(JSConstructor));
+			MethodBase ctorMember = FindAnnotatedMember(methods, typeof (JSConstructor));
 			if (ctorMember == null)
 			{
 				ctorMember = FindAnnotatedMember(ctors, typeof(JSConstructor));
@@ -1485,7 +1632,7 @@ namespace Rhino
 				string name = method_1.Name;
 				if (name.Equals("finishInit"))
 				{
-					Type[] parmTypes = Sharpen.Runtime.GetParameterTypes(method_1);
+					Type[] parmTypes = method_1.GetParameterTypes();
 					if (parmTypes.Length == 3 && parmTypes[0] == ScriptRuntime.ScriptableClass && parmTypes[1] == typeof(FunctionObject) && parmTypes[2] == ScriptRuntime.ScriptableClass && method_1.IsStatic)
 					{
 						finishInit = method_1;
@@ -1501,23 +1648,23 @@ namespace Rhino
 				{
 					continue;
 				}
-				Sharpen.Annotation.Annotation annotation = null;
+				Attribute annotation = null;
 				string prefix = null;
 				if (method_1.IsAnnotationPresent(typeof(JSFunction)))
 				{
-					annotation = method_1.GetAnnotation<JSFunction>();
+					annotation = method_1.GetCustomAttribute<JSFunction>();
 				}
 				else
 				{
 					if (method_1.IsAnnotationPresent(typeof(JSStaticFunction)))
 					{
-						annotation = method_1.GetAnnotation<JSStaticFunction>();
+						annotation = method_1.GetCustomAttribute<JSStaticFunction>();
 					}
 					else
 					{
 						if (method_1.IsAnnotationPresent(typeof(JSGetter)))
 						{
-							annotation = method_1.GetAnnotation<JSGetter>();
+							annotation = method_1.GetCustomAttribute<JSGetter>();
 						}
 						else
 						{
@@ -1574,7 +1721,7 @@ namespace Rhino
 						throw Context.ReportRuntimeError2("msg.extend.scriptable", proto.GetType().ToString(), name);
 					}
 					MethodInfo setter = FindSetterMethod(methods, name, setterPrefix);
-					int attr = ScriptableObject.PERMANENT | ScriptableObject.DONTENUM | (setter != null ? 0 : ScriptableObject.READONLY);
+					int attr = PERMANENT | DONTENUM | (setter != null ? 0 : READONLY);
 					((ScriptableObject)proto).DefineProperty(name, null, method_1, setter, attr);
 					continue;
 				}
@@ -1611,13 +1758,13 @@ namespace Rhino
 			return ctor;
 		}
 
-		private static MemberInfo FindAnnotatedMember<_T0>(MemberInfo[] members, Type<_T0> annotation) where _T0:Sharpen.Annotation.Annotation
+		private static T FindAnnotatedMember<T>(IEnumerable<T> members, Type annotation) where T: class, ICustomAttributeProvider
 		{
-			foreach (MemberInfo member in members)
+			foreach (T member in members)
 			{
-				if (member.IsAnnotationPresent(annotation))
+				if (member.GetCustomAttributes(annotation, true).Any())
 				{
-					return (MemberInfo)member;
+					return member;
 				}
 			}
 			return null;
@@ -1625,13 +1772,13 @@ namespace Rhino
 
 		private static MethodInfo FindSetterMethod(MethodInfo[] methods, string name, string prefix)
 		{
-			string newStyleName = "set" + System.Char.ToUpper(name[0]) + Sharpen.Runtime.Substring(name, 1);
+			string newStyleName = "set" + Char.ToUpper(name[0]) + name.Substring(1);
 			foreach (MethodInfo method in methods)
 			{
-				JSSetter annotation = method.GetAnnotation<JSSetter>();
+				JSSetter annotation = method.GetCustomAttribute<JSSetter>();
 				if (annotation != null)
 				{
-					if (name.Equals(annotation.Value()) || (string.Empty.Equals(annotation.Value()) && newStyleName.Equals(method.Name)))
+					if (name.Equals(annotation.Value) || (string.Empty.Equals(annotation.Value) && newStyleName.Equals(method.Name)))
 					{
 						return method;
 					}
@@ -1648,22 +1795,23 @@ namespace Rhino
 			return null;
 		}
 
-		private static string GetPropertyName(string methodName, string prefix, Sharpen.Annotation.Annotation annotation)
+		private static string GetPropertyName(string methodName, string prefix, Attribute annotation)
 		{
 			if (prefix != null)
 			{
-				return Sharpen.Runtime.Substring(methodName, prefix.Length);
+				return methodName.Substring(prefix.Length);
 			}
 			string propName = null;
-			if (annotation is JSGetter)
+			var jsGetter = annotation as JSGetter;
+			if (jsGetter != null)
 			{
-				propName = ((JSGetter)annotation).Value();
-				if (propName == null || propName.Length == 0)
+				propName = jsGetter.Value;
+				if (string.IsNullOrEmpty(propName))
 				{
 					if (methodName.Length > 3 && methodName.StartsWith("get"))
 					{
-						propName = Sharpen.Runtime.Substring(methodName, 3);
-						if (System.Char.IsUpper(propName[0]))
+						propName = methodName.Substring(3);
+						if (Char.IsUpper(propName[0]))
 						{
 							if (propName.Length == 1)
 							{
@@ -1671,9 +1819,9 @@ namespace Rhino
 							}
 							else
 							{
-								if (!System.Char.IsUpper(propName[1]))
+								if (!Char.IsUpper(propName[1]))
 								{
-									propName = System.Char.ToLower(propName[0]) + Sharpen.Runtime.Substring(propName, 1);
+									propName = Char.ToLower(propName[0]) + propName.Substring(1);
 								}
 							}
 						}
@@ -1682,30 +1830,32 @@ namespace Rhino
 			}
 			else
 			{
-				if (annotation is JSFunction)
+				var jsFunction = annotation as JSFunction;
+				if (jsFunction != null)
 				{
-					propName = ((JSFunction)annotation).Value();
+					propName = jsFunction.Value;
 				}
 				else
 				{
-					if (annotation is JSStaticFunction)
+					var jsStaticFunction = annotation as JSStaticFunction;
+					if (jsStaticFunction != null)
 					{
-						propName = ((JSStaticFunction)annotation).Value();
+						propName = jsStaticFunction.Value;
 					}
 				}
 			}
-			if (propName == null || propName.Length == 0)
+			if (string.IsNullOrEmpty(propName))
 			{
 				propName = methodName;
 			}
 			return propName;
 		}
 
-		private static Type ExtendsScriptable<T>(Type c) where T:Scriptable
+		private static Type ExtendsScriptable(Type c)
 		{
 			if (ScriptRuntime.ScriptableClass.IsAssignableFrom(c))
 			{
-				return (Type)c;
+				return c;
 			}
 			return null;
 		}
@@ -1718,7 +1868,7 @@ namespace Rhino
 		/// <param name="propertyName">the name of the property to define.</param>
 		/// <param name="value">the initial value of the property</param>
 		/// <param name="attributes">the attributes of the JavaScript property</param>
-		/// <seealso cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</seealso>
+		/// <seealso cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</seealso>
 		public virtual void DefineProperty(string propertyName, object value, int attributes)
 		{
 			CheckNotSealed(propertyName, 0);
@@ -1781,7 +1931,7 @@ namespace Rhino
 		/// </param>
 		/// <param name="clazz">the Java class to search for the getter and setter</param>
 		/// <param name="attributes">the attributes of the JavaScript property</param>
-		/// <seealso cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</seealso>
+		/// <seealso cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</seealso>
 		public virtual void DefineProperty(string propertyName, Type clazz, int attributes)
 		{
 			int length = propertyName.Length;
@@ -1790,8 +1940,8 @@ namespace Rhino
 				throw new ArgumentException();
 			}
 			char[] buf = new char[3 + length];
-			Sharpen.Runtime.GetCharsForString(propertyName, 0, length, buf, 3);
-			buf[3] = System.Char.ToUpper(buf[3]);
+			propertyName.CopyTo(0, buf, 3, length);
+			buf[3] = Char.ToUpper(buf[3]);
 			buf[0] = 'g';
 			buf[1] = 'e';
 			buf[2] = 't';
@@ -1803,7 +1953,7 @@ namespace Rhino
 			MethodInfo setter = FunctionObject.FindSingleMethod(methods, setterName);
 			if (setter == null)
 			{
-				attributes |= ScriptableObject.READONLY;
+				attributes |= READONLY;
 			}
 			DefineProperty(propertyName, null, getter, setter == null ? null : setter, attributes);
 		}
@@ -1868,7 +2018,7 @@ namespace Rhino
 					getterBox.delegateTo = typeof(void);
 				}
 				string errorId = null;
-				Type[] parmTypes = Sharpen.Runtime.GetParameterTypes(getter);
+				Type[] parmTypes = getter.GetParameterTypes();
 				if (parmTypes.Length == 0)
 				{
 					if (delegatedForm)
@@ -1880,7 +2030,7 @@ namespace Rhino
 				{
 					if (parmTypes.Length == 1)
 					{
-						object argType = parmTypes[0];
+						var argType = parmTypes[0];
 						// Allow ScriptableObject for compatibility
 						if (!(argType == ScriptRuntime.ScriptableClass || argType == ScriptRuntime.ScriptableObjectClass))
 						{
@@ -1926,7 +2076,7 @@ namespace Rhino
 					setterBox.delegateTo = typeof(void);
 				}
 				string errorId = null;
-				Type[] parmTypes = Sharpen.Runtime.GetParameterTypes(setter);
+				Type[] parmTypes = setter.GetParameterTypes();
 				if (parmTypes.Length == 1)
 				{
 					if (delegatedForm)
@@ -1962,7 +2112,7 @@ namespace Rhino
 					throw Context.ReportRuntimeError1(errorId, setter.ToString());
 				}
 			}
-			ScriptableObject.GetterSlot gslot = (ScriptableObject.GetterSlot)GetSlot(propertyName, 0, SLOT_MODIFY_GETTER_SETTER);
+			GetterSlot gslot = (GetterSlot)GetSlot(propertyName, 0, SLOT_MODIFY_GETTER_SETTER);
 			gslot.SetAttributes(attributes);
 			gslot.getter = getterBox;
 			gslot.setter = setterBox;
@@ -2010,7 +2160,7 @@ namespace Rhino
 		/// <param name="checkValid">whether to perform validity checks</param>
 		protected internal virtual void DefineOwnProperty(Context cx, object id, ScriptableObject desc, bool checkValid)
 		{
-			ScriptableObject.Slot slot = GetSlot(cx, id, SLOT_QUERY);
+			Slot slot = GetSlot(cx, id, SLOT_QUERY);
 			bool isNew = slot == null;
 			if (checkValid)
 			{
@@ -2033,11 +2183,11 @@ namespace Rhino
 			slot = UnwrapSlot(slot);
 			if (isAccessor)
 			{
-				if (!(slot is ScriptableObject.GetterSlot))
+				if (!(slot is GetterSlot))
 				{
 					slot = GetSlot(cx, id, SLOT_MODIFY_GETTER_SETTER);
 				}
-				ScriptableObject.GetterSlot gslot = (ScriptableObject.GetterSlot)slot;
+				GetterSlot gslot = (GetterSlot)slot;
 				object getter = GetProperty(desc, "get");
 				if (getter != ScriptableConstants.NOT_FOUND)
 				{
@@ -2053,7 +2203,7 @@ namespace Rhino
 			}
 			else
 			{
-				if (slot is ScriptableObject.GetterSlot && IsDataDescriptor(desc))
+				if (slot is GetterSlot && IsDataDescriptor(desc))
 				{
 					slot = GetSlot(cx, id, SLOT_CONVERT_ACCESSOR_TO_DATA);
 				}
@@ -2200,13 +2350,13 @@ namespace Rhino
 			// while zeroes with different signs are considered different.
 			if (currentValue.IsNumber() && newValue.IsNumber())
 			{
-				double d1 = System.Convert.ToDouble(currentValue);
-				double d2 = System.Convert.ToDouble(newValue);
+				double d1 = Convert.ToDouble(currentValue);
+				double d2 = Convert.ToDouble(newValue);
 				if (double.IsNaN(d1) && double.IsNaN(d2))
 				{
 					return true;
 				}
-				if (d1 == 0.0 && System.BitConverter.DoubleToInt64Bits(d1) != System.BitConverter.DoubleToInt64Bits(d2))
+				if (d1 == 0.0 && BitConverter.DoubleToInt64Bits(d1) != BitConverter.DoubleToInt64Bits(d2))
 				{
 					return false;
 				}
@@ -2262,7 +2412,7 @@ namespace Rhino
 		{
 			if (!(arg is Scriptable))
 			{
-				throw ScriptRuntime.TypeError1("msg.arg.not.object", ScriptRuntime.Typeof(arg));
+				throw ScriptRuntime.TypeError1("msg.arg.not.object", ScriptRuntime.TypeOf(arg));
 			}
 			return (Scriptable)arg;
 		}
@@ -2271,7 +2421,7 @@ namespace Rhino
 		{
 			if (!(arg is ScriptableObject))
 			{
-				throw ScriptRuntime.TypeError1("msg.arg.not.object", ScriptRuntime.Typeof(arg));
+				throw ScriptRuntime.TypeError1("msg.arg.not.object", ScriptRuntime.TypeOf(arg));
 			}
 			return (ScriptableObject)arg;
 		}
@@ -2422,7 +2572,7 @@ namespace Rhino
 				if (count >= 0)
 				{
 					// Make sure all LazilyLoadedCtors are initialized before sealing.
-					ScriptableObject.Slot slot = firstAdded;
+					Slot slot = firstAdded;
 					while (slot != null)
 					{
 						object value = slot.value;
@@ -2525,13 +2675,13 @@ namespace Rhino
 		/// <since>1.7R3</since>
 		public static T GetTypedProperty<T>(Scriptable s, int index)
 		{
-			System.Type type = typeof(T);
+			Type type = typeof(T);
 			object val = GetProperty(s, index);
 			if (val == ScriptableConstants.NOT_FOUND)
 			{
 				val = null;
 			}
-			return type.Cast(Context.JsToJava(val, type));
+			return (T) Context.JsToJava(val, type);
 		}
 
 		/// <summary>Gets an indexed property from an object or any object in its prototype chain.</summary>
@@ -2594,13 +2744,13 @@ namespace Rhino
 		/// <since>1.7R3</since>
 		public static T GetTypedProperty<T>(Scriptable s, string name)
 		{
-			System.Type type = typeof(T);
+			Type type = typeof(T);
 			object val = GetProperty(s, name);
 			if (val == ScriptableConstants.NOT_FOUND)
 			{
 				val = null;
 			}
-			return type.Cast(Context.JsToJava(val, type));
+			return (T) Context.JsToJava(val, type);
 		}
 
 		/// <summary>
@@ -2683,7 +2833,7 @@ namespace Rhino
 		/// Searches for the named property in the prototype chain. If it is found,
 		/// the value of the property in <code>obj</code> is changed through a call
 		/// to
-		/// <see cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</see>
+		/// <see cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</see>
 		/// on the
 		/// prototype passing <code>obj</code> as the <code>start</code> argument.
 		/// This allows the prototype to veto the property setting in case the
@@ -2696,11 +2846,7 @@ namespace Rhino
 		/// <since>1.5R2</since>
 		public static void PutProperty(Scriptable obj, string name, object value)
 		{
-			Scriptable @base = GetBase(obj, name);
-			if (@base == null)
-			{
-				@base = obj;
-			}
+			Scriptable @base = GetBase(obj, name) ?? obj;
 			@base.Put(name, obj, value);
 		}
 
@@ -2711,7 +2857,7 @@ namespace Rhino
 		/// Searches for the named property in the prototype chain. If it is found,
 		/// the value of the property in <code>obj</code> is changed through a call
 		/// to
-		/// <see cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</see>
+		/// <see cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</see>
 		/// on the
 		/// prototype passing <code>obj</code> as the <code>start</code> argument.
 		/// This allows the prototype to veto the property setting in case the
@@ -2742,7 +2888,7 @@ namespace Rhino
 		/// Searches for the indexed property in the prototype chain. If it is found,
 		/// the value of the property in <code>obj</code> is changed through a call
 		/// to
-		/// <see cref="Scriptable.Put(int, Scriptable, object)">Scriptable.Put(int, Scriptable, object)</see>
+		/// <see cref="Scriptable.Put(int, SIScriptable object)">Scriptable.Put(int, Scriptable, object)</see>
 		/// on the prototype
 		/// passing <code>obj</code> as the <code>start</code> argument. This allows
 		/// the prototype to veto the property setting in case the prototype defines
@@ -2900,7 +3046,7 @@ namespace Rhino
 			// and use ScriptableObject.getTopLevelScope(fun) if the flag is not
 			// set. But that require access to Context and messy code
 			// so for now it is not checked.
-			Scriptable scope = ScriptableObject.GetTopLevelScope(obj);
+			Scriptable scope = GetTopLevelScope(obj);
 			if (cx != null)
 			{
 				return fun.Call(cx, scope, obj, args);
@@ -2970,7 +3116,7 @@ namespace Rhino
 		/// <seealso cref="GetAssociatedValue(object)">GetAssociatedValue(object)</seealso>
 		public static object GetTopScopeValue(Scriptable scope, object key)
 		{
-			scope = ScriptableObject.GetTopLevelScope(scope);
+			scope = GetTopLevelScope(scope);
 			for (; ; )
 			{
 				if (scope is ScriptableObject)
@@ -3035,7 +3181,7 @@ namespace Rhino
 		{
 			// This method is very hot (basically called on each assignment)
 			// so we inline the extensible/sealed checks below.
-			ScriptableObject.Slot slot;
+			Slot slot;
 			if (this != start)
 			{
 				slot = GetSlot(name, index, SLOT_QUERY);
@@ -3081,7 +3227,7 @@ namespace Rhino
 		private bool PutConstImpl(string name, int index, Scriptable start, object value, int constFlag)
 		{
 			System.Diagnostics.Debug.Assert((constFlag != EMPTY));
-			ScriptableObject.Slot slot;
+			Slot slot;
 			if (this != start)
 			{
 				slot = GetSlot(name, index, SLOT_QUERY);
@@ -3125,9 +3271,9 @@ namespace Rhino
 			return slot.SetValue(value, this, start);
 		}
 
-		private ScriptableObject.Slot FindAttributeSlot(string name, int index, int accessType)
+		private Slot FindAttributeSlot(string name, int index, int accessType)
 		{
-			ScriptableObject.Slot slot = GetSlot(name, index, accessType);
+			Slot slot = GetSlot(name, index, accessType);
 			if (slot == null)
 			{
 				string str = (name != null ? name : index.ToString());
@@ -3136,9 +3282,9 @@ namespace Rhino
 			return slot;
 		}
 
-		private static ScriptableObject.Slot UnwrapSlot(ScriptableObject.Slot slot)
+		private static Slot UnwrapSlot(Slot slot)
 		{
-			return (slot is ScriptableObject.RelinkedSlot) ? ((ScriptableObject.RelinkedSlot)slot).slot : slot;
+			return (slot is RelinkedSlot) ? ((RelinkedSlot)slot).slot : slot;
 		}
 
 		/// <summary>Locate the slot with given name or index.</summary>
@@ -3148,10 +3294,10 @@ namespace Rhino
 		/// </remarks>
 		/// <param name="name">property name or null if slot holds spare array index.</param>
 		/// <param name="index">index or 0 if slot holds property name.</param>
-		private ScriptableObject.Slot GetSlot(string name, int index, int accessType)
+		private Slot GetSlot(string name, int index, int accessType)
 		{
 			// Check the hashtable without using synchronization
-			ScriptableObject.Slot[] slotsLocalRef = slots;
+			Slot[] slotsLocalRef = slots;
 			// Get stable local reference
 			if (slotsLocalRef == null && accessType == SLOT_QUERY)
 			{
@@ -3160,7 +3306,7 @@ namespace Rhino
 			int indexOrHash = (name != null ? name.GetHashCode() : index);
 			if (slotsLocalRef != null)
 			{
-				ScriptableObject.Slot slot;
+				Slot slot;
 				int slotIndex = GetSlotIndex(slotsLocalRef.Length, indexOrHash);
 				for (slot = slotsLocalRef[slotIndex]; slot != null; slot = slot.next)
 				{
@@ -3190,7 +3336,7 @@ namespace Rhino
 					case SLOT_MODIFY_GETTER_SETTER:
 					{
 						slot = UnwrapSlot(slot);
-						if (slot is ScriptableObject.GetterSlot)
+						if (slot is GetterSlot)
 						{
 							return slot;
 						}
@@ -3200,7 +3346,7 @@ namespace Rhino
 					case SLOT_CONVERT_ACCESSOR_TO_DATA:
 					{
 						slot = UnwrapSlot(slot);
-						if (!(slot is ScriptableObject.GetterSlot))
+						if (!(slot is GetterSlot))
 						{
 							return slot;
 						}
@@ -3213,16 +3359,16 @@ namespace Rhino
 			return CreateSlot(name, indexOrHash, accessType);
 		}
 
-		private ScriptableObject.Slot CreateSlot(string name, int indexOrHash, int accessType)
+		private Slot CreateSlot(string name, int indexOrHash, int accessType)
 		{
 			lock (this)
 			{
-				ScriptableObject.Slot[] slotsLocalRef = slots;
+				Slot[] slotsLocalRef = slots;
 				int insertPos;
 				if (count == 0)
 				{
 					// Always throw away old slots if any on empty insert.
-					slotsLocalRef = new ScriptableObject.Slot[INITIAL_SLOT_SIZE];
+					slotsLocalRef = new Slot[INITIAL_SLOT_SIZE];
 					slots = slotsLocalRef;
 					insertPos = GetSlotIndex(slotsLocalRef.Length, indexOrHash);
 				}
@@ -3230,8 +3376,8 @@ namespace Rhino
 				{
 					int tableSize = slotsLocalRef.Length;
 					insertPos = GetSlotIndex(tableSize, indexOrHash);
-					ScriptableObject.Slot prev = slotsLocalRef[insertPos];
-					ScriptableObject.Slot slot = prev;
+					Slot prev = slotsLocalRef[insertPos];
+					Slot slot = prev;
 					while (slot != null)
 					{
 						if (slot.indexOrHash == indexOrHash && (slot.name == name || (name != null && name.Equals(slot.name))))
@@ -3248,17 +3394,17 @@ namespace Rhino
 						// vice versa, or it could be a race in application code.
 						// Check if we need to replace the slot depending on the
 						// accessType flag and return the appropriate slot instance.
-						ScriptableObject.Slot inner = UnwrapSlot(slot);
-						ScriptableObject.Slot newSlot;
-						if (accessType == SLOT_MODIFY_GETTER_SETTER && !(inner is ScriptableObject.GetterSlot))
+						Slot inner = UnwrapSlot(slot);
+						Slot newSlot;
+						if (accessType == SLOT_MODIFY_GETTER_SETTER && !(inner is GetterSlot))
 						{
-							newSlot = new ScriptableObject.GetterSlot(name, indexOrHash, inner.GetAttributes());
+							newSlot = new GetterSlot(name, indexOrHash, inner.GetAttributes());
 						}
 						else
 						{
-							if (accessType == SLOT_CONVERT_ACCESSOR_TO_DATA && (inner is ScriptableObject.GetterSlot))
+							if (accessType == SLOT_CONVERT_ACCESSOR_TO_DATA && (inner is GetterSlot))
 							{
-								newSlot = new ScriptableObject.Slot(name, indexOrHash, inner.GetAttributes());
+								newSlot = new Slot(name, indexOrHash, inner.GetAttributes());
 							}
 							else
 							{
@@ -3303,14 +3449,14 @@ namespace Rhino
 						if (4 * (count + 1) > 3 * slotsLocalRef.Length)
 						{
 							// table size must be a power of 2, always grow by x2
-							slotsLocalRef = new ScriptableObject.Slot[slotsLocalRef.Length * 2];
+							slotsLocalRef = new Slot[slotsLocalRef.Length * 2];
 							CopyTable(slots, slotsLocalRef, count);
 							slots = slotsLocalRef;
 							insertPos = GetSlotIndex(slotsLocalRef.Length, indexOrHash);
 						}
 					}
 				}
-				ScriptableObject.Slot newSlot_1 = (accessType == SLOT_MODIFY_GETTER_SETTER ? new ScriptableObject.GetterSlot(name, indexOrHash, 0) : new ScriptableObject.Slot(name, indexOrHash, 0));
+				Slot newSlot_1 = (accessType == SLOT_MODIFY_GETTER_SETTER ? new GetterSlot(name, indexOrHash, 0) : new Slot(name, indexOrHash, 0));
 				if (accessType == SLOT_MODIFY_CONST)
 				{
 					newSlot_1.SetAttributes(CONST);
@@ -3337,13 +3483,13 @@ namespace Rhino
 			lock (this)
 			{
 				int indexOrHash = (name != null ? name.GetHashCode() : index);
-				ScriptableObject.Slot[] slotsLocalRef = slots;
+				Slot[] slotsLocalRef = slots;
 				if (count != 0)
 				{
 					int tableSize = slotsLocalRef.Length;
 					int slotIndex = GetSlotIndex(tableSize, indexOrHash);
-					ScriptableObject.Slot prev = slotsLocalRef[slotIndex];
-					ScriptableObject.Slot slot = prev;
+					Slot prev = slotsLocalRef[slotIndex];
+					Slot slot = prev;
 					while (slot != null)
 					{
 						if (slot.indexOrHash == indexOrHash && (slot.name == name || (name != null && name.Equals(slot.name))))
@@ -3369,7 +3515,7 @@ namespace Rhino
 						// getIds() but delete is an infrequent operation so O(n)
 						// should be ok
 						// ordered list always uses the actual slot
-						ScriptableObject.Slot deleted = UnwrapSlot(slot);
+						Slot deleted = UnwrapSlot(slot);
 						if (deleted == firstAdded)
 						{
 							prev = null;
@@ -3402,7 +3548,7 @@ namespace Rhino
 		}
 
 		// Must be inside synchronized (this)
-		private static void CopyTable(ScriptableObject.Slot[] oldSlots, ScriptableObject.Slot[] newSlots, int count)
+		private static void CopyTable(Slot[] oldSlots, Slot[] newSlots, int count)
 		{
 			if (count == 0)
 			{
@@ -3413,13 +3559,13 @@ namespace Rhino
 			for (; ; )
 			{
 				--i;
-				ScriptableObject.Slot slot = oldSlots[i];
+				Slot slot = oldSlots[i];
 				while (slot != null)
 				{
 					int insertPos = GetSlotIndex(tableSize, slot.indexOrHash);
 					// If slot has next chain in old table use a new
 					// RelinkedSlot wrapper to keep old table valid
-					ScriptableObject.Slot insSlot = slot.next == null ? slot : new ScriptableObject.RelinkedSlot(slot);
+					Slot insSlot = slot.next == null ? slot : new RelinkedSlot(slot);
 					AddKnownAbsentSlot(newSlots, insSlot, insertPos);
 					slot = slot.next;
 					if (--count == 0)
@@ -3436,7 +3582,7 @@ namespace Rhino
 		/// This is an optimization to use when inserting into empty table,
 		/// after table growth or during deserialization.
 		/// </remarks>
-		private static void AddKnownAbsentSlot(ScriptableObject.Slot[] slots, ScriptableObject.Slot slot, int insertPos)
+		private static void AddKnownAbsentSlot(Slot[] slots, Slot slot, int insertPos)
 		{
 			if (slots[insertPos] == null)
 			{
@@ -3444,8 +3590,8 @@ namespace Rhino
 			}
 			else
 			{
-				ScriptableObject.Slot prev = slots[insertPos];
-				ScriptableObject.Slot next = prev.next;
+				Slot prev = slots[insertPos];
+				Slot next = prev.next;
 				while (next != null)
 				{
 					prev = next;
@@ -3457,14 +3603,14 @@ namespace Rhino
 
 		internal virtual object[] GetIds(bool getAll)
 		{
-			ScriptableObject.Slot[] s = slots;
+			Slot[] s = slots;
 			object[] a = ScriptRuntime.emptyArgs;
 			if (s == null)
 			{
 				return a;
 			}
 			int c = 0;
-			ScriptableObject.Slot slot = firstAdded;
+			Slot slot = firstAdded;
 			while (slot != null && slot.wasDeleted)
 			{
 				// we used to removed deleted slots from the linked list here
@@ -3481,7 +3627,7 @@ namespace Rhino
 					{
 						a = new object[s.Length];
 					}
-					a[c++] = slot.name != null ? slot.name : slot.indexOrHash;
+					a[c++] = slot.name ?? (object) slot.indexOrHash;
 				}
 				slot = slot.orderedNext;
 				while (slot != null && slot.wasDeleted)
@@ -3495,7 +3641,7 @@ namespace Rhino
 				return a;
 			}
 			object[] result = new object[c];
-			System.Array.Copy(a, 0, result, 0, c);
+			Array.Copy(a, 0, result, 0, c);
 			return result;
 		}
 
@@ -3518,7 +3664,7 @@ namespace Rhino
 				else
 				{
 					@out.WriteInt(slots.Length);
-					ScriptableObject.Slot slot = firstAdded;
+					Slot slot = firstAdded;
 					while (slot != null && slot.wasDeleted)
 					{
 						// as long as we're traversing the order-added linked list,
@@ -3529,7 +3675,7 @@ namespace Rhino
 					while (slot != null)
 					{
 						@out.WriteObject(slot);
-						ScriptableObject.Slot next = slot.orderedNext;
+						Slot next = slot.orderedNext;
 						while (next != null && next.wasDeleted)
 						{
 							// remove deleted slots
@@ -3565,17 +3711,17 @@ namespace Rhino
 					}
 					tableSize = newSize;
 				}
-				slots = new ScriptableObject.Slot[tableSize];
+				slots = new Slot[tableSize];
 				int objectsCount = count;
 				if (objectsCount < 0)
 				{
 					// "this" was sealed
 					objectsCount = ~objectsCount;
 				}
-				ScriptableObject.Slot prev = null;
+				Slot prev = null;
 				for (int i = 0; i != objectsCount; ++i)
 				{
-					lastAdded = (ScriptableObject.Slot)@in.ReadObject();
+					lastAdded = (Slot)@in.ReadObject();
 					if (i == 0)
 					{
 						firstAdded = lastAdded;
@@ -3593,16 +3739,16 @@ namespace Rhino
 
 		protected internal virtual ScriptableObject GetOwnPropertyDescriptor(Context cx, object id)
 		{
-			ScriptableObject.Slot slot = GetSlot(cx, id, SLOT_QUERY);
+			Slot slot = GetSlot(cx, id, SLOT_QUERY);
 			if (slot == null)
 			{
 				return null;
 			}
 			Scriptable scope = GetParentScope();
-			return slot.GetPropertyDescriptor(cx, (scope == null ? this : scope));
+			return slot.GetPropertyDescriptor(cx, scope ?? this);
 		}
 
-		protected internal virtual ScriptableObject.Slot GetSlot(Context cx, object id, int accessType)
+		protected internal virtual Slot GetSlot(Context cx, object id, int accessType)
 		{
 			string name = ScriptRuntime.ToStringIdOrIndex(cx, id);
 			if (name == null)
@@ -3638,7 +3784,7 @@ namespace Rhino
 			{
 				if (key.IsNumber())
 				{
-					value = Get(System.Convert.ToInt32(key), this);
+					value = Get(Convert.ToInt32(key), this);
 				}
 			}
 			if (value == ScriptableConstants.NOT_FOUND || value == Undefined.instance)

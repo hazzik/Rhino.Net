@@ -97,7 +97,7 @@ namespace Rhino.CommonJS.Module
 		/// <remarks>
 		/// Sets whether the created require() instances will be sandboxed.
 		/// See
-		/// <see cref="Require.Require(Rhino.Context, Rhino.Scriptable, ModuleScriptProvider, Rhino.Script, Rhino.Script, bool)">Require.Require(Rhino.Context, Rhino.Scriptable, ModuleScriptProvider, Rhino.Script, Rhino.Script, bool)</see>
+		/// <see cref="Require.Require(Rhino.Context, Scriptable, ModuleScriptProvider, Rhino.Script, Rhino.Script, bool)">Require.Require(Rhino.Context, Rhino.Scriptable, ModuleScriptProvider, Rhino.Script, Rhino.Script, bool)</see>
 		/// for explanation.
 		/// </remarks>
 		/// <param name="sandboxed">
@@ -115,7 +115,7 @@ namespace Rhino.CommonJS.Module
 		/// <remarks>
 		/// Creates a new require() function. You are still responsible for invoking
 		/// either
-		/// <see cref="Require.Install(Rhino.Scriptable)">Require.Install(Rhino.Scriptable)</see>
+		/// <see cref="Require.Install(Scriptable)">Require.Install(Rhino.Scriptable)</see>
 		/// or
 		/// <see cref="Require.RequireMain(Rhino.Context, string)">Require.RequireMain(Rhino.Context, string)</see>
 		/// to effectively make it

@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.IO;
 using Rhino;
 using Rhino.CommonJS.Module.Provider;
 using Sharpen;
@@ -67,7 +68,7 @@ namespace Rhino.CommonJS.Module.Provider
 		/// <exception cref="System.IO.IOException"></exception>
 		private ModuleSource LoadFromPathArray(string moduleId, Scriptable paths, object validator)
 		{
-			long llength = ScriptRuntime.ToUint32(ScriptableObject.GetProperty(paths, "length"));
+			long llength = ScriptRuntime.ToUInt32(ScriptableObject.GetProperty(paths, "length"));
 			// Yeah, I'll ignore entries beyond Integer.MAX_VALUE; so sue me.
 			int ilength = llength > int.MaxValue ? int.MaxValue : (int)llength;
 			for (int i = 0; i < ilength; ++i)
@@ -78,7 +79,7 @@ namespace Rhino.CommonJS.Module.Provider
 					Uri uri = new Uri(path);
 					if (!uri.IsAbsoluteUri)
 					{
-						uri = new FilePath(path).ToURI().Resolve(string.Empty);
+						uri = new Uri(new FileInfo(path).FullName).Resolve(string.Empty);
 					}
 					ModuleSource moduleSource = LoadFromUri(uri.Resolve(moduleId), uri, validator);
 					if (moduleSource != null)

@@ -35,7 +35,7 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestAdapter()
 		{
-			string source = "(new JavaAdapter(" + typeof(Bug419940Test.Foo).FullName + ", {})).doSomething();";
+			string source = "(new JavaAdapter(" + typeof (Bug419940Test.Foo).FullName.Replace("+", "$") + ", {})).DoSomething();";
 			Context cx = ContextFactory.GetGlobal().EnterContext();
 			try
 			{

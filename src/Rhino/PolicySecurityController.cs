@@ -5,10 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
+#if ENCHANCED_SECURITY
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Emit;
 using Org.Mozilla.Classfile;
 using Rhino;
 using Sharpen;
@@ -17,15 +18,15 @@ namespace Rhino
 {
 	/// <summary>
 	/// A security controller relying on Java
-	/// <see cref="Sharpen.Policy">Sharpen.Policy</see>
+	/// <see cref="Policy">Sharpen.Policy</see>
 	/// in effect. When you use
 	/// this security controller, your securityDomain objects must be instances of
-	/// <see cref="Sharpen.CodeSource">Sharpen.CodeSource</see>
+	/// <see cref="CodeSource">Sharpen.CodeSource</see>
 	/// representing the location from where you load your
 	/// scripts. Any Java policy "grant" statements matching the URL and certificate
 	/// in code sources will apply to the scripts. If you specify any certificates
 	/// within your
-	/// <see cref="Sharpen.CodeSource">Sharpen.CodeSource</see>
+	/// <see cref="CodeSource">Sharpen.CodeSource</see>
 	/// objects, it is your responsibility to verify
 	/// (or not) that the script source files are signed in whatever
 	/// implementation-specific way you're using.
@@ -33,9 +34,9 @@ namespace Rhino
 	/// <author>Attila Szegedi</author>
 	public class PolicySecurityController : SecurityController
 	{
-		private static readonly byte[] secureCallerImplBytecode = LoadBytecode();
+		private static readonly byte[] secureCallerImplBytecode = LoadByteCode();
 
-		private static readonly IDictionary<CodeSource, IDictionary<ClassLoader, SoftReference<PolicySecurityController.SecureCaller>>> callers = new WeakHashMap<CodeSource, IDictionary<ClassLoader, SoftReference<PolicySecurityController.SecureCaller>>>();
+		private static readonly IDictionary<CodeSource, IDictionary<ClassLoader, SoftReference<SecureCaller>>> callers = new WeakHashMap<CodeSource, IDictionary<ClassLoader, SoftReference<SecureCaller>>>();
 
 		// We're storing a CodeSource -> (ClassLoader -> SecureRenderer), since we
 		// need to have one renderer per class loader. We're using weak hash maps
@@ -68,7 +69,7 @@ namespace Rhino
 
 		public override GeneratedClassLoader CreateClassLoader(ClassLoader parent, object securityDomain)
 		{
-			return (PolicySecurityController.Loader)AccessController.DoPrivileged(new _PrivilegedAction_78(parent, securityDomain));
+			return (Loader)AccessController.DoPrivileged(new _PrivilegedAction_78(parent, securityDomain));
 		}
 
 		private sealed class _PrivilegedAction_78 : PrivilegedAction<object>
@@ -81,7 +82,7 @@ namespace Rhino
 
 			public object Run()
 			{
-				return new PolicySecurityController.Loader(parent, (CodeSource)securityDomain);
+				return new Loader(parent, (CodeSource)securityDomain);
 			}
 
 			private readonly ClassLoader parent;
@@ -102,20 +103,20 @@ namespace Rhino
 			// runtime permission
 			ClassLoader classLoader = (ClassLoader)AccessController.DoPrivileged(new _PrivilegedAction_102(cx));
 			CodeSource codeSource = (CodeSource)securityDomain;
-			IDictionary<ClassLoader, SoftReference<PolicySecurityController.SecureCaller>> classLoaderMap;
+			IDictionary<ClassLoader, SoftReference<SecureCaller>> classLoaderMap;
 			lock (callers)
 			{
 				classLoaderMap = callers.Get(codeSource);
 				if (classLoaderMap == null)
 				{
-					classLoaderMap = new WeakHashMap<ClassLoader, SoftReference<PolicySecurityController.SecureCaller>>();
-					callers [codeSource] = classLoaderMap;
+					classLoaderMap = new WeakHashMap<ClassLoader, SoftReference<SecureCaller>>();
+					callers[codeSource] = classLoaderMap;
 				}
 			}
-			PolicySecurityController.SecureCaller caller;
+			SecureCaller caller;
 			lock (classLoaderMap)
 			{
-				SoftReference<PolicySecurityController.SecureCaller> @ref = classLoaderMap.Get(classLoader);
+				SoftReference<SecureCaller> @ref = classLoaderMap.Get(classLoader);
 				if (@ref != null)
 				{
 					caller = @ref.Get();
@@ -130,8 +131,8 @@ namespace Rhino
 					{
 						// Run in doPrivileged as we'll be checked for
 						// "createClassLoader" runtime permission
-						caller = (PolicySecurityController.SecureCaller)AccessController.DoPrivileged(new _PrivilegedExceptionAction_132(classLoader, codeSource));
-						classLoaderMap [classLoader] = new SoftReference<PolicySecurityController.SecureCaller>(caller);
+						caller = (SecureCaller)AccessController.DoPrivileged(new _PrivilegedExceptionAction_132(classLoader, codeSource));
+						classLoaderMap[classLoader] = new SoftReference<SecureCaller>(caller);
 					}
 					catch (PrivilegedActionException ex)
 					{
@@ -168,9 +169,9 @@ namespace Rhino
 			/// <exception cref="System.Exception"></exception>
 			public object Run()
 			{
-				PolicySecurityController.Loader loader = new PolicySecurityController.Loader(classLoader, codeSource);
-				Type c = loader.DefineClass(typeof(PolicySecurityController.SecureCaller).FullName + "Impl", PolicySecurityController.secureCallerImplBytecode);
-				return System.Activator.CreateInstance(c);
+				Loader loader = new Loader(classLoader, codeSource);
+				Type c = loader.DefineClass(typeof(SecureCaller).FullName + "Impl", secureCallerImplBytecode);
+				return Activator.CreateInstance(c);
 			}
 
 			private readonly ClassLoader classLoader;
@@ -183,25 +184,40 @@ namespace Rhino
 			public abstract object Call(Callable callable, Context cx, Scriptable scope, Scriptable thisObj, object[] args);
 		}
 
-		private static byte[] LoadBytecode()
+		private static ModuleBuilder module;
+
+		private static byte[] LoadByteCode()
 		{
-			string secureCallerClassName = typeof(PolicySecurityController.SecureCaller).FullName;
-			ClassFileWriter cfw = new ClassFileWriter(secureCallerClassName + "Impl", secureCallerClassName, "<generated>");
-			cfw.StartMethod("<init>", "()V", ClassFileWriter.ACC_PUBLIC);
-			cfw.AddALoad(0);
-			cfw.AddInvoke(ByteCode.INVOKESPECIAL, secureCallerClassName, "<init>", "()V");
-			cfw.Add(ByteCode.RETURN);
-			cfw.StopMethod((short)1);
-			string callableCallSig = "Lorg/mozilla/javascript/Context;" + "Lorg/mozilla/javascript/Scriptable;" + "Lorg/mozilla/javascript/Scriptable;" + "[Ljava/lang/Object;)Ljava/lang/Object;";
-			cfw.StartMethod("call", "(Lorg/mozilla/javascript/Callable;" + callableCallSig, (short)(ClassFileWriter.ACC_PUBLIC | ClassFileWriter.ACC_FINAL));
-			for (int i = 1; i < 6; ++i)
-			{
-				cfw.AddALoad(i);
-			}
-			cfw.AddInvoke(ByteCode.INVOKEINTERFACE, "org/mozilla/javascript/Callable", "call", "(" + callableCallSig);
-			cfw.Add(ByteCode.ARETURN);
-			cfw.StopMethod((short)6);
+			var baseType = typeof (SecureCaller);
+			var type = module.DefineType(baseType.Name + "Impl", TypeAttributes.Public, baseType);
+			GenerateConstructor(type, baseType);
+			GenerateCall(type);
+
 			return cfw.ToByteArray();
+		}
+
+		private static void GenerateCall(TypeBuilder type)
+		{
+			var method = type.DefineMethod("Call", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (Scriptable), typeof (object[])});
+			var il = method.GetILGenerator();
+			il.Emit(OpCodes.Ldarg_1); // callable
+			il.Emit(OpCodes.Ldarg_2); // cx
+			il.Emit(OpCodes.Ldarg_3); // scope
+			il.Emit(OpCodes.Ldarg_S, (byte) 4); // thisObj
+			il.Emit(OpCodes.Ldarg_S, (byte) 5); // args
+			il.Emit(OpCodes.Callvirt, typeof (Callable).GetMethod("Call", new[] {typeof (Context), typeof (Scriptable), typeof (Scriptable), typeof (object[])}));
+			il.Emit(OpCodes.Ret);
+		}
+
+		private static void GenerateConstructor(TypeBuilder type, Type baseType)
+		{
+			var constructor = type.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, Type.EmptyTypes);
+			var il = constructor.GetILGenerator();
+
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Call, baseType.GetConstructor(Type.EmptyTypes));
+			il.Emit(OpCodes.Ret);
 		}
 	}
 }
+#endif

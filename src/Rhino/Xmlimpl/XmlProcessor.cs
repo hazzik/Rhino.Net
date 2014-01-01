@@ -5,19 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#if XML
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using Javax.Xml.Parsers;
-using Javax.Xml.Transform;
-using Javax.Xml.Transform.Dom;
-using Javax.Xml.Transform.Stream;
-using Org.Xml.Sax;
-using Rhino;
-using Rhino.XmlImpl;
 using Sharpen;
 
 namespace Rhino.XmlImpl
@@ -25,8 +19,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal class XmlProcessor
 	{
-		private const long serialVersionUID = 6903514433204808713L;
-
 		private bool ignoreComments;
 
 		private bool ignoreProcessingInstructions;
@@ -43,12 +35,7 @@ namespace Rhino.XmlImpl
 		[System.NonSerialized]
 		private TransformerFactory xform;
 
-		[System.NonSerialized]
-		private LinkedBlockingDeque<DocumentBuilder> documentBuilderPool;
-
-		private XmlProcessor.RhinoSAXErrorHandler errorHandler = new XmlProcessor.RhinoSAXErrorHandler();
-
-		//    Disambiguate from Rhino.Node
+		//    Disambiguate from Rhino.Net.Node
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
 		private void ReadObject(ObjectInputStream stream)
@@ -58,34 +45,6 @@ namespace Rhino.XmlImpl
 			this.dom.SetNamespaceAware(true);
 			this.dom.SetIgnoringComments(false);
 			this.xform = TransformerFactory.NewInstance();
-			int poolSize = Runtime.GetRuntime().AvailableProcessors() * 2;
-			this.documentBuilderPool = new LinkedBlockingDeque<DocumentBuilder>(poolSize);
-		}
-
-		[System.Serializable]
-		private class RhinoSAXErrorHandler : ErrorHandler
-		{
-			private const long serialVersionUID = 6918417235413084055L;
-
-			private void ThrowError(SAXParseException e)
-			{
-				throw ScriptRuntime.ConstructError("TypeError", e.Message, e.GetLineNumber() - 1);
-			}
-
-			public virtual void Error(SAXParseException e)
-			{
-				ThrowError(e);
-			}
-
-			public virtual void FatalError(SAXParseException e)
-			{
-				ThrowError(e);
-			}
-
-			public virtual void Warning(SAXParseException e)
-			{
-				Context.ReportWarning(e.Message);
-			}
 		}
 
 		internal XmlProcessor()
@@ -95,8 +54,6 @@ namespace Rhino.XmlImpl
 			this.dom.SetNamespaceAware(true);
 			this.dom.SetIgnoringComments(false);
 			this.xform = TransformerFactory.NewInstance();
-			int poolSize = Runtime.GetRuntime().AvailableProcessors() * 2;
-			this.documentBuilderPool = new LinkedBlockingDeque<DocumentBuilder>(poolSize);
 		}
 
 		internal void SetDefault()
@@ -188,33 +145,6 @@ namespace Rhino.XmlImpl
 			return dom;
 		}
 
-		// Get from pool, or create one without locking, if needed.
-		/// <exception cref="Javax.Xml.Parsers.ParserConfigurationException"></exception>
-		private DocumentBuilder GetDocumentBuilderFromPool()
-		{
-			DocumentBuilder builder = documentBuilderPool.PollFirst();
-			if (builder == null)
-			{
-				builder = GetDomFactory().NewDocumentBuilder();
-			}
-			builder.SetErrorHandler(errorHandler);
-			return builder;
-		}
-
-		// Insert into pool, if resettable. Pool capacity is limited to
-		// number of processors * 2.
-		private void ReturnDocumentBuilderToPool(DocumentBuilder db)
-		{
-			try
-			{
-				db.Reset();
-				documentBuilderPool.OfferFirst(db);
-			}
-			catch (NotSupportedException)
-			{
-			}
-		}
-
 		// document builders that don't support reset() can't be pooled
 		private void AddProcessingInstructionsTo(IList<System.Xml.XmlNode> list, System.Xml.XmlNode node)
 		{
@@ -281,12 +211,11 @@ namespace Rhino.XmlImpl
 		internal System.Xml.XmlNode ToXml(string defaultNamespaceUri, string xml)
 		{
 			//    See ECMA357 10.3.1
-			DocumentBuilder builder = null;
 			try
 			{
-				string syntheticXml = "<parent xmlns=\"" + defaultNamespaceUri + "\">" + xml + "</parent>";
-				builder = GetDocumentBuilderFromPool();
-				XmlDocument document = builder.Parse(new InputSource(new StringReader(syntheticXml)));
+				string syntheticXml = string.Format("<parent xmlns=\"{0}\">{1}</parent>", defaultNamespaceUri, xml);
+				var document = new XmlDocument();
+				document.LoadXml(syntheticXml);
 				if (ignoreProcessingInstructions)
 				{
 					IList<System.Xml.XmlNode> list = new List<System.Xml.XmlNode>();
@@ -346,36 +275,11 @@ namespace Rhino.XmlImpl
 			{
 				throw new Exception(e);
 			}
-			finally
-			{
-				if (builder != null)
-				{
-					ReturnDocumentBuilderToPool(builder);
-				}
-			}
 		}
 
 		internal virtual XmlDocument NewDocument()
 		{
-			DocumentBuilder builder = null;
-			try
-			{
-				//    TODO    Should this use XML settings?
-				builder = GetDocumentBuilderFromPool();
-				return builder.NewDocument();
-			}
-			catch (ParserConfigurationException ex)
-			{
-				//    TODO    How to handle these runtime errors?
-				throw new Exception(ex);
-			}
-			finally
-			{
-				if (builder != null)
-				{
-					ReturnDocumentBuilderToPool(builder);
-				}
-			}
+			return new XmlDocument();
 		}
 
 		//    TODO    Cannot remember what this is for, so whether it should use settings or not
@@ -418,7 +322,8 @@ namespace Rhino.XmlImpl
 			string elementText = ToString(e);
 			int begin = elementText.IndexOf('"');
 			int end = elementText.LastIndexOf('"');
-			return Sharpen.Runtime.Substring(elementText, begin + 1, end);
+			int index = begin + 1;
+			return elementText.Substring(index, end - index);
 		}
 
 		internal virtual string EscapeTextValue(object value)
@@ -438,7 +343,7 @@ namespace Rhino.XmlImpl
 			string elementText = ToString(e);
 			int begin = elementText.IndexOf('>') + 1;
 			int end = elementText.LastIndexOf('<');
-			return (begin < end) ? Sharpen.Runtime.Substring(elementText, begin, end) : string.Empty;
+			return (begin < end) ? elementText.Substring(begin, end - begin) : string.Empty;
 		}
 
 		private string EscapeElementValue(string s)
@@ -560,3 +465,4 @@ namespace Rhino.XmlImpl
 		}
 	}
 }
+#endif

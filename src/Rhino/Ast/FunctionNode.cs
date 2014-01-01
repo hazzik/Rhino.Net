@@ -69,7 +69,7 @@ namespace Rhino.Ast
 			SETTER
 		}
 
-		private static readonly IList<AstNode> NO_PARAMS = Sharpen.Collections.UnmodifiableList(new List<AstNode>());
+		private static readonly IList<AstNode> NO_PARAMS = new List<AstNode>().AsReadOnly();
 
 		private Name functionName;
 
@@ -381,7 +381,7 @@ namespace Rhino.Ast
 			{
 				liveLocals = new Dictionary<Node, int[]>();
 			}
-			liveLocals [node] = locals;
+			liveLocals[node] = locals;
 		}
 
 		public override int AddFunction(Rhino.Ast.FunctionNode fnNode)

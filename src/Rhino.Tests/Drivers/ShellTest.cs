@@ -9,57 +9,40 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
-using Rhino;
-using Rhino.Drivers;
 using Rhino.Tools.Shell;
 using Sharpen;
+using Thread = System.Threading.Thread;
 
 namespace Rhino.Drivers
 {
 	/// <version>$Id: ShellTest.java,v 1.14 2011/03/29 15:17:49 hannes%helma.at Exp $</version>
 	public class ShellTest
 	{
-		private sealed class _FileFilter_25 : FileFilter
+		public static bool DIRECTORY_FILTER(FileSystemInfo pathname)
 		{
-			public _FileFilter_25()
-			{
-			}
-
-			public bool Accept(FilePath pathname)
-			{
-				return pathname.IsDirectory() && !pathname.GetName().Equals("CVS");
-			}
+			return pathname is DirectoryInfo && !pathname.Name.Equals("CVS");
 		}
 
-		public static readonly FileFilter DIRECTORY_FILTER = new _FileFilter_25();
-
-		private sealed class _FileFilter_32 : FileFilter
+		public static bool TEST_FILTER(FileSystemInfo pathname)
 		{
-			public _FileFilter_32()
-			{
-			}
-
-			public bool Accept(FilePath pathname)
-			{
-				return pathname.GetName().EndsWith(".js") && !pathname.GetName().Equals("shell.js") && !pathname.GetName().Equals("browser.js") && !pathname.GetName().Equals("template.js");
-			}
+			var name = pathname.Name;
+			return name.EndsWith(".js") && !name.Equals("shell.js") && !name.Equals("browser.js") && !name.Equals("template.js");
 		}
-
-		public static readonly FileFilter TEST_FILTER = new _FileFilter_32();
 
 		public static string GetStackTrace(Exception t)
 		{
-			MemoryStream bytes = new MemoryStream();
-			Sharpen.Runtime.PrintStackTrace(t, new TextWriter(bytes));
-			return Sharpen.Runtime.GetStringForBytes(bytes.ToArray());
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			Runtime.PrintStackTrace(t, new StreamWriter(bytes));
+			return Encoding.UTF8.GetString(bytes.ToByteArray());
 		}
 
-		private static void RunFileIfExists(Context cx, Scriptable global, FilePath f)
+		private static void RunFileIfExists(Context cx, Scriptable global, FileInfo f)
 		{
-			if (f.IsFile())
+			if (f.Exists)
 			{
-				Main.ProcessFileNoThrow(cx, global, f.GetPath());
+				Rhino.Tools.Shell.Program.ProcessFileNoThrow(cx, global, f.FullName);
 			}
 		}
 
@@ -67,56 +50,45 @@ namespace Rhino.Drivers
 		{
 			internal bool finished;
 
-			internal ShellTest.ErrorReporterWrapper errors;
+			internal ErrorReporterWrapper errors;
 
 			internal int exitCode = 0;
 		}
-
 		public abstract class Status
 		{
-			private bool negative;
+			public bool Negative { get; set; }
 
-			public void SetNegative()
+			public void HadErrors(JsError[] errors)
 			{
-				this.negative = true;
-			}
-
-			public bool IsNegative()
-			{
-				return this.negative;
-			}
-
-			public void HadErrors(ShellTest.Status.JsError[] errors)
-			{
-				if (!negative && errors.Length > 0)
+				if (!Negative && errors.Length > 0)
 				{
-					Failed("JavaScript errors:\n" + ShellTest.Status.JsError.ToString(errors));
+					Failed("JavaScript errors:\n" + JsError.ToString(errors));
 				}
 				else
 				{
-					if (negative && errors.Length == 0)
+					if (Negative && errors.Length == 0)
 					{
 						Failed("Should have produced runtime error.");
 					}
 				}
 			}
 
-			public void HadErrors(FilePath jsFile, ShellTest.Status.JsError[] errors)
+			public void HadErrors(FileInfo jsFile, JsError[] errors)
 			{
-				if (!negative && errors.Length > 0)
+				if (!Negative && errors.Length > 0)
 				{
-					Failed("JavaScript errors in " + jsFile + ":\n" + ShellTest.Status.JsError.ToString(errors));
+					Failed("JavaScript errors in " + jsFile.FullName + ":\n" + JsError.ToString(errors));
 				}
 				else
 				{
-					if (negative && errors.Length == 0)
+					if (Negative && errors.Length == 0)
 					{
-						Failed("Should have produced runtime error in " + jsFile + ".");
+						Failed("Should have produced runtime error in " + jsFile.FullName + ".");
 					}
 				}
 			}
 
-			public abstract void Running(FilePath jsFile);
+			public abstract void Running(FileInfo jsFile);
 
 			public abstract void Failed(string s);
 
@@ -128,180 +100,9 @@ namespace Rhino.Drivers
 
 			public abstract void OutputWas(string s);
 
-			internal static ShellTest.Status Compose(ShellTest.Status[] array)
+			internal static Status Compose(Status[] array)
 			{
-				return new _Status_96(array);
-			}
-
-			private sealed class _Status_96 : ShellTest.Status
-			{
-				public _Status_96(ShellTest.Status[] array)
-				{
-					this.array = array;
-				}
-
-				public override void Running(FilePath file)
-				{
-					for (int i = 0; i < array.Length; i++)
-					{
-						array[i].Running(file);
-					}
-				}
-
-				public override void Threw(Exception t)
-				{
-					for (int i = 0; i < array.Length; i++)
-					{
-						array[i].Threw(t);
-					}
-				}
-
-				public override void Failed(string s)
-				{
-					for (int i = 0; i < array.Length; i++)
-					{
-						array[i].Failed(s);
-					}
-				}
-
-				public override void ExitCodesWere(int expected, int actual)
-				{
-					for (int i = 0; i < array.Length; i++)
-					{
-						array[i].ExitCodesWere(expected, actual);
-					}
-				}
-
-				public override void OutputWas(string s)
-				{
-					for (int i = 0; i < array.Length; i++)
-					{
-						array[i].OutputWas(s);
-					}
-				}
-
-				public override void TimedOut()
-				{
-					for (int i = 0; i < array.Length; i++)
-					{
-						array[i].TimedOut();
-					}
-				}
-
-				private readonly ShellTest.Status[] array;
-			}
-
-			internal class JsError
-			{
-				internal static string ToString(ShellTest.Status.JsError[] e)
-				{
-					string rv = string.Empty;
-					for (int i = 0; i < e.Length; i++)
-					{
-						rv += e[i].ToString();
-						if (i + 1 != e.Length)
-						{
-							rv += "\n";
-						}
-					}
-					return rv;
-				}
-
-				private string message;
-
-				private string sourceName;
-
-				private int line;
-
-				private string lineSource;
-
-				private int lineOffset;
-
-				internal JsError(string message, string sourceName, int line, string lineSource, int lineOffset)
-				{
-					this.message = message;
-					this.sourceName = sourceName;
-					this.line = line;
-					this.lineSource = lineSource;
-					this.lineOffset = lineOffset;
-				}
-
-				public override string ToString()
-				{
-					string locationLine = string.Empty;
-					if (sourceName != null)
-					{
-						locationLine += sourceName + ":";
-					}
-					if (line != 0)
-					{
-						locationLine += line + ": ";
-					}
-					locationLine += message;
-					string sourceLine = this.lineSource;
-					string errCaret = null;
-					if (lineSource != null)
-					{
-						errCaret = string.Empty;
-						for (int i = 0; i < lineSource.Length; i++)
-						{
-							char c = lineSource[i];
-							if (i < lineOffset - 1)
-							{
-								if (c == '\t')
-								{
-									errCaret += "\t";
-								}
-								else
-								{
-									errCaret += " ";
-								}
-							}
-							else
-							{
-								if (i == lineOffset - 1)
-								{
-									errCaret += "^";
-								}
-							}
-						}
-					}
-					string rv = locationLine;
-					if (sourceLine != null)
-					{
-						rv += "\n" + sourceLine;
-					}
-					if (errCaret != null)
-					{
-						rv += "\n" + errCaret;
-					}
-					return rv;
-				}
-
-				internal virtual string GetMessage()
-				{
-					return message;
-				}
-
-				internal virtual string GetSourceName()
-				{
-					return sourceName;
-				}
-
-				internal virtual int GetLine()
-				{
-					return line;
-				}
-
-				internal virtual string GetLineSource()
-				{
-					return lineSource;
-				}
-
-				internal virtual int GetLineOffset()
-				{
-					return lineOffset;
-				}
+				return new CompositeStatus(array);
 			}
 		}
 
@@ -309,7 +110,7 @@ namespace Rhino.Drivers
 		{
 			private ErrorReporter original;
 
-			private List<ShellTest.Status.JsError> errors = new List<ShellTest.Status.JsError>();
+			public List<ShellTest.JsError> errors = new List<ShellTest.JsError>();
 
 			internal ErrorReporterWrapper(ErrorReporter original)
 			{
@@ -318,7 +119,7 @@ namespace Rhino.Drivers
 
 			private void AddError(string @string, string string0, int i, string string1, int i0)
 			{
-				errors.Add(new ShellTest.Status.JsError(@string, string0, i, string1, i0));
+				errors.Add(new ShellTest.JsError(@string, string0, i, string1, i0));
 			}
 
 			public virtual void Warning(string @string, string string0, int i, string string1, int i0)
@@ -342,30 +143,34 @@ namespace Rhino.Drivers
 			public abstract int GetTimeoutMilliseconds();
 		}
 
-		private static void CallStop(Sharpen.Thread t)
+		private static void CallStop(Thread t)
 		{
-			t.Stop();
+			t.Abort();
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		public static void Run(ShellContextFactory shellContextFactory, FilePath jsFile, ShellTest.Parameters parameters, ShellTest.Status status)
+		public static void Run(ShellContextFactory shellContextFactory, FileInfo jsFile, Parameters parameters, Status status)
 		{
 			Global global = new Global();
 			MemoryStream @out = new MemoryStream();
-			TextWriter p = new TextWriter(@out);
+			TextWriter p = new StreamWriter(@out);
 			global.SetOut(p);
 			global.SetErr(p);
-			global.DefineFunctionProperties(new string[] { "options" }, typeof(ShellTest), ScriptableObject.DONTENUM | ScriptableObject.PERMANENT | ScriptableObject.READONLY);
+			global.DefineFunctionProperties(new[] { "options" }, typeof(ShellTest), ScriptableObject.DONTENUM | ScriptableObject.PERMANENT | ScriptableObject.READONLY);
 			// test suite expects keywords to be disallowed as identifiers
 			shellContextFactory.SetAllowReservedKeywords(false);
-			ShellTest.TestState testState = new ShellTest.TestState();
-			if (jsFile.GetName().EndsWith("-n.js"))
+			TestState testState = new TestState();
+			if (jsFile.Name.EndsWith("-n.js"))
 			{
-				status.SetNegative();
+				status.Negative = true;
 			}
-			Exception[] thrown = new Exception[] { null };
-			Sharpen.Thread t = new Sharpen.Thread(new _Runnable_274(shellContextFactory, thrown, testState, status, jsFile, global), jsFile.GetPath());
-			t.SetDaemon(true);
+			Exception[] thrown = { null };
+			ThreadStart thread = () => Thread(shellContextFactory, jsFile, status, testState, global, thrown);
+			var t = new Thread(thread)
+			{
+				Name = jsFile.Name,
+				IsBackground = true
+			};
 			t.Start();
 			t.Join(parameters.GetTimeoutMilliseconds());
 			lock (testState)
@@ -378,8 +183,8 @@ namespace Rhino.Drivers
 			}
 			int expectedExitCode = 0;
 			p.Flush();
-			status.OutputWas(Sharpen.Runtime.GetStringForBytes(@out.ToArray()));
-			BufferedReader r = new BufferedReader(new StreamReader(new MemoryStream(@out.ToArray())));
+			status.OutputWas(Encoding.UTF8.GetString(@out.ToArray()));
+			StreamReader r = new StreamReader(new MemoryStream(@out.ToArray()));
 			string failures = string.Empty;
 			for (; ; )
 			{
@@ -409,74 +214,49 @@ namespace Rhino.Drivers
 			}
 		}
 
-		private sealed class _Runnable_274 : Runnable
+		private static void Thread(ShellContextFactory shellContextFactory, FileInfo jsFile, Status status, TestState testState, Global global, Exception[] thrown)
 		{
-			public _Runnable_274(ShellContextFactory shellContextFactory, Exception[] thrown, ShellTest.TestState testState, ShellTest.Status status, FilePath jsFile, Global global)
+			try
 			{
-				this.shellContextFactory = shellContextFactory;
-				this.thrown = thrown;
-				this.testState = testState;
-				this.status = status;
-				this.jsFile = jsFile;
-				this.global = global;
+				shellContextFactory.Call(cx => O(jsFile, status, testState, global, cx));
 			}
-
-			public void Run()
+			catch (Exception t2)
 			{
-				try
+				thrown [0] = t2;
+			}
+			finally
+			{
+				lock (testState)
 				{
-					shellContextFactory.Call(cx =>
-					{
-						status.Running(jsFile);
-						testState.errors = new ShellTest.ErrorReporterWrapper(cx.GetErrorReporter());
-						cx.SetErrorReporter(testState.errors);
-						global.Init(cx);
-						try
-						{
-							ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile().GetParentFile().GetParentFile(), "shell.js"));
-							ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile().GetParentFile(), "shell.js"));
-							ShellTest.RunFileIfExists(cx, global, new FilePath(jsFile.GetParentFile(), "shell.js"));
-							ShellTest.RunFileIfExists(cx, global, jsFile);
-							status.HadErrors(jsFile, Sharpen.Collections.ToArray(testState.errors.errors, new ShellTest.Status.JsError[0]));
-						}
-						catch (ThreadAbortException)
-						{
-						}
-						catch (Exception t)
-						{
-							status.Threw(t);
-						}
-						return null;
-					});
-				}
-				catch (Exception t)
-				{
-					thrown[0] = t;
-				}
-				catch (Exception t)
-				{
-					thrown[0] = t;
-				}
-				finally
-				{
-					lock (testState)
-					{
-						testState.finished = true;
-					}
+					testState.finished = true;
 				}
 			}
+		}
 
-			private readonly ShellContextFactory shellContextFactory;
+		private static object O(FileInfo jsFile, Status status, TestState testState, Global global, Context cx)
+		{
+			status.Running(jsFile);
+			testState.errors = new ErrorReporterWrapper(cx.GetErrorReporter());
+			cx.SetErrorReporter(testState.errors);
 
-			private readonly Exception[] thrown;
+			global.Init(cx);
 
-			private readonly ShellTest.TestState testState;
-
-			private readonly ShellTest.Status status;
-
-			private readonly FilePath jsFile;
-
-			private readonly Global global;
+			try
+			{
+				RunFileIfExists(cx, global, new FileInfo(jsFile.DirectoryName + "/../../" + "shell.js"));
+				RunFileIfExists(cx, global, new FileInfo(jsFile.DirectoryName + "/../" + "shell.js"));
+				RunFileIfExists(cx, global, new FileInfo(jsFile.DirectoryName + "/shell.js"));
+				RunFileIfExists(cx, global, jsFile);
+				status.HadErrors(jsFile, testState.errors.errors.ToArray());
+			}
+			catch (ThreadAbortException)
+			{
+			}
+			catch (Exception t1)
+			{
+				status.Threw(t1);
+			}
+			return null;
 		}
 
 		// Global function to mimic options() function in spidermonkey.
@@ -486,6 +266,175 @@ namespace Rhino.Drivers
 		public static string Options()
 		{
 			return string.Empty;
+		}
+		private sealed class CompositeStatus : Status
+		{
+			public CompositeStatus(Status[] array)
+			{
+				this.array = array;
+			}
+
+			public override void Running(FileInfo file)
+			{
+				foreach (Status status in array)
+				{
+					status.Running(file);
+				}
+			}
+
+			public override void Threw(Exception t)
+			{
+				foreach (Status status in array)
+				{
+					status.Threw(t);
+				}
+			}
+
+			public override void Failed(string s)
+			{
+				foreach (Status status in array)
+				{
+					status.Failed(s);
+				}
+			}
+
+			public override void ExitCodesWere(int expected, int actual)
+			{
+				foreach (Status status in array)
+				{
+					status.ExitCodesWere(expected, actual);
+				}
+			}
+
+			public override void OutputWas(string s)
+			{
+				foreach (Status status in array)
+				{
+					status.OutputWas(s);
+				}
+			}
+
+			public override void TimedOut()
+			{
+				foreach (Status status in array)
+				{
+					status.TimedOut();
+				}
+			}
+
+			private readonly Status[] array;
+		}
+		public class JsError
+		{
+			internal static string ToString(JsError[] e)
+			{
+				string rv = String.Empty;
+				for (int i = 0; i < e.Length; i++)
+				{
+					rv += e[i].ToString();
+					if (i + 1 != e.Length)
+					{
+						rv += "\n";
+					}
+				}
+				return rv;
+			}
+
+			private string message;
+
+			private string sourceName;
+
+			private int line;
+
+			private string lineSource;
+
+			private int lineOffset;
+
+			internal JsError(string message, string sourceName, int line, string lineSource, int lineOffset)
+			{
+				this.message = message;
+				this.sourceName = sourceName;
+				this.line = line;
+				this.lineSource = lineSource;
+				this.lineOffset = lineOffset;
+			}
+
+			public override string ToString()
+			{
+				string locationLine = String.Empty;
+				if (sourceName != null)
+				{
+					locationLine += sourceName + ":";
+				}
+				if (line != 0)
+				{
+					locationLine += line + ": ";
+				}
+				locationLine += message;
+				string sourceLine = lineSource;
+				string errCaret = null;
+				if (lineSource != null)
+				{
+					errCaret = String.Empty;
+					for (int i = 0; i < lineSource.Length; i++)
+					{
+						char c = lineSource[i];
+						if (i < lineOffset - 1)
+						{
+							if (c == '\t')
+							{
+								errCaret += "\t";
+							}
+							else
+							{
+								errCaret += " ";
+							}
+						}
+						else
+						{
+							if (i == lineOffset - 1)
+							{
+								errCaret += "^";
+							}
+						}
+					}
+				}
+				string rv = locationLine;
+				if (sourceLine != null)
+				{
+					rv += "\n" + sourceLine;
+				}
+				if (errCaret != null)
+				{
+					rv += "\n" + errCaret;
+				}
+				return rv;
+			}
+
+			internal virtual string GetMessage()
+			{
+				return message;
+			}
+
+			internal virtual string GetSourceName()
+			{
+				return sourceName;
+			}
+
+			internal virtual int GetLine()
+			{
+				return line;
+			}
+
+			internal virtual string GetLineSource()
+			{
+				return lineSource;
+			}
+
+			internal virtual int GetLineOffset()
+			{
+				return lineOffset;
+			}
 		}
 	}
 }

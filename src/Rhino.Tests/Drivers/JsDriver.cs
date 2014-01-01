@@ -5,19 +5,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#if JS_DRIVER
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using Javax.Xml.Parsers;
-using Javax.Xml.Transform;
-using Javax.Xml.Transform.Dom;
-using Javax.Xml.Transform.Stream;
-using Rhino.Drivers;
+using System.Xml.Xsl;
 using Rhino.Tools.Shell;
 using Sharpen;
+using Environment = System.Environment;
 
 namespace Rhino.Drivers
 {
@@ -44,14 +42,14 @@ namespace Rhino.Drivers
 
 		private class Tests
 		{
-			private FilePath testDirectory;
+			private readonly DirectoryInfo testDirectory;
 
-			private string[] list;
+			private readonly string[] list;
 
-			private string[] skip;
+			private readonly string[] skip;
 
 			/// <exception cref="System.IO.IOException"></exception>
-			internal Tests(FilePath testDirectory, string[] list, string[] skip)
+			internal Tests(DirectoryInfo testDirectory, string[] list, string[] skip)
 			{
 				this.testDirectory = testDirectory;
 				this.list = GetTestList(list);
@@ -59,61 +57,57 @@ namespace Rhino.Drivers
 			}
 
 			/// <exception cref="System.IO.IOException"></exception>
-			private string[] GetTestList(string[] tests)
+			private static string[] GetTestList(string[] tests)
 			{
-				List<string> list = new List<string>();
-				for (int i = 0; i < tests.Length; i++)
+				var result = new List<string>();
+				foreach (string t in tests)
 				{
-					if (tests[i].StartsWith("@"))
+					if (t.StartsWith("@"))
 					{
-						TestUtils.AddTestsFromFile(Sharpen.Runtime.Substring(tests[i], 1), list);
+						TestUtils.AddTestsFromFile(t.Substring(1), result);
 					}
 					else
 					{
-						list.Add(tests[i]);
+						result.Add(t);
 					}
 				}
-				return Sharpen.Collections.ToArray(list, new string[0]);
+				return result.ToArray();
 			}
 
 			private bool Matches(string path)
 			{
-				if (list.Length == 0)
-				{
-					return true;
-				}
-				return TestUtils.Matches(list, path);
+				return list.Length == 0 || TestUtils.Matches(list, path);
 			}
 
 			private bool Excluded(string path)
 			{
-				if (skip.Length == 0)
-				{
-					return false;
-				}
-				return TestUtils.Matches(skip, path);
+				return skip.Length != 0 && TestUtils.Matches(skip, path);
 			}
 
-			private void AddFiles(IList<JsDriver.Tests.Script> rv, string prefix, FilePath directory)
+			private void AddFiles(ICollection<Script> rv, string prefix, DirectoryInfo directory)
 			{
-				FilePath[] files = directory.ListFiles();
-				if (files == null)
+				FileSystemInfo[] files = directory.GetFileSystemInfos();
+				foreach (FileSystemInfo file in files)
 				{
-					throw new Exception("files null for " + directory);
-				}
-				for (int i = 0; i < files.Length; i++)
-				{
-					string path = prefix + files[i].GetName();
-					if (ShellTest.DIRECTORY_FILTER.Accept(files[i]))
+					string path = prefix + file.Name;
+					var info = file as DirectoryInfo;
+					if (info != null  )
 					{
-						AddFiles(rv, path + "/", files[i]);
+						if (!file.Name.Equals("CVS"))
+							AddFiles(rv, path + "/", info);
 					}
 					else
 					{
-						bool isTopLevel = prefix.Length == 0;
-						if (ShellTest.TEST_FILTER.Accept(files[i]) && Matches(path) && !Excluded(path) && !isTopLevel)
+						var name = file.Name;
+						if (name.EndsWith(".js") &&
+							!name.Equals("shell.js") &&
+							!name.Equals("browser.js") &&
+							!name.Equals("template.js") &&
+							Matches(path) &&
+							!Excluded(path) &&
+							prefix.Length > 0)
 						{
-							rv.Add(new JsDriver.Tests.Script(path, files[i]));
+							rv.Add(new Script(path, (FileInfo) file));
 						}
 					}
 				}
@@ -121,62 +115,45 @@ namespace Rhino.Drivers
 
 			internal class Script
 			{
-				private string path;
-
-				private FilePath file;
-
-				internal Script(string path, FilePath file)
+				internal Script(string path, FileInfo file)
 				{
-					this.path = path;
-					this.file = file;
+					Path = path;
+					File = file;
 				}
 
-				internal virtual string GetPath()
-				{
-					return path;
-				}
+				internal string Path { get; private set; }
 
-				internal virtual FilePath GetFile()
-				{
-					return file;
-				}
+				internal FileInfo File { get; private set; }
 			}
 
-			internal virtual JsDriver.Tests.Script[] GetFiles()
+			internal virtual Script[] GetFiles()
 			{
-				List<JsDriver.Tests.Script> rv = new List<JsDriver.Tests.Script>();
+				List<Script> rv = new List<Script>();
 				AddFiles(rv, string.Empty, testDirectory);
-				return Sharpen.Collections.ToArray(rv, new JsDriver.Tests.Script[0]);
+				return rv.ToArray();
 			}
 		}
 
 		private class ConsoleStatus : ShellTest.Status
 		{
-			private FilePath jsFile;
+			private FileInfo jsFile;
 
-			private JsDriver.Arguments.Console console;
+			private readonly Arguments.Console console;
 
-			private bool trace;
+			private readonly bool trace;
 
 			private bool failed;
 
-			internal ConsoleStatus(JsDriver.Arguments.Console console, bool trace)
+			internal ConsoleStatus(Arguments.Console console, bool trace)
 			{
 				this.console = console;
 				this.trace = trace;
 			}
 
-			public override void Running(FilePath jsFile)
+			public override void Running(FileInfo jsFile)
 			{
-				try
-				{
-					console.Println("Running: " + jsFile.GetCanonicalPath());
-					this.jsFile = jsFile;
-				}
-				catch (IOException e)
-				{
-					throw new Exception(e);
-				}
+				console.Println("Running: " + jsFile.FullName);
+				this.jsFile = jsFile;
 			}
 
 			public override void Failed(string s)
@@ -228,19 +205,17 @@ namespace Rhino.Drivers
 				node.InnerText = node.InnerText + "\n" + content;
 				return true;
 			}
-			else
+			
+			XmlNodeList children = node.ChildNodes;
+			for (int i = 0; i < children.Count; i++)
 			{
-				XmlNodeList children = node.ChildNodes;
-				for (int i = 0; i < children.Count; i++)
+				if (children.Item(i) is XmlElement)
 				{
-					if (children.Item(i) is XmlElement)
+					XmlElement e = (XmlElement)children.Item(i);
+					bool rv = SetContent(e, id, content);
+					if (rv)
 					{
-						XmlElement e = (XmlElement)children.Item(i);
-						bool rv = SetContent(e, id, content);
-						if (rv)
-						{
-							return true;
-						}
+						return true;
 					}
 				}
 			}
@@ -253,21 +228,21 @@ namespace Rhino.Drivers
 			{
 				return node;
 			}
-			else
+			
+			XmlNodeList children = node.ChildNodes;
+			for (int i = 0; i < children.Count; i++)
 			{
-				XmlNodeList children = node.ChildNodes;
-				for (int i = 0; i < children.Count; i++)
+				var element = children.Item(i) as XmlElement;
+				if (element != null)
 				{
-					if (children.Item(i) is XmlElement)
+					XmlElement rv = GetElementById(element, id);
+					if (rv != null)
 					{
-						XmlElement rv = GetElementById((XmlElement)children.Item(i), id);
-						if (rv != null)
-						{
-							return rv;
-						}
+						return rv;
 					}
 				}
 			}
+
 			return null;
 		}
 
@@ -298,15 +273,15 @@ namespace Rhino.Drivers
 
 		private class HtmlStatus : ShellTest.Status
 		{
-			private string testPath;
+			private readonly string testPath;
 
-			private string bugUrl;
+			private readonly string bugUrl;
 
-			private string lxrUrl;
+			private readonly string lxrUrl;
 
-			private XmlDocument html;
+			private readonly XmlDocument html;
 
-			private XmlElement failureHtml;
+			private readonly XmlElement failureHtml;
 
 			private bool failed;
 
@@ -321,7 +296,7 @@ namespace Rhino.Drivers
 				this.failureHtml = failureHtml;
 			}
 
-			public override void Running(FilePath file)
+			public override void Running(FileInfo file)
 			{
 			}
 
@@ -354,16 +329,16 @@ namespace Rhino.Drivers
 
 			public override void OutputWas(string s)
 			{
-				this.output = s;
+				output = s;
 			}
 
 			private string GetLinesStartingWith(string prefix)
 			{
-				BufferedReader r = new BufferedReader(new StringReader(output));
-				string line = null;
+				StringReader r = new StringReader(output);
 				string rv = string.Empty;
 				try
 				{
+					string line;
 					while ((line = r.ReadLine()) != null)
 					{
 						if (line.StartsWith(prefix))
@@ -383,12 +358,12 @@ namespace Rhino.Drivers
 				}
 			}
 
-			internal virtual bool Failed()
+			internal bool Failed()
 			{
 				return failed;
 			}
 
-			internal virtual void Finish()
+			internal void Finish()
 			{
 				if (failed)
 				{
@@ -397,7 +372,7 @@ namespace Rhino.Drivers
 					XmlElement bnlink = GetElementById(failureHtml, "failureDetails.bug.href");
 					if (bn.Length > 0)
 					{
-						string number = Sharpen.Runtime.Substring(bn, "BUGNUMBER: ".Length);
+						string number = bn.Substring("BUGNUMBER: ".Length);
 						if (!number.Equals("none"))
 						{
 							bnlink.SetAttribute("href", bugUrl + number);
@@ -422,20 +397,20 @@ namespace Rhino.Drivers
 
 		private class XmlStatus : ShellTest.Status
 		{
-			private XmlElement target;
+			private readonly XmlElement target;
 
 			private DateTime start;
 
 			internal XmlStatus(string path, XmlElement root)
 			{
-				this.target = root.OwnerDocument.CreateElement("test");
-				this.target.SetAttribute("path", path);
+				target = root.OwnerDocument.CreateElement("test");
+				target.SetAttribute("path", path);
 				root.AppendChild(target);
 			}
 
-			public override void Running(FilePath file)
+			public override void Running(FileInfo file)
 			{
-				this.start = new DateTime();
+				start = new DateTime();
 			}
 
 			private XmlElement CreateElement(XmlElement parent, string name)
@@ -449,7 +424,7 @@ namespace Rhino.Drivers
 			{
 				DateTime end = new DateTime();
 				long elapsed = end.GetTime() - start.GetTime();
-				this.target.SetAttribute("elapsed", elapsed.ToString());
+				target.SetAttribute("elapsed", elapsed.ToString());
 			}
 
 			private void SetTextContent(XmlElement e, string content)
@@ -495,13 +470,13 @@ namespace Rhino.Drivers
 
 		private class Results
 		{
-			private ShellContextFactory factory;
+			private readonly ShellContextFactory factory;
 
-			private JsDriver.Arguments arguments;
+			private readonly Arguments arguments;
 
-			private FilePath output;
+			private readonly FileInfo output;
 
-			private bool trace;
+			private readonly bool trace;
 
 			private XmlDocument html;
 
@@ -515,32 +490,21 @@ namespace Rhino.Drivers
 
 			private int failures;
 
-			internal Results(ShellContextFactory factory, JsDriver.Arguments arguments, bool trace)
+			internal Results(ShellContextFactory factory, Arguments arguments, bool trace)
 			{
 				this.factory = factory;
 				this.arguments = arguments;
-				FilePath output = arguments.GetOutputFile();
-				if (output == null)
-				{
-					output = new FilePath("rhino-test-results." + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").Format(new DateTime()) + ".html");
-				}
+				FileInfo output = arguments.GetOutputFile() ??
+								  new FileInfo(string.Format("rhino-test-results.{0:yyyy.MM.dd.HH.mm.ss}.html", DateTime.Now));
 				this.output = output;
 				this.trace = trace;
 			}
 
 			private XmlDocument Parse(Stream @in)
 			{
-				try
-				{
-					DocumentBuilderFactory factory = DocumentBuilderFactory.NewInstance();
-					factory.SetValidating(false);
-					DocumentBuilder dom = factory.NewDocumentBuilder();
-					return dom.Parse(@in);
-				}
-				catch (Exception t)
-				{
-					throw new Exception("Parser failure", t);
-				}
+				var document = new XmlDocument();
+				document.Load(@in);
+				return document;
 			}
 
 			private XmlDocument GetTemplate()
@@ -552,21 +516,21 @@ namespace Rhino.Drivers
 			{
 				try
 				{
-					FilePath output = this.output;
+					FileInfo output = this.output;
 					TransformerFactory factory = TransformerFactory.NewInstance();
 					Transformer xform = factory.NewTransformer();
 					if (xml)
 					{
 						xform.SetOutputProperty(OutputKeys.METHOD, "xml");
 						xform.SetOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-						output = new FilePath(output.GetCanonicalPath() + ".xml");
+						output = new FileInfo(output.FullName + ".xml");
 					}
-					xform.Transform(new DOMSource(template), new StreamResult(new FileOutputStream(output)));
+					xform.Transform(new DOMSource(template), new StreamResult(new FileOutputStream(new FilePath(output.FullName))));
 				}
 				catch (IOException e)
 				{
 					arguments.GetConsole().Println("Could not write results file to " + output + ": ");
-					Sharpen.Runtime.PrintStackTrace(e, System.Console.Error);
+					Console.Error.WriteLine (e);
 				}
 				catch (TransformerConfigurationException e)
 				{
@@ -580,13 +544,13 @@ namespace Rhino.Drivers
 
 			internal virtual void Start()
 			{
-				this.html = GetTemplate();
-				this.failureHtml = GetElementById(html.DocumentElement, "failureDetails.prototype");
-				if (this.failureHtml == null)
+				html = GetTemplate();
+				failureHtml = GetElementById(html.DocumentElement, "failureDetails.prototype");
+				if (failureHtml == null)
 				{
 					try
 					{
-						TransformerFactory.NewInstance().NewTransformer().Transform(new DOMSource(html), new StreamResult(System.Console.Error));
+						TransformerFactory.NewInstance().NewTransformer().Transform(new DOMSource(html), new StreamResult(Console.Error));
 					}
 					catch (Exception t)
 					{
@@ -594,10 +558,10 @@ namespace Rhino.Drivers
 					}
 					throw new Exception("No");
 				}
-				this.failureHtml.ParentNode.RemoveChild(this.failureHtml);
+				failureHtml.ParentNode.RemoveChild(failureHtml);
 				try
 				{
-					this.xml = DocumentBuilderFactory.NewInstance().NewDocumentBuilder().GetDOMImplementation().CreateDocument(null, "results", null);
+					xml = DocumentBuilderFactory.NewInstance().NewDocumentBuilder().GetDOMImplementation().CreateDocument(null, "results", null);
 					xml.DocumentElement.SetAttribute("timestamp", new DateTime().GetTime().ToString());
 					xml.DocumentElement.SetAttribute("optimization", arguments.GetOptimizationLevel().ToString());
 					xml.DocumentElement.SetAttribute("strict", arguments.IsStrict().ToString());
@@ -607,25 +571,18 @@ namespace Rhino.Drivers
 				{
 					throw new Exception(e);
 				}
-				this.start = new DateTime();
+				start = new DateTime();
 			}
 
-			internal virtual void Run(JsDriver.Tests.Script script, ShellTest.Parameters parameters)
+			internal virtual void Run(Tests.Script script, ShellTest.Parameters parameters)
 			{
-				string path = script.GetPath();
-				FilePath test = script.GetFile();
-				JsDriver.ConsoleStatus cStatus = new JsDriver.ConsoleStatus(arguments.GetConsole(), trace);
-				JsDriver.HtmlStatus hStatus = new JsDriver.HtmlStatus(arguments.GetLxrUrl(), arguments.GetBugUrl(), path, html, (XmlElement)failureHtml.CloneNode(true));
-				JsDriver.XmlStatus xStatus = new JsDriver.XmlStatus(path, this.xml.DocumentElement);
+				string path = script.Path;
+				FileInfo test = script.File;
+				ConsoleStatus cStatus = new ConsoleStatus(arguments.GetConsole(), trace);
+				HtmlStatus hStatus = new HtmlStatus(arguments.GetLxrUrl(), arguments.GetBugUrl(), path, html, (XmlElement)failureHtml.CloneNode(true));
+				XmlStatus xStatus = new XmlStatus(path, xml.DocumentElement);
 				ShellTest.Status status = ShellTest.Status.Compose(new ShellTest.Status[] { cStatus, hStatus, xStatus });
-				try
-				{
-					ShellTest.Run(factory, test, parameters, status);
-				}
-				catch (Exception e)
-				{
-					throw new Exception(e);
-				}
+				ShellTest.Run(factory, test, parameters, status);
 				tests++;
 				if (hStatus.Failed())
 				{
@@ -634,7 +591,7 @@ namespace Rhino.Drivers
 				hStatus.Finish();
 			}
 
-			private void Set(XmlDocument document, string id, string value)
+			private static void Set(XmlDocument document, string id, string value)
 			{
 				GetElementById(document.DocumentElement, id).InnerText = value;
 			}
@@ -645,10 +602,10 @@ namespace Rhino.Drivers
 				long elapsedMs = end.GetTime() - start.GetTime();
 				Set(html, "results.testlist", Join(arguments.GetTestList()));
 				Set(html, "results.skiplist", Join(arguments.GetSkipList()));
-				string pct = new DecimalFormat("##0.00").Format((double)failures / (double)tests * 100.0);
+				string pct = string.Format("{0:##0.00}", (double)failures / tests * 100.0);
 				Set(html, "results.results", "Tests attempted: " + tests + " Failures: " + failures + " (" + pct + "%)");
 				Set(html, "results.platform", "java.home=" + Runtime.GetProperty("java.home") + "\n" + "java.version=" + Runtime.GetProperty("java.version") + "\n" + "os.name=" + Runtime.GetProperty("os.name"));
-				Set(html, "results.classpath", Runtime.GetProperty("java.class.path").Replace(FilePath.pathSeparatorChar, ' '));
+				Set(html, "results.classpath", Runtime.GetProperty("java.class.path").Replace(Path.PathSeparator, ' '));
 				int elapsedSeconds = (int)(elapsedMs / 1000);
 				int elapsedMinutes = elapsedSeconds / 60;
 				elapsedSeconds = elapsedSeconds % 60;
@@ -662,7 +619,7 @@ namespace Rhino.Drivers
 
 		private class ShellTestParameters : ShellTest.Parameters
 		{
-			private int timeout;
+			private readonly int timeout;
 
 			internal ShellTestParameters(int timeout)
 			{
@@ -676,72 +633,69 @@ namespace Rhino.Drivers
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		internal virtual void Run(JsDriver.Arguments arguments)
+		internal virtual void Run(Arguments arguments)
 		{
 			if (arguments.Help())
 			{
-				System.Console.Out.WriteLine("See mozilla/js/tests/README-jsDriver.html; note that some options are not supported.");
-				System.Console.Out.WriteLine("Consult the Java source code at testsrc/org/mozilla/javascript/JsDriver.java for details.");
-				System.Environment.Exit(0);
+				Console.Out.WriteLine("See mozilla/js/tests/README-jsDriver.html; note that some options are not supported.");
+				Console.Out.WriteLine("Consult the Java source code at testsrc/org/mozilla/javascript/JsDriver.java for details.");
+				Environment.Exit(0);
 			}
 			ShellContextFactory factory = new ShellContextFactory();
 			factory.SetOptimizationLevel(arguments.GetOptimizationLevel());
 			factory.SetStrictMode(arguments.IsStrict());
-			FilePath path = arguments.GetTestsPath();
-			if (path == null)
+			DirectoryInfo path = arguments.GetTestsPath() ??
+								 new DirectoryInfo("../tests");
+			if (!path.Exists)
 			{
-				path = new FilePath("../tests");
+				throw new Exception("JavaScript tests not found at " + path.FullName);
 			}
-			if (!path.Exists())
-			{
-				throw new Exception("JavaScript tests not found at " + path.GetCanonicalPath());
-			}
-			JsDriver.Tests tests = new JsDriver.Tests(path, arguments.GetTestList(), arguments.GetSkipList());
-			JsDriver.Tests.Script[] all = tests.GetFiles();
+			Tests tests = new Tests(path, arguments.GetTestList(), arguments.GetSkipList());
+			Tests.Script[] all = tests.GetFiles();
 			arguments.GetConsole().Println("Running " + all.Length + " tests.");
-			JsDriver.Results results = new JsDriver.Results(factory, arguments, arguments.Trace());
+			Results results = new Results(factory, arguments, arguments.Trace());
 			results.Start();
-			for (int i = 0; i < all.Length; i++)
+			foreach (var t in all)
 			{
-				results.Run(all[i], new JsDriver.ShellTestParameters(arguments.GetTimeout()));
+				results.Run(t, new ShellTestParameters(arguments.GetTimeout()));
 			}
 			results.Finish();
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		public static void Main(JsDriver.Arguments arguments)
+		public static void Main(Arguments arguments)
 		{
 			JsDriver driver = new JsDriver();
 			driver.Run(arguments);
 		}
 
-		private class Arguments
+		public class Arguments
 		{
-			private List<JsDriver.Arguments.Option> options = new List<JsDriver.Arguments.Option>();
+			private readonly List<Option> options = new List<Option>();
 
-			private JsDriver.Arguments.Option bugUrl;
+			private readonly Option bugUrl;
 
-			private JsDriver.Arguments.Option optimizationLevel;
+			private readonly Option optimizationLevel;
 
-			private JsDriver.Arguments.Option strict;
+			private readonly Option strict;
 
-			private JsDriver.Arguments.Option outputFile;
+			private readonly Option outputFile;
 
-			private JsDriver.Arguments.Option help;
+			private readonly Option help;
 
-			private JsDriver.Arguments.Option logFailuresToConsole;
+			private readonly Option logFailuresToConsole;
 
-			private JsDriver.Arguments.Option testList;
+			private readonly Option testList;
 
-			private JsDriver.Arguments.Option skipList;
+			private readonly Option skipList;
 
-			private JsDriver.Arguments.Option testsPath;
+			private readonly Option testsPath;
 
-			private JsDriver.Arguments.Option trace;
+			private readonly Option trace;
 
-			private JsDriver.Arguments.Option lxrUrl;
+			private readonly Option lxrUrl;
 
-			private JsDriver.Arguments.Option timeout;
+			private readonly Option timeout;
 
 			public class Console
 			{
@@ -756,21 +710,21 @@ namespace Rhino.Drivers
 				}
 			}
 
-			private JsDriver.Arguments.Console console = new JsDriver.Arguments.Console();
+			private readonly Console console = new Console();
 
-			private class Option
+			private sealed class Option
 			{
-				private string letterOption;
+				private readonly string letterOption;
 
-				private string wordOption;
+				private readonly string wordOption;
 
-				private bool array;
+				private readonly bool array;
 
-				private bool flag;
+				private readonly bool flag;
 
 				private bool ignored;
 
-				private List<string> values = new List<string>();
+				private readonly List<string> values = new List<string>();
 
 				internal Option(Arguments _enclosing, string letterOption, string wordOption, bool array, bool flag, string unspecified)
 				{
@@ -783,72 +737,72 @@ namespace Rhino.Drivers
 					this.array = array;
 					if (!flag && !array)
 					{
-						this.values.Add(unspecified);
+						values.Add(unspecified);
 					}
 					this._enclosing.options.Add(this);
 				}
 
-				internal virtual JsDriver.Arguments.Option Ignored()
+				internal Option Ignored()
 				{
-					this.ignored = true;
+					ignored = true;
 					return this;
 				}
 
-				internal virtual int GetInt()
+				internal int GetInt()
 				{
-					return System.Convert.ToInt32(this.GetValue());
+					return Convert.ToInt32(GetValue());
 				}
 
-				internal virtual string GetValue()
+				internal string GetValue()
 				{
-					return this.values[0];
+					return values[0];
 				}
 
-				internal virtual bool GetSwitch()
+				internal bool GetSwitch()
 				{
-					return this.values.Count > 0;
+					return values.Count > 0;
 				}
 
-				internal virtual FilePath GetFile()
+				internal FileInfo GetFile()
 				{
-					if (this.GetValue() == null)
+					if (GetValue() == null)
 					{
 						return null;
 					}
-					return new FilePath(this.GetValue());
+					return new FileInfo(GetValue());
 				}
 
-				internal virtual string[] GetValues()
+				internal string[] GetValues()
 				{
-					return Sharpen.Collections.ToArray(this.values, new string[0]);
+					return values.ToArray();
 				}
 
-				internal virtual void Process(IList<string> arguments)
+				internal void Process(IList<string> arguments)
 				{
 					string option = arguments[0];
-					string dashLetter = (this.letterOption == null) ? (string)null : "-" + this.letterOption;
-					if (option.Equals(dashLetter) || option.Equals("--" + this.wordOption))
+					string dashLetter = (letterOption == null) ? (string)null : "-" + letterOption;
+					if (option.Equals(dashLetter) || option.Equals("--" + wordOption))
 					{
 						arguments.Remove(0);
-						if (this.flag)
+						if (flag)
 						{
-							this.values.Add(0, (string)null);
+							values.Insert(0, null);
 						}
 						else
 						{
-							if (this.array)
+							if (array)
 							{
 								while (arguments.Count > 0 && !arguments[0].StartsWith("-"))
 								{
-									this.values.Add(arguments.Remove(0));
+									values.Add(arguments.Remove(0));
 								}
 							}
 							else
 							{
-								this.values.Set(0, arguments.Remove(0));
+								values.Set(0, arguments.Remove(0));
 							}
 						}
-						if (this.ignored)
+						if (ignored)
 						{
 							System.Console.Error.WriteLine("WARNING: " + option + " is ignored in the Java version of the test driver.");
 						}
@@ -881,7 +835,7 @@ namespace Rhino.Drivers
 			}
 
 			//    -f FILE, --file=FILE
-			public virtual FilePath GetOutputFile()
+			public virtual FileInfo GetOutputFile()
 			{
 				return outputFile.GetFile();
 			}
@@ -915,7 +869,7 @@ namespace Rhino.Drivers
 			}
 
 			//    -p PATH, --testpath=PATH
-			public virtual FilePath GetTestsPath()
+			public virtual DirectoryInfo GetTestsPath()
 			{
 				return testsPath.GetFile();
 			}
@@ -944,7 +898,7 @@ namespace Rhino.Drivers
 				return timeout.GetInt();
 			}
 
-			public virtual JsDriver.Arguments.Console GetConsole()
+			public virtual Console GetConsole()
 			{
 				return console;
 			}
@@ -957,10 +911,11 @@ namespace Rhino.Drivers
 					if (option.StartsWith("--"))
 					{
 						//    preprocess --name=value options into --name value
-						if (option.IndexOf("=") != -1)
+						var indexOfEq = option.IndexOf("=", StringComparison.Ordinal);
+						if (indexOfEq != -1)
 						{
-							arguments.Set(0, Sharpen.Runtime.Substring(option, option.IndexOf("=")));
-							arguments.Add(1, Sharpen.Runtime.Substring(option, option.IndexOf("=") + 1));
+							arguments.Set(0, option.Substring(indexOfEq));
+							arguments.Insert(1, option.Substring(indexOfEq + 1));
 						}
 					}
 					else
@@ -972,9 +927,9 @@ namespace Rhino.Drivers
 							{
 								for (int i = 2; i < option.Length; i++)
 								{
-									arguments.Add(1, "-" + Sharpen.Runtime.Substring(option, i, i + 1));
+									arguments.Insert(1, "-" + option.Substring(i, i + 1 - i));
 								}
-								arguments.Set(0, Sharpen.Runtime.Substring(option, 0, 2));
+								arguments.Set(0, option.Substring(0, 2 - 0));
 							}
 						}
 					}
@@ -995,18 +950,18 @@ namespace Rhino.Drivers
 
 			public Arguments()
 			{
-				bugUrl = new JsDriver.Arguments.Option(this, "b", "bugurl", false, false, "http://bugzilla.mozilla.org/show_bug.cgi?id=");
-				optimizationLevel = new JsDriver.Arguments.Option(this, "o", "optimization", false, false, "-1");
-				strict = new JsDriver.Arguments.Option(this, null, "strict", false, true, null);
-				outputFile = new JsDriver.Arguments.Option(this, "f", "file", false, false, null);
-				help = new JsDriver.Arguments.Option(this, "h", "help", false, true, null);
-				logFailuresToConsole = new JsDriver.Arguments.Option(this, "k", "confail", false, true, null);
-				testList = new JsDriver.Arguments.Option(this, "l", "list", true, false, null);
-				skipList = new JsDriver.Arguments.Option(this, "L", "neglist", true, false, null);
-				testsPath = new JsDriver.Arguments.Option(this, "p", "testpath", false, false, null);
-				trace = new JsDriver.Arguments.Option(this, "t", "trace", false, true, null);
-				lxrUrl = new JsDriver.Arguments.Option(this, "u", "lxrurl", false, false, "http://lxr.mozilla.org/mozilla/source/js/tests/");
-				timeout = new JsDriver.Arguments.Option(this, null, "timeout", false, false, "60000");
+				bugUrl = new Option(this, "b", "bugurl", false, false, "http://bugzilla.mozilla.org/show_bug.cgi?id=");
+				optimizationLevel = new Option(this, "o", "optimization", false, false, "-1");
+				strict = new Option(this, null, "strict", false, true, null);
+				outputFile = new Option(this, "f", "file", false, false, null);
+				help = new Option(this, "h", "help", false, true, null);
+				logFailuresToConsole = new Option(this, "k", "confail", false, true, null);
+				testList = new Option(this, "l", "list", true, false, null);
+				skipList = new Option(this, "L", "neglist", true, false, null);
+				testsPath = new Option(this, "p", "testpath", false, false, null);
+				trace = new Option(this, "t", "trace", false, true, null);
+				lxrUrl = new Option(this, "u", "lxrurl", false, false, "http://lxr.mozilla.org/mozilla/source/js/tests/");
+				timeout = new Option(this, null, "timeout", false, false, "60000");
 			}
 		}
 
@@ -1014,10 +969,12 @@ namespace Rhino.Drivers
 		public static void Main(string[] args)
 		{
 			List<string> arguments = new List<string>();
-			Sharpen.Collections.AddAll(arguments, Arrays.AsList(args));
-			JsDriver.Arguments clArguments = new JsDriver.Arguments();
+			arguments.AddRange(args);
+			Arguments clArguments = new Arguments();
 			clArguments.Process(arguments);
 			Main(clArguments);
 		}
 	}
 }
+
+#endif

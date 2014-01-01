@@ -7,10 +7,12 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
-using Rhino;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
+using Rhino.Drivers;
 using Rhino.Tests.CommonJS.Module;
 using Sharpen;
 
@@ -18,67 +20,54 @@ namespace Rhino.Tests.CommonJS.Module
 {
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: ComplianceTest.java,v 1.1 2011/04/07 22:24:37 hannes%helma.at Exp $</version>
-	[NUnit.Framework.TestFixture]
+	[TestFixture(Description = "InteroperableJS tests")]
 	public class ComplianceTest
 	{
-		/// <exception cref="System.Exception"></exception>
-		public static TestSuite Suite()
-		{
-			TestSuite suite = new TestSuite("InteroperableJS tests");
-			Uri url = typeof(ComplianceTest).GetResource("1.0");
-			string path = URLDecoder.Decode(url.GetFile(), Runtime.GetProperty("file.encoding"));
-			FilePath testsDir = new FilePath(path);
-			AddTests(suite, testsDir, string.Empty);
-			return suite;
-		}
+//		/// <exception cref="System.Exception"></exception>
+//		public static TestSuite Suite()
+//		{
+//			TestSuite suite = new TestSuite("InteroperableJS tests");
+//			Uri url = typeof(ComplianceTest).GetResource("1.0");
+//			string path = URLDecoder.Decode(url.GetFile(), Runtime.GetProperty("file.encoding"));
+//			DirectoryInfo testsDir = new DirectoryInfo(path);
+//			AddTests(suite, testsDir, string.Empty);
+//			return suite;
+//		}
 
-		private static void AddTests(TestSuite suite, FilePath testDir, string name)
+		private static void AddTests(TestSuite suite, DirectoryInfo testDir, string name)
 		{
-			FilePath programFile = new FilePath(testDir, "program.js");
-			if (programFile.IsFile())
+			FileInfo programFile = new FileInfo(testDir.FullName + "/" + "program.js");
+			if (programFile.Exists)
 			{
-				suite.AddTest(CreateTest(testDir, name));
+				suite.AddTest(new ComplianceTestCase(testDir, name));
 			}
 			else
 			{
-				FilePath[] files = testDir.ListFiles();
-				foreach (FilePath file in files)
+				DirectoryInfo[] files = testDir.GetDirectories();
+				foreach (DirectoryInfo directory in files)
 				{
-					if (file.IsDirectory())
-					{
-						AddTests(suite, file, name + "/" + file.GetName());
-					}
+					AddTests(suite, directory, name + "/" + directory.Name);
 				}
 			}
 		}
 
-		private static NUnit.Framework.Test CreateTest(FilePath testDir, string name)
+		private sealed class ComplianceTestCase : TestCase
 		{
-			return new _TestCase_54(testDir, name);
-		}
-
-		private sealed class _TestCase_54 : TestCase
-		{
-			public _TestCase_54(FilePath testDir, string baseArg1) : base(baseArg1)
+			public ComplianceTestCase(DirectoryInfo testDir, string baseArg1) : base(baseArg1)
 			{
 				this.testDir = testDir;
 			}
 
-			public override int CountTestCases()
-			{
-				return 1;
-			}
-
 			/// <exception cref="System.Exception"></exception>
-			public override void RunBare()
+			public void RunBare()
 			{
 				Context cx = Context.Enter();
 				try
 				{
 					cx.SetOptimizationLevel(-1);
 					Scriptable scope = cx.InitStandardObjects();
-					ScriptableObject.PutProperty(scope, "print", new ComplianceTest.Print(scope));
-					ComplianceTest.CreateRequire(testDir, cx, scope).RequireMain(cx, "program");
+					ScriptableObject.PutProperty(scope, "print", new Print(scope));
+					CreateRequire(testDir, cx, scope).RequireMain(cx, "program");
 				}
 				finally
 				{
@@ -86,35 +75,41 @@ namespace Rhino.Tests.CommonJS.Module
 				}
 			}
 
-			private readonly FilePath testDir;
+			private readonly DirectoryInfo testDir;
 		}
 
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
-		private static Require CreateRequire(FilePath dir, Context cx, Scriptable scope)
+		private static Require CreateRequire(DirectoryInfo dir, Context cx, Scriptable scope)
 		{
-			return new Require(cx, scope, new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections<>.Singleton(dir.GetAbsoluteFile().ToURI()), Collections<>.Singleton(new Uri(typeof(ComplianceTest).GetResource(".").ToExternalForm() + "/")))), null, null, false);
+			return new Require(cx,
+				scope,
+				new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(new List<Uri>(1) { new Uri(dir.FullName) },
+					new List<Uri>(1) { new Uri(typeof (ComplianceTest).GetResource(".") + "/") })),
+				null,
+				null,
+				false);
 		}
 
-		[System.Serializable]
-		private class Print : ScriptableObject, Function
+		[Serializable]
+		private sealed class Print : ScriptableObject, Function
 		{
 			internal Print(Scriptable scope)
 			{
-				SetPrototype(ScriptableObject.GetFunctionPrototype(scope));
+				SetPrototype(GetFunctionPrototype(scope));
 			}
 
-			public virtual object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
+			public object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 			{
 				if (args.Length > 1 && "fail".Equals(args[1]))
 				{
-					throw new AssertionFailedError(args[0].ToString());
+					throw new AssertionException(args[0].ToString());
 				}
 				return null;
 			}
 
-			public virtual Scriptable Construct(Context cx, Scriptable scope, object[] args)
+			public Scriptable Construct(Context cx, Scriptable scope, object[] args)
 			{
-				throw new AssertionFailedError("Shouldn't be invoked as constructor");
+				throw new AssertionException("Shouldn't be invoked as constructor");
 			}
 
 			public override string GetClassName()

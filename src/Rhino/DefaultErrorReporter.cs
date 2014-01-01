@@ -57,7 +57,7 @@ namespace Rhino
 				if (message.StartsWith(prefix))
 				{
 					error = TYPE_ERROR_NAME;
-					message = Sharpen.Runtime.Substring(message, prefix.Length);
+					message = message.Substring(prefix.Length);
 				}
 				throw ScriptRuntime.ConstructError(error, message, sourceURI, line, lineText, lineOffset);
 			}

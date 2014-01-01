@@ -7,9 +7,6 @@
  */
 
 using NUnit.Framework;
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
 
 namespace Rhino.Tests
 {
@@ -113,7 +110,7 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void GetIndexIdsShouldIncludeIdsLessThan2ToThe32()
 		{
-			int maxIndex = (int)(1L << 31) - 1;
+			int maxIndex = int.MaxValue;
 			array.Put(maxIndex, array, "a");
 			NUnit.Framework.Assert.That(array.GetIndexIds(), Is.EqualTo(new int[] { maxIndex }));
 		}

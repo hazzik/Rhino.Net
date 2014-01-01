@@ -125,12 +125,12 @@ namespace Rhino.CommonJS.Module.Provider
 	{
 		/// <summary>
 		/// A special return value for
-		/// <see cref="LoadSource(string, Rhino.Scriptable, object)">LoadSource(string, Rhino.Scriptable, object)</see>
+		/// <see cref="LoadSource(string, Scriptable, object)">LoadSource(string, Rhino.Scriptable, object)</see>
 		/// and
 		/// <see cref="LoadSource(System.Uri, System.Uri, object)">LoadSource(System.Uri, System.Uri, object)</see>
 		/// that signifies that the
 		/// cached representation is still valid according to the passed validator.
 		/// </summary>
-		public const ModuleSource NOT_MODIFIED = new ModuleSource(null, null, null, null, null);
+		public static readonly ModuleSource NOT_MODIFIED = new ModuleSource(null, null, null, null, null);
 	}
 }

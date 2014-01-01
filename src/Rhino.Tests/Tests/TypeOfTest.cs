@@ -6,9 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
+using System;
+using NUnit.Framework;
 
 namespace Rhino.Tests
 {
@@ -19,24 +18,22 @@ namespace Rhino.Tests
 	/// Includes fix and test for https://bugzilla.mozilla.org/show_bug.cgi?id=453360
 	/// </remarks>
 	/// <author>Marc Guillemot</author>
-	[NUnit.Framework.TestFixture]
-	public class TypeOfTest
+	[TestFixture]
+	public sealed class TypeOfTest
 	{
-		[System.Serializable]
+		[Serializable]
 		public class Foo : ScriptableObject
 		{
-			private const long serialVersionUID = -8771045033217033529L;
+			private readonly string _typeOfValue;
 
-			private readonly string typeOfValue_;
-
-			public Foo(string _typeOfValue)
+			public Foo(string typeOfValue)
 			{
-				typeOfValue_ = _typeOfValue;
+				_typeOfValue = typeOfValue;
 			}
 
 			public override string GetTypeOf()
 			{
-				return typeOfValue_;
+				return _typeOfValue;
 			}
 
 			public override string GetClassName()
@@ -47,17 +44,17 @@ namespace Rhino.Tests
 
 		/// <summary>ECMA 11.4.3 says that typeof on host object is Implementation-dependent</summary>
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestCustomizeTypeOf()
+		[Test]
+		public void TestCustomizeTypeOf()
 		{
-			TestCustomizeTypeOf("object", new TypeOfTest.Foo("object"));
-			TestCustomizeTypeOf("blabla", new TypeOfTest.Foo("blabla"));
+			TestCustomizeTypeOf("object", new Foo("object"));
+			TestCustomizeTypeOf("blabla", new Foo("blabla"));
 		}
 
 		/// <summary>ECMA 11.4.3 says that typeof on host object is Implementation-dependent</summary>
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void Test0()
+		[Test]
+		public void Test0()
 		{
 			Function f = new Test0Function();
 			DoTest("function", cx =>
@@ -88,8 +85,8 @@ namespace Rhino.Tests
 
 		/// <summary>See https://bugzilla.mozilla.org/show_bug.cgi?id=453360</summary>
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestBug453360()
+		[Test]
+		public void TestBug453360()
 		{
 			DoTest("object", "typeof new RegExp();");
 			DoTest("object", "typeof /foo/;");
@@ -111,14 +108,14 @@ namespace Rhino.Tests
 			DoTest(1, expected, action);
 		}
 
-		private void DoTest(int optimizationLevel, string expected, ContextAction action)
+		private static void DoTest(int optimizationLevel, string expected, ContextAction action)
 		{
 			object o = new ContextFactory().Call(cx =>
 			{
 				cx.SetOptimizationLevel(optimizationLevel);
 				return Context.ToString(action(cx));
 			});
-			NUnit.Framework.Assert.AreEqual(expected, o);
+			Assert.AreEqual(expected, o);
 		}
 	}
 }

@@ -49,8 +49,6 @@ namespace Rhino
 	[System.Serializable]
 	public class ImporterTopLevel : TopLevel
 	{
-		internal const long serialVersionUID = -9095380847465315412L;
-
 		private static readonly object IMPORTER_TAG = "Importer";
 
 		public ImporterTopLevel()
@@ -223,7 +221,7 @@ namespace Rhino
 		private void ImportClass(NativeJavaClass cl)
 		{
 			string s = cl.GetClassObject().FullName;
-			string n = Sharpen.Runtime.Substring(s, s.LastIndexOf('.') + 1);
+			string n = s.Substring(s.LastIndexOf('.') + 1);
 			object val = Get(n, this);
 			if (val != ScriptableConstants.NOT_FOUND && val != cl)
 			{

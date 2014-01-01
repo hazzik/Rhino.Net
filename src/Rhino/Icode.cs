@@ -13,7 +13,7 @@ using Sharpen;
 namespace Rhino
 {
 	/// <summary>Additional interpreter-specific codes</summary>
-	internal abstract class Icode
+	public abstract class Icode
 	{
 		internal const int Icode_DELNAME = 0;
 

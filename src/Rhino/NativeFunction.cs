@@ -88,7 +88,7 @@ namespace Rhino
 		/// <returns>The next yielded value (if any)</returns>
 		public virtual object ResumeGenerator(Context cx, Scriptable scope, int operation, object state, object value)
 		{
-			throw new EvaluatorException("resumeGenerator() not implemented");
+			throw new EvaluatorException("ResumeGenerator() not implemented");
 		}
 
 		protected internal abstract int GetLanguageVersion();

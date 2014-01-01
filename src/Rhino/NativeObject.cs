@@ -9,7 +9,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Rhino;
+using System.Linq;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -20,11 +21,9 @@ namespace Rhino
 	/// See ECMA 15.2.
 	/// </remarks>
 	/// <author>Norris Boyd</author>
-	[System.Serializable]
-	public class NativeObject : IdScriptableObject, IDictionary
+	[Serializable]
+	public class NativeObject : IdScriptableObject, IDictionary, IDictionary<object, object>
 	{
-		internal const long serialVersionUID = -6345305608474346996L;
-
 		private static readonly object OBJECT_TAG = "Object";
 
 		internal static void Init(Scriptable scope, bool @sealed)
@@ -38,9 +37,24 @@ namespace Rhino
 			return "Object";
 		}
 
+		public IEnumerator<KeyValuePair<object, object>> GetEnumerator()
+		{
+			throw new NotImplementedException();
+		}
+
+		void IDictionary.Remove(object key)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string ToString()
 		{
 			return ScriptRuntime.DefaultObjectToString(this);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		protected internal override void FillConstructorProperties(IdFunctionObject ctor)
@@ -193,7 +207,7 @@ namespace Rhino
 						if (L != 0 && s[0] == '(' && s[L - 1] == ')')
 						{
 							// Strip () that surrounds toSource
-							s = Sharpen.Runtime.Substring(s, 1, L - 1);
+							s = s.Substring(1, L - 2);
 						}
 						return s;
 					}
@@ -246,7 +260,7 @@ namespace Rhino
 							{
 								ScriptableObject so = (ScriptableObject)thisObj;
 								int attrs = so.GetAttributes(index);
-								result = ((attrs & ScriptableObject.DONTENUM) == 0);
+								result = ((attrs & DONTENUM) == 0);
 							}
 						}
 						else
@@ -256,7 +270,7 @@ namespace Rhino
 							{
 								ScriptableObject so = (ScriptableObject)thisObj;
 								int attrs = so.GetAttributes(s);
-								result = ((attrs & ScriptableObject.DONTENUM) == 0);
+								result = ((attrs & DONTENUM) == 0);
 							}
 						}
 					}
@@ -440,7 +454,7 @@ namespace Rhino
 					object arg = args.Length < 1 ? Undefined.instance : args[0];
 					Scriptable obj = (arg == null) ? null : EnsureScriptable(arg);
 					ScriptableObject newObject = new NativeObject();
-					newObject.SetParentScope(this.GetParentScope());
+					newObject.SetParentScope(GetParentScope());
 					newObject.SetPrototype(obj);
 					if (args.Length > 1 && args[1] != Undefined.instance)
 					{
@@ -537,26 +551,23 @@ namespace Rhino
 			}
 		}
 
-		// methods implementing java.util.Map
 		public virtual bool ContainsKey(object key)
 		{
-			if (key is string)
+			var stringKey = key as string;
+			if (stringKey != null)
 			{
-				return Has((string)key, this);
+				return Has(stringKey, this);
 			}
-			else
+			if (key.IsNumber())
 			{
-				if (key.IsNumber())
-				{
-					return Has(System.Convert.ToInt32(key), this);
-				}
+				return Has(Convert.ToInt32(key), this);
 			}
 			return false;
 		}
 
 		public virtual bool ContainsValue(object value)
 		{
-			foreach (object obj in ((ICollection<object>)Values))
+			foreach (object obj in Values)
 			{
 				if (value == obj || value != null && value.Equals(obj))
 				{
@@ -566,50 +577,79 @@ namespace Rhino
 			return false;
 		}
 
-		public virtual object Remove(object key)
+		IDictionaryEnumerator IDictionary.GetEnumerator()
 		{
-			object value = Get(key);
-			if (key is string)
+			throw new NotImplementedException();
+		}
+
+		public virtual bool Remove(object key)
+		{
+			var stringKey = key as string;
+			if (stringKey != null)
 			{
-				Delete((string)key);
+				Delete(stringKey);
 			}
 			else
 			{
 				if (key.IsNumber())
 				{
-					Delete(System.Convert.ToInt32(key));
+					Delete(Convert.ToInt32(key));
 				}
 			}
-			return value;
+			return true;
+		}
+
+		public bool TryGetValue(object key, out object value)
+		{
+			if (!ContainsKey(key))
+			{
+				value = null;
+				return false;
+			}
+			else
+			{
+				value = Get(key);
+				return true;
+			}
+		}
+
+		public object this[object key]
+		{
+			get { return Get(key); }
+			set { throw new NotSupportedException(); }
 		}
 
 		public virtual ICollection<object> Keys
 		{
-			get
-			{
-				return new NativeObject.KeySet(this);
-			}
+			get { return new KeyCollection(this); }
+		}
+
+		ICollection IDictionary.Values
+		{
+			get { return new ValueCollection(this); }
+		}
+
+		ICollection IDictionary.Keys
+		{
+			get { return new KeyCollection(this); }
 		}
 
 		public virtual ICollection<object> Values
 		{
-			get
-			{
-				return new NativeObject.ValueCollection(this);
-			}
+			get { return new ValueCollection(this); }
 		}
 
-		public virtual ICollection<KeyValuePair<object, object>> EntrySet()
+		public bool Contains(object key)
 		{
-			return new NativeObject.EntrySet(this);
+			return ContainsKey(key);
 		}
 
-		public virtual object Put(object key, object value)
+		public void Add(object key, object value)
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual void PutAll(IDictionary m)
+		public void Add(KeyValuePair<object, object> item)
 		{
 			throw new NotSupportedException();
 		}
@@ -619,257 +659,194 @@ namespace Rhino
 			throw new NotSupportedException();
 		}
 
-		internal class EntrySet : AbstractSet<KeyValuePair<object, object>>
+		public bool Contains(KeyValuePair<object, object> item)
 		{
-			public override IEnumerator<KeyValuePair<object, object>> GetEnumerator()
-			{
-				return new _IEnumerator_483(this);
-			}
-
-			private sealed class _IEnumerator_483 : IEnumerator<KeyValuePair<object, object>>
-			{
-				public _IEnumerator_483(EntrySet _enclosing)
-				{
-					this._enclosing = _enclosing;
-					this.ids = this._enclosing._enclosing.GetIds();
-					this.key = null;
-					this.index = 0;
-				}
-
-				internal object[] ids;
-
-				internal object key;
-
-				internal int index;
-
-				public bool HasNext()
-				{
-					return this.index < this.ids.Length;
-				}
-
-				public KeyValuePair<object, object> Next()
-				{
-					object ekey = this.key = this.ids[this.index++];
-					object value = this._enclosing._enclosing.Get(this.key);
-					return new _KeyValuePair_495(ekey, value);
-				}
-
-				private sealed class _KeyValuePair_495 : KeyValuePair<object, object>
-				{
-					public _KeyValuePair_495(object ekey, object value)
-					{
-						this.ekey = ekey;
-						this.value = value;
-					}
-
-					public object Key
-					{
-						get
-						{
-							return ekey;
-						}
-					}
-
-					public object Value
-					{
-						get
-						{
-							return value;
-						}
-					}
-
-					public object SetValue(object value)
-					{
-						throw new NotSupportedException();
-					}
-
-					public override bool Equals(object other)
-					{
-						if (!(other is DictionaryEntry))
-						{
-							return false;
-						}
-						DictionaryEntry e = (DictionaryEntry)other;
-						return (ekey == null ? e.Key == null : ekey.Equals(e.Key)) && (value == null ? e.Value == null : value.Equals(e.Value));
-					}
-
-					public override int GetHashCode()
-					{
-						return (ekey == null ? 0 : ekey.GetHashCode()) ^ (value == null ? 0 : value.GetHashCode());
-					}
-
-					public override string ToString()
-					{
-						return ekey + "=" + value;
-					}
-
-					private readonly object ekey;
-
-					private readonly object value;
-				}
-
-				public void Remove()
-				{
-					if (this.key == null)
-					{
-						throw new InvalidOperationException();
-					}
-					Sharpen.Collections.Remove(this._enclosing._enclosing, this.key);
-					this.key = null;
-				}
-
-				private readonly EntrySet _enclosing;
-			}
-
-			public override int Count
-			{
-				get
-				{
-					return this._enclosing.Size();
-				}
-			}
-
-			internal EntrySet(NativeObject _enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
-
-			private readonly NativeObject _enclosing;
+			object value;
+			return TryGetValue(item.Key, out value) && value == item.Value;
 		}
 
-		internal class KeySet : AbstractSet<object>
+		public void CopyTo(KeyValuePair<object, object>[] array, int arrayIndex)
 		{
-			public override bool Contains(object key)
-			{
-				return this._enclosing.ContainsKey(key);
-			}
-
-			public override IEnumerator<object> GetEnumerator()
-			{
-				return new _IEnumerator_553(this);
-			}
-
-			private sealed class _IEnumerator_553 : IEnumerator<object>
-			{
-				public _IEnumerator_553(KeySet _enclosing)
-				{
-					this._enclosing = _enclosing;
-					this.ids = this._enclosing._enclosing.GetIds();
-					this.index = 0;
-				}
-
-				internal object[] ids;
-
-				internal object key;
-
-				internal int index;
-
-				public bool HasNext()
-				{
-					return this.index < this.ids.Length;
-				}
-
-				public object Next()
-				{
-					try
-					{
-						return (this.key = this.ids[this.index++]);
-					}
-					catch (IndexOutOfRangeException)
-					{
-						this.key = null;
-						throw new NoSuchElementException();
-					}
-				}
-
-				public void Remove()
-				{
-					if (this.key == null)
-					{
-						throw new InvalidOperationException();
-					}
-					Sharpen.Collections.Remove(this._enclosing._enclosing, this.key);
-					this.key = null;
-				}
-
-				private readonly KeySet _enclosing;
-			}
-
-			public override int Count
-			{
-				get
-				{
-					return this._enclosing.Size();
-				}
-			}
-
-			internal KeySet(NativeObject _enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
-
-			private readonly NativeObject _enclosing;
+			throw new NotImplementedException();
 		}
 
-		internal class ValueCollection : AbstractCollection<object>
+		public bool Remove(KeyValuePair<object, object> item)
 		{
-			public override IEnumerator<object> GetEnumerator()
+			throw new NotImplementedException();
+		}
+
+		public void CopyTo(Array array, int index)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Count
+		{
+			get { return Size(); }
+		}
+
+		public object SyncRoot
+		{
+			get { return this; }
+		}
+
+		public bool IsSynchronized
+		{
+			get { return false; }
+		}
+
+		public bool IsReadOnly
+		{
+			get { return false; }
+		}
+
+		public bool IsFixedSize
+		{
+			get { return false; }
+		}
+
+		private class KeyCollection : ICollection<object>, ICollection
+		{
+			void ICollection<object>.Add(object item)
 			{
-				return new _IEnumerator_591(this);
+				throw new NotSupportedException();
 			}
 
-			private sealed class _IEnumerator_591 : IEnumerator<object>
+			void ICollection<object>.Clear()
 			{
-				public _IEnumerator_591(ValueCollection _enclosing)
-				{
-					this._enclosing = _enclosing;
-					this.ids = this._enclosing._enclosing.GetIds();
-					this.index = 0;
-				}
-
-				internal object[] ids;
-
-				internal object key;
-
-				internal int index;
-
-				public bool HasNext()
-				{
-					return this.index < this.ids.Length;
-				}
-
-				public object Next()
-				{
-					return this._enclosing._enclosing.Get((this.key = this.ids[this.index++]));
-				}
-
-				public void Remove()
-				{
-					if (this.key == null)
-					{
-						throw new InvalidOperationException();
-					}
-					Sharpen.Collections.Remove(this._enclosing._enclosing, this.key);
-					this.key = null;
-				}
-
-				private readonly ValueCollection _enclosing;
+				throw new NotSupportedException();
 			}
 
-			public override int Count
+			bool ICollection<object>.Contains(object key)
 			{
-				get
+				return _obj.ContainsKey(key);
+			}
+
+			void ICollection<object>.CopyTo(object[] array, int arrayIndex)
+			{
+				throw new NotImplementedException();
+			}
+
+			bool ICollection<object>.Remove(object item)
+			{
+				throw new NotSupportedException();
+			}
+
+			public IEnumerator<object> GetEnumerator()
+			{
+				return ((IEnumerable<object>) _obj.GetIds()).GetEnumerator();
+			}
+
+			void ICollection.CopyTo(Array array, int index)
+			{
+				throw new NotImplementedException();
+			}
+
+			public int Count
+			{
+				get { return _obj.Size(); }
+			}
+
+			object ICollection.SyncRoot
+			{
+				get { return _obj.SyncRoot; }
+			}
+
+			bool ICollection.IsSynchronized
+			{
+				get { return false; }
+			}
+
+			bool ICollection<object>.IsReadOnly
+			{
+				get { return true; }
+			}
+
+			internal KeyCollection(NativeObject obj)
+			{
+				_obj = obj;
+			}
+
+			private readonly NativeObject _obj;
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
+		}
+
+		private class ValueCollection : ICollection<object>, ICollection
+		{
+			public IEnumerator<object> GetEnumerator()
+			{
+				var ids = _obj.GetIds();
+				var index = 0;
+				while (index < ids.Length)
 				{
-					return this._enclosing.Size();
+					yield return _obj.Get(ids[index++]);
 				}
 			}
 
-			internal ValueCollection(NativeObject _enclosing)
+			void ICollection<object>.Add(object item)
 			{
-				this._enclosing = _enclosing;
+				throw new NotSupportedException();
 			}
 
-			private readonly NativeObject _enclosing;
+			void ICollection<object>.Clear()
+			{
+				throw new NotSupportedException();
+			}
+
+			bool ICollection<object>.Contains(object item)
+			{
+				return Enumerable.Contains(this, item);
+			}
+
+			void ICollection<object>.CopyTo(object[] array, int arrayIndex)
+			{
+				throw new NotImplementedException();
+			}
+
+			bool ICollection<object>.Remove(object item)
+			{
+				throw new NotSupportedException();
+			}
+
+			void ICollection.CopyTo(Array array, int index)
+			{
+				throw new NotImplementedException();
+			}
+
+			public int Count
+			{
+				get { return _obj.Size(); }
+			}
+
+			object ICollection.SyncRoot
+			{
+				get { return _obj.SyncRoot; }
+			}
+
+			bool ICollection.IsSynchronized
+			{
+				get { return false; }
+			}
+
+			bool ICollection<object>.IsReadOnly
+			{
+				get { return true; }
+			}
+
+			internal ValueCollection(NativeObject obj)
+			{
+				_obj = obj;
+			}
+
+			private readonly NativeObject _obj;
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
 		}
 
 		// #string_id_map#

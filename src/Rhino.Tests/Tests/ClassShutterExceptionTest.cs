@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using NUnit.Framework;
 using Rhino;
 using Rhino.Tests;
 using Sharpen;
@@ -58,7 +59,7 @@ namespace Rhino.Tests
 		{
 			try
 			{
-				Helper("java.lang.System.out.println('hi');");
+				Helper("System.Console.WriteLine('hi');");
 				NUnit.Framework.Assert.Fail();
 			}
 			catch (RhinoException)

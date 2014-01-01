@@ -43,7 +43,7 @@ namespace Rhino
 
 		private void Init()
 		{
-			itsICode = new byte[INITIAL_MAX_ICODE_LENGTH];
+			itsICode = new sbyte[INITIAL_MAX_ICODE_LENGTH];
 			itsStringTable = new string[INITIAL_STRINGTABLE_SIZE];
 		}
 
@@ -63,7 +63,7 @@ namespace Rhino
 
 		internal object[] itsRegExpLiterals;
 
-		internal byte[] itsICode;
+		internal sbyte[] itsICode;
 
 		internal int[] itsExceptionTable;
 

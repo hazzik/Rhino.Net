@@ -10,8 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
-using Rhino;
+using Rhino.Annotations;
 using Sharpen;
 
 namespace Rhino
@@ -28,11 +29,11 @@ namespace Rhino
 		/// </remarks>
 		internal class JavaAdapterSignature
 		{
-			internal Type superClass;
+			private Type superClass;
 
-			internal Type[] interfaces;
+			private Type[] interfaces;
 
-			internal ObjToIntMap names;
+			private ObjToIntMap names;
 
 			internal JavaAdapterSignature(Type superClass, Type[] interfaces, ObjToIntMap names)
 			{
@@ -43,11 +44,11 @@ namespace Rhino
 
 			public override bool Equals(object obj)
 			{
-				if (!(obj is JavaAdapter.JavaAdapterSignature))
+				if (!(obj is JavaAdapterSignature))
 				{
 					return false;
 				}
-				JavaAdapter.JavaAdapterSignature sig = (JavaAdapter.JavaAdapterSignature)obj;
+				JavaAdapterSignature sig = (JavaAdapterSignature)obj;
 				if (superClass != sig.superClass)
 				{
 					return false;
@@ -113,6 +114,7 @@ namespace Rhino
 			throw f.Unknown();
 		}
 
+		[UsedImplicitly]
 		public static object ConvertResult(object result, Type c)
 		{
 			if (result == Undefined.instance && (c != ScriptRuntime.ObjectClass && c != ScriptRuntime.StringClass))
@@ -123,6 +125,7 @@ namespace Rhino
 			return Context.JsToJava(result, c);
 		}
 
+		[UsedImplicitly]
 		public static Scriptable CreateAdapterWrapper(Scriptable obj, object adapter)
 		{
 			Scriptable scope = ScriptableObject.GetTopLevelScope(obj);
@@ -135,7 +138,7 @@ namespace Rhino
 		/// <exception cref="System.MemberAccessException"></exception>
 		public static object GetAdapterSelf(Type adapterClass, object adapter)
 		{
-			FieldInfo self = Sharpen.Runtime.GetDeclaredField(adapterClass, "self");
+			FieldInfo self = adapterClass.GetDeclaredField("self");
 			return self.GetValue(adapter);
 		}
 
@@ -192,7 +195,7 @@ namespace Rhino
 				superClass = ScriptRuntime.ObjectClass;
 			}
 			Type[] interfaces = new Type[interfaceCount];
-			System.Array.Copy(intfs, 0, interfaces, 0, interfaceCount);
+			Array.Copy(intfs, 0, interfaces, 0, interfaceCount);
 			// next argument is implementation, must be scriptable
 			Scriptable obj = ScriptableObject.EnsureScriptable(args[classCount]);
 			Type adapterClass = GetAdapterClass(scope, superClass, interfaces, obj);
@@ -208,7 +211,7 @@ namespace Rhino
 					object[] ctorArgs = new object[argsCount + 2];
 					ctorArgs[0] = obj;
 					ctorArgs[1] = cx.GetFactory();
-					System.Array.Copy(args, classCount + 1, ctorArgs, 2, argsCount);
+					Array.Copy(args, classCount + 1, ctorArgs, 2, argsCount);
 					// TODO: cache class wrapper?
 					NativeJavaClass classWrapper = new NativeJavaClass(scope, adapterClass, true);
 					NativeJavaMethod ctors = classWrapper.members.ctors;
@@ -268,10 +271,10 @@ namespace Rhino
 				@out.WriteObject(delegee);
 				return;
 			}
-			catch (MemberAccessException)
+			catch (MissingFieldException)
 			{
 			}
-			catch (MissingFieldException)
+			catch (MemberAccessException)
 			{
 			}
 			throw new IOException();
@@ -292,12 +295,12 @@ namespace Rhino
 			{
 				factory = null;
 			}
-			Type superClass = Sharpen.Runtime.GetType((string)@in.ReadObject());
+			Type superClass = Runtime.GetType((string)@in.ReadObject());
 			string[] interfaceNames = (string[])@in.ReadObject();
 			Type[] interfaces = new Type[interfaceNames.Length];
 			for (int i = 0; i < interfaceNames.Length; i++)
 			{
-				interfaces[i] = Sharpen.Runtime.GetType(interfaceNames[i]);
+				interfaces[i] = Runtime.GetType(interfaceNames[i]);
 			}
 			Scriptable delegee = (Scriptable)@in.ReadObject();
 			Type adapterClass = GetAdapterClass(self, superClass, interfaces, delegee);
@@ -310,13 +313,13 @@ namespace Rhino
 			catch (InstantiationException)
 			{
 			}
+			catch (MissingMethodException)
+			{
+			}
 			catch (MemberAccessException)
 			{
 			}
 			catch (TargetInvocationException)
-			{
-			}
-			catch (MissingMethodException)
 			{
 			}
 			throw new TypeLoadException("adapter");
@@ -351,72 +354,76 @@ namespace Rhino
 		private static Type GetAdapterClass(Scriptable scope, Type superClass, Type[] interfaces, Scriptable obj)
 		{
 			ClassCache cache = ClassCache.Get(scope);
-			IDictionary<JavaAdapter.JavaAdapterSignature, Type> generated = cache.GetInterfaceAdapterCacheMap();
+			IDictionary<JavaAdapterSignature, Type> generated = cache.GetInterfaceAdapterCacheMap();
 			ObjToIntMap names = GetObjectFunctionNames(obj);
-			JavaAdapter.JavaAdapterSignature sig;
-			sig = new JavaAdapter.JavaAdapterSignature(superClass, interfaces, names);
+			var sig = new JavaAdapterSignature(superClass, interfaces, names);
 			Type adapterClass = generated.Get(sig);
 			if (adapterClass == null)
 			{
 				string adapterName = "adapter" + cache.NewClassSerialNumber();
-				byte[] code = CreateAdapterCode(names, adapterName, superClass, interfaces, null);
-				adapterClass = LoadAdapterClass(adapterName, code);
+				adapterClass = CreateAdapterCode(names, adapterName, superClass, interfaces, null);
 				if (cache.IsCachingEnabled())
 				{
-					generated [sig] = adapterClass;
+					generated[sig] = adapterClass;
 				}
 			}
 			return adapterClass;
 		}
 
-		public static byte[] CreateAdapterCode(ObjToIntMap functionNames, string adapterName, Type superClass, Type[] interfaces, string scriptClassName)
+		public static Type CreateAdapterCode(ObjToIntMap functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName)
 		{
-			ClassFileWriter cfw = new ClassFileWriter(adapterName, superClass.FullName, "<adapter>");
-			cfw.AddField("factory", "Lorg/mozilla/javascript/ContextFactory;", (short)(ClassFileWriter.ACC_PUBLIC | ClassFileWriter.ACC_FINAL));
-			cfw.AddField("delegee", "Lorg/mozilla/javascript/Scriptable;", (short)(ClassFileWriter.ACC_PUBLIC | ClassFileWriter.ACC_FINAL));
-			cfw.AddField("self", "Lorg/mozilla/javascript/Scriptable;", (short)(ClassFileWriter.ACC_PUBLIC | ClassFileWriter.ACC_FINAL));
-			int interfacesCount = interfaces == null ? 0 : interfaces.Length;
-			for (int i = 0; i < interfacesCount; i++)
+			interfaces = interfaces ?? Type.EmptyTypes;
+
+			var type = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("TempAssembly" + DateTime.Now.Millisecond), AssemblyBuilderAccess.Run)
+				.DefineDynamicModule("TempModule" + DateTime.Now.Millisecond)
+				.DefineType(name, TypeAttributes.Public, baseType);
+
+			var factory = type.DefineField("factory", typeof (ContextFactory), FieldAttributes.Public | FieldAttributes.InitOnly);
+			var delegee = type.DefineField("delegee", typeof(Scriptable), FieldAttributes.Public | FieldAttributes.InitOnly);
+			var self = type.DefineField("self", typeof (Scriptable), FieldAttributes.Public | FieldAttributes.InitOnly);
+
+			foreach (var @interface in interfaces)
 			{
-				if (interfaces[i] != null)
+				if (@interface != null)
 				{
-					cfw.AddInterface(interfaces[i].FullName);
+					type.AddInterfaceImplementation(@interface);
 				}
 			}
-			string superName = superClass.FullName.Replace('.', '/');
-			ConstructorInfo[] ctors = superClass.GetDeclaredConstructors();
-			foreach (ConstructorInfo ctor in ctors)
+
+			foreach (var ctor in baseType.GetDeclaredConstructors())
 			{
 				if (ctor.IsPublic || ctor.IsFamily)
 				{
-					GenerateCtor(cfw, adapterName, superName, ctor);
+					GenerateCtor(type, ctor, factory, delegee, self);
 				}
 			}
-			GenerateSerialCtor(cfw, adapterName, superName);
+
+			GenerateSerialCtor(type, baseType, factory, delegee, self);
+
 			if (scriptClassName != null)
 			{
-				GenerateEmptyCtor(cfw, adapterName, superName, scriptClassName);
+				GenerateEmptyCtor(type, type, baseType, scriptClassName);
 			}
 			ObjToIntMap generatedOverrides = new ObjToIntMap();
 			ObjToIntMap generatedMethods = new ObjToIntMap();
+			
 			// generate methods to satisfy all specified interfaces.
-			for (int i_1 = 0; i_1 < interfacesCount; i_1++)
+			foreach (Type @interface in interfaces)
 			{
-				MethodInfo[] methods = interfaces[i_1].GetMethods();
-				for (int j = 0; j < methods.Length; j++)
+				MethodInfo[] methods = @interface.GetMethods();
+				foreach (MethodInfo method in methods)
 				{
-					MethodInfo method = methods[j];
 					if (method.IsStatic || method.IsFinal)
 					{
 						continue;
 					}
 					string methodName = method.Name;
-					Type[] argTypes = Sharpen.Runtime.GetParameterTypes(method);
+					Type[] argTypes = method.GetParameterTypes();
 					if (!functionNames.Has(methodName))
 					{
 						try
 						{
-							superClass.GetMethod(methodName, argTypes);
+							baseType.GetMethod(methodName, argTypes);
 							// The class we're extending implements this method and
 							// the JavaScript object doesn't have an override. See
 							// bug 61226.
@@ -433,19 +440,18 @@ namespace Rhino
 					string methodKey = methodName + methodSignature;
 					if (!generatedOverrides.Has(methodKey))
 					{
-						GenerateMethod(cfw, adapterName, methodName, argTypes, method.ReturnType, true);
+						GenerateMethod(type, methodName, argTypes, method.ReturnType, true, factory, delegee, self);
 						generatedOverrides.Put(methodKey, 0);
 						generatedMethods.Put(methodName, 0);
 					}
 				}
 			}
+
 			// Now, go through the superclass's methods, checking for abstract
 			// methods or additional methods to override.
 			// generate any additional overrides that the object might contain.
-			MethodInfo[] methods_1 = GetOverridableMethods(superClass);
-			for (int j_1 = 0; j_1 < methods_1.Length; j_1++)
+			foreach (MethodInfo method in GetOverridableMethods(baseType))
 			{
-				MethodInfo method = methods_1[j_1];
 				// if a method is marked abstract, must implement it or the
 				// resulting class won't be instantiable. otherwise, if the object
 				// has a property of the same name, then an override is intended.
@@ -455,25 +461,26 @@ namespace Rhino
 				{
 					// make sure to generate only one instance of a particular
 					// method/signature.
-					Type[] argTypes = Sharpen.Runtime.GetParameterTypes(method);
+					Type[] argTypes = method.GetParameterTypes();
 					string methodSignature = GetMethodSignature(method, argTypes);
 					string methodKey = methodName + methodSignature;
 					if (!generatedOverrides.Has(methodKey))
 					{
-						GenerateMethod(cfw, adapterName, methodName, argTypes, method.ReturnType, true);
+						GenerateMethod(type, methodName, argTypes, method.ReturnType, true, factory, delegee, self);
 						generatedOverrides.Put(methodKey, 0);
 						generatedMethods.Put(methodName, 0);
 						// if a method was overridden, generate a "super$method"
 						// which lets the delegate call the superclass' version.
 						if (!isAbstractMethod)
 						{
-							GenerateSuper(cfw, adapterName, superName, methodName, methodSignature, argTypes, method.ReturnType);
+							GenerateSuper(type, methodName, argTypes, method);
 						}
 					}
 				}
 			}
-			// Generate Java methods for remaining properties that are not
+			// Generate Java methods for remaining properties that are not 
 			// overrides.
+
 			ObjToIntMap.Iterator iter = new ObjToIntMap.Iterator(functionNames);
 			for (iter.Start(); !iter.Done(); iter.Next())
 			{
@@ -488,94 +495,64 @@ namespace Rhino
 				{
 					parms[k] = ScriptRuntime.ObjectClass;
 				}
-				GenerateMethod(cfw, adapterName, functionName, parms, ScriptRuntime.ObjectClass, false);
+				GenerateMethod(type, functionName, parms, ScriptRuntime.ObjectClass, false, factory, delegee, self);
 			}
-			return cfw.ToByteArray();
+			return type.CreateType();
 		}
 
-		internal static MethodInfo[] GetOverridableMethods(Type clazz)
+		internal static IEnumerable<MethodInfo> GetOverridableMethods(Type type)
 		{
-			List<MethodInfo> list = new List<MethodInfo>();
-			HashSet<string> skip = new HashSet<string>();
+			var list = new List<MethodInfo>();
+			var skip = new HashSet<string>();
 			// Check superclasses before interfaces so we always choose
 			// implemented methods over abstract ones, even if a subclass
 			// re-implements an interface already implemented in a superclass
 			// (e.g. java.util.ArrayList)
-			for (Type c = clazz; c != null; c = c.BaseType)
+			for (Type t = type; t != null; t = t.BaseType)
 			{
-				AppendOverridableMethods(c, list, skip);
+				AppendOverridableMethods(t, list, skip);
 			}
-			for (Type c_1 = clazz; c_1 != null; c_1 = c_1.BaseType)
+			for (var t = type; t != null; t = t.BaseType)
 			{
-				foreach (Type intf in c_1.GetInterfaces())
+				foreach (Type @interface in t.GetInterfaces())
 				{
-					AppendOverridableMethods(intf, list, skip);
+					AppendOverridableMethods(@interface, list, skip);
 				}
 			}
-			return Sharpen.Collections.ToArray(list, new MethodInfo[list.Count]);
+			return list.ToArray();
 		}
 
-		private static void AppendOverridableMethods(Type c, List<MethodInfo> list, HashSet<string> skip)
+		private static void AppendOverridableMethods(Type c, IList<MethodInfo> list, ICollection<string> skip)
 		{
-			MethodInfo[] methods = Sharpen.Runtime.GetDeclaredMethods(c);
-			for (int i = 0; i < methods.Length; i++)
+			foreach (var method in c.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
 			{
-				string methodKey = methods[i].Name + GetMethodSignature(methods[i], Sharpen.Runtime.GetParameterTypes(methods[i]));
+				string methodKey = method.Name + GetMethodSignature(method, method.GetParameterTypes());
 				if (skip.Contains(methodKey))
 				{
 					continue;
 				}
 				// skip this method
-				if (methods[i].IsStatic)
+				if (!method.IsStatic)
 				{
-					continue;
-				}
-				if (methods[i].IsFinal)
-				{
-					// Make sure we don't add a final method to the list
-					// of overridable methods.
-					skip.Add(methodKey);
-					continue;
-				}
-				if (methods[i].IsPublic || methods[i].IsFamily)
-				{
-					list.Add(methods[i]);
-					skip.Add(methodKey);
+					if (method.IsVirtual)
+					{
+						if (method.IsPublic || method.IsFamily)
+						{
+							list.Add(method);
+							skip.Add(methodKey);
+						}
+					}
+					else
+					{
+						// Make sure we don't add a final method to the list
+						// of overridable methods.
+						skip.Add(methodKey);
+					}
 				}
 			}
 		}
 
-		internal static Type LoadAdapterClass(string className, byte[] classBytes)
-		{
-			object staticDomain;
-			Type domainClass = SecurityController.GetStaticSecurityDomainClass();
-			if (domainClass == typeof(CodeSource) || domainClass == typeof(ProtectionDomain))
-			{
-				// use the calling script's security domain if available
-				ProtectionDomain protectionDomain = SecurityUtilities.GetScriptProtectionDomain();
-				if (protectionDomain == null)
-				{
-					protectionDomain = typeof(JavaAdapter).GetProtectionDomain();
-				}
-				if (domainClass == typeof(CodeSource))
-				{
-					staticDomain = protectionDomain == null ? null : protectionDomain.GetCodeSource();
-				}
-				else
-				{
-					staticDomain = protectionDomain;
-				}
-			}
-			else
-			{
-				staticDomain = null;
-			}
-			GeneratedClassLoader loader = SecurityController.CreateLoader(null, staticDomain);
-			Type result = loader.DefineClass(className, classBytes);
-			loader.LinkClass(result);
-			return result;
-		}
-
+		[UsedImplicitly]
 		public static Function GetFunction(Scriptable obj, string functionName)
 		{
 			object x = ScriptableObject.GetProperty(obj, functionName);
@@ -603,6 +580,7 @@ namespace Rhino
 		/// Utility method which dynamically binds a Context to the current thread,
 		/// if none already exists.
 		/// </remarks>
+		[UsedImplicitly]
 		public static object CallMethod(ContextFactory factory, Scriptable thisObj, Function f, object[] args, long argsToWrap)
 		{
 			if (f == null)
@@ -626,7 +604,7 @@ namespace Rhino
 			}
 			else
 			{
-				return factory.Call(c => DoCall(c, scope, thisObj, f, args, argsToWrap));
+				return factory.Call(context => DoCall(context, scope, thisObj, f, args, argsToWrap));
 			}
 		}
 
@@ -647,6 +625,7 @@ namespace Rhino
 			return f.Call(cx, scope, thisObj, args);
 		}
 
+		[UsedImplicitly]
 		public static Scriptable RunScript(Script script)
 		{
 			return (Scriptable) ContextFactory.GetGlobal().Call(cx =>
@@ -657,134 +636,121 @@ namespace Rhino
 			});
 		}
 
-		private static void GenerateCtor(ClassFileWriter cfw, string adapterName, string superName, ConstructorInfo superCtor)
+		private static void GenerateCtor(TypeBuilder tb, ConstructorInfo baseTypeConstructor, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
-			short locals = 3;
-			// this + factory + delegee
-			Type[] parameters = superCtor.GetParameterTypes();
+			Type[] baseParameterTypes = baseTypeConstructor.GetParameterTypes();
 			// Note that we swapped arguments in app-facing constructors to avoid
 			// conflicting signatures with serial constructor defined below.
-			if (parameters.Length == 0)
+
+			var parameterTypes = new Type[2 + baseParameterTypes.Length];
+			parameterTypes[0] = typeof (Scriptable);
+			parameterTypes[1] = typeof (ContextFactory);
+			Array.Copy(baseParameterTypes, 0, parameterTypes, 2, baseParameterTypes.Length);
+
+			var constructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, parameterTypes);
+			var il = constructor.GetILGenerator();
+			
+			// Invoke base class constructor
+			il.Emit(OpCodes.Ldarg_0); // this
+			for (int index = 0; index < baseParameterTypes.Length; index++)
 			{
-				cfw.StartMethod("<init>", "(Lorg/mozilla/javascript/Scriptable;" + "Lorg/mozilla/javascript/ContextFactory;)V", ClassFileWriter.ACC_PUBLIC);
-				// Invoke base class constructor
-				cfw.Add(ByteCode.ALOAD_0);
-				// this
-				cfw.AddInvoke(ByteCode.INVOKESPECIAL, superName, "<init>", "()V");
+				il.EmitLdarg(index + 3);
 			}
-			else
-			{
-				StringBuilder sig = new StringBuilder("(Lorg/mozilla/javascript/Scriptable;" + "Lorg/mozilla/javascript/ContextFactory;");
-				int marker = sig.Length;
-				// lets us reuse buffer for super signature
-				foreach (Type c in parameters)
-				{
-					AppendTypeString(sig, c);
-				}
-				sig.Append(")V");
-				cfw.StartMethod("<init>", sig.ToString(), ClassFileWriter.ACC_PUBLIC);
-				// Invoke base class constructor
-				cfw.Add(ByteCode.ALOAD_0);
-				// this
-				short paramOffset = 3;
-				foreach (Type parameter in parameters)
-				{
-					paramOffset += GeneratePushParam(cfw, paramOffset, parameter);
-				}
-				locals = paramOffset;
-				sig.Delete(1, marker);
-				cfw.AddInvoke(ByteCode.INVOKESPECIAL, superName, "<init>", sig.ToString());
-			}
+			il.Emit(OpCodes.Call, baseTypeConstructor);
+			
 			// Save parameter in instance variable "delegee"
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.Add(ByteCode.ALOAD_1);
-			// first arg: Scriptable delegee
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "delegee", "Lorg/mozilla/javascript/Scriptable;");
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldarg_1); // first arg: Scriptable delegee
+			il.Emit(OpCodes.Stfld, delegee);
+
 			// Save parameter in instance variable "factory"
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.Add(ByteCode.ALOAD_2);
-			// second arg: ContextFactory instance
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "factory", "Lorg/mozilla/javascript/ContextFactory;");
-			cfw.Add(ByteCode.ALOAD_0);
-			// this for the following PUTFIELD for self
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldarg_2); // second arg: ContextFactory instance
+			il.Emit(OpCodes.Stfld, factory);
+
+			il.Emit(OpCodes.Ldarg_0); // this for the following PUTFIELD for self
+
 			// create a wrapper object to be used as "this" in method calls
-			cfw.Add(ByteCode.ALOAD_1);
-			// the Scriptable delegee
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/JavaAdapter", "createAdapterWrapper", "(Lorg/mozilla/javascript/Scriptable;" + "Ljava/lang/Object;" + ")Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "self", "Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.RETURN);
-			cfw.StopMethod(locals);
+			il.Emit(OpCodes.Ldarg_1); // the Scriptable delegee
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("CreateAdapterWrapper", new[] { typeof (Scriptable), typeof (Object) }));
+			il.Emit(OpCodes.Stfld, self);
+
+			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateSerialCtor(ClassFileWriter cfw, string adapterName, string superName)
+		private static void GenerateSerialCtor(TypeBuilder type, Type baseType, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
-			cfw.StartMethod("<init>", "(Lorg/mozilla/javascript/ContextFactory;" + "Lorg/mozilla/javascript/Scriptable;" + "Lorg/mozilla/javascript/Scriptable;" + ")V", ClassFileWriter.ACC_PUBLIC);
+			/*  public XXX (ContextFactory factory, Scriptable delegee, Scriptable self) : base ()
+			 *  {
+			 *      this.factory = factory;
+			 *      this.delegee = delegee;
+			 *      this.self = self;
+			 *  }
+			 */ 
+			var constructor = type.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] {typeof (ContextFactory), typeof (Scriptable), typeof (Scriptable)});
+			var il = constructor.GetILGenerator();
+			
 			// Invoke base class constructor
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.AddInvoke(ByteCode.INVOKESPECIAL, superName, "<init>", "()V");
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Call, baseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null));
+
 			// Save parameter in instance variable "factory"
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.Add(ByteCode.ALOAD_1);
-			// first arg: ContextFactory instance
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "factory", "Lorg/mozilla/javascript/ContextFactory;");
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldarg_1); // first arg: ContextFactory instance
+			il.Emit(OpCodes.Stfld, factory);
+			
 			// Save parameter in instance variable "delegee"
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.Add(ByteCode.ALOAD_2);
-			// second arg: Scriptable delegee
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "delegee", "Lorg/mozilla/javascript/Scriptable;");
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldloc_2); // second arg: Scriptable instance
+			il.Emit(OpCodes.Stfld, delegee);
+
 			// save self
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.Add(ByteCode.ALOAD_3);
-			// third arg: Scriptable self
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "self", "Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.RETURN);
-			cfw.StopMethod((short)4);
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldarg_3); // third arg: Scriptable instance
+			il.Emit(OpCodes.Stfld, self);
+
+			il.Emit(OpCodes.Ret);
 		}
 
-		// 4: this + factory + delegee + self
-		private static void GenerateEmptyCtor(ClassFileWriter cfw, string adapterName, string superName, string scriptClassName)
+		private static void GenerateEmptyCtor(TypeBuilder type, Type adapterType, Type baseType, Type scriptType)
 		{
-			cfw.StartMethod("<init>", "()V", ClassFileWriter.ACC_PUBLIC);
+			/*  public XXX () : base() 
+			 *  {
+			 *      Scriptable scriptable = JavaAdapter.RunScript(new Script());
+			 *      this.delegee = scriptable;
+			 *      this.self = JavaAdapter.CreateAdapterWrapper(scriptable, this);
+			 *  }
+			 */
+			var constructor = type.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, Type.EmptyTypes);
+			var il = constructor.GetILGenerator();
+
 			// Invoke base class constructor
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.AddInvoke(ByteCode.INVOKESPECIAL, superName, "<init>", "()V");
-			// Set factory to null to use current global when necessary
-			cfw.Add(ByteCode.ALOAD_0);
-			cfw.Add(ByteCode.ACONST_NULL);
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "factory", "Lorg/mozilla/javascript/ContextFactory;");
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Call, baseType.GetConstructor(Type.EmptyTypes));
+
 			// Load script class
-			cfw.Add(ByteCode.NEW, scriptClassName);
-			cfw.Add(ByteCode.DUP);
-			cfw.AddInvoke(ByteCode.INVOKESPECIAL, scriptClassName, "<init>", "()V");
+			il.Emit(OpCodes.Call, scriptType.GetConstructor(Type.EmptyTypes));
+			
 			// Run script and save resulting scope
-			cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/JavaAdapter", "runScript", "(Lorg/mozilla/javascript/Script;" + ")Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.ASTORE_1);
+			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("RunScript", new[] { typeof (Script) }));
+			var scriptable = il.DeclareLocal(typeof (Scriptable));
+			il.Emit(OpCodes.Stloc, scriptable);
+
 			// Save the Scriptable in instance variable "delegee"
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.Add(ByteCode.ALOAD_1);
-			// the Scriptable
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "delegee", "Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.ALOAD_0);
-			// this for the following PUTFIELD for self
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldloc, scriptable); // Scriptable
+			il.Emit(OpCodes.Stfld, adapterType.GetField("delegee"));
+
+			il.Emit(OpCodes.Ldarg_0); // this for the following Stfld for self
+			
 			// create a wrapper object to be used as "this" in method calls
-			cfw.Add(ByteCode.ALOAD_1);
-			// the Scriptable
-			cfw.Add(ByteCode.ALOAD_0);
-			// this
-			cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/JavaAdapter", "createAdapterWrapper", "(Lorg/mozilla/javascript/Scriptable;" + "Ljava/lang/Object;" + ")Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.PUTFIELD, adapterName, "self", "Lorg/mozilla/javascript/Scriptable;");
-			cfw.Add(ByteCode.RETURN);
-			cfw.StopMethod((short)2);
+			il.Emit(OpCodes.Ldloc, scriptable); // the Scriptable
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("CreateAdapterWrapper", new[] { typeof (Scriptable), typeof (Object) }));
+			il.Emit(OpCodes.Stfld, adapterType.GetField("self"));
+
+			il.Emit(OpCodes.Ret);
 		}
 
 		// this + delegee
@@ -794,100 +760,22 @@ namespace Rhino
 		/// Non-primitive Java types are left as-is pending conversion
 		/// in the helper method. Leaves the array object on the top of the stack.
 		/// </remarks>
-		internal static void GeneratePushWrappedArgs(ClassFileWriter cfw, Type[] argTypes, int arrayLength)
+		private static void GeneratePushWrappedArgs(ILGenerator il, Type[] argumentTypes, int arrayLength)
 		{
 			// push arguments
-			cfw.AddPush(arrayLength);
-			cfw.Add(ByteCode.ANEWARRAY, "java/lang/Object");
-			int paramOffset = 1;
-			for (int i = 0; i != argTypes.Length; ++i)
+			il.EmitLoadConstant(arrayLength);
+			il.Emit(OpCodes.Newarr, typeof (object));
+			for (int i = 0; i != argumentTypes.Length; ++i)
 			{
-				cfw.Add(ByteCode.DUP);
-				// duplicate array reference
-				cfw.AddPush(i);
-				paramOffset += GenerateWrapArg(cfw, paramOffset, argTypes[i]);
-				cfw.Add(ByteCode.AASTORE);
-			}
-		}
-
-		/// <summary>Generates code to wrap Java argument into Object.</summary>
-		/// <remarks>
-		/// Generates code to wrap Java argument into Object.
-		/// Non-primitive Java types are left unconverted pending conversion
-		/// in the helper method. Leaves the wrapper object on the top of the stack.
-		/// </remarks>
-		private static int GenerateWrapArg(ClassFileWriter cfw, int paramOffset, Type argType)
-		{
-			int size = 1;
-			if (!argType.IsPrimitive)
-			{
-				cfw.Add(ByteCode.ALOAD, paramOffset);
-			}
-			else
-			{
-				if (argType == typeof(bool))
+				il.Emit(OpCodes.Dup); // duplicate array reference
+				il.EmitLoadConstant(i);
+				il.EmitLdarg(i + 1);
+				if (argumentTypes [i].IsValueType)
 				{
-					// wrap boolean values with java.lang.Boolean.
-					cfw.Add(ByteCode.NEW, "java/lang/Boolean");
-					cfw.Add(ByteCode.DUP);
-					cfw.Add(ByteCode.ILOAD, paramOffset);
-					cfw.AddInvoke(ByteCode.INVOKESPECIAL, "java/lang/Boolean", "<init>", "(Z)V");
+					il.Emit(OpCodes.Box, argumentTypes [i]);
 				}
-				else
-				{
-					if (argType == typeof(char))
-					{
-						// Create a string of length 1 using the character parameter.
-						cfw.Add(ByteCode.ILOAD, paramOffset);
-						cfw.AddInvoke(ByteCode.INVOKESTATIC, "java/lang/String", "valueOf", "(C)Ljava/lang/String;");
-					}
-					else
-					{
-						// convert all numeric values to java.lang.Double.
-						cfw.Add(ByteCode.NEW, "java/lang/Double");
-						cfw.Add(ByteCode.DUP);
-						string typeName = argType.FullName;
-						switch (typeName[0])
-						{
-							case 'b':
-							case 's':
-							case 'i':
-							{
-								// load an int value, convert to double.
-								cfw.Add(ByteCode.ILOAD, paramOffset);
-								cfw.Add(ByteCode.I2D);
-								break;
-							}
-
-							case 'l':
-							{
-								// load a long, convert to double.
-								cfw.Add(ByteCode.LLOAD, paramOffset);
-								cfw.Add(ByteCode.L2D);
-								size = 2;
-								break;
-							}
-
-							case 'f':
-							{
-								// load a float, convert to double.
-								cfw.Add(ByteCode.FLOAD, paramOffset);
-								cfw.Add(ByteCode.F2D);
-								break;
-							}
-
-							case 'd':
-							{
-								cfw.Add(ByteCode.DLOAD, paramOffset);
-								size = 2;
-								break;
-							}
-						}
-						cfw.AddInvoke(ByteCode.INVOKESPECIAL, "java/lang/Double", "<init>", "(D)V");
-					}
-				}
+				il.Emit(OpCodes.Stelem_Ref);
 			}
-			return size;
 		}
 
 		/// <summary>Generates code to convert a wrapped value type to a primitive type.</summary>
@@ -896,239 +784,139 @@ namespace Rhino
 		/// Handles unwrapping java.lang.Boolean, and java.lang.Number types.
 		/// Generates the appropriate RETURN bytecode.
 		/// </remarks>
-		internal static void GenerateReturnResult(ClassFileWriter cfw, Type retType, bool callConvertResult)
+		private static void GenerateReturnResult(ILGenerator il, Type type, bool callConvertResult)
 		{
 			// wrap boolean values with java.lang.Boolean, convert all other
 			// primitive values to java.lang.Double.
-			if (retType == typeof(void))
+			if (type == typeof(void))
 			{
-				cfw.Add(ByteCode.POP);
-				cfw.Add(ByteCode.RETURN);
+				il.Emit(OpCodes.Pop);
+				il.Emit(OpCodes.Ret);
+				return;
 			}
-			else
+			if (type == typeof(bool))
 			{
-				if (retType == typeof(bool))
+				il.Emit(OpCodes.Call, typeof (Context).GetMethod("ToBoolean", new[] { typeof (object) }));
+				il.Emit(OpCodes.Ret);
+				return;
+			}
+			if (type == typeof(char))
+			{
+				// characters are represented as strings in JavaScript.
+				// return the first character.
+				// first convert the value to a string if possible.
+				il.Emit(OpCodes.Call, typeof (Context).GetMethod("ToString", new[] { typeof (object) }));
+				il.Emit(OpCodes.Ldc_I4_0);
+				il.Emit(OpCodes.Callvirt, typeof (String).GetMethod("get_Chars", new[] { typeof (int) }));
+				il.Emit(OpCodes.Ret);
+				return;
+			}
+			if (type.IsPrimitive)
+			{
+				il.Emit(OpCodes.Call, typeof (Context).GetMethod("ToNumber", new[] { typeof (object) }));
+				switch (type.FullName)
 				{
-					cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Context", "toBoolean", "(Ljava/lang/Object;)Z");
-					cfw.Add(ByteCode.IRETURN);
-				}
-				else
-				{
-					if (retType == typeof(char))
+					case "System.Byte":
+					case "System.Int16":
+					case "System.Int32":
 					{
-						// characters are represented as strings in JavaScript.
-						// return the first character.
-						// first convert the value to a string if possible.
-						cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Context", "toString", "(Ljava/lang/Object;)Ljava/lang/String;");
-						cfw.Add(ByteCode.ICONST_0);
-						cfw.AddInvoke(ByteCode.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C");
-						cfw.Add(ByteCode.IRETURN);
+						il.Emit(OpCodes.Conv_I4);
+						il.Emit(OpCodes.Ret);
+						return;
 					}
-					else
+
+					case "System.Int64":
 					{
-						if (retType.IsPrimitive)
-						{
-							cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Context", "toNumber", "(Ljava/lang/Object;)D");
-							string typeName = retType.FullName;
-							switch (typeName[0])
-							{
-								case 'b':
-								case 's':
-								case 'i':
-								{
-									cfw.Add(ByteCode.D2I);
-									cfw.Add(ByteCode.IRETURN);
-									break;
-								}
+						il.Emit(OpCodes.Conv_I8);
+						il.Emit(OpCodes.Ret);
+						return;
+					}
 
-								case 'l':
-								{
-									cfw.Add(ByteCode.D2L);
-									cfw.Add(ByteCode.LRETURN);
-									break;
-								}
+					case "System.Single":
+					{
+						il.Emit(OpCodes.Conv_R4);
+						il.Emit(OpCodes.Ret);
+						return;
+					}
 
-								case 'f':
-								{
-									cfw.Add(ByteCode.D2F);
-									cfw.Add(ByteCode.FRETURN);
-									break;
-								}
+					case "System.Double":
+					{
+						il.Emit(OpCodes.Ret);
+						return;
+					}
 
-								case 'd':
-								{
-									cfw.Add(ByteCode.DRETURN);
-									break;
-								}
-
-								default:
-								{
-									throw new Exception("Unexpected return type " + retType.ToString());
-								}
-							}
-						}
-						else
-						{
-							string retTypeStr = retType.FullName;
-							if (callConvertResult)
-							{
-								cfw.AddLoadConstant(retTypeStr);
-								cfw.AddInvoke(ByteCode.INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
-								cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/JavaAdapter", "convertResult", "(Ljava/lang/Object;" + "Ljava/lang/Class;" + ")Ljava/lang/Object;");
-							}
-							// Now cast to return type
-							cfw.Add(ByteCode.CHECKCAST, retTypeStr);
-							cfw.Add(ByteCode.ARETURN);
-						}
+					default:
+					{
+						throw new Exception("Unexpected return type " + type);
 					}
 				}
 			}
+			if (callConvertResult)
+			{
+				il.Emit(OpCodes.Ldtoken, type);
+				il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("ConvertResult", new[] { typeof (object), typeof (Type) }));
+			}
+			// Now cast to return type
+			il.Emit(OpCodes.Castclass, type);
+			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateMethod(ClassFileWriter cfw, string genName, string methodName, Type[] parms, Type returnType, bool convertResult)
+		private static void GenerateMethod(TypeBuilder type, string methodName, Type[] parameterTypes, Type returnType, bool convertResult, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
-			StringBuilder sb = new StringBuilder();
-			int paramsEnd = AppendMethodSignature(parms, returnType, sb);
-			string methodSignature = sb.ToString();
-			cfw.StartMethod(methodName, methodSignature, ClassFileWriter.ACC_PUBLIC);
-			// Prepare stack to call method
-			// push factory
-			cfw.Add(ByteCode.ALOAD_0);
-			cfw.Add(ByteCode.GETFIELD, genName, "factory", "Lorg/mozilla/javascript/ContextFactory;");
-			// push self
-			cfw.Add(ByteCode.ALOAD_0);
-			cfw.Add(ByteCode.GETFIELD, genName, "self", "Lorg/mozilla/javascript/Scriptable;");
-			// push function
-			cfw.Add(ByteCode.ALOAD_0);
-			cfw.Add(ByteCode.GETFIELD, genName, "delegee", "Lorg/mozilla/javascript/Scriptable;");
-			cfw.AddPush(methodName);
-			cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/JavaAdapter", "getFunction", "(Lorg/mozilla/javascript/Scriptable;" + "Ljava/lang/String;" + ")Lorg/mozilla/javascript/Function;");
-			// push arguments
-			GeneratePushWrappedArgs(cfw, parms, parms.Length);
+			/*  public TRet Method(T1, ...) 
+			 *  {
+			 *      Function function = JavaAdapter.GetFunction(this.delegee, "Method");
+			 *      object result = JavaAdapter.CallMethod(this.factory, this.self, function, new [] { T1, ... }, mask);
+			 *      return (TRet)result;
+			 *  }
+			 */
 			// push bits to indicate which parameters should be wrapped
-			if (parms.Length > 64)
+			if (parameterTypes.Length > 64)
 			{
 				// If it will be an issue, then passing a static boolean array
 				// can be an option, but for now using simple bitmask
 				throw Context.ReportRuntimeError0("JavaAdapter can not subclass methods with more then" + " 64 arguments.");
 			}
+
+			var method = type.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Virtual, returnType, parameterTypes);
+			var il = method.GetILGenerator();
+
+			// Prepare stack to call method
+
+			// push factory
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldfld, factory);
+
+			// push self
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldfld, self);
+
+			// push function
+			il.Emit(OpCodes.Ldarg_0); // this
+			il.Emit(OpCodes.Ldfld, delegee);
+
+			il.EmitLoadConstant(methodName);
+
+			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("GetFunction", new[] {typeof (Scriptable), typeof (string)}));
+
+			// push arguments
+			GeneratePushWrappedArgs(il, parameterTypes, parameterTypes.Length);
+
 			long convertionMask = 0;
-			for (int i = 0; i != parms.Length; ++i)
+			for (int i = 0; i != parameterTypes.Length; ++i)
 			{
-				if (!parms[i].IsPrimitive)
+				if (!parameterTypes [i].IsPrimitive)
 				{
 					convertionMask |= (1 << i);
 				}
 			}
-			cfw.AddPush(convertionMask);
-			// go through utility method, which creates a Context to run the
-			// method in.
-			cfw.AddInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/JavaAdapter", "callMethod", "(Lorg/mozilla/javascript/ContextFactory;" + "Lorg/mozilla/javascript/Scriptable;" + "Lorg/mozilla/javascript/Function;" + "[Ljava/lang/Object;" + "J" + ")Ljava/lang/Object;");
-			GenerateReturnResult(cfw, returnType, convertResult);
-			cfw.StopMethod((short)paramsEnd);
-		}
 
-		/// <summary>
-		/// Generates code to push typed parameters onto the operand stack
-		/// prior to a direct Java method call.
-		/// </summary>
-		/// <remarks>
-		/// Generates code to push typed parameters onto the operand stack
-		/// prior to a direct Java method call.
-		/// </remarks>
-		private static int GeneratePushParam(ClassFileWriter cfw, int paramOffset, Type paramType)
-		{
-			if (!paramType.IsPrimitive)
-			{
-				cfw.AddALoad(paramOffset);
-				return 1;
-			}
-			string typeName = paramType.FullName;
-			switch (typeName[0])
-			{
-				case 'z':
-				case 'b':
-				case 'c':
-				case 's':
-				case 'i':
-				{
-					// load an int value, convert to double.
-					cfw.AddILoad(paramOffset);
-					return 1;
-				}
+			il.EmitLoadConstant(convertionMask);
 
-				case 'l':
-				{
-					// load a long, convert to double.
-					cfw.AddLLoad(paramOffset);
-					return 2;
-				}
-
-				case 'f':
-				{
-					// load a float, convert to double.
-					cfw.AddFLoad(paramOffset);
-					return 1;
-				}
-
-				case 'd':
-				{
-					cfw.AddDLoad(paramOffset);
-					return 2;
-				}
-			}
-			throw Kit.CodeBug();
-		}
-
-		/// <summary>
-		/// Generates code to return a Java type, after calling a Java method
-		/// that returns the same type.
-		/// </summary>
-		/// <remarks>
-		/// Generates code to return a Java type, after calling a Java method
-		/// that returns the same type.
-		/// Generates the appropriate RETURN bytecode.
-		/// </remarks>
-		private static void GeneratePopResult(ClassFileWriter cfw, Type retType)
-		{
-			if (retType.IsPrimitive)
-			{
-				string typeName = retType.FullName;
-				switch (typeName[0])
-				{
-					case 'b':
-					case 'c':
-					case 's':
-					case 'i':
-					case 'z':
-					{
-						cfw.Add(ByteCode.IRETURN);
-						break;
-					}
-
-					case 'l':
-					{
-						cfw.Add(ByteCode.LRETURN);
-						break;
-					}
-
-					case 'f':
-					{
-						cfw.Add(ByteCode.FRETURN);
-						break;
-					}
-
-					case 'd':
-					{
-						cfw.Add(ByteCode.DRETURN);
-						break;
-					}
-				}
-			}
-			else
-			{
-				cfw.Add(ByteCode.ARETURN);
-			}
+			// go through utility method, which creates a Context to run the method in.
+			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("CallMethod", new[] { typeof (ContextFactory), typeof (Scriptable), typeof (Function), typeof (object[]), typeof (long) }));
+			
+			GenerateReturnResult(il, returnType, convertResult);
 		}
 
 		/// <summary>
@@ -1141,58 +929,40 @@ namespace Rhino
 		/// from JavaScript that is equivalent to calling "super.methodName()"
 		/// from Java. Eventually, this may be supported directly in JavaScript.
 		/// </remarks>
-		private static void GenerateSuper(ClassFileWriter cfw, string genName, string superName, string methodName, string methodSignature, Type[] parms, Type returnType)
+		private static void GenerateSuper(TypeBuilder type, string methodName, Type[] argTypes, MethodInfo baseMethod)
 		{
-			cfw.StartMethod("super$" + methodName, methodSignature, ClassFileWriter.ACC_PUBLIC);
-			// push "this"
-			cfw.Add(ByteCode.ALOAD, 0);
+			var method1 = type.DefineMethod("super$" + methodName, MethodAttributes.Public, baseMethod.ReturnType, argTypes);
+			var il = method1.GetILGenerator();
+
+			il.Emit(OpCodes.Ldloc, 0); // this
 			// push the rest of the parameters.
-			int paramOffset = 1;
-			foreach (Type parm in parms)
+			for (int index = 0; index < argTypes.Length; index++)
 			{
-				paramOffset += GeneratePushParam(cfw, paramOffset, parm);
+				il.EmitLdarg(index + 1);
 			}
-			// call the superclass implementation of the method.
-			cfw.AddInvoke(ByteCode.INVOKESPECIAL, superName, methodName, methodSignature);
-			// now, handle the return type appropriately.
-			Type retType = returnType;
-			if (!retType.Equals(typeof(void)))
-			{
-				GeneratePopResult(cfw, retType);
-			}
-			else
-			{
-				cfw.Add(ByteCode.RETURN);
-			}
-			cfw.StopMethod((short)(paramOffset + 1));
+			il.Emit(OpCodes.Call, method1);
+			il.Emit(OpCodes.Ret);
 		}
 
 		/// <summary>Returns a fully qualified method name concatenated with its signature.</summary>
 		/// <remarks>Returns a fully qualified method name concatenated with its signature.</remarks>
 		private static string GetMethodSignature(MethodInfo method, Type[] argTypes)
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			AppendMethodSignature(argTypes, method.ReturnType, sb);
 			return sb.ToString();
 		}
 
-		internal static int AppendMethodSignature(Type[] argTypes, Type returnType, StringBuilder sb)
+		private static void AppendMethodSignature(ICollection<Type> argTypes, Type returnType, StringBuilder sb)
 		{
 			sb.Append('(');
-			int firstLocal = 1 + argTypes.Length;
 			// includes this.
 			foreach (Type type in argTypes)
 			{
 				AppendTypeString(sb, type);
-				if (type == typeof(long) || type == typeof(double))
-				{
-					// adjust for double slot
-					++firstLocal;
-				}
 			}
 			sb.Append(')');
 			AppendTypeString(sb, returnType);
-			return firstLocal;
 		}
 
 		private static StringBuilder AppendTypeString(StringBuilder sb, Type type)
@@ -1218,7 +988,7 @@ namespace Rhino
 					else
 					{
 						string typeName = type.FullName;
-						typeLetter = System.Char.ToUpper(typeName[0]);
+						typeLetter = Char.ToUpper(typeName[0]);
 					}
 				}
 				sb.Append(typeLetter);
@@ -1230,32 +1000,6 @@ namespace Rhino
 				sb.Append(';');
 			}
 			return sb;
-		}
-
-		internal static int[] GetArgsToConvert(Type[] argTypes)
-		{
-			int count = 0;
-			for (int i = 0; i != argTypes.Length; ++i)
-			{
-				if (!argTypes[i].IsPrimitive)
-				{
-					++count;
-				}
-			}
-			if (count == 0)
-			{
-				return null;
-			}
-			int[] array = new int[count];
-			count = 0;
-			for (int i_1 = 0; i_1 != argTypes.Length; ++i_1)
-			{
-				if (!argTypes[i_1].IsPrimitive)
-				{
-					array[count++] = i_1;
-				}
-			}
-			return array;
 		}
 
 		private static readonly object FTAG = "JavaAdapter";

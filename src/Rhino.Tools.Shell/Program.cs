@@ -54,7 +54,9 @@ namespace Rhino.Tools.Shell
 
 		internal static Require require;
 
+#if ENCHANCED_SECURITY
 		private static SecurityProxy securityImpl;
+#endif
 
 		private static readonly ScriptCache scriptCache = new ScriptCache(32);
 
@@ -75,10 +77,12 @@ namespace Rhino.Tools.Shell
 		{
 			try
 			{
+#if ENCHANCED_SECURITY
 				if (bool.GetBoolean("rhino.use_java_policy_security"))
 				{
 					InitJavaPolicySecuritySupport();
 				}
+#endif
 			}
 			catch (SecurityException ex)
 			{
@@ -430,6 +434,7 @@ goodUsage_break: ;
 			return null;
 		}
 
+#if ENCHANCED_SECURITY
 		private static void InitJavaPolicySecuritySupport()
 		{
 			Exception exObj;
@@ -458,6 +463,7 @@ goodUsage_break: ;
 			}
 			throw Kit.InitCause(new InvalidOperationException("Can not load security support: " + exObj), exObj);
 		}
+#endif
 
 		/// <summary>Evaluate JavaScript source.</summary>
 		/// <remarks>Evaluate JavaScript source.</remarks>
@@ -608,21 +614,28 @@ goodUsage_break: ;
 		/// <exception cref="System.IO.IOException"></exception>
 		public static void ProcessFile(Context cx, Scriptable scope, string filename)
 		{
+#if ENCHANCED_SECURITY
 			if (securityImpl == null)
+#endif
 			{
 				ProcessFileSecure(cx, scope, filename, null);
 			}
+#if ENCHANCED_SECURITY
 			else
 			{
 				securityImpl.CallProcessFileSecure(cx, scope, filename);
 			}
+#endif
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
 		internal static void ProcessFileSecure(Context cx, Scriptable scope, string path, object securityDomain)
 		{
 			bool isClass = path.EndsWith(".class");
-			object source = ReadFileOrUrl(path, !isClass);
+			object source = isClass
+				? SourceReader.ReadFileOrUrlAsByteArray(path)
+				: SourceReader.ReadFileOrUrlAsString(path, shellContextFactory.GetCharacterEncoding());
+
 			byte[] digest = GetDigest(source);
 			string key = path + "_" + cx.GetOptimizationLevel();
 			ScriptReference @ref = scriptCache.Get(key, digest);
@@ -631,7 +644,9 @@ goodUsage_break: ;
 			{
 				if (isClass)
 				{
+#if COMPILATION
 					script = LoadCompiledScript(cx, path, (byte[])source, securityDomain);
+#endif
 				}
 				else
 				{
@@ -646,7 +661,7 @@ goodUsage_break: ;
 							int c = strSrc[i];
 							if (c == '\n' || c == '\r')
 							{
-								strSrc = Runtime.Substring(strSrc, i);
+								strSrc = strSrc.Substring(i);
 								break;
 							}
 						}
@@ -696,6 +711,7 @@ goodUsage_break: ;
 			return digest;
 		}
 
+#if COMPILATION
 		/// <exception cref="System.IO.FileNotFoundException"></exception>
 		private static Script LoadCompiledScript(Context cx, string path, byte[] data, object securityDomain)
 		{
@@ -721,7 +737,7 @@ goodUsage_break: ;
 				// or it comes before nameStart
 				nameEnd = path.Length;
 			}
-			string name = Sharpen.Runtime.Substring(path, nameStart, nameEnd);
+			string name = path.Substring(nameStart, nameEnd - nameStart);
 			try
 			{
 				GeneratedClassLoader loader = SecurityController.CreateLoader(cx.GetApplicationClassLoader(), securityDomain);
@@ -744,13 +760,14 @@ goodUsage_break: ;
 				throw new Exception("", inex);
 			}
 		}
+#endif
 
-		public static Stream GetIn()
+		public static TextReader GetIn()
 		{
 			return GetGlobal().GetIn();
 		}
 
-		public static void SetIn(Stream @in)
+		public static void SetIn(TextReader @in)
 		{
 			GetGlobal().SetIn(@in);
 		}
@@ -773,18 +790,6 @@ goodUsage_break: ;
 		public static void SetErr(TextWriter err)
 		{
 			GetGlobal().SetErr(err);
-		}
-
-		/// <summary>Read file or url specified by <tt>path</tt>.</summary>
-		/// <remarks>Read file or url specified by <tt>path</tt>.</remarks>
-		/// <returns>
-		/// file or url content as <tt>byte[]</tt> or as <tt>String</tt> if
-		/// <tt>convertToString</tt> is true.
-		/// </returns>
-		/// <exception cref="System.IO.IOException"></exception>
-		private static object ReadFileOrUrl(string path, bool convertToString)
-		{
-			return SourceReader.ReadFileOrUrl(path, convertToString, shellContextFactory.GetCharacterEncoding());
 		}
 
 		internal class ScriptReference : SoftReference<Script>
@@ -813,7 +818,7 @@ goodUsage_break: ;
 				queue = new ReferenceQueue<Script>();
 			}
 
-			protected override bool RemoveEldestEntry(KeyValuePair<string, ScriptReference> eldest)
+			protected bool RemoveEldestEntry(KeyValuePair<string, ScriptReference> eldest)
 			{
 				return Count > capacity;
 			}
@@ -823,12 +828,12 @@ goodUsage_break: ;
 				ScriptReference @ref;
 				while ((@ref = (ScriptReference)queue.Poll()) != null)
 				{
-					Collections.Remove(this, @ref.path);
+					Remove(@ref.path);
 				}
 				@ref = Get(path);
 				if (@ref != null && !Arrays.Equals(digest, @ref.digest))
 				{
-					Collections.Remove(this, @ref.path);
+					Remove(@ref.path);
 					@ref = null;
 				}
 				return @ref;

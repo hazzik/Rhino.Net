@@ -118,7 +118,7 @@ namespace Rhino.Optimizer
 							Block.FatBlock fb = NewFatBlock(beginNodeIndex, i - 1);
 							if (statementNodes[beginNodeIndex].GetType() == Token.TARGET)
 							{
-								theTargetBlocks [statementNodes[beginNodeIndex]] = fb;
+								theTargetBlocks[statementNodes[beginNodeIndex]] = fb;
 							}
 							theBlocks.Add(fb);
 							// start the next block at this node
@@ -134,7 +134,7 @@ namespace Rhino.Optimizer
 						Block.FatBlock fb = NewFatBlock(beginNodeIndex, i);
 						if (statementNodes[beginNodeIndex].GetType() == Token.TARGET)
 						{
-							theTargetBlocks [statementNodes[beginNodeIndex]] = fb;
+							theTargetBlocks[statementNodes[beginNodeIndex]] = fb;
 						}
 						theBlocks.Add(fb);
 						// start the next block at the next node
@@ -148,7 +148,7 @@ namespace Rhino.Optimizer
 				Block.FatBlock fb = NewFatBlock(beginNodeIndex, statementNodes.Length - 1);
 				if (statementNodes[beginNodeIndex].GetType() == Token.TARGET)
 				{
-					theTargetBlocks [statementNodes[beginNodeIndex]] = fb;
+					theTargetBlocks[statementNodes[beginNodeIndex]] = fb;
 				}
 				theBlocks.Add(fb);
 			}
@@ -435,7 +435,7 @@ namespace Rhino.Optimizer
 		// truth in advertising
 		private bool DoReachedUseDataFlow()
 		{
-			itsLiveOnExitSet.Clear();
+			itsLiveOnExitSet.SetAll(false);
 			if (itsSuccessors != null)
 			{
 				for (int i = 0; i < itsSuccessors.Length; i++)

@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#if XML
 
 using System;
 using System.Text;
@@ -14,7 +15,7 @@ using Sharpen;
 
 namespace Rhino.XmlImpl
 {
-	[System.Serializable]
+	[Serializable]
 	internal class XMLName : Ref
 	{
 		internal const long serialVersionUID = 3832176310755686977L;
@@ -181,20 +182,20 @@ namespace Rhino.XmlImpl
 				{
 					if (l == 1)
 					{
-						return XMLName.FormStar();
+						return FormStar();
 					}
 				}
 				else
 				{
 					if (firstChar == '@')
 					{
-						XMLName xmlName = XMLName.FormProperty(string.Empty, Sharpen.Runtime.Substring(name, 1));
+						XMLName xmlName = XMLName.FormProperty(string.Empty, name.Substring(1));
 						xmlName.SetAttributeName();
 						return xmlName;
 					}
 				}
 			}
-			return XMLName.FormProperty(defaultNamespaceUri, name);
+			return FormProperty(defaultNamespaceUri, name);
 		}
 
 		internal static XMLName Create(XmlNode.QName qname, bool attribute, bool descendants)
@@ -340,13 +341,13 @@ namespace Rhino.XmlImpl
 					{
 						for (int i = 0; i < children.Length; i++)
 						{
-							if (this.Matches(children[i]))
+							if (Matches(children[i]))
 							{
 								rv.AddToList(children[i]);
 							}
 						}
 					}
-					rv.SetTargets(target, this.ToQname());
+					rv.SetTargets(target, ToQname());
 				}
 			}
 		}
@@ -509,7 +510,7 @@ namespace Rhino.XmlImpl
 
 		internal XmlNode.QName ToQname()
 		{
-			return this.qname;
+			return qname;
 		}
 
 		internal bool MatchesLocalName(string localName)
@@ -519,9 +520,9 @@ namespace Rhino.XmlImpl
 
 		internal bool MatchesElement(XmlNode.QName qname)
 		{
-			if (this.Uri() == null || this.Uri().Equals(qname.GetNamespace().GetUri()))
+			if (Uri() == null || Uri().Equals(qname.GetNamespace().GetUri()))
 			{
-				if (this.LocalName().Equals("*") || this.LocalName().Equals(qname.GetLocalName()))
+				if (LocalName().Equals("*") || LocalName().Equals(qname.GetLocalName()))
 				{
 					return true;
 				}
@@ -541,9 +542,9 @@ namespace Rhino.XmlImpl
 			{
 				if (node.IsAttribute())
 				{
-					if (this.Uri() == null || this.Uri().Equals(nodeUri))
+					if (Uri() == null || Uri().Equals(nodeUri))
 					{
-						if (this.LocalName().Equals("*") || this.LocalName().Equals(qname.GetLocalName()))
+						if (LocalName().Equals("*") || LocalName().Equals(qname.GetLocalName()))
 						{
 							return true;
 						}
@@ -559,7 +560,7 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				if (this.Uri() == null || ((node.IsElement()) && this.Uri().Equals(nodeUri)))
+				if (Uri() == null || ((node.IsElement()) && Uri().Equals(nodeUri)))
 				{
 					if (LocalName().Equals("*"))
 					{
@@ -604,3 +605,4 @@ namespace Rhino.XmlImpl
 		}
 	}
 }
+#endif

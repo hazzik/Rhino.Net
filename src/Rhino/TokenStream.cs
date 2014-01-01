@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Rhino;
@@ -848,7 +849,7 @@ L0_break: ;
 				}
 				else
 				{
-					identifierStart = char.IsJavaIdentifierStart((char)c);
+					identifierStart = CharEx.IsJavaIdentifierStart((char)c);
 					if (identifierStart)
 					{
 						stringBufferTop = 0;
@@ -906,7 +907,7 @@ L0_break: ;
 							}
 							else
 							{
-								if (c == EOF_CHAR || c == BYTE_ORDER_MARK || !char.IsJavaIdentifierPart((char)c))
+								if (c == EOF_CHAR || c == BYTE_ORDER_MARK || !CharEx.IsJavaIdentifierPart((char)c))
 								{
 									break;
 								}
@@ -1674,13 +1675,13 @@ retry_break: ;
 			}
 			else
 			{
-				return c == unchecked((int)(0xA0)) || c == BYTE_ORDER_MARK || char.GetType((char)c) == char.SPACE_SEPARATOR;
+				return c == unchecked((int)(0xA0)) || c == BYTE_ORDER_MARK || char.GetUnicodeCategory((char)c) == UnicodeCategory.SpaceSeparator;
 			}
 		}
 
 		private static bool IsJSFormatChar(int c)
 		{
-			return c > 127 && char.GetType((char)c) == char.FORMAT;
+			return c > 127 && char.GetUnicodeCategory((char)c) == UnicodeCategory.Format;
 		}
 
 		/// <summary>Parser calls the method when it gets / or /= in literal context.</summary>
@@ -2422,7 +2423,7 @@ retry_break: ;
 						}
 					}
 				}
-				return Sharpen.Runtime.Substring(sourceString, lineStart, lineEnd);
+				return sourceString.Substring(lineStart, lineEnd - lineStart);
 			}
 			else
 			{
@@ -2561,7 +2562,7 @@ retry_break: ;
 				{
 					Kit.CodeBug();
 				}
-				return Sharpen.Runtime.Substring(sourceString, tokenBeg, tokenEnd);
+				return sourceString.Substring(tokenBeg, tokenEnd - tokenBeg);
 			}
 			else
 			{
@@ -2579,7 +2580,7 @@ retry_break: ;
 		private string ConvertLastCharToHex(string str)
 		{
 			int lastIndex = str.Length - 1;
-			StringBuilder buf = new StringBuilder(Sharpen.Runtime.Substring(str, 0, lastIndex));
+			StringBuilder buf = new StringBuilder(str.Substring(0, lastIndex));
 			buf.Append("\\u");
 			string hexCode = Sharpen.Extensions.ToHexString(str[lastIndex]);
 			for (int i = 0; i < 4 - hexCode.Length; ++i)

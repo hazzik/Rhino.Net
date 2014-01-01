@@ -129,7 +129,7 @@ namespace Rhino
 				}
 				f.ExportAsScopeProperty();
 			}
-			ScriptableObject.DefineProperty(scope, "NaN", ScriptRuntime.NaNobj, ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
+			ScriptableObject.DefineProperty(scope, "NaN", ScriptRuntime.NaN, ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
 			ScriptableObject.DefineProperty(scope, "Infinity", ScriptRuntime.WrapNumber(double.PositiveInfinity), ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
 			ScriptableObject.DefineProperty(scope, "undefined", Undefined.instance, ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
 			string[] errorMethods = new string[] { "ConversionError", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "InternalError", "JavaException" };
@@ -262,7 +262,7 @@ namespace Rhino
 			int len = s.Length;
 			if (len == 0)
 			{
-				return ScriptRuntime.NaNobj;
+				return ScriptRuntime.NaN;
 			}
 			bool negative = false;
 			int start = 0;
@@ -290,7 +290,7 @@ namespace Rhino
 			{
 				if (radix < 2 || radix > 36)
 				{
-					return ScriptRuntime.NaNobj;
+					return ScriptRuntime.NaN;
 				}
 				else
 				{
@@ -336,7 +336,7 @@ namespace Rhino
 		{
 			if (args.Length < 1)
 			{
-				return ScriptRuntime.NaNobj;
+				return ScriptRuntime.NaN;
 			}
 			string s = ScriptRuntime.ToString(args[0]);
 			int len = s.Length;
@@ -347,7 +347,7 @@ namespace Rhino
 			{
 				if (start == len)
 				{
-					return ScriptRuntime.NaNobj;
+					return ScriptRuntime.NaN;
 				}
 				c = s[start];
 				if (!ScriptRuntime.IsStrWhiteSpaceChar(c))
@@ -362,7 +362,7 @@ namespace Rhino
 				++i;
 				if (i == len)
 				{
-					return ScriptRuntime.NaNobj;
+					return ScriptRuntime.NaN;
 				}
 				c = s[i];
 			}
@@ -382,7 +382,7 @@ namespace Rhino
 					}
 					return ScriptRuntime.WrapNumber(d);
 				}
-				return ScriptRuntime.NaNobj;
+				return ScriptRuntime.NaN;
 			}
 			// Find the end of the legal bit
 			int @decimal = -1;
@@ -469,14 +469,14 @@ namespace Rhino
 			{
 				i = exponent;
 			}
-			s = Sharpen.Runtime.Substring(s, start, i);
+			s = s.Substring(start, i - start);
 			try
 			{
 				return s;
 			}
 			catch (FormatException)
 			{
-				return ScriptRuntime.NaNobj;
+				return ScriptRuntime.NaN;
 			}
 		}
 
@@ -753,7 +753,7 @@ namespace Rhino
 						// decode always compress so result can not be bigger then
 						// str.length()
 						buf = new char[length];
-						Sharpen.Runtime.GetCharsForString(str, 0, k, buf, 0);
+						str.CopyTo(0, buf, 0, k);
 						bufTop = k;
 					}
 					int start = k;

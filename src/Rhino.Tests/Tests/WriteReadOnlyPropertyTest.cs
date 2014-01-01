@@ -9,9 +9,6 @@
 using System;
 using System.Reflection;
 using NUnit.Framework;
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
 
 namespace Rhino.Tests
 {
@@ -23,39 +20,36 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <seealso><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=519933">Rhino bug 519933</a></seealso>
 	/// <author>Marc Guillemot</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class WriteReadOnlyPropertyTest
 	{
-		/// <exception cref="System.Exception">if the test fails</exception>
-		[NUnit.Framework.Test]
-		public virtual void TestWriteReadOnly_accepted()
+		[Test]
+		public void TestWriteReadOnly_accepted()
 		{
 			TestWriteReadOnly(true);
 		}
 
-		/// <exception cref="System.Exception">if the test fails</exception>
-		[NUnit.Framework.Test]
-		public virtual void TestWriteReadOnly_throws()
+		[Test]
+		public void TestWriteReadOnly_throws()
 		{
 			try
 			{
 				TestWriteReadOnly(false);
-				NUnit.Framework.Assert.Fail();
+				Assert.Fail();
 			}
 			catch (EcmaError e)
 			{
-				NUnit.Framework.Assert.IsTrue(e.Message.Contains("Cannot set property myProp that has only a getter"), e.Message);
+				Assert.IsTrue(e.Message.Contains("Cannot set property myProp that has only a getter"), e.Message);
 			}
 		}
 
-		/// <exception cref="System.Exception"></exception>
-		internal virtual void TestWriteReadOnly(bool acceptWriteReadOnly)
+		private static void TestWriteReadOnly(bool acceptWriteReadOnly)
 		{
-			MethodInfo readMethod = typeof(WriteReadOnlyPropertyTest.Foo).GetMethod("getMyProp", (Type[])null);
-			WriteReadOnlyPropertyTest.Foo foo = new WriteReadOnlyPropertyTest.Foo("hello");
+			MethodInfo readMethod = typeof(Foo).GetMethod("GetMyProp", Type.EmptyTypes);
+			Foo foo = new Foo("hello");
 			foo.DefineProperty("myProp", null, readMethod, null, ScriptableObject.EMPTY);
 			string script = "foo.myProp = 123; foo.myProp";
-			ContextFactory contextFactory = new _ContextFactory_66(acceptWriteReadOnly);
+			ContextFactory contextFactory = new TestContextFactory(acceptWriteReadOnly);
 			contextFactory.Call(cx =>
 			{
 				ScriptableObject top = cx.InitStandardObjects();
@@ -65,9 +59,9 @@ namespace Rhino.Tests
 			});
 		}
 
-		private sealed class _ContextFactory_66 : ContextFactory
+		private sealed class TestContextFactory : ContextFactory
 		{
-			public _ContextFactory_66(bool acceptWriteReadOnly)
+			public TestContextFactory(bool acceptWriteReadOnly)
 			{
 				this.acceptWriteReadOnly = acceptWriteReadOnly;
 			}
@@ -85,14 +79,14 @@ namespace Rhino.Tests
 		}
 
 		/// <summary>Simple utility allowing to better see the concerned scope while debugging</summary>
-		[System.Serializable]
-		internal class Foo : ScriptableObject
+		[Serializable]
+		private sealed class Foo : ScriptableObject
 		{
-			internal readonly string prop_;
+			private readonly string _prop;
 
 			internal Foo(string label)
 			{
-				prop_ = label;
+				_prop = label;
 			}
 
 			public override string GetClassName()
@@ -100,9 +94,9 @@ namespace Rhino.Tests
 				return "Foo";
 			}
 
-			public virtual string GetMyProp()
+			public string GetMyProp()
 			{
-				return prop_;
+				return _prop;
 			}
 		}
 	}

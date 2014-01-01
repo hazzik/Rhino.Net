@@ -34,11 +34,11 @@ namespace Rhino.Tools
 
 		/// <summary>
 		/// Look up the message corresponding to messageId in the
-		/// Rhino.Tools.Shell.resources.Messages property file.
+		/// Rhino.Net.tools.shell.resources.Messages property file.
 		/// </summary>
 		/// <remarks>
 		/// Look up the message corresponding to messageId in the
-		/// Rhino.Tools.Shell.resources.Messages property file.
+		/// Rhino.Net.tools.shell.resources.Messages property file.
 		/// For internationalization support.
 		/// </remarks>
 		public static string GetMessage(string messageId)
@@ -79,8 +79,7 @@ namespace Rhino.Tools
 			}
 			else
 			{
-				MessageFormat formatter = new MessageFormat(formatString);
-				return formatter.Format(args);
+				return string.Format(formatString, args);
 			}
 		}
 
@@ -169,7 +168,7 @@ namespace Rhino.Tools
 			}
 			else
 			{
-				string lineSeparator = SecurityUtilities.GetSystemProperty("line.separator");
+				string lineSeparator = Environment.NewLine;
 				string msg = GetExceptionMessage(ex) + lineSeparator + ex.GetScriptStackTrace();
 				ReportErrorMessage(msg, ex.SourceName(), ex.LineNumber(), ex.LineSource(), ex.ColumnNumber(), false);
 			}

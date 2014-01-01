@@ -8,9 +8,6 @@
 
 using System.Collections.Generic;
 using System.Text;
-using Rhino;
-using Rhino.Ast;
-using Sharpen;
 
 namespace Rhino.Ast
 {
@@ -30,7 +27,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class TryStatement : AstNode
 	{
-		private static readonly IList<CatchClause> NO_CATCHES = Sharpen.Collections.UnmodifiableList(new List<CatchClause>());
+		private static readonly IList<CatchClause> NO_CATCHES = new List<CatchClause>().AsReadOnly();
 
 		private AstNode tryBlock;
 

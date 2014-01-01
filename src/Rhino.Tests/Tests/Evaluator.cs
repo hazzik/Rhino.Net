@@ -22,7 +22,7 @@ namespace Rhino.Tests
 
 		public static object Eval(string source, string id, Scriptable @object)
 		{
-			return Eval(source, Collections.SingletonMap(id, @object));
+			return Eval(source, new Dictionary<string, Scriptable> { { id, @object } });
 		}
 
 		public static object Eval(string source, IDictionary<string, Scriptable> bindings)

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Rhino;
 using Rhino.Ast;
 using Rhino.Testing;
@@ -922,8 +923,7 @@ namespace Rhino.Tests
 			AstRoot root = ParseAsReader("/** a */var a;\n /** b */var b; /** c */var c;");
 			NUnit.Framework.Assert.IsNotNull(root.GetComments());
 			NUnit.Framework.Assert.AreEqual(3, root.GetComments().Count);
-			Comment[] comments = new Comment[3];
-			comments = Sharpen.Collections.ToArray(root.GetComments(), comments);
+			Comment[] comments = root.GetComments().ToArray();
 			NUnit.Framework.Assert.AreEqual("/** a */", comments[0].GetValue());
 			NUnit.Framework.Assert.AreEqual("/** b */", comments[1].GetValue());
 			NUnit.Framework.Assert.AreEqual("/** c */", comments[2].GetValue());
@@ -949,8 +949,7 @@ namespace Rhino.Tests
 			AstRoot root = ParseAsReader("/* foo \n" + " bar \n" + "*/\n" + "/** @param {string} x */\n" + "function a(x) {};\n");
 			NUnit.Framework.Assert.IsNotNull(root.GetComments());
 			NUnit.Framework.Assert.AreEqual(2, root.GetComments().Count);
-			Comment[] comments = new Comment[2];
-			comments = Sharpen.Collections.ToArray(root.GetComments(), comments);
+			Comment[] comments = root.GetComments().ToArray();
 			NUnit.Framework.Assert.AreEqual(0, comments[0].GetLineno());
 			NUnit.Framework.Assert.AreEqual(3, comments[1].GetLineno());
 		}

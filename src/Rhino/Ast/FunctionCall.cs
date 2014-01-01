@@ -22,7 +22,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class FunctionCall : AstNode
 	{
-		protected internal static readonly IList<AstNode> NO_ARGS = Sharpen.Collections.UnmodifiableList(new List<AstNode>());
+		protected internal static readonly IList<AstNode> NO_ARGS = new List<AstNode>().AsReadOnly();
 
 		protected internal AstNode target;
 

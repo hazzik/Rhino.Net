@@ -16,11 +16,9 @@ namespace Rhino
 	/// Instances of this class are thrown by the JavaScript 'throw' keyword.
 	/// </remarks>
 	/// <author>Mike McCabe</author>
-	[System.Serializable]
+	[Serializable]
 	public class JavaScriptException : RhinoException
 	{
-		internal const long serialVersionUID = -7666130513694669293L;
-
 		/// <summary>Create a JavaScript exception wrapping the given JavaScript value</summary>
 		/// <param name="value">the JavaScript value thrown.</param>
 		public JavaScriptException(object value, string sourceName, int lineNumber)
@@ -52,12 +50,9 @@ namespace Rhino
 			{
 				return "null";
 			}
-			else
+			if (value is NativeError)
 			{
-				if (value is NativeError)
-				{
-					return value.ToString();
-				}
+				return value.ToString();
 			}
 			try
 			{
@@ -66,14 +61,13 @@ namespace Rhino
 			catch (Exception)
 			{
 				// ScriptRuntime.toString may throw a RuntimeException
-				if (value is Scriptable)
+				var scriptable = value as Scriptable;
+				if (scriptable != null)
 				{
-					return ScriptRuntime.DefaultObjectToString((Scriptable)value);
+					return ScriptRuntime.DefaultObjectToString(scriptable);
 				}
-				else
-				{
-					return value.ToString();
-				}
+				
+				return value.ToString();
 			}
 		}
 
@@ -83,6 +77,6 @@ namespace Rhino
 			return value;
 		}
 
-		private object value;
+		private readonly object value;
 	}
 }

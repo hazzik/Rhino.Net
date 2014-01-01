@@ -35,7 +35,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class SwitchStatement : Jump
 	{
-		private static readonly IList<SwitchCase> NO_CASES = Sharpen.Collections.UnmodifiableList(new List<SwitchCase>());
+		private static readonly IList<SwitchCase> NO_CASES = new List<SwitchCase>().AsReadOnly();
 
 		private AstNode expression;
 

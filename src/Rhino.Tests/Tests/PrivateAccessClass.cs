@@ -42,13 +42,13 @@ namespace Rhino.Tests
 
 		private class PrivateNestedClass
 		{
-			private PrivateNestedClass()
+			public PrivateNestedClass()
 			{
 			}
 
 			internal int packagePrivateInt = 0;
 
-			private int privateInt = 1;
+			internal int privateInt = 1;
 
 			protected internal int protectedInt = 2;
 		}

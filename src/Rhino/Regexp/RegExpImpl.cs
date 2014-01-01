@@ -80,7 +80,7 @@ namespace Rhino.RegExp
 						Replace_glob(data, cx, scope, this, lc.index, lc.length);
 					}
 					SubString rc = this.rightContext;
-					data.charBuf.AppendRange(rc.str, rc.index, rc.index + rc.length);
+					data.charBuf.Append(rc.str, rc.index, rc.length);
 					return data.charBuf.ToString();
 				}
 
@@ -202,7 +202,7 @@ namespace Rhino.RegExp
 				// reuse ip to save object creation
 				ip[0] = i;
 				object ret = re.ExecuteRegExp(cx, scope, this, target, ip, NativeRegExp.TEST);
-				if (ret != true)
+				if (!(ret is bool) || (bool) ret != true)
 				{
 					// Mismatch: ensure our caller advances i past end of string.
 					ip[0] = ipsave;
@@ -210,37 +210,41 @@ namespace Rhino.RegExp
 					matched[0] = false;
 					return length;
 				}
-				i = ip[0];
-				ip[0] = ipsave;
-				matched[0] = true;
-				SubString sep = this.lastMatch;
-				matchlen[0] = sep.length;
-				if (matchlen[0] == 0)
+				else
 				{
-					if (i == ip[0])
+					i = ip[0];
+					ip[0] = ipsave;
+					matched[0] = true;
+					SubString sep = this.lastMatch;
+					matchlen[0] = sep.length;
+					if (matchlen[0] == 0)
 					{
-						if (i == length)
+						if (i == ip[0])
 						{
-							if (version == Context.VERSION_1_2)
+							if (i == length)
 							{
-								matchlen[0] = 1;
-								result = i;
+								if (version == Context.VERSION_1_2)
+								{
+									matchlen[0] = 1;
+									result = i;
+								}
+								else
+								{
+									result = -1;
+								}
+								break;
 							}
-							else
-							{
-								result = -1;
-							}
-							break;
+							i++;
+							goto again_continue;
 						}
-						i++;
-						goto again_continue;
 					}
+					// imitating C goto
+					// PR_ASSERT((size_t)i >= sep->length);
+					result = i - matchlen[0];
+					break;
+					again_continue:
+					;
 				}
-				// imitating C goto
-				// PR_ASSERT((size_t)i >= sep->length);
-				result = i - matchlen[0];
-				break;
-again_continue: ;
 			}
 again_break: ;
 			int size = (parens == null) ? 0 : parens.Length;
@@ -368,7 +372,7 @@ again_break: ;
 			{
 				charBuf.EnsureCapacity(rdata.charBuf.Length + growth);
 			}
-			charBuf.AppendRange(reImpl.leftContext.str, leftIndex, leftIndex + leftlen);
+			charBuf.Append(reImpl.leftContext.str, leftIndex, leftlen);
 			if (rdata.lambda != null)
 			{
 				charBuf.Append(lambdaStr);
@@ -502,8 +506,8 @@ again_break: ;
 				int[] skip = new int[1];
 				do
 				{
-					int len = dp - cp;
-					charBuf.Append(Sharpen.Runtime.Substring(da, cp, dp));
+					var len = dp - cp;
+					charBuf.Append(da.Substring(cp, len));
 					cp = dp;
 					SubString sub = InterpretDollar(cx, regExpImpl, da, dp, skip);
 					if (sub != null)
@@ -511,7 +515,7 @@ again_break: ;
 						len = sub.length;
 						if (len > 0)
 						{
-							charBuf.AppendRange(sub.str, sub.index, sub.index + len);
+							charBuf.Append(sub.str, sub.index, len);
 						}
 						cp += skip[0];
 						dp += skip[0];
@@ -527,7 +531,7 @@ again_break: ;
 			int daL = da.Length;
 			if (daL > cp)
 			{
-				charBuf.Append(Sharpen.Runtime.Substring(da, cp, daL));
+				charBuf.Append(da.Substring(cp, daL - cp));
 			}
 		}
 
@@ -549,7 +553,7 @@ again_break: ;
 			// Initialize to avoid warning.
 			if (limited)
 			{
-				limit = ScriptRuntime.ToUint32(args[1]);
+				limit = ScriptRuntime.ToUInt32(args[1]);
 				if (limit > target.Length)
 				{
 					limit = 1 + target.Length;
@@ -596,11 +600,12 @@ again_break: ;
 				}
 				else
 				{
-					substr = Sharpen.Runtime.Substring(target, ip[0], match);
+					int index = ip[0];
+					substr = target.Substring(index, match - index);
 				}
 				result.Put(len, result, substr);
 				len++;
-				if (re != null && matched[0] == true)
+				if (re != null && matched[0])
 				{
 					int size = parens[0].Length;
 					for (int num = 0; num < size; num++)

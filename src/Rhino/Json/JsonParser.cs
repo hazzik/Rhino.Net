@@ -8,6 +8,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using Rhino;
 using Rhino.Json;
@@ -219,7 +222,7 @@ namespace Rhino.Json
 							throw new JsonParser.ParseException("Unexpected comma in array literal");
 						}
 						pos += 1;
-						return cx.NewArray(scope, Sharpen.Collections.ToArray(list));
+						return cx.NewArray(scope, list.ToArray());
 					}
 
 					case ',':
@@ -270,7 +273,7 @@ namespace Rhino.Json
 					{
 						if (c == '"')
 						{
-							return Sharpen.Runtime.Substring(src, stringStart, pos - 1);
+							return src.Substring(stringStart, pos - 1 - stringStart);
 						}
 					}
 				}
@@ -279,7 +282,7 @@ namespace Rhino.Json
 			while (pos < length)
 			{
 				System.Diagnostics.Debug.Assert(src[pos - 1] == '\\');
-				b.AppendRange(src, stringStart, pos - 1);
+				b.Append(src, stringStart, pos - 1 - stringStart);
 				if (pos >= length)
 				{
 					throw new JsonParser.ParseException("Unterminated string");
@@ -339,12 +342,12 @@ namespace Rhino.Json
 					{
 						if (length - pos < 5)
 						{
-							throw new JsonParser.ParseException("Invalid character code: \\u" + Sharpen.Runtime.Substring(src, pos));
+							throw new JsonParser.ParseException("Invalid character code: \\u" + src.Substring(pos));
 						}
 						int code = FromHex(src[pos + 0]) << 12 | FromHex(src[pos + 1]) << 8 | FromHex(src[pos + 2]) << 4 | FromHex(src[pos + 3]);
 						if (code < 0)
 						{
-							throw new JsonParser.ParseException("Invalid character code: " + Sharpen.Runtime.Substring(src, pos, pos + 4));
+							throw new JsonParser.ParseException("Invalid character code: " + src.Substring(pos, pos + 4 - pos));
 						}
 						pos += 4;
 						b.Append((char)code);
@@ -374,7 +377,7 @@ namespace Rhino.Json
 						{
 							if (c == '"')
 							{
-								b.AppendRange(src, stringStart, pos - 1);
+								b.Append(src, stringStart, pos - 1 - stringStart);
 								return b.ToString();
 							}
 						}
@@ -440,8 +443,8 @@ namespace Rhino.Json
 					ReadDigits();
 				}
 			}
-			string num = Sharpen.Runtime.Substring(src, numberStart, pos);
-			double dval = System.Double.Parse(num);
+			string num = src.Substring(numberStart, pos - numberStart);
+			var dval = ParseDouble(num);
 			int ival = (int)dval;
 			if (ival == dval)
 			{
@@ -453,9 +456,21 @@ namespace Rhino.Json
 			}
 		}
 
+		private static double ParseDouble(string num)
+		{
+			double result;
+			if (Double.TryParse(num, NumberStyles.AllowThousands | NumberStyles.Float, CultureInfo.InvariantCulture, out result))
+			{
+				return result;
+			}
+			if (num.Trim().StartsWith("-"))
+				return Double.NegativeInfinity;
+			return Double.PositiveInfinity;
+		}
+
 		private JsonParser.ParseException NumberError(int start, int end)
 		{
-			return new JsonParser.ParseException("Unsupported number format: " + Sharpen.Runtime.Substring(src, start, end));
+			return new JsonParser.ParseException("Unsupported number format: " + src.Substring(start, end - start));
 		}
 
 		/// <exception cref="Rhino.Json.JsonParser.ParseException"></exception>
@@ -556,16 +571,22 @@ namespace Rhino.Json
 			}
 		}
 
-		[System.Serializable]
+		[Serializable]
 		public class ParseException : Exception
 		{
-			internal const long serialVersionUID = 4804542791749920772L;
-
-			internal ParseException(string message) : base(message)
+			public ParseException()
 			{
 			}
 
-			internal ParseException(Exception cause) : base(cause)
+			public ParseException(string message) : base(message)
+			{
+			}
+
+			public ParseException(string message, Exception inner) : base(message, inner)
+			{
+			}
+
+			protected ParseException(SerializationInfo info, StreamingContext context) : base(info, context)
 			{
 			}
 		}

@@ -466,7 +466,7 @@ namespace Rhino
 			BigInteger b1;
 			BigInteger delta;
 			BigInteger mlo;
-			BigInteger mhi;
+			BigInteger mhi = 0;
 			BigInteger S;
 			int[] be = new int[1];
 			int[] bbits = new int[1];
@@ -665,7 +665,7 @@ namespace Rhino
 					{
 						ilim = ilim1;
 						k--;
-						d *= 10.;
+						d *= 10.0;
 						ieps++;
 					}
 				}
@@ -675,7 +675,6 @@ namespace Rhino
 				eps = SetWord0(eps, Word0(eps) - (P - 1) * Exp_msk1);
 				if (ilim == 0)
 				{
-					S = mhi = null;
 					d -= 5.0;
 					if (d > eps)
 					{
@@ -796,7 +795,6 @@ namespace Rhino
 				ds = tens[k];
 				if (ndigits < 0 && ilim <= 0)
 				{
-					S = mhi = null;
 					if (ilim < 0 || d < 5 * ds || (!biasUp && d == 5 * ds))
 					{
 						buf.Length = 0;
@@ -855,7 +853,6 @@ namespace Rhino
 			}
 			m2 = b2;
 			m5 = b5;
-			mhi = mlo = null;
 			if (leftright)
 			{
 				if (mode < 2)

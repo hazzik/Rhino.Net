@@ -142,15 +142,7 @@ namespace Rhino
 			if (stackProvider == null)
 			{
 				stackProvider = re;
-				try
-				{
-					DefineProperty("stack", null, typeof(NativeError).GetMethod("getStack"), typeof(NativeError).GetMethod("setStack", typeof(object)), 0);
-				}
-				catch (MissingMethodException nsm)
-				{
-					// should not happen
-					throw new Exception(nsm);
-				}
+				DefineProperty("stack", null, typeof (NativeError).GetMethod("GetStack"), typeof (NativeError).GetMethod("SetStack", new[] { typeof (object) }), 0);
 			}
 		}
 

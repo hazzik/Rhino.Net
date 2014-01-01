@@ -226,28 +226,21 @@ namespace Rhino
 					throw new InvalidOperationException();
 				}
 				hasCustomGlobal = true;
-				return new _T1664473621(this);
+				return new GlobalSetterImpl();
 			}
 		}
 
-		internal class _T1664473621 : ContextFactory.GlobalSetter
+		private sealed class GlobalSetterImpl : GlobalSetter
 		{
-			public virtual void SetContextFactoryGlobal(ContextFactory factory)
+			public void SetContextFactoryGlobal(ContextFactory factory)
 			{
-				ContextFactory.global = factory == null ? new ContextFactory() : factory;
+				global = factory ?? new ContextFactory();
 			}
 
-			public virtual ContextFactory GetContextFactoryGlobal()
+			public ContextFactory GetContextFactoryGlobal()
 			{
-				return ContextFactory.global;
+				return global;
 			}
-
-			internal _T1664473621(ContextFactory _enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
-
-			private readonly ContextFactory _enclosing;
 		}
 
 		/// <summary>
@@ -410,6 +403,7 @@ namespace Rhino
 			}
 		}
 
+#if ENCHANCED_SECURITY
 		/// <summary>Create class loader for generated classes.</summary>
 		/// <remarks>
 		/// Create class loader for generated classes.
@@ -426,7 +420,7 @@ namespace Rhino
 		{
 			return AccessController.DoPrivileged(new _PrivilegedAction_344(parent));
 		}
-
+		
 		private sealed class _PrivilegedAction_344 : PrivilegedAction<DefiningClassLoader>
 		{
 			public _PrivilegedAction_344(ClassLoader parent)
@@ -441,12 +435,13 @@ namespace Rhino
 
 			private readonly ClassLoader parent;
 		}
+#endif
 
 		/// <summary>Get ClassLoader to use when searching for Java classes.</summary>
 		/// <remarks>
 		/// Get ClassLoader to use when searching for Java classes.
 		/// Unless it was explicitly initialized with
-		/// <see cref="InitApplicationClassLoader(Sharpen.ClassLoader)">InitApplicationClassLoader(Sharpen.ClassLoader)</see>
+		/// <see cref="InitApplicationClassLoader(ClassLoader)">InitApplicationClassLoader(Sharpen.ClassLoader)</see>
 		/// the method returns
 		/// null to indicate that Thread.getContextClassLoader() should be used.
 		/// </remarks>

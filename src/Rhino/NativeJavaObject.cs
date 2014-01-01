@@ -12,6 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -895,19 +896,19 @@ namespace Rhino
 										NativeArray array = (NativeArray)value;
 										long length = array.GetLength();
 										Type arrayType = type.GetElementType();
-										object Result = System.Array.CreateInstance(arrayType, (int)length);
+										Array result = System.Array.CreateInstance(arrayType, (int)length);
 										for (int i = 0; i < length; ++i)
 										{
 											try
 											{
-												Sharpen.Runtime.SetArrayValue(Result, i, CoerceTypeImpl(arrayType, array.Get(i, array)));
+												result.SetValue(CoerceTypeImpl(arrayType, array.Get(i, array)), i);
 											}
 											catch (EvaluatorException)
 											{
 												ReportConversionError(value, type);
 											}
 										}
-										return Result;
+										return result;
 									}
 									else
 									{
@@ -922,12 +923,14 @@ namespace Rhino
 										}
 										else
 										{
+#if INTERFACE_ADAPTER
 											if (type.IsInterface && (value is NativeObject || value is NativeFunction))
 											{
 												// Try to use function/object as implementation of Java interface.
 												return CreateInterfaceAdapter(type, (ScriptableObject)value);
 											}
 											else
+#endif
 											{
 												ReportConversionError(value, type);
 											}
@@ -943,6 +946,7 @@ namespace Rhino
 			return value;
 		}
 
+#if INTERFACE_ADAPTER
 		protected internal static object CreateInterfaceAdapter(Type type, ScriptableObject so)
 		{
 			// XXX: Currently only instances of ScriptableObject are
@@ -963,6 +967,7 @@ namespace Rhino
 			glue = so.AssociateValue(key, glue);
 			return glue;
 		}
+#endif
 
 		private static object CoerceToNumber(Type type, object value)
 		{
@@ -1272,10 +1277,10 @@ namespace Rhino
 				try
 				{
 					sig2[0] = ScriptRuntime.ObjectClass;
-					sig2[1] = Kit.ClassOrNull("java.io.ObjectOutputStream");
+					sig2[1] = Kit.ClassOrNull("Sharpen.ObjectOutputStream");
 					adapter_writeAdapterObject = cl.GetMethod("writeAdapterObject", sig2);
 					sig2[0] = ScriptRuntime.ScriptableClass;
-					sig2[1] = Kit.ClassOrNull("java.io.ObjectInputStream");
+					sig2[1] = Kit.ClassOrNull("Sharpen.ObjectInputStream");
 					adapter_readAdapterObject = cl.GetMethod("readAdapterObject", sig2);
 				}
 				catch (MissingMethodException)

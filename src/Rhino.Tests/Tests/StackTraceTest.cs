@@ -8,30 +8,27 @@
 
 using System;
 using NUnit.Framework;
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
 
 namespace Rhino.Tests
 {
 	/// <author>Marc Guillemot</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class StackTraceTest
 	{
-		internal static readonly string LS = Runtime.GetProperty("line.separator");
+		private static readonly string LS = Environment.NewLine;
 
 		/// <summary>As of CVS head on May, 11.</summary>
 		/// <remarks>
 		/// As of CVS head on May, 11. 2009, stacktrace information is lost when a call to some
 		/// native function has been made.
 		/// </remarks>
-		[NUnit.Framework.Test]
-		public virtual void TestFailureStackTrace()
+		[Test]
+		public void TestFailureStackTrace()
 		{
 			RhinoException.UseMozillaStackStyle(false);
 			string source1 = "function f2() { throw 'hello'; }; f2();";
 			string source2 = "function f2() { 'H'.toLowerCase(); throw 'hello'; }; f2();";
-			string source3 = "function f2() { new java.lang.String('H').toLowerCase(); throw 'hello'; }; f2();";
+			string source3 = "function f2() { System.String.Intern('H').ToLower(); throw 'hello'; }; f2();";
 			string result = "\tat test.js (f2)" + LS + "\tat test.js" + LS;
 			RunWithExpectedStackTrace(source1, result);
 			RunWithExpectedStackTrace(source2, result);
@@ -41,7 +38,6 @@ namespace Rhino.Tests
 		private static void RunWithExpectedStackTrace(string source, string expectedStackTrace)
 		{
 			Utils.RunWithOptimizationLevel(cx =>
-
 			{
 				Scriptable scope = cx.InitStandardObjects();
 				try

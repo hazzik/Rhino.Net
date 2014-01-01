@@ -5,13 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
+#if ENCHANCED_SECURITY
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using Rhino;
 using Sharpen;
+using Thread = System.Threading.Thread;
 
 namespace Rhino
 {
@@ -38,7 +37,7 @@ namespace Rhino
 		/// </remarks>
 		internal static object CallSecurely(CodeSource codeSource, Callable callable, Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 		{
-			Sharpen.Thread thread = Sharpen.Thread.CurrentThread();
+			Thread thread = Thread.CurrentThread;
 			// Run in doPrivileged as we might be checked for "getClassLoader"
 			// runtime permission
 			ClassLoader classLoader = (ClassLoader)AccessController.DoPrivileged(new _PrivilegedAction_51(thread));
@@ -49,7 +48,7 @@ namespace Rhino
 				if (classLoaderMap == null)
 				{
 					classLoaderMap = new WeakHashMap<ClassLoader, SoftReference<SecureCaller>>();
-					callers [codeSource] = classLoaderMap;
+					callers[codeSource] = classLoaderMap;
 				}
 			}
 			SecureCaller caller;
@@ -71,7 +70,7 @@ namespace Rhino
 						// Run in doPrivileged as we'll be checked for
 						// "createClassLoader" runtime permission
 						caller = (SecureCaller)AccessController.DoPrivileged(new _PrivilegedExceptionAction_82(classLoader, codeSource));
-						classLoaderMap [classLoader] = new SoftReference<SecureCaller>(caller);
+						classLoaderMap[classLoader] = new SoftReference<SecureCaller>(caller);
 					}
 					catch (PrivilegedActionException ex)
 					{
@@ -84,7 +83,7 @@ namespace Rhino
 
 		private sealed class _PrivilegedAction_51 : PrivilegedAction<object>
 		{
-			public _PrivilegedAction_51(Sharpen.Thread thread)
+			public _PrivilegedAction_51(Thread thread)
 			{
 				this.thread = thread;
 			}
@@ -94,7 +93,7 @@ namespace Rhino
 				return thread.GetContextClassLoader();
 			}
 
-			private readonly Sharpen.Thread thread;
+			private readonly Thread thread;
 		}
 
 		private sealed class _PrivilegedExceptionAction_82 : PrivilegedExceptionAction<object>
@@ -109,7 +108,7 @@ namespace Rhino
 			public object Run()
 			{
 				ClassLoader effectiveClassLoader;
-				Type thisClass = this.GetType();
+				Type thisClass = GetType();
 				if (classLoader.LoadClass(thisClass.FullName) != thisClass)
 				{
 					effectiveClassLoader = thisClass.GetClassLoader();
@@ -118,9 +117,9 @@ namespace Rhino
 				{
 					effectiveClassLoader = classLoader;
 				}
-				SecureCaller.SecureClassLoaderImpl secCl = new SecureCaller.SecureClassLoaderImpl(effectiveClassLoader);
-				Type c = secCl.DefineAndLinkClass(typeof(SecureCaller).FullName + "Impl", SecureCaller.secureCallerImplBytecode, codeSource);
-				return System.Activator.CreateInstance(c);
+				SecureClassLoaderImpl secCl = new SecureClassLoaderImpl(effectiveClassLoader);
+				Type c = secCl.DefineAndLinkClass(typeof(SecureCaller).FullName + "Impl", secureCallerImplBytecode, codeSource);
+				return Activator.CreateInstance(c);
 			}
 
 			private readonly ClassLoader classLoader;
@@ -128,13 +127,13 @@ namespace Rhino
 			private readonly CodeSource codeSource;
 		}
 
-		private class SecureClassLoaderImpl : SecureClassLoader
+		private sealed class SecureClassLoaderImpl : SecureClassLoader
 		{
 			internal SecureClassLoaderImpl(ClassLoader parent) : base(parent)
 			{
 			}
 
-			internal virtual Type DefineAndLinkClass(string name, byte[] bytes, CodeSource cs)
+			internal Type DefineAndLinkClass(string name, byte[] bytes, CodeSource cs)
 			{
 				Type cl = DefineClass(name, bytes, 0, bytes.Length, cs);
 				ResolveClass(cl);
@@ -144,18 +143,14 @@ namespace Rhino
 
 		private static byte[] LoadBytecode()
 		{
-			return (byte[])AccessController.DoPrivileged(new _PrivilegedAction_129());
+			return (byte[]) AccessController.DoPrivileged(new _PrivilegedAction_129());
 		}
 
 		private sealed class _PrivilegedAction_129 : PrivilegedAction<object>
 		{
-			public _PrivilegedAction_129()
-			{
-			}
-
 			public object Run()
 			{
-				return SecureCaller.LoadBytecodePrivileged();
+				return LoadBytecodePrivileged();
 			}
 		}
 
@@ -190,3 +185,5 @@ namespace Rhino
 		}
 	}
 }
+
+#endif

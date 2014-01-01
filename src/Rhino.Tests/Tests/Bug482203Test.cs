@@ -7,18 +7,17 @@
  */
 
 using System.IO;
-using Rhino;
-using Rhino.Tests;
+using NUnit.Framework;
 using Sharpen;
 
 namespace Rhino.Tests
 {
-	[NUnit.Framework.TestFixture]
-	public class Bug482203Test
+	[TestFixture]
+	public sealed class Bug482203Test
 	{
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestJsApi()
+		[Test]
+		public void TestJsApi()
 		{
 			Context cx = Context.Enter();
 			try
@@ -38,8 +37,8 @@ namespace Rhino.Tests
 					counter++;
 					((Callable)cont).Call(cx, scope, scope, new object[] { null });
 				}
-				NUnit.Framework.Assert.AreEqual(counter, 5);
-				NUnit.Framework.Assert.AreEqual(3, ScriptableObject.GetProperty(scope, "result"));
+				Assert.AreEqual(counter, 5);
+				Assert.AreEqual(3, ScriptableObject.GetProperty(scope, "result"));
 			}
 			finally
 			{
@@ -48,8 +47,8 @@ namespace Rhino.Tests
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestJavaApi()
+		[Test]
+		public void TestJavaApi()
 		{
 			Context cx = Context.Enter();
 			try
@@ -69,8 +68,8 @@ namespace Rhino.Tests
 					counter++;
 					cx.ResumeContinuation(cont, scope, null);
 				}
-				NUnit.Framework.Assert.AreEqual(counter, 5);
-				NUnit.Framework.Assert.AreEqual(3, ScriptableObject.GetProperty(scope, "result"));
+				Assert.AreEqual(counter, 5);
+				Assert.AreEqual(3, ScriptableObject.GetProperty(scope, "result"));
 			}
 			finally
 			{

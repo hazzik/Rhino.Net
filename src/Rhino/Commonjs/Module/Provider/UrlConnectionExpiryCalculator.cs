@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Net;
 using Rhino.CommonJS.Module.Provider;
 using Sharpen;
 
@@ -33,8 +34,8 @@ namespace Rhino.CommonJS.Module.Provider
 		/// Given a URL connection, returns a calculated heuristic expiry time (in
 		/// terms of milliseconds since epoch) for the resource.
 		/// </remarks>
-		/// <param name="urlConnection">the URL connection for the resource</param>
+		/// <param name="response">the URL connection for the resource</param>
 		/// <returns>the expiry for the resource</returns>
-		long CalculateExpiry(URLConnection urlConnection);
+		long CalculateExpiry(HttpWebResponse response);
 	}
 }

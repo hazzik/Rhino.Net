@@ -38,7 +38,7 @@ namespace Rhino.Ast
 
 		private IList<RegExpLiteral> regexps;
 
-		private IList<FunctionNode> EMPTY_LIST = Sharpen.Collections.EmptyList();
+		private IList<FunctionNode> EMPTY_LIST = Collections<FunctionNode>.EMPTY_SET;
 
 		private IList<Symbol> symbols = new List<Symbol>(4);
 
@@ -255,17 +255,17 @@ namespace Rhino.Ast
 			return functions.Count - 1;
 		}
 
-		public virtual int GetRegexpCount()
+		public virtual int GetRegExpCount()
 		{
 			return regexps == null ? 0 : regexps.Count;
 		}
 
-		public virtual string GetRegexpString(int index)
+		public virtual string GetRegExpString(int index)
 		{
 			return regexps[index].GetValue();
 		}
 
-		public virtual string GetRegexpFlags(int index)
+		public virtual string GetRegExpFlags(int index)
 		{
 			return regexps[index].GetFlags();
 		}

@@ -12,9 +12,10 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Security;
-using Rhino;
+using Rhino.Annotations;
 using Rhino.Ast;
 using Rhino.Debug;
+using Rhino.Utils;
 using Rhino.Xml;
 using Sharpen;
 
@@ -334,10 +335,9 @@ namespace Rhino
 		/// </returns>
 		/// <seealso cref="ContextFactory.EnterContext()">ContextFactory.EnterContext()</seealso>
 		/// <seealso cref="ContextFactory.Call(ContextAction)">ContextFactory.Call(ContextAction)</seealso>
-		public static Rhino.Context GetCurrentContext()
+		public static Context GetCurrentContext()
 		{
-			object helper = VMBridge.instance.GetThreadContextHelper();
-			return VMBridge.instance.GetContext(helper);
+			return VMBridge.Context;
 		}
 
 		/// <summary>
@@ -380,8 +380,7 @@ namespace Rhino
 
 		internal static Rhino.Context Enter(Rhino.Context cx, ContextFactory factory)
 		{
-			object helper = VMBridge.instance.GetThreadContextHelper();
-			Rhino.Context old = VMBridge.instance.GetContext(helper);
+			Rhino.Context old = VMBridge.Context;
 			if (old != null)
 			{
 				cx = old;
@@ -408,7 +407,7 @@ namespace Rhino
 						throw new InvalidOperationException("can not use Context instance already associated with some thread");
 					}
 				}
-				VMBridge.instance.SetContext(helper, cx);
+				VMBridge.Context = cx;
 			}
 			++cx.enterCount;
 			return cx;
@@ -426,10 +425,10 @@ namespace Rhino
 		/// again associated with a Context.
 		/// </remarks>
 		/// <seealso cref="ContextFactory.EnterContext()">ContextFactory.EnterContext()</seealso>
+		//TODO: Use as dispose.
 		public static void Exit()
 		{
-			object helper = VMBridge.instance.GetThreadContextHelper();
-			Rhino.Context cx = VMBridge.instance.GetContext(helper);
+			Rhino.Context cx = VMBridge.Context;
 			if (cx == null)
 			{
 				throw new InvalidOperationException("Calling Context.exit without previous Context.enter");
@@ -440,7 +439,7 @@ namespace Rhino
 			}
 			if (--cx.enterCount == 0)
 			{
-				VMBridge.instance.SetContext(helper, null);
+				VMBridge.Context = null;
 				cx.factory.OnContextReleased(cx);
 			}
 		}
@@ -1568,6 +1567,7 @@ namespace Rhino
 		/// the corresponding boolean value converted using
 		/// the ECMA rules
 		/// </returns>
+		[UsedImplicitly]
 		public static bool ToBoolean(object value)
 		{
 			return ScriptRuntime.ToBoolean(value);
@@ -1934,6 +1934,7 @@ namespace Rhino
 			maximumInterpreterStackDepth = max;
 		}
 
+#if ENCHANCED_SECURITY
 		/// <summary>Set the security controller for this context.</summary>
 		/// <remarks>
 		/// Set the security controller for this context.
@@ -1970,6 +1971,7 @@ namespace Rhino
 			}
 			securityController = controller;
 		}
+#endif
 
 		/// <summary>Set the LiveConnect access filter for this context.</summary>
 		/// <remarks>
@@ -2097,7 +2099,7 @@ namespace Rhino
 				{
 					threadLocalMap = new Dictionary<object, object>();
 				}
-				threadLocalMap [key] = value;
+				threadLocalMap[key] = value;
 			}
 		}
 
@@ -2115,7 +2117,7 @@ namespace Rhino
 			{
 				return;
 			}
-			Sharpen.Collections.Remove(threadLocalMap, key);
+			threadLocalMap.Remove(key);
 		}
 
 		/// <summary>Set a WrapFactory for this Context.</summary>
@@ -2365,11 +2367,12 @@ namespace Rhino
 			f.ObserveInstructionCount(this, instructionCount);
 		}
 
+#if ENCHANCED_SECURITY
 		/// <summary>Create class loader for generated classes.</summary>
 		/// <remarks>
 		/// Create class loader for generated classes.
 		/// The method calls
-		/// <see cref="ContextFactory.CreateClassLoader(Sharpen.ClassLoader)">ContextFactory.CreateClassLoader(Sharpen.ClassLoader)</see>
+		/// <see cref="ContextFactory.CreateClassLoader(ClassLoader)">ContextFactory.CreateClassLoader(Sharpen.ClassLoader)</see>
 		/// using the result of
 		/// <see cref="GetFactory()">GetFactory()</see>
 		/// .
@@ -2388,7 +2391,7 @@ namespace Rhino
 				ClassLoader loader = f.GetApplicationClassLoader();
 				if (loader == null)
 				{
-					ClassLoader threadLoader = VMBridge.instance.GetCurrentThreadClassLoader();
+					ClassLoader threadLoader = VMBridge.GetCurrentThreadClassLoader();
 					if (threadLoader != null && Kit.TestIfCanLoadRhinoClasses(threadLoader))
 					{
 						// Thread.getContextClassLoader is not cached since
@@ -2433,6 +2436,7 @@ namespace Rhino
 			}
 			applicationClassLoader = loader;
 		}
+#endif
 
 		/// <summary>
 		/// Internal method that reports an error for missing calls to
@@ -2459,10 +2463,12 @@ namespace Rhino
 			{
 				sourceName = "unnamed script";
 			}
+#if ENCHANCED_SECURITY
 			if (securityDomain != null && GetSecurityController() == null)
 			{
 				throw new ArgumentException("securityDomain should be null if setSecurityController() was never called");
 			}
+#endif
 			// One of sourceReader or sourceString has to be null
 			if (!(sourceReader == null ^ sourceString == null))
 			{
@@ -2628,10 +2634,10 @@ namespace Rhino
 						{
 							if (c == '\n' && open != -1 && close != -1 && colon != -1 && open < colon && colon < close)
 							{
-								string fileStr = Sharpen.Runtime.Substring(s, open + 1, colon);
+								string fileStr = s.Substring(open + 1, colon - (open + 1));
 								if (!fileStr.EndsWith(".java"))
 								{
-									string lineStr = Sharpen.Runtime.Substring(s, colon + 1, close);
+									string lineStr = s.Substring(colon + 1, close - (colon + 1));
 									try
 									{
 										linep[0] = System.Convert.ToInt32(lineStr);
@@ -2673,6 +2679,7 @@ namespace Rhino
 			return version == VERSION_DEFAULT || version >= VERSION_1_3;
 		}
 
+#if ENCHANCED_SECURITY
 		// The method must NOT be public or protected
 		internal virtual SecurityController GetSecurityController()
 		{
@@ -2683,6 +2690,7 @@ namespace Rhino
 			}
 			return securityController;
 		}
+#endif
 
 		public bool IsGeneratingDebugChanged()
 		{
@@ -2769,7 +2777,9 @@ namespace Rhino
 
 		internal int version;
 
+#if ENCHANCED_SECURITY
 		private SecurityController securityController;
+#endif
 
 		private bool hasClassShutter;
 

@@ -7,6 +7,8 @@
  */
 
 using System;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Rhino;
 using Rhino.Tests;
 using Sharpen;
@@ -68,7 +70,7 @@ namespace Rhino.Tests
 			{
 				Exception t = new Exception();
 				// remove prefix and suffix of method name
-				return t.GetStackTrace()[8].GetMethodName().ReplaceFirst("_[^_]*_(.*)_[^_]*", "$1");
+				return Regex.Replace(new StackTrace(t).GetFrame(8).GetMethod().Name, "_[^_]*_(.*)_[^_]*", "$1");
 			}
 
 			internal JavaNameGetter(GeneratedMethodNameTest _enclosing)

@@ -62,7 +62,7 @@ namespace Rhino.Tests
 				ScriptableObject topScope = cx.InitStandardObjects();
 				CustomSetterAcceptNullScriptableTest.Foo foo = new CustomSetterAcceptNullScriptableTest.Foo();
 				// define custom setter method
-				MethodInfo setMyPropMethod = typeof(CustomSetterAcceptNullScriptableTest.Foo).GetMethod("setMyProp", typeof(CustomSetterAcceptNullScriptableTest.Foo2));
+				MethodInfo setMyPropMethod = typeof (CustomSetterAcceptNullScriptableTest.Foo).GetMethod("SetMyProp", new[] { typeof (CustomSetterAcceptNullScriptableTest.Foo2) });
 				foo.DefineProperty("myProp", null, null, setMyPropMethod, ScriptableObject.EMPTY);
 				topScope.Put("foo", topScope, foo);
 				ScriptableObject.DefineClass<CustomSetterAcceptNullScriptableTest.Foo2>(topScope);

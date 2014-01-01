@@ -5,9 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
+#if ENCHANCED_SECURITY
 using System;
 using System.IO;
+using System.Security.Policy;
 using System.Text;
 using Rhino;
 using Rhino.Tools.Shell;
@@ -45,8 +46,6 @@ namespace Rhino.Tools.Shell
 		[System.Serializable]
 		private class ContextPermissions : PermissionCollection
 		{
-			internal const long serialVersionUID = -1721494496320750721L;
-
 			internal ContextPermissions(ProtectionDomain staticDomain)
 			{
 				// Construct PermissionCollection that permits an action only
@@ -207,7 +206,7 @@ namespace Rhino.Tools.Shell
 		private ProtectionDomain GetUrlDomain(Uri url)
 		{
 			CodeSource cs;
-			cs = new CodeSource(url, (Certificate[])null);
+			cs = new CodeSource(url, null);
 			PermissionCollection pc = Policy.GetPolicy().GetPermissions(cs);
 			return new ProtectionDomain(cs, pc);
 		}
@@ -301,3 +300,5 @@ namespace Rhino.Tools.Shell
 		}
 	}
 }
+
+#endif

@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Rhino;
 using Rhino.Ast;
@@ -176,7 +177,7 @@ namespace Rhino.Ast
 		{
 			IDictionary<string, Symbol> src = source.EnsureSymbolTable();
 			IDictionary<string, Symbol> dst = dest.EnsureSymbolTable();
-			if (!Sharpen.Collections.Disjoint(src.Keys, dst.Keys))
+			if (src.Keys.Any(i => dst.Keys.Contains(i)))
 			{
 				CodeBug();
 			}
@@ -184,7 +185,7 @@ namespace Rhino.Ast
 			{
 				Symbol sym = entry.Value;
 				sym.SetContainingTable(dest);
-				dst [entry.Key] = sym;
+				dst[entry.Key] = sym;
 			}
 		}
 
@@ -221,7 +222,12 @@ namespace Rhino.Ast
 		/// </returns>
 		public virtual Symbol GetSymbol(string name)
 		{
-			return symbolTable == null ? null : symbolTable.Get(name);
+			Symbol val;
+			if (symbolTable != null && symbolTable.TryGetValue(name, out val))
+			{
+				return val;
+			}
+			return null;
 		}
 
 		/// <summary>Enters a symbol into this scope.</summary>
@@ -233,7 +239,7 @@ namespace Rhino.Ast
 				throw new ArgumentException("null symbol name");
 			}
 			EnsureSymbolTable();
-			symbolTable [symbol.GetName()] = symbol;
+			symbolTable[symbol.GetName()] = symbol;
 			symbol.SetContainingTable(this);
 			top.AddSymbol(symbol);
 		}
@@ -263,11 +269,7 @@ namespace Rhino.Ast
 
 		private IDictionary<string, Symbol> EnsureSymbolTable()
 		{
-			if (symbolTable == null)
-			{
-				symbolTable = new LinkedHashMap<string, Symbol>(5);
-			}
-			return symbolTable;
+			return symbolTable ?? (symbolTable = new LinkedHashMap<string, Symbol>(5));
 		}
 
 		/// <summary>

@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#if ENCHANCED_SECURITY
 
 using System;
 using System.Security;
@@ -35,7 +36,7 @@ namespace Rhino
 	/// SecurityController class.
 	/// </remarks>
 	/// <seealso cref="Context.SetSecurityController(SecurityController)">Context.SetSecurityController(SecurityController)</seealso>
-	/// <seealso cref="Sharpen.ClassLoader">Sharpen.ClassLoader</seealso>
+	/// <seealso cref="ClassLoader">Sharpen.ClassLoader</seealso>
 	/// <since>1.5 Release 4</since>
 	public abstract class SecurityController
 	{
@@ -122,7 +123,7 @@ namespace Rhino
 		/// <see cref="Context">Context</see>
 		/// ,
 		/// the method calls
-		/// <see cref="Context.CreateClassLoader(Sharpen.ClassLoader)">Context.CreateClassLoader(Sharpen.ClassLoader)</see>
+		/// <see cref="Context.CreateClassLoader(ClassLoader)">Context.CreateClassLoader(Sharpen.ClassLoader)</see>
 		/// .
 		/// </summary>
 		/// <param name="parent">
@@ -198,3 +199,4 @@ namespace Rhino
 		}
 	}
 }
+#endif

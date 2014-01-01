@@ -31,7 +31,7 @@ namespace Rhino.Tools.Shell
 
 		private string characterEncoding;
 
-		protected internal override bool HasFeature(Context cx, int featureIndex)
+		protected override bool HasFeature(Context cx, int featureIndex)
 		{
 			switch (featureIndex)
 			{
@@ -60,7 +60,7 @@ namespace Rhino.Tools.Shell
 			return base.HasFeature(cx, featureIndex);
 		}
 
-		protected internal override void OnContextCreated(Context cx)
+		protected override void OnContextCreated(Context cx)
 		{
 			cx.SetLanguageVersion(languageVersion);
 			cx.SetOptimizationLevel(optimizationLevel);

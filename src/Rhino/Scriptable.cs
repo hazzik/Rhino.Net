@@ -69,7 +69,7 @@ namespace Rhino
 		/// <LI>java.lang.Boolean objects</LI>
 		/// <LI>java.lang.String objects</LI>
 		/// <LI>java.lang.Number objects</LI>
-		/// <LI>Rhino.Scriptable objects</LI>
+		/// <LI>Rhino.Net.Scriptable objects</LI>
 		/// <LI>null</LI>
 		/// <LI>The value returned by Context.getUndefinedValue()</LI>
 		/// <LI>NOT_FOUND</LI>
@@ -149,7 +149,7 @@ namespace Rhino
 		/// <LI>java.lang.Boolean objects</LI>
 		/// <LI>java.lang.String objects</LI>
 		/// <LI>java.lang.Number objects</LI>
-		/// <LI>Rhino.Scriptable objects</LI>
+		/// <LI>Rhino.Net.Scriptable objects</LI>
 		/// <LI>null</LI>
 		/// <LI>The value returned by Context.getUndefinedValue()</LI>
 		/// </UL><p>
@@ -303,6 +303,6 @@ namespace Rhino
 		/// Value returned from <code>get</code> if the property is not
 		/// found.
 		/// </remarks>
-		public const object NOT_FOUND = UniqueTag.NOT_FOUND;
+		public static readonly object NOT_FOUND = UniqueTag.NOT_FOUND;
 	}
 }

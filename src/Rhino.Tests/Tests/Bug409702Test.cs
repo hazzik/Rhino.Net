@@ -12,7 +12,7 @@ using Sharpen;
 
 namespace Rhino.Tests
 {
-	/// <summary>See https://bugzilla.mozilla.org/show_bug.cgi?id=409702</summary>
+	/// <summary>See https://bugzilla.mozilla.org/show_bug.cgi?id=409702 </summary>
 	/// <author>Norris Boyd</author>
 	[NUnit.Framework.TestFixture]
 	public class Bug409702Test
@@ -39,7 +39,7 @@ namespace Rhino.Tests
 		public virtual void TestAdapter()
 		{
 			int value = 12;
-			string source = "var instance = " + "  new JavaAdapter(" + typeof(Bug409702Test.Foo.Subclass).FullName + "," + "{ b: function () { return " + value + "; } });" + "instance.b();";
+			string source = "var instance = " + "  new JavaAdapter(" + typeof (Bug409702Test.Foo.Subclass).FullName.Replace("+", "$") + "," + "{ B: function () { return " + value + "; } });" + "instance.B();";
 			Context cx = ContextFactory.GetGlobal().EnterContext();
 			try
 			{

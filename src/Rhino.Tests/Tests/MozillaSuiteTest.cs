@@ -9,17 +9,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Runners;
 using Rhino.Drivers;
-using Rhino.Tests;
 using Rhino.Tools.Shell;
 using Sharpen;
 
 namespace Rhino.Tests
 {
 	/// <summary>
-	/// This JUnit suite runs the Mozilla test suite (in mozilla.org CVS
+	/// This JUnit suite runs the Mozilla test suite (in mozilla.org CVS 
 	/// at /mozilla/js/tests).
 	/// </summary>
 	/// <remarks>
@@ -38,43 +37,34 @@ namespace Rhino.Tests
 	/// </remarks>
 	/// <author>Norris Boyd</author>
 	/// <author>Attila Szegedi</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class MozillaSuiteTest
 	{
-		private readonly FilePath jsFile;
-
-		private readonly int optimizationLevel;
-
-		internal static readonly int[] OPT_LEVELS = new int[] { -1, 0, 9 };
-
-		public MozillaSuiteTest(FilePath jsFile, int optimizationLevel)
-		{
-			this.jsFile = jsFile;
-			this.optimizationLevel = optimizationLevel;
-		}
+		private static readonly int[] OPT_LEVELS = { -1, 0, 9 };
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static FilePath GetTestDir()
+		public static DirectoryInfo GetTestDir()
 		{
-			FilePath testDir = null;
-			if (Runtime.GetProperty("mozilla.js.tests") != null)
+			DirectoryInfo testDir;
+			var property = Runtime.GetProperty("mozilla.js.tests");
+			if (property != null)
 			{
-				testDir = new FilePath(Runtime.GetProperty("mozilla.js.tests"));
+				testDir = new DirectoryInfo(property);
 			}
 			else
 			{
-				Uri url = typeof(StandardTests).GetResource(".");
-				string path = url.GetFile();
+				Uri url = typeof (StandardTests).GetResource(".");
+				string path = null;//url.GetFile();
 				int jsIndex = path.LastIndexOf("/js");
 				if (jsIndex == -1)
 				{
-					throw new InvalidOperationException("You aren't running the tests " + "from within the standard mozilla/js directory structure");
+					throw new InvalidOperationException("You aren't running the tests from within the standard mozilla/js directory structure");
 				}
-				path = Sharpen.Runtime.Substring(path, 0, jsIndex + 3).Replace('/', FilePath.separatorChar);
+				path = path.Substring(0, jsIndex + 3).Replace('/', Path.DirectorySeparatorChar);
 				path = path.Replace("%20", " ");
-				testDir = new FilePath(path, "tests");
+				testDir = new DirectoryInfo(path + "/tests");
 			}
-			if (!testDir.IsDirectory())
+			if (!testDir.Exists)
 			{
 				throw new FileNotFoundException(testDir + " is not a directory");
 			}
@@ -83,69 +73,57 @@ namespace Rhino.Tests
 
 		public static string GetTestFilename(int optimizationLevel)
 		{
-			return "opt" + optimizationLevel + ".tests";
+			return string.Format("opt{0}.tests", optimizationLevel);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static FilePath[] GetTestFiles(int optimizationLevel)
+		public static FileInfo[] GetTestFiles(int optimizationLevel)
 		{
-			FilePath testDir = GetTestDir();
-			string[] tests = TestUtils.LoadTestsFromResource("/" + GetTestFilename(optimizationLevel), null);
-			Arrays.Sort(tests);
-			FilePath[] files = new FilePath[tests.Length];
+			DirectoryInfo testDir = GetTestDir();
+			string[] tests = TestUtils.LoadTestsFromResource("/" + GetTestFilename(optimizationLevel));
+			Array.Sort(tests, string.CompareOrdinal);
+			FileInfo[] files = new FileInfo[tests.Length];
 			for (int i = 0; i < files.Length; i++)
 			{
-				files[i] = new FilePath(testDir, tests[i]);
+				files[i] = new FileInfo(testDir.FullName + "/" + tests[i]);
 			}
 			return files;
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static string LoadFile(FilePath f)
+		public static string LoadFile(FileInfo f)
 		{
-			int length = (int)f.Length();
-			// don't worry about very long files
-			char[] buf = new char[length];
-			new FileReader(f).Read(buf, 0, length);
-			return new string(buf);
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
-		[Parameterized.Parameters]
-		public static ICollection<object[]> MozillaSuiteValues()
-		{
-			IList<object[]> result = new List<object[]>();
-			int[] optLevels = OPT_LEVELS;
-			for (int i = 0; i < optLevels.Length; i++)
+			using (StreamReader reader = f.OpenText())
 			{
-				FilePath[] tests = GetTestFiles(optLevels[i]);
-				foreach (FilePath f in tests)
-				{
-					result.Add(new object[] { f, optLevels[i] });
-				}
+				return reader.ReadToEnd();
 			}
-			return result;
 		}
 
-		// move "@Parameters" to this method to test a single Mozilla test
 		/// <exception cref="System.IO.IOException"></exception>
-		public static ICollection<object[]> SingleDoctest()
+		public static IEnumerable<object[]> MozillaSuiteValues()
 		{
-			string SINGLE_TEST_FILE = "e4x/Expressions/11.1.1.js";
-			int SINGLE_TEST_OPTIMIZATION_LEVEL = -1;
-			IList<object[]> result = new List<object[]>();
-			FilePath f = new FilePath(GetTestDir(), SINGLE_TEST_FILE);
-			result.Add(new object[] { f, SINGLE_TEST_OPTIMIZATION_LEVEL });
-			return result;
+			return OPT_LEVELS.SelectMany(GetTestFiles, (i, file) => new object[] {file, i});
+		}
+
+		/// <exception cref="System.IO.IOException"></exception>
+		public static IEnumerable<object[]> SingleDoctest()
+		{
+			const int singleTestOptimizationLevel = -1;
+			var f = new FileInfo(GetTestDir().FullName + "/" + "e4x/Expressions/11.1.1.js");
+			return new[]
+			{
+				new object[] {f, singleTestOptimizationLevel}
+			};
 		}
 
 		private class ShellTestParameters : ShellTest.Parameters
 		{
 			public override int GetTimeoutMilliseconds()
 			{
-				if (Runtime.GetProperty("mozilla.js.tests.timeout") != null)
+				var timeout = Runtime.GetProperty("mozilla.js.tests.timeout");
+				if (timeout != null)
 				{
-					return System.Convert.ToInt32(Runtime.GetProperty("mozilla.js.tests.timeout"));
+					return Convert.ToInt32(timeout);
 				}
 				return 10000;
 			}
@@ -153,9 +131,9 @@ namespace Rhino.Tests
 
 		private class JunitStatus : ShellTest.Status
 		{
-			internal FilePath file;
+			internal FileInfo file;
 
-			public sealed override void Running(FilePath jsFile)
+			public sealed override void Running(FileInfo jsFile)
 			{
 				// remember file in case we fail
 				file = jsFile;
@@ -166,13 +144,13 @@ namespace Rhino.Tests
 				// Include test source in message, this is the only way
 				// to locate the test in a Parameterized JUnit test
 				string msg = "In \"" + file + "\":" + Runtime.GetProperty("line.separator") + s;
-				System.Console.Out.WriteLine(msg);
-				NUnit.Framework.Assert.Fail(msg);
+				Console.Out.WriteLine(msg);
+				Assert.Fail(msg);
 			}
 
 			public sealed override void ExitCodesWere(int expected, int actual)
 			{
-				NUnit.Framework.Assert.AreEqual(expected, actual, "Unexpected exit code");
+				Assert.AreEqual(expected, actual, "Unexpected exit code");
 			}
 
 			public sealed override void OutputWas(string s)
@@ -183,7 +161,7 @@ namespace Rhino.Tests
 			// tests.
 			public sealed override void Threw(Exception t)
 			{
-				NUnit.Framework.Assert.Fail(ShellTest.GetStackTrace(t));
+				Assert.Fail(ShellTest.GetStackTrace(t));
 			}
 
 			public sealed override void TimedOut()
@@ -193,15 +171,16 @@ namespace Rhino.Tests
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void RunMozillaTest()
+		[TestCaseSource("MozillaSuiteValues")]
+		//[TestCaseSource("SingleDoctest")] // uncomment this to test a single Mozilla test
+		public void RunMozillaTest(FileInfo file, int level)
 		{
-			//System.out.println("Test \"" + jsFile + "\" running under optimization level " + optimizationLevel);
-			ShellContextFactory shellContextFactory = new ShellContextFactory();
-			shellContextFactory.SetOptimizationLevel(optimizationLevel);
-			MozillaSuiteTest.ShellTestParameters @params = new MozillaSuiteTest.ShellTestParameters();
-			MozillaSuiteTest.JunitStatus status = new MozillaSuiteTest.JunitStatus();
-			ShellTest.Run(shellContextFactory, jsFile, @params, status);
+			//Console.WriteLine("Test \"{0}\" running under optimization level {1}", file, level);
+			var factory = new ShellContextFactory();
+			factory.SetOptimizationLevel(level);
+			var @params = new ShellTestParameters();
+			var status = new JunitStatus();
+			ShellTest.Run(factory, file, @params, status);
 		}
 
 		/// <summary>
@@ -215,26 +194,25 @@ namespace Rhino.Tests
 		/// <exception cref="System.IO.IOException"></exception>
 		public static void Main(string[] args)
 		{
-			TextWriter @out = new TextWriter("fix-tests-files.sh");
+			TextWriter @out = new StreamWriter("fix-tests-files.sh");
 			try
 			{
-				for (int i = 0; i < OPT_LEVELS.Length; i++)
+				foreach (int optLevel in OPT_LEVELS)
 				{
-					int optLevel = OPT_LEVELS[i];
-					FilePath testDir = GetTestDir();
-					FilePath[] allTests = TestUtils.RecursiveListFiles(testDir, new _FileFilter_204());
-					HashSet<FilePath> diff = new HashSet<FilePath>(Arrays.AsList(allTests));
-					FilePath[] testFiles = GetTestFiles(optLevel);
-					diff.RemoveAll(Arrays.AsList(testFiles));
+					DirectoryInfo testDir = GetTestDir();
+					FileInfo[] allTests = TestUtils.RecursiveListFiles(testDir, path => ShellTest.DIRECTORY_FILTER(path) || ShellTest.TEST_FILTER(path));
+					HashSet<FileInfo> diff = new HashSet<FileInfo>(allTests);
+					FileInfo[] testFiles = GetTestFiles(optLevel);
+					diff.RemoveAll(testFiles);
 					List<string> skippedPassed = new List<string>();
-					int absolutePathLength = testDir.GetAbsolutePath().Length + 1;
-					foreach (FilePath testFile in diff)
+					int absolutePathLength = testDir.FullName.Length + 1;
+					foreach (FileInfo testFile in diff)
 					{
 						try
 						{
-							(new MozillaSuiteTest(testFile, optLevel)).RunMozillaTest();
+							new MozillaSuiteTest().RunMozillaTest(testFile, optLevel);
 							// strip off testDir
-							string canonicalized = Sharpen.Runtime.Substring(testFile.GetAbsolutePath(), absolutePathLength);
+							string canonicalized = testFile.FullName.Substring(absolutePathLength);
 							canonicalized = canonicalized.Replace('\\', '/');
 							skippedPassed.Add(canonicalized);
 						}
@@ -249,32 +227,20 @@ namespace Rhino.Tests
 					if (skippedPassed.Count > 0)
 					{
 						@out.WriteLine("cat >> " + GetTestFilename(optLevel) + " <<EOF");
-						string[] sorted = Sharpen.Collections.ToArray(skippedPassed, new string[0]);
-						Arrays.Sort(sorted);
-						for (int j = 0; j < sorted.Length; j++)
+						string[] sorted = skippedPassed.ToArray();
+						Array.Sort(sorted, string.CompareOrdinal);
+						foreach (string t in sorted)
 						{
-							@out.WriteLine(sorted[j]);
+							@out.WriteLine(t);
 						}
 						@out.WriteLine("EOF");
 					}
 				}
-				System.Console.Out.WriteLine("Done.");
+				Console.Out.WriteLine("Done.");
 			}
 			finally
 			{
 				@out.Close();
-			}
-		}
-
-		private sealed class _FileFilter_204 : FileFilter
-		{
-			public _FileFilter_204()
-			{
-			}
-
-			public bool Accept(FilePath pathname)
-			{
-				return ShellTest.DIRECTORY_FILTER.Accept(pathname) || ShellTest.TEST_FILTER.Accept(pathname);
 			}
 		}
 	}

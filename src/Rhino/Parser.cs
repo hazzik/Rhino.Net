@@ -562,13 +562,13 @@ namespace Rhino
 		/// <see cref="CompilerEnvirons">CompilerEnvirons</see>
 		/// .)
 		/// </returns>
-		public virtual AstRoot Parse(string sourceString, string sourceURI, int lineno)
+		public virtual AstRoot Parse(string sourceString, string uri, int lineno)
 		{
 			if (parseFinished)
 			{
 				throw new InvalidOperationException("parser reused");
 			}
-			this.sourceURI = sourceURI;
+			this.sourceURI = uri;
 			if (compilerEnv.IsIdeMode())
 			{
 				this.sourceChars = sourceString.ToCharArray();
@@ -597,7 +597,7 @@ namespace Rhino
 		/// <see cref="System.IO.TextReader">System.IO.TextReader</see>
 		/// encounters an error
 		/// </exception>
-		public virtual AstRoot Parse(TextReader sourceReader, string sourceURI, int lineno)
+		public virtual AstRoot Parse(TextReader reader, string uri, int lineno)
 		{
 			if (parseFinished)
 			{
@@ -605,12 +605,12 @@ namespace Rhino
 			}
 			if (compilerEnv.IsIdeMode())
 			{
-				return Parse(ReadFully(sourceReader), sourceURI, lineno);
+				return Parse(reader.ReadToEnd(), uri, lineno);
 			}
 			try
 			{
-				this.sourceURI = sourceURI;
-				ts = new TokenStream(this, sourceReader, null, lineno);
+				this.sourceURI = uri;
+				ts = new TokenStream(this, reader, null, lineno);
 				return Parse();
 			}
 			finally
@@ -864,7 +864,7 @@ bodyLoop_break: ;
 					}
 					string pname = currentScriptOrFn.GetNextTempName();
 					DefineSymbol(Token.LP, pname, false);
-					destructuring [pname] = expr;
+					destructuring[pname] = expr;
 				}
 				else
 				{
@@ -1276,7 +1276,7 @@ guessingStatementEnd_break: ;
 				default:
 				{
 					// LabeledStatement
-					lineno = ts.lineno;
+					int lineno = ts.lineno;
 					pn = new ExpressionStatement(Expr(), !InsideFunction());
 					pn.SetLineno(lineno);
 					break;
@@ -2181,7 +2181,7 @@ switchLoop_break: ;
 				}
 			}
 			bundle.AddLabel(label);
-			labelSet [name] = bundle;
+			labelSet[name] = bundle;
 		}
 
 		/// <summary>Found a name in a statement context.</summary>
@@ -2243,7 +2243,7 @@ switchLoop_break: ;
 				// remove the labels for this statement from the global set
 				foreach (Label lb in bundle.GetLabels())
 				{
-					Sharpen.Collections.Remove(labelSet, lb.GetName());
+					labelSet.Remove(lb.GetName());
 				}
 			}
 			// If stmt has parent assigned its position already is relative
@@ -3113,7 +3113,7 @@ switchLoop_break: ;
 						int rb = -1;
 						lineno = ts.lineno;
 						AstNode expr = Expr();
-						end = GetNodeEnd(expr);
+						int end = GetNodeEnd(expr);
 						if (MustMatchToken(Token.RB, "msg.no.bracket.index"))
 						{
 							rb = ts.tokenBeg;
@@ -3252,7 +3252,7 @@ tailLoop_break: ;
 				}
 			}
 			bool xml = @ref is XmlRef;
-			InfixExpression result = xml ? new XmlMemberGet() : new PropertyGet();
+			InfixExpression result = xml ? new XmlMemberGet() : (InfixExpression) new PropertyGet();
 			if (xml && tt == Token.DOT)
 			{
 				result.SetType(Token.DOT);
@@ -3513,8 +3513,8 @@ tailLoop_break: ;
 				case Token.FALSE:
 				case Token.TRUE:
 				{
-					pos = ts.tokenBeg;
-					end = ts.tokenEnd;
+					int pos = ts.tokenBeg;
+					int end = ts.tokenEnd;
 					return new KeywordLiteral(pos, end - pos, tt);
 				}
 
@@ -4392,38 +4392,18 @@ commaLoop_break: ;
 			}
 		}
 
-		private void WarnTrailingComma<_T0>(int pos, IList<_T0> elems, int commaPos)
+		private void WarnTrailingComma<T>(int pos, IList<T> elems, int commaPos) where T: Node
 		{
 			if (compilerEnv.GetWarnTrailingComma())
 			{
 				// back up from comma to beginning of line or array/objlit
 				if (!elems.IsEmpty())
 				{
-					pos = ((AstNode)elems[0]).GetPosition();
+					object foo = elems[0];
+					pos = ((AstNode) foo).GetPosition();
 				}
 				pos = Math.Max(pos, LineBeginningFor(commaPos));
 				AddWarning("msg.extra.trailing.comma", pos, commaPos - pos);
-			}
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
-		private string ReadFully(TextReader reader)
-		{
-			BufferedReader @in = new BufferedReader(reader);
-			try
-			{
-				char[] cbuf = new char[1024];
-				StringBuilder sb = new StringBuilder(1024);
-				int bytes_read;
-				while ((bytes_read = @in.Read(cbuf, 0, 1024)) != -1)
-				{
-					sb.Append(cbuf, 0, bytes_read);
-				}
-				return sb.ToString();
-			}
-			finally
-			{
-				@in.Close();
 			}
 		}
 

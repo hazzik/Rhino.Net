@@ -56,7 +56,7 @@ namespace Rhino.Ast
 		public Comment(int pos, int len, Token.CommentType type, string value) : base(pos, len)
 		{
 			{
-				type = Token.COMMENT;
+				this.type = Token.COMMENT;
 			}
 			commentType = type;
 			this.value = value;

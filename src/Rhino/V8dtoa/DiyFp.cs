@@ -127,7 +127,7 @@ namespace Rhino.V8dtoa
 
 		internal virtual void Normalize()
 		{
-			System.Diagnostics.Debug.Assert((f != 0));
+			System.Diagnostics.Debug.Assert((this.f != 0));
 			long f = this.f;
 			int e = this.e;
 			// This method is mainly called for normalizing boundaries. In general

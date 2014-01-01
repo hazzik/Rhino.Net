@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using Rhino.CommonJS.Module.Provider;
 using Sharpen;
@@ -16,11 +17,11 @@ using Sharpen;
 namespace Rhino.CommonJS.Module.Provider
 {
 	/// <summary>
-	/// A URL-based script provider that can load modules against a set of base
+	/// A URL-based script provider that can load modules against a set of baseUri
 	/// privileged and fallback URIs.
 	/// </summary>
 	/// <remarks>
-	/// A URL-based script provider that can load modules against a set of base
+	/// A URL-based script provider that can load modules against a set of baseUri
 	/// privileged and fallback URIs. It is deliberately not named "URI provider"
 	/// but a "URL provider" since it actually only works against those URIs that
 	/// are URLs (and the JRE has a protocol handler for them). It creates cache
@@ -32,11 +33,9 @@ namespace Rhino.CommonJS.Module.Provider
 	/// </remarks>
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: UrlModuleSourceProvider.java,v 1.4 2011/04/07 20:26:12 hannes%helma.at Exp $</version>
-	[System.Serializable]
+	[Serializable]
 	public class UrlModuleSourceProvider : ModuleSourceProviderBase
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly IEnumerable<Uri> privilegedUris;
 
 		private readonly IEnumerable<Uri> fallbackUris;
@@ -144,78 +143,51 @@ namespace Rhino.CommonJS.Module.Provider
 			ModuleSource source = LoadFromActualUri(fullUri, @base, validator);
 			// ... but for compatibility we support modules without extension,
 			// or ids with explicit extension.
-			return source != null ? source : LoadFromActualUri(uri, @base, validator);
+			return source ?? LoadFromActualUri(uri, @base, validator);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		protected internal virtual ModuleSource LoadFromActualUri(Uri uri, Uri @base, object validator)
+		protected virtual ModuleSource LoadFromActualUri(Uri uri, Uri baseUri, object validator)
 		{
-			Uri url = new Uri(@base == null ? null : @base.ToURL(), uri.ToString());
-			long request_time = Runtime.CurrentTimeMillis();
-			URLConnection urlConnection = OpenUrlConnection(url);
-			UrlModuleSourceProvider.URLValidator applicableValidator;
-			if (validator is UrlModuleSourceProvider.URLValidator)
-			{
-				UrlModuleSourceProvider.URLValidator uriValidator = ((UrlModuleSourceProvider.URLValidator)validator);
-				applicableValidator = uriValidator.AppliesTo(uri) ? uriValidator : null;
-			}
-			else
-			{
-				applicableValidator = null;
-			}
+			Uri url = baseUri == null ? uri : new Uri(baseUri, uri);
+			long requestTime = DateTime.UtcNow.ToMillisecondsSinceEpoch();
+			var request = (HttpWebRequest) WebRequest.Create(url);
+
+			URLConnection urlConnection = url.OpenConnection();
+
+			var urlValidator = validator as UrlValidator;
+			UrlValidator applicableValidator = urlValidator != null && urlValidator.AppliesTo(uri) ? urlValidator : null;
 			if (applicableValidator != null)
+				applicableValidator.ApplyConditionals(request);
+
+			var response = (HttpWebResponse) request.GetResponse();
+			if (applicableValidator != null && applicableValidator.UpdateValidator(response, requestTime, urlConnectionExpiryCalculator))
 			{
-				applicableValidator.ApplyConditionals(urlConnection);
+				response.Close();
+				return ModuleSourceProviderConstants.NOT_MODIFIED;
 			}
-			try
-			{
-				urlConnection.Connect();
-				if (applicableValidator != null && applicableValidator.UpdateValidator(urlConnection, request_time, urlConnectionExpiryCalculator))
-				{
-					Close(urlConnection);
-					return ModuleSourceProviderConstants.NOT_MODIFIED;
-				}
-				return new ModuleSource(GetReader(urlConnection), GetSecurityDomain(urlConnection), uri, @base, new UrlModuleSourceProvider.URLValidator(uri, urlConnection, request_time, urlConnectionExpiryCalculator));
-			}
-			catch (FileNotFoundException)
-			{
-				return null;
-			}
-			catch (Exception e)
-			{
-				Close(urlConnection);
-				throw;
-			}
-			catch (IOException e)
-			{
-				Close(urlConnection);
-				throw;
-			}
+
+			return new ModuleSource(GetReader(response), GetSecurityDomain(urlConnection), uri, baseUri, new UrlValidator(uri, response, requestTime, urlConnectionExpiryCalculator));
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private static TextReader GetReader(URLConnection urlConnection)
+		private static StreamReader GetReader(WebResponse response)
 		{
-			return new StreamReader(urlConnection.GetInputStream(), GetCharacterEncoding(urlConnection));
+			var stream = response.GetResponseStream();
+			if (stream != null) return new StreamReader(stream, Encoding.GetEncoding(GetCharacterEncodingName(response)));
+			return new StreamReader(new MemoryStream());
 		}
 
-		private static string GetCharacterEncoding(URLConnection urlConnection)
+		private static string GetCharacterEncodingName(WebResponse response)
 		{
-			ParsedContentType pct = new ParsedContentType(urlConnection.GetContentType());
+			var pct = new ParsedContentType(response.ContentType);
 			string encoding = pct.GetEncoding();
 			if (encoding != null)
-			{
 				return encoding;
-			}
 			string contentType = pct.GetContentType();
-			if (contentType != null && contentType.StartsWith("text/"))
-			{
-				return "8859_1";
-			}
-			else
-			{
-				return "utf-8";
-			}
+			return contentType != null && contentType.StartsWith("text/")
+				? "8859_1"
+				: "utf-8";
 		}
 
 		private object GetSecurityDomain(URLConnection urlConnection)
@@ -223,199 +195,117 @@ namespace Rhino.CommonJS.Module.Provider
 			return urlConnectionSecurityDomainProvider == null ? null : urlConnectionSecurityDomainProvider.GetSecurityDomain(urlConnection);
 		}
 
-		private void Close(URLConnection urlConnection)
-		{
-			try
-			{
-				urlConnection.GetInputStream().Close();
-			}
-			catch (IOException e)
-			{
-				OnFailedClosingUrlConnection(urlConnection, e);
-			}
-		}
-
-		/// <summary>
-		/// Override if you want to get notified if the URL connection fails to
-		/// close.
-		/// </summary>
-		/// <remarks>
-		/// Override if you want to get notified if the URL connection fails to
-		/// close. Does nothing by default.
-		/// </remarks>
-		/// <param name="urlConnection">the connection</param>
-		/// <param name="cause">the cause it failed to close.</param>
-		protected internal virtual void OnFailedClosingUrlConnection(URLConnection urlConnection, IOException cause)
-		{
-		}
-
-		/// <summary>
-		/// Can be overridden in subclasses to customize the URL connection opening
-		/// process.
-		/// </summary>
-		/// <remarks>
-		/// Can be overridden in subclasses to customize the URL connection opening
-		/// process. By default, just calls
-		/// <see cref="System.Uri.OpenConnection()">System.Uri.OpenConnection()</see>
-		/// .
-		/// </remarks>
-		/// <param name="url">the URL</param>
-		/// <returns>a connection to the URL.</returns>
-		/// <exception cref="System.IO.IOException">if an I/O error occurs.</exception>
-		protected internal virtual URLConnection OpenUrlConnection(Uri url)
-		{
-			return url.OpenConnection();
-		}
-
 		protected internal override bool EntityNeedsRevalidation(object validator)
 		{
-			return !(validator is UrlModuleSourceProvider.URLValidator) || ((UrlModuleSourceProvider.URLValidator)validator).EntityNeedsRevalidation();
+			return !(validator is UrlValidator) || ((UrlValidator)validator).EntityNeedsRevalidation();
 		}
 
-		[System.Serializable]
-		private class URLValidator
+		[Serializable]
+		private sealed class UrlValidator
 		{
-			private const long serialVersionUID = 1L;
+			private readonly Uri _uri;
 
-			private readonly Uri uri;
-
-			private readonly long lastModified;
+			private readonly DateTime lastModified;
 
 			private readonly string entityTags;
 
 			private long expiry;
 
-			public URLValidator(Uri uri, URLConnection urlConnection, long request_time, UrlConnectionExpiryCalculator urlConnectionExpiryCalculator)
+			public UrlValidator(Uri uri, HttpWebResponse response, long requestTime, UrlConnectionExpiryCalculator urlConnectionExpiryCalculator)
 			{
-				this.uri = uri;
-				this.lastModified = urlConnection.GetLastModified();
-				this.entityTags = GetEntityTags(urlConnection);
-				expiry = CalculateExpiry(urlConnection, request_time, urlConnectionExpiryCalculator);
+				_uri = uri;
+				lastModified = response.LastModified;
+				entityTags = response.Headers.Get("ETag");
+				expiry = CalculateExpiry(response, requestTime, urlConnectionExpiryCalculator);
 			}
 
 			/// <exception cref="System.IO.IOException"></exception>
-			internal virtual bool UpdateValidator(URLConnection urlConnection, long request_time, UrlConnectionExpiryCalculator urlConnectionExpiryCalculator)
+			internal bool UpdateValidator(HttpWebResponse response, long requestTime, UrlConnectionExpiryCalculator urlConnectionExpiryCalculator)
 			{
-				bool isResourceChanged = IsResourceChanged(urlConnection);
-				if (!isResourceChanged)
+				if (response.StatusCode != HttpStatusCode.NotModified)
 				{
-					expiry = CalculateExpiry(urlConnection, request_time, urlConnectionExpiryCalculator);
+					expiry = CalculateExpiry(response, requestTime, urlConnectionExpiryCalculator);
 				}
-				return isResourceChanged;
+				return response.StatusCode == HttpStatusCode.NotModified;
 			}
 
-			/// <exception cref="System.IO.IOException"></exception>
-			private bool IsResourceChanged(URLConnection urlConnection)
+			private static long CalculateExpiry(HttpWebResponse response, long requestTime, UrlConnectionExpiryCalculator urlConnectionExpiryCalculator)
 			{
-				if (urlConnection is HttpURLConnection)
-				{
-					return ((HttpURLConnection)urlConnection).GetResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED;
-				}
-				return lastModified == urlConnection.GetLastModified();
-			}
-
-			private long CalculateExpiry(URLConnection urlConnection, long request_time, UrlConnectionExpiryCalculator urlConnectionExpiryCalculator)
-			{
-				if ("no-cache".Equals(urlConnection.GetHeaderField("Pragma")))
-				{
+				if (string.Equals("no-cache", response.Headers ["Pragma"]))
 					return 0L;
-				}
-				string cacheControl = urlConnection.GetHeaderField("Cache-Control");
+
+
+				string cacheControl = response.Headers["Cache-Control"];
 				if (cacheControl != null)
 				{
-					if (cacheControl.IndexOf("no-cache") != -1)
-					{
+					if (cacheControl.IndexOf("no-cache", StringComparison.Ordinal) != -1)
 						return 0L;
-					}
-					int max_age = GetMaxAge(cacheControl);
-					if (-1 != max_age)
+					
+					int maxAge = GetMaxAge(cacheControl);
+					if (-1 != maxAge)
 					{
-						long response_time = Runtime.CurrentTimeMillis();
-						long apparent_age = Math.Max(0, response_time - urlConnection.GetDate());
-						long corrected_received_age = Math.Max(apparent_age, urlConnection.GetHeaderFieldInt("Age", 0) * 1000L);
-						long response_delay = response_time - request_time;
-						long corrected_initial_age = corrected_received_age + response_delay;
-						long creation_time = response_time - corrected_initial_age;
-						return max_age * 1000L + creation_time;
+						//TODO: fix me
+						/*
+						long responseTime = DateTime.UtcNow.ToMillisecondsSinceEpoch();
+						long apparentAge = Math.Max(0, responseTime - response.GetDate());
+						long correctedReceivedAge = Math.Max(apparentAge, response.GetHeaderFieldInt("Age", 0) * 1000L);
+						long responseDelay = responseTime - requestTime;
+						long correctedInitialAge = correctedReceivedAge + responseDelay;
+						long creationTime = responseTime - correctedInitialAge;
+						return maxAge * 1000L + creationTime;
+						 */
 					}
 				}
-				long explicitExpiry = urlConnection.GetHeaderFieldDate("Expires", -1L);
+				/*
+				long explicitExpiry = response.Headers["Expires"].GetHeaderFieldDate("Expires", -1L);
 				if (explicitExpiry != -1L)
 				{
 					return explicitExpiry;
-				}
-				return urlConnectionExpiryCalculator == null ? 0L : urlConnectionExpiryCalculator.CalculateExpiry(urlConnection);
+				} 
+				 */
+				return urlConnectionExpiryCalculator == null ? 0L : urlConnectionExpiryCalculator.CalculateExpiry(response);
 			}
 
-			private int GetMaxAge(string cacheControl)
+			private static int GetMaxAge(string cacheControl)
 			{
-				int maxAgeIndex = cacheControl.IndexOf("max-age");
+				int maxAgeIndex = cacheControl.IndexOf("max-age", StringComparison.Ordinal);
 				if (maxAgeIndex == -1)
-				{
 					return -1;
-				}
+
 				int eq = cacheControl.IndexOf('=', maxAgeIndex + 7);
 				if (eq == -1)
-				{
 					return -1;
-				}
-				int comma = cacheControl.IndexOf(',', eq + 1);
-				string strAge;
-				if (comma == -1)
-				{
-					strAge = Sharpen.Runtime.Substring(cacheControl, eq + 1);
-				}
-				else
-				{
-					strAge = Sharpen.Runtime.Substring(cacheControl, eq + 1, comma);
-				}
-				try
-				{
-					return System.Convert.ToInt32(strAge);
-				}
-				catch (FormatException)
-				{
-					return -1;
-				}
+
+				var afterEq = eq + 1;
+
+				var comma = cacheControl.IndexOf(',', afterEq);
+				var strAge = comma == -1
+					? cacheControl.Substring(afterEq)
+					: cacheControl.Substring(afterEq, comma - afterEq);
+
+				int maxAge;
+				if (!int.TryParse(strAge, out maxAge))
+					return - 1;
+				return maxAge;
 			}
 
-			private string GetEntityTags(URLConnection urlConnection)
+			internal bool AppliesTo(Uri uri)
 			{
-				IList<string> etags = urlConnection.GetHeaderFields().Get("ETag");
-				if (etags == null || etags.IsEmpty())
-				{
-					return null;
-				}
-				StringBuilder b = new StringBuilder();
-				IEnumerator<string> it = etags.GetEnumerator();
-				b.Append(it.Next());
-				while (it.HasNext())
-				{
-					b.Append(", ").Append(it.Next());
-				}
-				return b.ToString();
+				return _uri.Equals(uri);
 			}
 
-			internal virtual bool AppliesTo(Uri uri)
+			internal void ApplyConditionals(HttpWebRequest request)
 			{
-				return this.uri.Equals(uri);
+				if (lastModified != DateTime.MinValue)
+					request.IfModifiedSince = lastModified;
+
+				if (!string.IsNullOrEmpty(entityTags))
+					request.Headers.Add("If-None-Match", entityTags);
 			}
 
-			internal virtual void ApplyConditionals(URLConnection urlConnection)
+			internal bool EntityNeedsRevalidation()
 			{
-				if (lastModified != 0L)
-				{
-					urlConnection.SetIfModifiedSince(lastModified);
-				}
-				if (entityTags != null && entityTags.Length > 0)
-				{
-					urlConnection.AddRequestProperty("If-None-Match", entityTags);
-				}
-			}
-
-			internal virtual bool EntityNeedsRevalidation()
-			{
-				return Runtime.CurrentTimeMillis() > expiry;
+				return DateTime.UtcNow.ToMillisecondsSinceEpoch() > expiry;
 			}
 		}
 	}

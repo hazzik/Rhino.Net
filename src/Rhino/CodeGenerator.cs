@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
 using System;
 using Rhino;
 using Rhino.Ast;
 using Sharpen;
+using Label = System.Reflection.Emit.Label;
 
 namespace Rhino
 {
@@ -97,7 +97,7 @@ namespace Rhino
 			if (theFunction.IsGenerator())
 			{
 				AddIcode(Icode_GENERATOR);
-				AddUint16(theFunction.GetBaseLineno() & unchecked((int)(0xFFFF)));
+				AddUint16(theFunction.GetBaseLineno() & 0xffff);
 			}
 			GenerateICodeFromTree(theFunction.GetLastChild());
 		}
@@ -117,8 +117,8 @@ namespace Rhino
 			{
 				// Make itsData.itsICode length exactly iCodeTop to save memory
 				// and catch bugs with jumps beyond icode as early as possible
-				byte[] tmp = new byte[iCodeTop];
-				System.Array.Copy(itsData.itsICode, 0, tmp, 0, iCodeTop);
+				sbyte[] tmp = new sbyte[iCodeTop];
+				Array.Copy(itsData.itsICode, 0, tmp, 0, iCodeTop);
 				itsData.itsICode = tmp;
 			}
 			if (strings.Size() == 0)
@@ -149,14 +149,14 @@ namespace Rhino
 				if (itsData.itsDoubleTable.Length != doubleTableTop)
 				{
 					double[] tmp = new double[doubleTableTop];
-					System.Array.Copy(itsData.itsDoubleTable, 0, tmp, 0, doubleTableTop);
+					Array.Copy(itsData.itsDoubleTable, 0, tmp, 0, doubleTableTop);
 					itsData.itsDoubleTable = tmp;
 				}
 			}
 			if (exceptionTableTop != 0 && itsData.itsExceptionTable.Length != exceptionTableTop)
 			{
 				int[] tmp = new int[exceptionTableTop];
-				System.Array.Copy(itsData.itsExceptionTable, 0, tmp, 0, exceptionTableTop);
+				Array.Copy(itsData.itsExceptionTable, 0, tmp, 0, exceptionTableTop);
 				itsData.itsExceptionTable = tmp;
 			}
 			itsData.itsMaxVars = scriptOrFn.GetParamAndVarCount();
@@ -197,7 +197,7 @@ namespace Rhino
 
 		private void GenerateRegExpLiterals()
 		{
-			int N = scriptOrFn.GetRegexpCount();
+			int N = scriptOrFn.GetRegExpCount();
 			if (N == 0)
 			{
 				return;
@@ -207,8 +207,8 @@ namespace Rhino
 			object[] array = new object[N];
 			for (int i = 0; i != N; i++)
 			{
-				string @string = scriptOrFn.GetRegexpString(i);
-				string flags = scriptOrFn.GetRegexpFlags(i);
+				string @string = scriptOrFn.GetRegExpString(i);
+				string flags = scriptOrFn.GetRegExpFlags(i);
 				array[i] = rep.CompileRegExp(cx, @string, flags);
 			}
 			itsData.itsRegExpLiterals = array;
@@ -225,7 +225,7 @@ namespace Rhino
 				}
 				lineNumber = lineno;
 				AddIcode(Icode_LINE);
-				AddUint16(lineno & unchecked((int)(0xFFFF)));
+				AddUint16(lineno & 0xffff);
 			}
 		}
 
@@ -469,7 +469,7 @@ namespace Rhino
 					UpdateLineNumber(node);
 					VisitExpression(child, 0);
 					AddToken(Token.THROW);
-					AddUint16(lineNumber & unchecked((int)(0xFFFF)));
+					AddUint16(lineNumber & 0xffff);
 					StackChange(-1);
 					break;
 				}
@@ -488,7 +488,7 @@ namespace Rhino
 					{
 						// We're in a generator, so change RETURN to GENERATOR_END
 						AddIcode(Icode_GENERATOR_END);
-						AddUint16(lineNumber & unchecked((int)(0xFFFF)));
+						AddUint16(lineNumber & 0xffff);
 					}
 					else
 					{
@@ -616,7 +616,7 @@ namespace Rhino
 						AddIndexOp(Icode_CALLSPECIAL, argCount);
 						AddUint8(callType);
 						AddUint8(type == Token.NEW ? 1 : 0);
-						AddUint16(lineNumber & unchecked((int)(0xFFFF)));
+						AddUint16(lineNumber & 0xffff);
 					}
 					else
 					{
@@ -925,7 +925,7 @@ namespace Rhino
 								{
 									AddIcode(Icode_SHORTNUMBER);
 									// write short as uin16 bit pattern
-									AddUint16(inum & unchecked((int)(0xFFFF)));
+									AddUint16(inum & 0xffff);
 								}
 								else
 								{
@@ -1333,7 +1333,7 @@ namespace Rhino
 				else
 				{
 					int[] tmp = new int[labelTable.Length * 2];
-					System.Array.Copy(labelTable, 0, tmp, 0, label);
+					Array.Copy(labelTable, 0, tmp, 0, label);
 					labelTable = tmp;
 				}
 			}
@@ -1380,7 +1380,7 @@ namespace Rhino
 					else
 					{
 						long[] tmp = new long[fixupTable.Length * 2];
-						System.Array.Copy(fixupTable, 0, tmp, 0, top);
+						Array.Copy(fixupTable, 0, tmp, 0, top);
 						fixupTable = tmp;
 					}
 				}
@@ -1447,14 +1447,14 @@ namespace Rhino
 				itsData.longJumps.Put(offsetSite, jumpPC);
 				offset = 0;
 			}
-			byte[] array = itsData.itsICode;
-			array[offsetSite] = unchecked((byte)(offset >> 8));
-			array[offsetSite + 1] = unchecked((byte)offset);
+			sbyte[] array = itsData.itsICode;
+			array[offsetSite] = unchecked((sbyte)(offset >> 8));
+			array[offsetSite + 1] = unchecked((sbyte)offset);
 		}
 
 		private void AddToken(int token)
 		{
-			if (!Icode.ValidTokenCode(token))
+			if (!ValidTokenCode(token))
 			{
 				throw Kit.CodeBug();
 			}
@@ -1463,59 +1463,59 @@ namespace Rhino
 
 		private void AddIcode(int icode)
 		{
-			if (!Icode.ValidIcode(icode))
+			if (!ValidIcode(icode))
 			{
 				throw Kit.CodeBug();
 			}
 			// Write negative icode as uint8 bits
-			AddUint8(icode & unchecked((int)(0xFF)));
+			AddUint8(icode & 0xff);
 		}
 
 		private void AddUint8(int value)
 		{
-			if ((value & ~unchecked((int)(0xFF))) != 0)
+			if ((value & ~0xFF) != 0)
 			{
 				throw Kit.CodeBug();
 			}
-			byte[] array = itsData.itsICode;
+			sbyte[] array = itsData.itsICode;
 			int top = iCodeTop;
 			if (top == array.Length)
 			{
 				array = IncreaseICodeCapacity(1);
 			}
-			array[top] = unchecked((byte)value);
+			array[top] = unchecked((sbyte)value);
 			iCodeTop = top + 1;
 		}
 
 		private void AddUint16(int value)
 		{
-			if ((value & ~unchecked((int)(0xFFFF))) != 0)
+			if ((value & ~0xffff) != 0)
 			{
 				throw Kit.CodeBug();
 			}
-			byte[] array = itsData.itsICode;
+			sbyte[] array = itsData.itsICode;
 			int top = iCodeTop;
 			if (top + 2 > array.Length)
 			{
 				array = IncreaseICodeCapacity(2);
 			}
-			array[top] = unchecked((byte)((int)(((uint)value) >> 8)));
-			array[top + 1] = unchecked((byte)value);
+			array[top] = unchecked((sbyte)((int)(((uint)value) >> 8)));
+			array[top + 1] = unchecked((sbyte)value);
 			iCodeTop = top + 2;
 		}
 
 		private void AddInt(int i)
 		{
-			byte[] array = itsData.itsICode;
+			sbyte[] array = itsData.itsICode;
 			int top = iCodeTop;
 			if (top + 4 > array.Length)
 			{
 				array = IncreaseICodeCapacity(4);
 			}
-			array[top] = unchecked((byte)((int)(((uint)i) >> 24)));
-			array[top + 1] = unchecked((byte)((int)(((uint)i) >> 16)));
-			array[top + 2] = unchecked((byte)((int)(((uint)i) >> 8)));
-			array[top + 3] = unchecked((byte)i);
+			array[top] = unchecked((sbyte)((int)(((uint)i) >> 24)));
+			array[top + 1] = unchecked((sbyte)((int)(((uint)i) >> 16)));
+			array[top + 2] = unchecked((sbyte)((int)(((uint)i) >> 8)));
+			array[top + 3] = unchecked((sbyte)i);
 			iCodeTop = top + 4;
 		}
 
@@ -1531,7 +1531,7 @@ namespace Rhino
 				if (itsData.itsDoubleTable.Length == index)
 				{
 					double[] na = new double[index * 2];
-					System.Array.Copy(itsData.itsDoubleTable, 0, na, 0, index);
+					Array.Copy(itsData.itsDoubleTable, 0, na, 0, index);
 					itsData.itsDoubleTable = na;
 				}
 			}
@@ -1542,13 +1542,13 @@ namespace Rhino
 
 		private void AddGotoOp(int gotoOp)
 		{
-			byte[] array = itsData.itsICode;
+			sbyte[] array = itsData.itsICode;
 			int top = iCodeTop;
 			if (top + 3 > array.Length)
 			{
 				array = IncreaseICodeCapacity(3);
 			}
-			array[top] = unchecked((byte)gotoOp);
+			array[top] = unchecked((sbyte)gotoOp);
 			// Offset would written later
 			iCodeTop = top + 1 + 2;
 		}
@@ -1594,7 +1594,7 @@ namespace Rhino
 		private void AddStringOp(int op, string str)
 		{
 			AddStringPrefix(str);
-			if (Icode.ValidIcode(op))
+			if (ValidIcode(op))
 			{
 				AddIcode(op);
 			}
@@ -1607,7 +1607,7 @@ namespace Rhino
 		private void AddIndexOp(int op, int index)
 		{
 			AddIndexPrefix(index);
-			if (Icode.ValidIcode(op))
+			if (ValidIcode(op))
 			{
 				AddIcode(op);
 			}
@@ -1631,14 +1631,14 @@ namespace Rhino
 			}
 			else
 			{
-				if (index <= unchecked((int)(0xFF)))
+				if (index <= 0xff)
 				{
 					AddIcode(Icode_REG_STR1);
 					AddUint8(index);
 				}
 				else
 				{
-					if (index <= unchecked((int)(0xFFFF)))
+					if (index <= 0xffff)
 					{
 						AddIcode(Icode_REG_STR2);
 						AddUint16(index);
@@ -1664,14 +1664,14 @@ namespace Rhino
 			}
 			else
 			{
-				if (index <= unchecked((int)(0xFF)))
+				if (index <= 0xff)
 				{
 					AddIcode(Icode_REG_IND1);
 					AddUint8(index);
 				}
 				else
 				{
-					if (index <= unchecked((int)(0xFFFF)))
+					if (index <= 0xffff)
 					{
 						AddIcode(Icode_REG_IND2);
 						AddUint16(index);
@@ -1703,7 +1703,7 @@ namespace Rhino
 				if (table.Length == top)
 				{
 					table = new int[table.Length * 2];
-					System.Array.Copy(itsData.itsExceptionTable, 0, table, 0, top);
+					Array.Copy(itsData.itsExceptionTable, 0, table, 0, top);
 					itsData.itsExceptionTable = table;
 				}
 			}
@@ -1716,7 +1716,7 @@ namespace Rhino
 			exceptionTableTop = top + Interpreter.EXCEPTION_SLOT_SIZE;
 		}
 
-		private byte[] IncreaseICodeCapacity(int extraSize)
+		private sbyte[] IncreaseICodeCapacity(int extraSize)
 		{
 			int capacity = itsData.itsICode.Length;
 			int top = iCodeTop;
@@ -1729,8 +1729,8 @@ namespace Rhino
 			{
 				capacity = top + extraSize;
 			}
-			byte[] array = new byte[capacity];
-			System.Array.Copy(itsData.itsICode, 0, array, 0, top);
+			sbyte[] array = new sbyte[capacity];
+			Array.Copy(itsData.itsICode, 0, array, 0, top);
 			itsData.itsICode = array;
 			return array;
 		}

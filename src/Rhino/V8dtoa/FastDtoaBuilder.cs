@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
 using Rhino.V8dtoa;
 using Sharpen;
 
@@ -84,7 +85,10 @@ namespace Rhino.V8dtoa
 					chars[firstDigit + 1] = '.';
 					if (decPoint < 0)
 					{
-						Arrays.Fill(chars, firstDigit + 2, target, '0');
+						for (int i = firstDigit + 2; i < target; i++)
+						{
+							chars[i] = '0';
+						}
 					}
 					end += 2 - decPoint;
 				}
@@ -94,7 +98,10 @@ namespace Rhino.V8dtoa
 				if (point > end)
 				{
 					// large integer, add trailing zeroes
-					Arrays.Fill(chars, end, point, '0');
+					for (int i = end; i < point; i++)
+					{
+						chars[i] = '0';
+					}
 					end += point - end;
 				}
 			}

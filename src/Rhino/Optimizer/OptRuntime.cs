@@ -8,6 +8,7 @@
 
 using System;
 using Rhino;
+using Rhino.Annotations;
 using Rhino.Optimizer;
 using Sharpen;
 
@@ -15,12 +16,6 @@ namespace Rhino.Optimizer
 {
 	public sealed class OptRuntime : ScriptRuntime
 	{
-		public static readonly double zeroObj = 0.0;
-
-		public static readonly double oneObj = 1.0;
-
-		public static readonly double minusOneObj = -1.0;
-
 		/// <summary>Implement ....() call shrinking optimizer code.</summary>
 		/// <remarks>Implement ....() call shrinking optimizer code.</remarks>
 		public static object Call0(Callable fun, Scriptable thisObj, Context cx, Scriptable scope)
@@ -84,11 +79,12 @@ namespace Rhino.Optimizer
 			}
 			if (!(val1 is string))
 			{
-				return WrapDouble(ToNumber(val1) + val2);
+				return ToNumber(val1) + val2;
 			}
 			return (string) val1 + ToString(val2);
 		}
 
+		[UsedImplicitly]
 		public static object Add(double val1, object val2)
 		{
 			if (val2 is Scriptable)
@@ -97,11 +93,12 @@ namespace Rhino.Optimizer
 			}
 			if (!(val2 is string))
 			{
-				return WrapDouble(ToNumber(val2) + val1);
+				return ToNumber(val2) + val1;
 			}
 			return ToString(val1) + (string) val2;
 		}
 
+		[UsedImplicitly]
 		public static object ElemIncrDecr(object obj, double index, Context cx, int incrDecrMask)
 		{
 			return ScriptRuntime.ElemIncrDecr(obj, index, cx, incrDecrMask);
@@ -114,6 +111,7 @@ namespace Rhino.Optimizer
 			return result;
 		}
 
+		[UsedImplicitly]
 		public static void InitFunction(NativeFunction fn, int functionType, Scriptable scope, Context cx)
 		{
 			ScriptRuntime.InitFunction(cx, scope, fn, functionType, false);
@@ -127,40 +125,6 @@ namespace Rhino.Optimizer
 		public static object NewObjectSpecial(Context cx, object fun, object[] args, Scriptable scope, Scriptable callerThis, int callType)
 		{
 			return ScriptRuntime.NewSpecial(cx, fun, args, scope, callType);
-		}
-
-		public static double WrapDouble(double num)
-		{
-			if (num == 0.0)
-			{
-				if (1 / num > 0)
-				{
-					// +0.0
-					return zeroObj;
-				}
-			}
-			else
-			{
-				if (num == 1.0)
-				{
-					return oneObj;
-				}
-				else
-				{
-					if (num == -1.0)
-					{
-						return minusOneObj;
-					}
-					else
-					{
-						if (num != num)
-						{
-							return NaNobj;
-						}
-					}
-				}
-			}
-			return num;
 		}
 
 		internal static string EncodeIntArray(int[] array)
@@ -207,6 +171,7 @@ namespace Rhino.Optimizer
 			return array;
 		}
 
+		[UsedImplicitly]
 		public static Scriptable NewArrayLiteral(object[] objects, string encodedInts, int skipCount, Context cx, Scriptable scope)
 		{
 			int[] skipIndexces = DecodeIntArray(encodedInts, skipCount);
@@ -217,7 +182,7 @@ namespace Rhino.Optimizer
 		{
 			ContextFactory.GetGlobal().Call(cx =>
 			{
-				ScriptableObject global = ScriptRuntime.GetGlobal(cx);
+				ScriptableObject global = GetGlobal(cx);
 				// get the command line arguments and define "arguments"
 				// array in the top-level object
 				object[] argsCopy = new object[args.Length];
@@ -234,11 +199,13 @@ namespace Rhino.Optimizer
 			throw new JavaScriptException(NativeIterator.GetStopIterationObject((Scriptable)obj), string.Empty, 0);
 		}
 
+		[UsedImplicitly]
 		public static Scriptable CreateNativeGenerator(NativeFunction funObj, Scriptable scope, Scriptable thisObj, int maxLocals, int maxStack)
 		{
 			return new NativeGenerator(scope, funObj, new OptRuntime.GeneratorState(thisObj, maxLocals, maxStack));
 		}
 
+		[UsedImplicitly]
 		public static object[] GetGeneratorStackState(object obj)
 		{
 			OptRuntime.GeneratorState rgs = (OptRuntime.GeneratorState)obj;
@@ -249,6 +216,7 @@ namespace Rhino.Optimizer
 			return rgs.stackState;
 		}
 
+		[UsedImplicitly]
 		public static object[] GetGeneratorLocalsState(object obj)
 		{
 			OptRuntime.GeneratorState rgs = (OptRuntime.GeneratorState)obj;
@@ -261,19 +229,17 @@ namespace Rhino.Optimizer
 
 		public class GeneratorState
 		{
-			internal const string CLASS_NAME = "org/mozilla/javascript/optimizer/OptRuntime$GeneratorState";
+			internal static readonly Type CLASS_NAME = typeof (GeneratorState);
 
 			public int resumptionPoint;
 
 			internal const string resumptionPoint_NAME = "resumptionPoint";
 
-			internal const string resumptionPoint_TYPE = "I";
-
 			public Scriptable thisObj;
 
 			internal const string thisObj_NAME = "thisObj";
 
-			internal const string thisObj_TYPE = "Lorg/mozilla/javascript/Scriptable;";
+			internal static readonly Type thisObj_TYPE = typeof (Scriptable);
 
 			internal object[] stackState;
 

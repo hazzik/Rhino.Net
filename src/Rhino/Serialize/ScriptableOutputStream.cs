@@ -49,7 +49,7 @@ namespace Rhino.Serialize
 			// API class
 			this.scope = scope;
 			table = new Dictionary<object, string>();
-			table [scope] = string.Empty;
+			table[scope] = string.Empty;
 			EnableReplaceObject(true);
 			ExcludeStandardObjectNames();
 		}
@@ -82,7 +82,7 @@ namespace Rhino.Serialize
 		/// </param>
 		/// <exception cref="System.ArgumentException">
 		/// if the object is not a
-		/// <see cref="Rhino.Scriptable">Rhino.Scriptable</see>
+		/// <see cref="Scriptable">Rhino.Scriptable</see>
 		/// .
 		/// </exception>
 		public virtual void AddOptionalExcludedName(string name)
@@ -94,7 +94,7 @@ namespace Rhino.Serialize
 				{
 					throw new ArgumentException("Object for excluded name " + name + " is not a Scriptable, it is " + obj.GetType().FullName);
 				}
-				table [obj] = name;
+				table[obj] = name;
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace Rhino.Serialize
 		/// <exception cref="System.ArgumentException">
 		/// if the object is not found or is not
 		/// a
-		/// <see cref="Rhino.Scriptable">Rhino.Scriptable</see>
+		/// <see cref="Scriptable">Rhino.Scriptable</see>
 		/// .
 		/// </exception>
 		public virtual void AddExcludedName(string name)
@@ -124,7 +124,7 @@ namespace Rhino.Serialize
 			{
 				throw new ArgumentException("Object for excluded name " + name + " not found.");
 			}
-			table [obj] = name;
+			table[obj] = name;
 		}
 
 		/// <summary>Returns true if the name is excluded from serialization.</summary>
@@ -138,7 +138,7 @@ namespace Rhino.Serialize
 		/// <remarks>Removes a name from the list of names to exclude.</remarks>
 		public virtual void RemoveExcludedName(string name)
 		{
-			Sharpen.Collections.Remove(table, name);
+			table.Remove(name);
 		}
 
 		/// <summary>
@@ -182,8 +182,6 @@ namespace Rhino.Serialize
 		[System.Serializable]
 		internal class PendingLookup
 		{
-			internal const long serialVersionUID = -2692990309789917727L;
-
 			internal PendingLookup(string name)
 			{
 				this.name = name;
@@ -198,19 +196,15 @@ namespace Rhino.Serialize
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		protected override object ReplaceObject(object obj)
+		protected object ReplaceObject(object obj)
 		{
-			if (false)
-			{
-				throw new IOException();
-			}
 			// suppress warning
 			string name = table.Get(obj);
 			if (name == null)
 			{
 				return obj;
 			}
-			return new ScriptableOutputStream.PendingLookup(name);
+			return new PendingLookup(name);
 		}
 
 		private Scriptable scope;

@@ -9,6 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using Rhino;
 using Rhino.Tools;
 using Rhino.Tools.Idswitch;
@@ -92,7 +94,7 @@ namespace Rhino.Tools.Idswitch
 			Stream @is;
 			if (file_path.Equals("-"))
 			{
-				@is = Runtime.@in;
+				@is = Console.OpenStandardInput();
 			}
 			else
 			{
@@ -100,7 +102,7 @@ namespace Rhino.Tools.Idswitch
 			}
 			try
 			{
-				TextReader r = new StreamReader(@is, "ASCII");
+				TextReader r = new StreamReader(@is, Encoding.ASCII);
 				body.ReadData(r);
 			}
 			finally
@@ -113,7 +115,7 @@ namespace Rhino.Tools.Idswitch
 				Stream os;
 				if (file_path.Equals("-"))
 				{
-					os = System.Console.Out;
+					os = Console.OpenStandardOutput();
 				}
 				else
 				{
@@ -121,7 +123,7 @@ namespace Rhino.Tools.Idswitch
 				}
 				try
 				{
-					TextWriter w = new OutputStreamWriter(os);
+					TextWriter w = new StreamWriter(os);
 					body.WriteData(w);
 					w.Flush();
 				}
@@ -272,8 +274,7 @@ namespace Rhino.Tools.Idswitch
 		private void Generate_java_code()
 		{
 			P.Clear();
-			IdValuePair[] pairs = new IdValuePair[all_pairs.Count];
-			Sharpen.Collections.ToArray(all_pairs, pairs);
+			IdValuePair[] pairs = all_pairs.ToArray();
 			SwitchGenerator g = new SwitchGenerator();
 			g.char_tail_test_threshold = 2;
 			g.SetReporter(R);

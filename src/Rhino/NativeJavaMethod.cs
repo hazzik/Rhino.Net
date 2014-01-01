@@ -9,6 +9,8 @@
 using System;
 using System.Reflection;
 using System.Text;
+using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -25,25 +27,25 @@ namespace Rhino
 	/// <seealso cref="NativeJavaArray">NativeJavaArray</seealso>
 	/// <seealso cref="NativeJavaPackage">NativeJavaPackage</seealso>
 	/// <seealso cref="NativeJavaClass">NativeJavaClass</seealso>
-	[System.Serializable]
+	[Serializable]
 	public class NativeJavaMethod : BaseFunction
 	{
 		internal NativeJavaMethod(MemberBox[] methods)
 		{
-			this.functionName = methods[0].GetName();
+			functionName = methods[0].GetName();
 			this.methods = methods;
 		}
 
 		internal NativeJavaMethod(MemberBox[] methods, string name)
 		{
-			this.functionName = name;
+			functionName = name;
 			this.methods = methods;
 		}
 
 		internal NativeJavaMethod(MemberBox method, string name)
 		{
-			this.functionName = name;
-			this.methods = new MemberBox[] { method };
+			functionName = name;
+			methods = new MemberBox[] { method };
 		}
 
 		public NativeJavaMethod(MethodInfo method, string name) : this(new MemberBox(method), name)
@@ -192,23 +194,23 @@ namespace Rhino
 				{
 					newArgs[i] = Context.JsToJava(args[i], argTypes[i]);
 				}
-				object varArgs;
+				Array varArgs;
 				// Handle special situation where a single variable parameter
 				// is given and it is a Java or ECMA array or is null.
 				if (args.Length == argTypes.Length && (args[args.Length - 1] == null || args[args.Length - 1] is NativeArray || args[args.Length - 1] is NativeJavaArray))
 				{
 					// convert the ECMA array into a native array
-					varArgs = Context.JsToJava(args[args.Length - 1], argTypes[argTypes.Length - 1]);
+					varArgs = (Array) Context.JsToJava(args[args.Length - 1], argTypes[argTypes.Length - 1]);
 				}
 				else
 				{
 					// marshall the variable parameters
 					Type componentType = argTypes[argTypes.Length - 1].GetElementType();
-					varArgs = System.Array.CreateInstance(componentType, args.Length - argTypes.Length + 1);
-					for (int i_1 = 0; i_1 < Sharpen.Runtime.GetArrayLength(varArgs); i_1++)
+					varArgs = Array.CreateInstance(componentType, args.Length - argTypes.Length + 1);
+					for (int i = 0; i < varArgs.Length; i++)
 					{
-						object value = Context.JsToJava(args[argTypes.Length - 1 + i_1], componentType);
-						Sharpen.Runtime.SetArrayValue(varArgs, i_1, value);
+						object value = Context.JsToJava(args[argTypes.Length - 1 + i], componentType);
+						varArgs.SetValue(value, i);
 					}
 				}
 				// add varargs
@@ -228,7 +230,7 @@ namespace Rhino
 					{
 						if (origArgs == args)
 						{
-							args = args.Clone();
+							args = (object[]) args.Clone();
 						}
 						args[i] = coerced;
 					}
@@ -418,7 +420,7 @@ namespace Rhino
 							// When FEATURE_ENHANCED_JAVA_ACCESS gives us access
 							// to non-public members, continue to prefer public
 							// methods in overloading
-							if (!bestFit.Member().IsPublic)
+							if ((bestFit.Member().Attributes & MethodAttributes.Public) == 0)
 							{
 								++betterCount;
 							}
@@ -636,7 +638,7 @@ search_break: ;
 
 		private string functionName;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		private CopyOnWriteArrayList<ResolvedOverload> overloadCache;
 	}
 
@@ -694,11 +696,11 @@ search_break: ;
 
 		public override bool Equals(object other)
 		{
-			if (!(other is Rhino.ResolvedOverload))
+			if (!(other is ResolvedOverload))
 			{
 				return false;
 			}
-			Rhino.ResolvedOverload ovl = (Rhino.ResolvedOverload)other;
+			ResolvedOverload ovl = (ResolvedOverload)other;
 			return Arrays.Equals(types, ovl.types) && index == ovl.index;
 		}
 

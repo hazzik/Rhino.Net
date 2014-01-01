@@ -280,7 +280,7 @@ namespace Rhino.RegExp
 					{
 						sb = new StringBuilder();
 					}
-					sb.AppendRange(s, start, slash);
+					sb.Append(s, start, slash - start);
 					sb.Append("\\/");
 					start = slash + 1;
 				}
@@ -288,7 +288,7 @@ namespace Rhino.RegExp
 			}
 			if (sb != null)
 			{
-				sb.AppendRange(s, start, s.Length);
+				sb.Append(s, start, s.Length - start);
 				s = sb.ToString();
 			}
 			return s;
@@ -600,7 +600,7 @@ namespace Rhino.RegExp
 
 		private static bool CalculateBitmapSize(CompilerState state, RENode target, char[] src, int index, int end)
 		{
-			char rangeStart = 0;
+			char rangeStart = (char) 0;
 			char c;
 			int n;
 			int nDigits;
@@ -857,7 +857,7 @@ namespace Rhino.RegExp
 			}
 			if (overflow)
 			{
-				ReportError(overflowMessageId, src.ToString(start, state.cp - start));
+				ReportError(overflowMessageId, new string(src, start, state.cp - start));
 			}
 			return value;
 		}
@@ -1685,7 +1685,7 @@ namespace Rhino.RegExp
 			{
 				throw ScriptRuntime.ConstructError("SyntaxError", "invalid range in character class");
 			}
-			cs.bits[byteIndex] |= 1 << (c & unchecked((int)(0x7)));
+			cs.bits[byteIndex] |= (byte) (1 << (c & 0x7));
 		}
 
 		private static void AddCharacterRangeToCharSet(RECharSet cs, char c1, char c2)
@@ -1697,20 +1697,20 @@ namespace Rhino.RegExp
 			{
 				throw ScriptRuntime.ConstructError("SyntaxError", "invalid range in character class");
 			}
-			c1 &= (char)unchecked((int)(0x7));
-			c2 &= (char)unchecked((int)(0x7));
+			c1 &= (char) unchecked(0x7);
+			c2 &= (char) unchecked(0x7);
 			if (byteIndex1 == byteIndex2)
 			{
-				cs.bits[byteIndex1] |= ((unchecked((int)(0xFF))) >> (7 - (c2 - c1))) << c1;
+				cs.bits[byteIndex1] |= (byte) ((0xff >> (0x7 - (c2 - c1))) << c1);
 			}
 			else
 			{
-				cs.bits[byteIndex1] |= unchecked((int)(0xFF)) << c1;
+				cs.bits[byteIndex1] |= (byte)(unchecked((int)(0xFF)) << c1);
 				for (i = byteIndex1 + 1; i < byteIndex2; i++)
 				{
 					cs.bits[i] = unchecked((byte)unchecked((int)(0xFF)));
 				}
-				cs.bits[byteIndex2] |= (unchecked((int)(0xFF))) >> (7 - c2);
+				cs.bits[byteIndex2] |= (byte) ((unchecked((int) (0xFF))) >> (7 - c2));
 			}
 		}
 
@@ -1730,7 +1730,7 @@ namespace Rhino.RegExp
 		{
 			int src = charSet.startIndex;
 			int end = src + charSet.strlength;
-			char rangeStart = 0;
+			char rangeStart = (char) 0;
 			char thisCh;
 			int byteLength;
 			char c;
@@ -2869,7 +2869,7 @@ switchStatement_break: ;
 			{
 				result = cx.NewArray(scope, 0);
 				obj = (Scriptable)result;
-				string matchstr = Sharpen.Runtime.Substring(str, index, index + matchlen);
+				string matchstr = str.Substring(index, matchlen);
 				obj.Put(0, obj, matchstr);
 			}
 			if (re.parenCount == 0)
@@ -3547,7 +3547,7 @@ L0_break: ;
 			// clone parens array if it is shared with backtrack state
 			if (backTrackStackTop != null && backTrackStackTop.parens == parens)
 			{
-				parens = parens.Clone();
+				parens = (long[]) parens.Clone();
 			}
 			parens[i] = (index & unchecked((long)(0xffffffffL))) | ((long)length << 32);
 		}

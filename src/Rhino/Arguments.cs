@@ -86,7 +86,7 @@ namespace Rhino
 			{
 				if (args == activation.originalArgs)
 				{
-					args = args.Clone();
+					args = (object[]) args.Clone();
 				}
 				args[index] = value;
 			}
@@ -100,7 +100,7 @@ namespace Rhino
 				{
 					if (args == activation.originalArgs)
 					{
-						args = args.Clone();
+						args = (object[]) args.Clone();
 					}
 					args[index] = ScriptableConstants.NOT_FOUND;
 				}
@@ -398,11 +398,11 @@ L0_break: ;
 				if (!getAll)
 				{
 					// avoid adding args which were redefined to non-enumerable
-					for (int i_1 = 0; i_1 < present.Length; i_1++)
+					for (int i = 0; i < present.Length; i++)
 					{
-						if (!present[i_1] && base.Has(i_1, this))
+						if (!present[i] && base.Has(i, this))
 						{
-							present[i_1] = true;
+							present[i] = true;
 							extraCount--;
 						}
 					}
@@ -413,11 +413,11 @@ L0_break: ;
 					System.Array.Copy(ids, 0, tmp, extraCount, ids.Length);
 					ids = tmp;
 					int offset = 0;
-					for (int i_1 = 0; i_1 != args.Length; ++i_1)
+					for (int i = 0; i != args.Length; ++i)
 					{
-						if (present == null || !present[i_1])
+						if (present == null || !present[i])
 						{
-							ids[offset] = i_1;
+							ids[offset] = i;
 							++offset;
 						}
 					}

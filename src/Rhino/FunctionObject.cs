@@ -7,19 +7,15 @@
  */
 
 using System;
-using System.IO;
 using System.Reflection;
 using System.Security;
-using Rhino;
 using Sharpen;
 
 namespace Rhino
 {
-	[System.Serializable]
+	[Serializable]
 	public class FunctionObject : BaseFunction
 	{
-		internal const long serialVersionUID = -5332312783643935019L;
-
 		/// <summary>Create a JavaScript function object from a Java method.</summary>
 		/// <remarks>
 		/// Create a JavaScript function object from a Java method.
@@ -78,22 +74,12 @@ namespace Rhino
 		/// </param>
 		/// <param name="scope">enclosing scope of function</param>
 		/// <seealso cref="Scriptable">Scriptable</seealso>
-		public FunctionObject(string name, MemberInfo methodOrConstructor, Scriptable scope)
+		public FunctionObject(string name, MethodBase methodOrConstructor, Scriptable scope)
 		{
 			// API class
-			if (methodOrConstructor is ConstructorInfo)
-			{
-				member = new MemberBox((ConstructorInfo)methodOrConstructor);
-				isStatic = true;
-			}
-			else
-			{
-				// well, doesn't take a 'this'
-				member = new MemberBox((MethodInfo)methodOrConstructor);
-				isStatic = member.IsStatic();
-			}
-			string methodName = member.GetName();
-			this.functionName = name;
+			member = new MemberBox(methodOrConstructor);
+			isStatic = methodOrConstructor.IsConstructor || methodOrConstructor.IsStatic;
+			functionName = name;
 			Type[] types = member.argTypes;
 			int arity = types.Length;
 			if (arity == 4 && (types[1].IsArray || types[2].IsArray))
@@ -103,7 +89,7 @@ namespace Rhino
 				{
 					if (!isStatic || types[0] != ScriptRuntime.ContextClass || types[1].GetElementType() != ScriptRuntime.ObjectClass || types[2] != ScriptRuntime.FunctionClass || types[3] != typeof(bool))
 					{
-						throw Context.ReportRuntimeError1("msg.varargs.ctor", methodName);
+						throw Context.ReportRuntimeError1("msg.varargs.ctor", methodOrConstructor.Name);
 					}
 					parmsLength = VARARGS_CTOR;
 				}
@@ -111,7 +97,7 @@ namespace Rhino
 				{
 					if (!isStatic || types[0] != ScriptRuntime.ContextClass || types[1] != ScriptRuntime.ScriptableClass || types[2].GetElementType() != ScriptRuntime.ObjectClass || types[3] != ScriptRuntime.FunctionClass)
 					{
-						throw Context.ReportRuntimeError1("msg.varargs.fun", methodName);
+						throw Context.ReportRuntimeError1("msg.varargs.fun", methodOrConstructor.Name);
 					}
 					parmsLength = VARARGS_METHOD;
 				}
@@ -127,13 +113,13 @@ namespace Rhino
 						int tag = GetTypeTag(types[i]);
 						if (tag == JAVA_UNSUPPORTED_TYPE)
 						{
-							throw Context.ReportRuntimeError2("msg.bad.parms", types[i].FullName, methodName);
+							throw Context.ReportRuntimeError2("msg.bad.parms", types[i].FullName, methodOrConstructor.Name);
 						}
 						typeTags[i] = unchecked((byte)tag);
 					}
 				}
 			}
-			if (member.IsMethod())
+			if (!member.method.IsConstructor)
 			{
 				MethodInfo method = member.Method();
 				Type returnType = method.ReturnType;
@@ -279,21 +265,14 @@ namespace Rhino
 
 		public override string GetFunctionName()
 		{
-			return (functionName == null) ? string.Empty : functionName;
+			return functionName ?? string.Empty;
 		}
 
 		/// <summary>Get Java method or constructor this function represent.</summary>
 		/// <remarks>Get Java method or constructor this function represent.</remarks>
 		public virtual MemberInfo GetMethodOrConstructor()
 		{
-			if (member.IsMethod())
-			{
-				return member.Method();
-			}
-			else
-			{
-				return member.Ctor();
-			}
+			return member.method;
 		}
 
 		internal static MethodInfo FindSingleMethod(MethodInfo[] methods, string name)
@@ -331,7 +310,7 @@ namespace Rhino
 				// but getMethods is more expensive
 				if (!sawSecurityException)
 				{
-					methods = Sharpen.Runtime.GetDeclaredMethods(clazz);
+					methods = Runtime.GetDeclaredMethods(clazz);
 				}
 			}
 			catch (SecurityException)
@@ -382,13 +361,13 @@ namespace Rhino
 		/// the global object)
 		/// </param>
 		/// <param name="prototype">the prototype object</param>
-		/// <seealso cref="Scriptable.SetParentScope(Scriptable)">Scriptable.SetParentScope(Scriptable)</seealso>
-		/// <seealso cref="Scriptable.SetPrototype(Scriptable)">Scriptable.SetPrototype(Scriptable)</seealso>
+		/// <seealso cref="Scriptable.SetParentScope(SIScriptable">Scriptable.SetParentScope(Scriptable)</seealso>
+		/// <seealso cref="Scriptable.SetPrototype(SIScriptable">Scriptable.SetPrototype(Scriptable)</seealso>
 		/// <seealso cref="Scriptable.GetClassName()">Scriptable.GetClassName()</seealso>
 		public virtual void AddAsConstructor(Scriptable scope, Scriptable prototype)
 		{
 			InitAsConstructor(scope, prototype);
-			DefineProperty(scope, prototype.GetClassName(), this, ScriptableObject.DONTENUM);
+			DefineProperty(scope, prototype.GetClassName(), this, DONTENUM);
 		}
 
 		internal virtual void InitAsConstructor(Scriptable scope, Scriptable prototype)
@@ -396,7 +375,7 @@ namespace Rhino
 			ScriptRuntime.SetFunctionProtoAndParent(this, scope);
 			SetImmunePrototypeProperty(prototype);
 			prototype.SetParentScope(this);
-			DefineProperty(prototype, "constructor", this, ScriptableObject.DONTENUM | ScriptableObject.PERMANENT | ScriptableObject.READONLY);
+			DefineProperty(prototype, "constructor", this, DONTENUM | PERMANENT | READONLY);
 			SetParentScope(scope);
 		}
 
@@ -420,15 +399,14 @@ namespace Rhino
 			{
 				if (parmsLength == VARARGS_METHOD)
 				{
-					object[] invokeArgs = new object[] { cx, thisObj, args, this };
+					object[] invokeArgs = { cx, thisObj, args, this };
 					result = member.Invoke(null, invokeArgs);
 					checkMethodResult = true;
 				}
 				else
 				{
 					bool inNewExpr = (thisObj == null);
-					bool b = inNewExpr ? true : false;
-					object[] invokeArgs = new object[] { cx, args, this, b };
+					object[] invokeArgs = { cx, args, this, inNewExpr };
 					result = (member.IsCtor()) ? member.NewInstance(invokeArgs) : member.Invoke(null, invokeArgs);
 				}
 			}
@@ -467,17 +445,17 @@ namespace Rhino
 					// Do not allocate new argument array if java arguments are
 					// the same as the original js ones.
 					invokeArgs = args;
-					for (int i_1 = 0; i_1 != parmsLength; ++i_1)
+					for (int i = 0; i < parmsLength; i++)
 					{
-						object arg = args[i_1];
-						object converted = ConvertArg(cx, scope, arg, typeTags[i_1]);
+						object arg = args[i];
+						object converted = ConvertArg(cx, scope, arg, typeTags[i]);
 						if (arg != converted)
 						{
 							if (invokeArgs == args)
 							{
-								invokeArgs = args.Clone();
+								invokeArgs = (object[]) args.Clone();
 							}
-							invokeArgs[i_1] = converted;
+							invokeArgs[i] = converted;
 						}
 					}
 				}
@@ -545,7 +523,7 @@ namespace Rhino
 			Scriptable result;
 			try
 			{
-				result = (Scriptable)System.Activator.CreateInstance(member.GetDeclaringClass());
+				result = (Scriptable)Activator.CreateInstance(member.GetDeclaringClass());
 			}
 			catch (Exception ex)
 			{
@@ -619,15 +597,15 @@ namespace Rhino
 
 		private string functionName;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		private byte[] typeTags;
 
 		private int parmsLength;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		private bool hasVoidReturn;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		private int returnTypeTag;
 
 		private bool isStatic;

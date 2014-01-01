@@ -29,24 +29,9 @@ namespace Rhino.Xml
 		/// </remarks>
 		public abstract class Factory
 		{
-			public static XMLLib.Factory Create(string className)
+			public static Factory Create(string className)
 			{
-				return new _Factory_26(className);
-			}
-
-			private sealed class _Factory_26 : XMLLib.Factory
-			{
-				public _Factory_26(string className)
-				{
-					this.className = className;
-				}
-
-				public override string GetImplementationClassName()
-				{
-					return className;
-				}
-
-				private readonly string className;
+				return new DefaultFactory(className);
 			}
 
 			public abstract string GetImplementationClassName();
@@ -158,6 +143,21 @@ namespace Rhino.Xml
 		public virtual int GetPrettyIndent()
 		{
 			throw new NotSupportedException();
+		}
+
+		private sealed class DefaultFactory : Factory
+		{
+			public DefaultFactory(string className)
+			{
+				this.className = className;
+			}
+
+			public override string GetImplementationClassName()
+			{
+				return className;
+			}
+
+			private readonly string className;
 		}
 	}
 }

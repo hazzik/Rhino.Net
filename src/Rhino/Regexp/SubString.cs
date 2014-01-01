@@ -34,7 +34,7 @@ namespace Rhino.RegExp
 
 		public override string ToString()
 		{
-			return str == null ? string.Empty : Sharpen.Runtime.Substring(str, index, index + length);
+			return str == null ? string.Empty : str.Substring(index, length);
 		}
 
 		public static readonly SubString emptySubString = new SubString();

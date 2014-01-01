@@ -27,14 +27,14 @@ namespace Rhino
 		/// Reflection of Throwable.initCause(Throwable) from JDK 1.4
 		/// or nul if it is not available.
 		/// </remarks>
-		private static MethodInfo Throwable_initCause = null;
+		private static readonly MethodInfo Throwable_initCause;
 
 		static Kit()
 		{
 			// Are we running on a JDK 1.4 or later system?
 			try
 			{
-				Type ThrowableClass = Kit.ClassOrNull("java.lang.Throwable");
+				Type ThrowableClass = ClassOrNull("java.lang.Throwable");
 				Type[] signature = new Type[] { ThrowableClass };
 				Throwable_initCause = ThrowableClass.GetMethod("initCause", signature);
 			}
@@ -48,7 +48,12 @@ namespace Rhino
 		{
 			try
 			{
-				return Sharpen.Runtime.GetType(className);
+				foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+				{
+					Type t = a.GetType(className, false);
+					if (t != null)
+						return t;
+				}
 			}
 			catch (TypeLoadException)
 			{
@@ -99,7 +104,7 @@ namespace Rhino
 		{
 			try
 			{
-				return System.Activator.CreateInstance(cl);
+				return Activator.CreateInstance(cl);
 			}
 			catch (SecurityException)
 			{
@@ -121,7 +126,7 @@ namespace Rhino
 		internal static bool TestIfCanLoadRhinoClasses(ClassLoader loader)
 		{
 			Type testClass = ScriptRuntime.ContextFactoryClass;
-			Type x = Kit.ClassOrNull(loader, testClass.FullName);
+			Type x = ClassOrNull(loader, testClass.FullName);
 			if (x != testClass)
 			{
 				// The check covers the case when x == null =>
@@ -284,7 +289,7 @@ check_break: ;
 						throw new ArgumentException();
 					}
 					object[] tmp = new object[L + 1];
-					System.Array.Copy(array, 0, tmp, 0, L);
+					Array.Copy(array, 0, tmp, 0, L);
 					tmp[L] = listener;
 					bag = tmp;
 				}
@@ -360,8 +365,8 @@ check_break: ;
 							if (array[i] == listener)
 							{
 								object[] tmp = new object[L - 1];
-								System.Array.Copy(array, 0, tmp, 0, i);
-								System.Array.Copy(array, i + 1, tmp, i, L - (i + 1));
+								Array.Copy(array, 0, tmp, 0, i);
+								Array.Copy(array, i + 1, tmp, i, L - (i + 1));
 								bag = tmp;
 								break;
 							}
@@ -451,7 +456,7 @@ check_break: ;
 				object current = h.Get(key);
 				if (current == null)
 				{
-					h [key] = initialValue;
+					h[key] = initialValue;
 				}
 				else
 				{
@@ -477,11 +482,11 @@ check_break: ;
 
 			public override bool Equals(object anotherObj)
 			{
-				if (!(anotherObj is Kit.ComplexKey))
+				if (!(anotherObj is ComplexKey))
 				{
 					return false;
 				}
-				Kit.ComplexKey another = (Kit.ComplexKey)anotherObj;
+				ComplexKey another = (ComplexKey)anotherObj;
 				return key1.Equals(another.key1) && key2.Equals(another.key2);
 			}
 
@@ -505,7 +510,7 @@ check_break: ;
 			{
 				throw new ArgumentException();
 			}
-			return new Kit.ComplexKey(key1, key2);
+			return new ComplexKey(key1, key2);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
@@ -524,7 +529,7 @@ check_break: ;
 				if (cursor == buffer.Length)
 				{
 					char[] tmp = new char[buffer.Length * 2];
-					System.Array.Copy(buffer, 0, tmp, 0, cursor);
+					Array.Copy(buffer, 0, tmp, 0, cursor);
 					buffer = tmp;
 				}
 			}
@@ -551,14 +556,14 @@ check_break: ;
 				if (cursor == buffer.Length)
 				{
 					byte[] tmp = new byte[buffer.Length * 2];
-					System.Array.Copy(buffer, 0, tmp, 0, cursor);
+					Array.Copy(buffer, 0, tmp, 0, cursor);
 					buffer = tmp;
 				}
 			}
 			if (cursor != buffer.Length)
 			{
 				byte[] tmp = new byte[cursor];
-				System.Array.Copy(buffer, 0, tmp, 0, cursor);
+				Array.Copy(buffer, 0, tmp, 0, cursor);
 				buffer = tmp;
 			}
 			return buffer;
@@ -576,7 +581,7 @@ check_break: ;
 		{
 			Exception ex = new InvalidOperationException("FAILED ASSERTION");
 			// Print stack trace ASAP
-			Sharpen.Runtime.PrintStackTrace(ex, System.Console.Error);
+			Runtime.PrintStackTrace(ex, Console.Error);
 			throw ex;
 		}
 
@@ -593,7 +598,7 @@ check_break: ;
 			msg = "FAILED ASSERTION: " + msg;
 			Exception ex = new InvalidOperationException(msg);
 			// Print stack trace ASAP
-			Sharpen.Runtime.PrintStackTrace(ex, System.Console.Error);
+			Runtime.PrintStackTrace(ex, Console.Error);
 			throw ex;
 		}
 	}

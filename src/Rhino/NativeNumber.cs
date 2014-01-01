@@ -47,7 +47,7 @@ namespace Rhino
 		protected internal override void FillConstructorProperties(IdFunctionObject ctor)
 		{
 			int attr = ScriptableObject.DONTENUM | ScriptableObject.PERMANENT | ScriptableObject.READONLY;
-			ctor.DefineProperty("NaN", ScriptRuntime.NaNobj, attr);
+			ctor.DefineProperty("NaN", ScriptRuntime.NaN, attr);
 			ctor.DefineProperty("POSITIVE_INFINITY", ScriptRuntime.WrapNumber(double.PositiveInfinity), attr);
 			ctor.DefineProperty("NEGATIVE_INFINITY", ScriptRuntime.WrapNumber(double.NegativeInfinity), attr);
 			ctor.DefineProperty("MAX_VALUE", ScriptRuntime.WrapNumber(double.MaxValue), attr);

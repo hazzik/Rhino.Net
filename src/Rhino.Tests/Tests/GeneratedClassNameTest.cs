@@ -46,7 +46,7 @@ namespace Rhino.Tests
 			Script script = (Script)ContextFactory.GetGlobal().Call(cx => cx.CompileString("var f = 1", scriptName, 1, null));
 			// remove serial number
 			string name = script.GetType().Name;
-			NUnit.Framework.Assert.AreEqual(expectedName, Sharpen.Runtime.Substring(name, 0, name.LastIndexOf('_')));
+			NUnit.Framework.Assert.AreEqual(expectedName, name.Substring(0, name.LastIndexOf('_')));
 		}
 	}
 }

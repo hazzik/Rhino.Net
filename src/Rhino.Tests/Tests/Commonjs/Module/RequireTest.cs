@@ -7,22 +7,19 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Rhino;
+using NUnit.Framework;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
-using Rhino.Tests.CommonJS.Module;
 using Sharpen;
 
 namespace Rhino.Tests.CommonJS.Module
 {
-	/// <author>Attila Szegedi</author>
-	/// <version>$Id: RequireTest.java,v 1.1 2011/04/07 22:24:37 hannes%helma.at Exp $</version>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class RequireTest
 	{
-		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestSandboxed()
 		{
 			Context cx = CreateContext();
@@ -34,7 +31,7 @@ namespace Rhino.Tests.CommonJS.Module
 			try
 			{
 				require.RequireMain(cx, "blah");
-				NUnit.Framework.Assert.Fail();
+				Assert.Fail();
 			}
 			catch (InvalidOperationException)
 			{
@@ -50,26 +47,26 @@ namespace Rhino.Tests.CommonJS.Module
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestNonSandboxed()
 		{
 			Context cx = CreateContext();
 			Scriptable scope = cx.InitStandardObjects();
 			Require require = GetSandboxedRequire(cx, scope, false);
-			string jsFile = GetType().GetResource("testNonSandboxed.js").ToExternalForm();
+			string jsFile = GetType().GetResource("testNonSandboxed.js").ToString();
 			ScriptableObject.PutProperty(scope, "moduleUri", jsFile);
 			require.RequireMain(cx, "testNonSandboxed");
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestVariousUsageErrors()
 		{
 			TestWithSandboxedRequire("testNoArgsRequire");
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestRelativeId()
 		{
 			Context cx = CreateContext();
@@ -80,7 +77,7 @@ namespace Rhino.Tests.CommonJS.Module
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestSetMainForAlreadyLoadedModule()
 		{
 			Context cx = CreateContext();
@@ -91,11 +88,11 @@ namespace Rhino.Tests.CommonJS.Module
 			try
 			{
 				require.RequireMain(cx, "assert");
-				NUnit.Framework.Assert.Fail();
+				Assert.Fail();
 			}
 			catch (InvalidOperationException e)
 			{
-				NUnit.Framework.Assert.AreEqual(e.Message, "Attempt to set main module after it was loaded");
+				Assert.AreEqual(e.Message, "Attempt to set main module after it was loaded");
 			}
 		}
 
@@ -120,14 +117,14 @@ namespace Rhino.Tests.CommonJS.Module
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		private Require GetSandboxedRequire(Context cx, Scriptable scope, bool sandboxed)
 		{
-			return new Require(cx, cx.InitStandardObjects(), new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections<>.Singleton(GetDirectory()), null)), null, null, true);
+			return new Require(cx, cx.InitStandardObjects(), new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(new List<Uri> (1) { GetDirectory() }, null)), null, null, true);
 		}
 
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		private Uri GetDirectory()
 		{
-			string jsFile = GetType().GetResource("testSandboxed.js").ToExternalForm();
-			return new Uri(Sharpen.Runtime.Substring(jsFile, 0, jsFile.LastIndexOf('/') + 1));
+			string jsFile = GetType().GetResource("testSandboxed.js").ToString();
+			return new Uri(jsFile.Substring(0, jsFile.LastIndexOf('/') + 1));
 		}
 	}
 }

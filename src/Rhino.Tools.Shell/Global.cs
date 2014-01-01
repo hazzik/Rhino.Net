@@ -8,15 +8,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
-using Rhino;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
-using Rhino.Serialize;
-using Rhino.Tools;
-using Rhino.Tools.Shell;
 using Sharpen;
+using Thread = System.Threading.Thread;
 
 namespace Rhino.Tools.Shell
 {
@@ -26,30 +25,26 @@ namespace Rhino.Tools.Shell
 	/// This is of particular interest to server applications.
 	/// </remarks>
 	/// <author>Norris Boyd</author>
-	[System.Serializable]
-	public class Global : ImporterTopLevel
+	[Serializable]
+	public sealed class Global : ImporterTopLevel
 	{
-		internal const long serialVersionUID = 4029130780977538005L;
-
 		internal NativeArray history;
-
-		internal bool attemptedJLineLoad;
 
 		private ShellConsole console;
 
-		private Stream inStream;
+		private TextReader inStream;
 
 		private TextWriter outStream;
 
 		private TextWriter errStream;
 
-		private bool sealedStdLib = false;
+		private bool sealedStdLib;
 
 		internal bool initialized;
 
 		private QuitAction quitAction;
 
-		private string[] prompts = new string[] { "js> ", "  > " };
+		private readonly string[] prompts = { "js> ", "  > " };
 
 		private Dictionary<string, string> doctestCanonicalizations;
 
@@ -62,14 +57,14 @@ namespace Rhino.Tools.Shell
 			Init(cx);
 		}
 
-		public virtual bool IsInitialized()
+		public bool IsInitialized()
 		{
 			return initialized;
 		}
 
 		/// <summary>Set the action to call from quit().</summary>
 		/// <remarks>Set the action to call from quit().</remarks>
-		public virtual void InitQuitAction(QuitAction quitAction)
+		public void InitQuitAction(QuitAction quitAction)
 		{
 			if (quitAction == null)
 			{
@@ -82,7 +77,7 @@ namespace Rhino.Tools.Shell
 			this.quitAction = quitAction;
 		}
 
-		public virtual void Init(ContextFactory factory)
+		public void Init(ContextFactory factory)
 		{
 			factory.Call(cx =>
 			{
@@ -91,24 +86,24 @@ namespace Rhino.Tools.Shell
 			});
 		}
 
-		public virtual void Init(Context cx)
+		public void Init(Context cx)
 		{
 			// Define some global functions particular to the shell. Note
 			// that these functions are not part of ECMA.
 			InitStandardObjects(cx, sealedStdLib);
-			string[] names = new string[] { "defineClass", "deserialize", "doctest", "gc", "help", "load", "loadClass", "print", "quit", "readFile", "readUrl", "runCommand", "seal", "serialize", "spawn", "sync", "toint32", "version" };
-			DefineFunctionProperties(names, typeof(Rhino.Tools.Shell.Global), ScriptableObject.DONTENUM);
+			string[] names = new string[] { "DefineClass", "Deserialize", "Doctest", "Gc", "Help", "Load", "LoadClass", "Print", "Quit", "ReadFile", "ReadUrl", "RunCommand", "Seal", "Serialize", "Spawn", "Sync", "ToInt32", "Version" };
+			DefineFunctionProperties(names, typeof(Global), DONTENUM);
 			// Set up "environment" in the global scope to provide access to the
 			// System environment variables.
 			Environment.DefineClass(this);
 			Environment environment = new Environment(this);
-			DefineProperty("environment", environment, ScriptableObject.DONTENUM);
+			DefineProperty("environment", environment, DONTENUM);
 			history = (NativeArray)cx.NewArray(this, 0);
-			DefineProperty("history", history, ScriptableObject.DONTENUM);
+			DefineProperty("history", history, DONTENUM);
 			initialized = true;
 		}
 
-		public virtual Require InstallRequire(Context cx, IList<string> modulePath, bool sandboxed)
+		public Require InstallRequire(Context cx, IList<string> modulePath, bool sandboxed)
 		{
 			RequireBuilder rb = new RequireBuilder();
 			rb.SetSandboxed(sandboxed);
@@ -135,7 +130,7 @@ namespace Rhino.Tools.Shell
 					}
 					catch (URISyntaxException usx)
 					{
-						throw new Exception(usx);
+						throw new Exception("", usx);
 					}
 				}
 			}
@@ -158,7 +153,7 @@ namespace Rhino.Tools.Shell
 
 		public static void Gc(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
-			System.GC.Collect();
+			GC.Collect();
 		}
 
 		/// <summary>Print the string values of its arguments.</summary>
@@ -197,7 +192,7 @@ namespace Rhino.Tools.Shell
 		/// </remarks>
 		public static void Quit(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
-			Rhino.Tools.Shell.Global global = GetInstance(funObj);
+			Global global = GetInstance(funObj);
 			if (global.quitAction != null)
 			{
 				int exitCode = (args.Length == 0 ? 0 : ScriptRuntime.ToInt32(args[0]));
@@ -243,7 +238,7 @@ namespace Rhino.Tools.Shell
 				catch (VirtualMachineError ex)
 				{
 					// Treat StackOverflow and OutOfMemory as runtime errors
-					Sharpen.Runtime.PrintStackTrace(ex);
+					Runtime.PrintStackTrace(ex);
 					string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 					throw Context.ReportRuntimeError(msg);
 				}
@@ -275,7 +270,7 @@ namespace Rhino.Tools.Shell
 		/// if an exception is thrown
 		/// during execution of methods of the named class
 		/// </exception>
-		/// <seealso cref="Rhino.ScriptableObject.DefineClass{T}(Rhino.Scriptable, System.Type{T})">Rhino.ScriptableObject.DefineClass&lt;T&gt;(Rhino.Scriptable, System.Type&lt;T&gt;)</seealso>
+		/// <seealso cref="Rhino.ScriptableObject.DefineClass(Scriptable, System.Type)">Rhino.ScriptableObject.DefineClass&lt;T&gt;(Rhino.Scriptable, System.Type&lt;T&gt;)</seealso>
 		/// <exception cref="System.MemberAccessException"></exception>
 		/// <exception cref="Sharpen.InstantiationException"></exception>
 		/// <exception cref="System.Reflection.TargetInvocationException"></exception>
@@ -286,7 +281,7 @@ namespace Rhino.Tools.Shell
 			{
 				throw ReportRuntimeError("msg.must.implement.Scriptable");
 			}
-			ScriptableObject.DefineClass(thisObj, (Type)clazz);
+			DefineClass(thisObj, clazz);
 		}
 
 		/// <summary>Load and execute a script compiled to a class file.</summary>
@@ -318,7 +313,7 @@ namespace Rhino.Tools.Shell
 			{
 				throw ReportRuntimeError("msg.must.implement.Script");
 			}
-			Script script = (Script)System.Activator.CreateInstance(clazz);
+			Script script = (Script)Activator.CreateInstance(clazz);
 			script.Exec(cx, thisObj);
 		}
 
@@ -340,7 +335,7 @@ namespace Rhino.Tools.Shell
 			string className = Context.ToString(args[0]);
 			try
 			{
-				return Sharpen.Runtime.GetType(className);
+				return Runtime.GetType(className);
 			}
 			catch (TypeLoadException)
 			{
@@ -351,53 +346,59 @@ namespace Rhino.Tools.Shell
 		/// <exception cref="System.IO.IOException"></exception>
 		public static void Serialize(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
+#if SERIALIZATION
 			if (args.Length < 2)
 			{
-				throw Context.ReportRuntimeError("Expected an object to serialize and a filename to write " + "the serialization to");
+				throw Context.ReportRuntimeError("Expected an object to serialize and a filename to write the serialization to");
 			}
 			object obj = args[0];
 			string filename = Context.ToString(args[1]);
 			FileOutputStream fos = new FileOutputStream(filename);
-			Scriptable scope = ScriptableObject.GetTopLevelScope(thisObj);
+			Scriptable scope = GetTopLevelScope(thisObj);
 			ScriptableOutputStream @out = new ScriptableOutputStream(fos, scope);
 			@out.WriteObject(obj);
 			@out.Close();
+#endif
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
 		public static object Deserialize(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
+#if SERIALIZATION
 			if (args.Length < 1)
 			{
 				throw Context.ReportRuntimeError("Expected a filename to read the serialization from");
 			}
 			string filename = Context.ToString(args[0]);
 			FileInputStream fis = new FileInputStream(filename);
-			Scriptable scope = ScriptableObject.GetTopLevelScope(thisObj);
+			Scriptable scope = GetTopLevelScope(thisObj);
 			ObjectInputStream @in = new ScriptableInputStream(fis, scope);
 			object deserialized = @in.ReadObject();
 			@in.Close();
 			return Context.ToObject(deserialized, scope);
+#else
+			return null;
+#endif
 		}
 
-		public virtual string[] GetPrompts(Context cx)
+		public string[] GetPrompts(Context cx)
 		{
-			if (ScriptableObject.HasProperty(this, "prompts"))
+			if (HasProperty(this, "prompts"))
 			{
-				object promptsJS = ScriptableObject.GetProperty(this, "prompts");
+				object promptsJS = GetProperty(this, "prompts");
 				if (promptsJS is Scriptable)
 				{
 					Scriptable s = (Scriptable)promptsJS;
-					if (ScriptableObject.HasProperty(s, 0) && ScriptableObject.HasProperty(s, 1))
+					if (HasProperty(s, 0) && HasProperty(s, 1))
 					{
-						object elem0 = ScriptableObject.GetProperty(s, 0);
+						object elem0 = GetProperty(s, 0);
 						if (elem0 is Function)
 						{
 							elem0 = ((Function)elem0).Call(cx, this, s, new object[0]);
 						}
 						prompts[0] = Context.ToString(elem0);
-						object elem1 = ScriptableObject.GetProperty(s, 1);
+						object elem1 = GetProperty(s, 1);
 						if (elem1 is Function)
 						{
 							elem1 = ((Function)elem1).Call(cx, this, s, new object[0]);
@@ -424,16 +425,16 @@ namespace Rhino.Tools.Shell
 				return false;
 			}
 			string session = Context.ToString(args[0]);
-			Rhino.Tools.Shell.Global global = GetInstance(funObj);
+			Global global = GetInstance(funObj);
 			return global.RunDoctest(cx, global, session, null, 0);
 		}
 
-		public virtual int RunDoctest(Context cx, Scriptable scope, string session, string sourceName, int lineNumber)
+		public int RunDoctest(Context cx, Scriptable scope, string session, string sourceName, int lineNumber)
 		{
 			doctestCanonicalizations = new Dictionary<string, string>();
 			string[] lines = session.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
-			string prompt0 = this.prompts[0].Trim();
-			string prompt1 = this.prompts[1].Trim();
+			string prompt0 = prompts[0].Trim();
+			string prompt1 = prompts[1].Trim();
 			int testCount = 0;
 			int i = 0;
 			while (i < lines.Length && !lines[i].Trim().StartsWith(prompt0))
@@ -443,12 +444,12 @@ namespace Rhino.Tools.Shell
 			// skip lines that don't look like shell sessions
 			while (i < lines.Length)
 			{
-				string inputString = Sharpen.Runtime.Substring(lines[i].Trim(), prompt0.Length);
+				string inputString = lines[i].Trim().Substring(prompt0.Length);
 				inputString += "\n";
 				i++;
 				while (i < lines.Length && lines[i].Trim().StartsWith(prompt1))
 				{
-					inputString += Sharpen.Runtime.Substring(lines[i].Trim(), prompt1.Length);
+					inputString += lines[i].Trim().Substring(prompt1.Length);
 					inputString += "\n";
 					i++;
 				}
@@ -458,15 +459,15 @@ namespace Rhino.Tools.Shell
 					expectedString += lines[i] + "\n";
 					i++;
 				}
-				TextWriter savedOut = this.GetOut();
-				TextWriter savedErr = this.GetErr();
+				TextWriter savedOut = GetOut();
+				TextWriter savedErr = GetErr();
 				MemoryStream @out = new MemoryStream();
 				MemoryStream err = new MemoryStream();
-				this.SetOut(new TextWriter(@out));
-				this.SetErr(new TextWriter(err));
+				SetOut(new StreamWriter(@out));
+				SetErr(new StreamWriter(err));
 				string resultString = string.Empty;
 				ErrorReporter savedErrorReporter = cx.GetErrorReporter();
-				cx.SetErrorReporter(new ToolErrorReporter(false, this.GetErr()));
+				cx.SetErrorReporter(new ToolErrorReporter(false, GetErr()));
 				try
 				{
 					testCount++;
@@ -482,8 +483,8 @@ namespace Rhino.Tools.Shell
 				}
 				finally
 				{
-					this.SetOut(savedOut);
-					this.SetErr(savedErr);
+					SetOut(savedOut);
+					SetErr(savedErr);
 					cx.SetErrorReporter(savedErrorReporter);
 					resultString += err.ToString() + @out.ToString();
 				}
@@ -521,17 +522,19 @@ namespace Rhino.Tools.Shell
 		/// </returns>
 		private bool DoctestOutputMatches(string expected, string actual)
 		{
+			throw new NotImplementedException();
+			/*
 			expected = expected.Trim();
 			actual = actual.Trim().Replace("\r\n", "\n");
-			if (expected.Equals(actual))
+			if (expected == actual)
 			{
 				return true;
 			}
-			foreach (KeyValuePair<string, string> entry in (ICollection<KeyValuePair<string, string>>) doctestCanonicalizations)
+			foreach (KeyValuePair<string, string> entry in doctestCanonicalizations)
 			{
 				expected = expected.Replace(entry.Key, entry.Value);
 			}
-			if (expected.Equals(actual))
+			if (expected == actual)
 			{
 				return true;
 			}
@@ -541,7 +544,7 @@ namespace Rhino.Tools.Shell
 			// regexp that matches the hex number preceded by '@', then enter mappings into
 			// "doctestCanonicalizations" so that we ensure that the mappings are
 			// consistent within a session.
-			Sharpen.Pattern p = Sharpen.Pattern.Compile("@[0-9a-fA-F]+");
+			Pattern p = Pattern.Compile("@[0-9a-fA-F]+");
 			Matcher expectedMatcher = p.Matcher(expected);
 			Matcher actualMatcher = p.Matcher(actual);
 			for (; ; )
@@ -559,7 +562,7 @@ namespace Rhino.Tools.Shell
 					return false;
 				}
 				int start = expectedMatcher.Start();
-				if (!Sharpen.Runtime.Substring(expected, 0, start).Equals(Sharpen.Runtime.Substring(actual, 0, start)))
+				if (expected.Substring(0, start) != actual.Substring(0, start))
 				{
 					return false;
 				}
@@ -568,22 +571,22 @@ namespace Rhino.Tools.Shell
 				string mapping = doctestCanonicalizations.Get(expectedGroup);
 				if (mapping == null)
 				{
-					((IDictionary<,>) doctestCanonicalizations) [expectedGroup] = actualGroup;
+					doctestCanonicalizations[expectedGroup] = actualGroup;
 					expected = expected.Replace(expectedGroup, actualGroup);
 				}
 				else
 				{
-					if (!actualGroup.Equals(mapping))
+					if (actualGroup != mapping)
 					{
 						return false;
 					}
 				}
 				// wrong object!
-				if (expected.Equals(actual))
+				if (expected == actual)
 				{
 					return true;
 				}
-			}
+			} */
 		}
 
 		/// <summary>
@@ -604,7 +607,6 @@ namespace Rhino.Tools.Shell
 		public static object Spawn(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
 			Scriptable scope = funObj.GetParentScope();
-			Runner runner;
 			if (args.Length != 0 && args[0] is Function)
 			{
 				object[] newArgs = null;
@@ -616,23 +618,23 @@ namespace Rhino.Tools.Shell
 				{
 					newArgs = ScriptRuntime.emptyArgs;
 				}
-				runner = new Runner(scope, (Function)args[0], newArgs);
+				var thread = new Thread(() => cx.GetFactory().Call(c => ((Function) args[0]).Call(c, scope, scope, newArgs)));
+				thread.Start();
+				return thread;
 			}
 			else
 			{
 				if (args.Length != 0 && args[0] is Script)
 				{
-					runner = new Runner(scope, (Script)args[0]);
+					var thread = new Thread(() => cx.GetFactory().Call(c => ((Script) args[0]).Exec(c, scope)));
+					thread.Start();
+					return thread;
 				}
 				else
 				{
 					throw ReportRuntimeError("msg.spawn.args");
 				}
 			}
-			runner.factory = cx.GetFactory();
-			Sharpen.Thread thread = new Sharpen.Thread(runner);
-			thread.Start();
-			return thread;
 		}
 
 		/// <summary>
@@ -724,11 +726,11 @@ namespace Rhino.Tools.Shell
 			{
 				throw ReportRuntimeError("msg.runCommand.bad.args");
 			}
-			Stream @in = null;
-			Stream @out = null;
-			Stream err = null;
-			MemoryStream outBytes = null;
-			MemoryStream errBytes = null;
+			TextReader @in = null;
+			TextWriter @out = null;
+			TextWriter err = null;
+			TextWriter outBytes = null;
+			TextWriter errBytes = null;
 			object outObj = null;
 			object errObj = null;
 			string[] environment = null;
@@ -738,7 +740,7 @@ namespace Rhino.Tools.Shell
 			{
 				@params = (Scriptable)args[L - 1];
 				--L;
-				object envObj = ScriptableObject.GetProperty(@params, "env");
+				object envObj = GetProperty(@params, "env");
 				if (envObj != ScriptableConstants.NOT_FOUND)
 				{
 					if (envObj == null)
@@ -752,7 +754,7 @@ namespace Rhino.Tools.Shell
 							throw ReportRuntimeError("msg.runCommand.bad.env");
 						}
 						Scriptable envHash = (Scriptable)envObj;
-						object[] ids = ScriptableObject.GetPropertyIds(envHash);
+						object[] ids = GetPropertyIds(envHash);
 						environment = new string[ids.Length];
 						for (int i = 0; i != ids.Length; ++i)
 						{
@@ -762,15 +764,15 @@ namespace Rhino.Tools.Shell
 							if (keyObj is string)
 							{
 								key = (string)keyObj;
-								val = ScriptableObject.GetProperty(envHash, key);
+								val = GetProperty(envHash, key);
 							}
 							else
 							{
-								int ikey = System.Convert.ToInt32(keyObj);
-								key = Extensions.ToString(ikey);
-								val = ScriptableObject.GetProperty(envHash, ikey);
+								int ikey = Convert.ToInt32(keyObj);
+								key = ikey.ToString();
+								val = GetProperty(envHash, ikey);
 							}
-							if (val == ScriptableObject.NOT_FOUND)
+							if (val == ScriptableConstants.NOT_FOUND)
 							{
 								val = Undefined.instance;
 							}
@@ -778,73 +780,73 @@ namespace Rhino.Tools.Shell
 						}
 					}
 				}
-				object inObj = ScriptableObject.GetProperty(@params, "input");
+				object inObj = GetProperty(@params, "input");
 				if (inObj != ScriptableConstants.NOT_FOUND)
 				{
 					@in = ToInputStream(inObj);
 				}
-				outObj = ScriptableObject.GetProperty(@params, "output");
+				outObj = GetProperty(@params, "output");
 				if (outObj != ScriptableConstants.NOT_FOUND)
 				{
 					@out = ToOutputStream(outObj);
 					if (@out == null)
 					{
-						outBytes = new MemoryStream();
+						outBytes = new StringWriter();
 						@out = outBytes;
 					}
 				}
-				errObj = ScriptableObject.GetProperty(@params, "err");
+				errObj = GetProperty(@params, "err");
 				if (errObj != ScriptableConstants.NOT_FOUND)
 				{
 					err = ToOutputStream(errObj);
 					if (err == null)
 					{
-						errBytes = new MemoryStream();
+						errBytes = new StringWriter();
 						err = errBytes;
 					}
 				}
-				object addArgsObj = ScriptableObject.GetProperty(@params, "args");
+				object addArgsObj = GetProperty(@params, "args");
 				if (addArgsObj != ScriptableConstants.NOT_FOUND)
 				{
 					Scriptable s = Context.ToObject(addArgsObj, GetTopLevelScope(thisObj));
 					addArgs = cx.GetElements(s);
 				}
 			}
-			Rhino.Tools.Shell.Global global = GetInstance(funObj);
+			Global global = GetInstance(funObj);
 			if (@out == null)
 			{
-				@out = (global != null) ? global.GetOut() : System.Console.Out;
+				@out = (global != null) ? global.GetOut() : Console.Out;
 			}
 			if (err == null)
 			{
-				err = (global != null) ? global.GetErr() : System.Console.Error;
+				err = (global != null) ? global.GetErr() : Console.Error;
 			}
 			// If no explicit input stream, do not send any input to process,
 			// in particular, do not use System.in to avoid deadlocks
 			// when waiting for user input to send to process which is already
 			// terminated as it is not always possible to interrupt read method.
 			string[] cmd = new string[(addArgs == null) ? L : L + addArgs.Length];
-			for (int i_1 = 0; i_1 != L; ++i_1)
+			for (int i = 0; i != L; ++i)
 			{
-				cmd[i_1] = ScriptRuntime.ToString(args[i_1]);
+				cmd[i] = ScriptRuntime.ToString(args[i]);
 			}
 			if (addArgs != null)
 			{
-				for (int i = 0; i_1 != addArgs.Length; ++i_1)
+				for (int i = 0; i != addArgs.Length; ++i)
 				{
-					cmd[L + i_1] = ScriptRuntime.ToString(addArgs[i_1]);
+					cmd[L + i] = ScriptRuntime.ToString(addArgs[i]);
 				}
 			}
 			int exitCode = RunProcess(cmd, environment, @in, @out, err);
 			if (outBytes != null)
 			{
 				string s = ScriptRuntime.ToString(outObj) + outBytes.ToString();
-				ScriptableObject.PutProperty(@params, "output", s);
+				PutProperty(@params, "output", s);
 			}
 			if (errBytes != null)
 			{
 				string s = ScriptRuntime.ToString(errObj) + errBytes.ToString();
-				ScriptableObject.PutProperty(@params, "err", s);
+				PutProperty(@params, "err", s);
 			}
 			return exitCode;
 		}
@@ -947,7 +949,7 @@ namespace Rhino.Tools.Shell
 
 		/// <summary>Convert the argument to int32 number.</summary>
 		/// <remarks>Convert the argument to int32 number.</remarks>
-		public static object Toint32(Context cx, Scriptable thisObj, object[] args, Function funObj)
+		public static object ToInt32(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
 			object arg = (args.Length != 0 ? args[0] : Undefined.instance);
 			if (arg is int)
@@ -957,76 +959,59 @@ namespace Rhino.Tools.Shell
 			return ScriptRuntime.WrapInt(ScriptRuntime.ToInt32(arg));
 		}
 
-		private bool LoadJLine(Encoding cs)
+		public ShellConsole GetConsole(Encoding cs)
 		{
-			if (!attemptedJLineLoad)
-			{
-				// Check if we can use JLine for better command line handling
-				attemptedJLineLoad = true;
-				console = ShellConsole.GetConsole(this, cs);
-			}
-			return console != null;
-		}
-
-		public virtual ShellConsole GetConsole(Encoding cs)
-		{
-			if (!LoadJLine(cs))
-			{
 			console = ShellConsole.GetConsole(GetIn(), GetErr(), cs);
-			}
 			return console;
 		}
 
-		public virtual Stream GetIn()
+		public TextReader GetIn()
 		{
-			if (inStream == null && !attemptedJLineLoad)
+			if (inStream == null)
 			{
-				if (LoadJLine(Encoding.Default))
-				{
-					inStream = console.GetIn();
+				console = null;
 			}
-		}
-			return inStream == null ? Runtime.@in : inStream;
+			return inStream ?? Console.@In;
 		}
 
-		public virtual void SetIn(Stream @in)
+		public void SetIn(TextReader @in)
 		{
 			inStream = @in;
 		}
 
-		public virtual TextWriter GetOut()
+		public TextWriter GetOut()
 		{
-			return outStream == null ? System.Console.Out : outStream;
+			return outStream ?? Console.Out;
 		}
 
-		public virtual void SetOut(TextWriter @out)
+		public void SetOut(TextWriter @out)
 		{
 			outStream = @out;
 		}
 
-		public virtual TextWriter GetErr()
+		public TextWriter GetErr()
 		{
-			return errStream == null ? System.Console.Error : errStream;
+			return errStream ?? Console.Error;
 		}
 
-		public virtual void SetErr(TextWriter err)
+		public void SetErr(TextWriter err)
 		{
 			errStream = err;
 		}
 
-		public virtual void SetSealedStdLib(bool value)
+		public void SetSealedStdLib(bool value)
 		{
 			sealedStdLib = value;
 		}
 
-		private static Rhino.Tools.Shell.Global GetInstance(Function function)
+		private static Global GetInstance(Function function)
 		{
 			Scriptable scope = function.GetParentScope();
-			if (!(scope is Rhino.Tools.Shell.Global))
+			if (!(scope is Global))
 			{
 				throw ReportRuntimeError("msg.bad.shell.function.scope", scope.ToString());
 			}
-			return (Rhino.Tools.Shell.Global)scope;
+			return (Global)scope;
 		}
 
 		/// <summary>Runs the given process using Runtime.exec().</summary>
@@ -1038,55 +1023,47 @@ namespace Rhino.Tools.Shell
 		/// </remarks>
 		/// <returns>Exit value of process.</returns>
 		/// <exception cref="System.IO.IOException">If there was an error executing the process.</exception>
-		private static int RunProcess(string[] cmd, string[] environment, Stream @in, Stream @out, Stream err)
+		private static int RunProcess(string[] cmd, string[] environment, TextReader @in, TextWriter @out, TextWriter err)
 		{
-			SystemProcess p;
-			if (environment == null)
-			{
-				p = Runtime.GetRuntime().Exec(cmd);
-			}
-			else
-			{
-				p = Runtime.GetRuntime().Exec(cmd, environment);
-			}
+			Process p = Run(cmd, environment);
 			try
 			{
-				PipeThread inThread = null;
+				Thread inThread = null;
 				if (@in != null)
 				{
-					inThread = new PipeThread(false, @in, p.GetOutputStream());
+					inThread = new Thread(() => Pipe(false, @in, p.StandardInput));
 					inThread.Start();
 				}
 				else
 				{
-					p.GetOutputStream().Close();
+					p.StandardInput.Close();
 				}
-				PipeThread outThread = null;
+				Thread outThread = null;
 				if (@out != null)
 				{
-					outThread = new PipeThread(true, p.GetInputStream(), @out);
+					outThread = new Thread(() => Pipe(true, p.StandardOutput, @out));
 					outThread.Start();
 				}
 				else
 				{
-					p.GetInputStream().Close();
+					p.StandardOutput.Close();
 				}
-				PipeThread errThread = null;
+				Thread errThread = null;
 				if (err != null)
 				{
-					errThread = new PipeThread(true, p.GetErrorStream(), err);
+					errThread = new Thread(() => Pipe(true, p.StandardError, err));
 					errThread.Start();
 				}
 				else
 				{
-					p.GetErrorStream().Close();
+					p.StandardError.Close();
 				}
 				// wait for process completion
 				for (; ; )
 				{
 					try
 					{
-						p.WaitFor();
+						p.WaitForExit();
 						if (outThread != null)
 						{
 							outThread.Join();
@@ -1105,21 +1082,61 @@ namespace Rhino.Tools.Shell
 					{
 					}
 				}
-				return p.ExitValue();
+				return p.ExitCode;
 			}
 			finally
 			{
-				p.Destroy();
+				if (!p.HasExited)
+				{
+					try
+					{
+						p.Kill();
 					}
+					catch (InvalidOperationException)
+					{
+						// Already exited. Do nothing
 					}
+				}
+			}
+		}
+
+		private static Process Run(string[] cmd, string[] environment)
+		{
+			try
+			{
+				var psi = new ProcessStartInfo
+				{
+					FileName = cmd[0],
+					Arguments = string.Join(" ", cmd, 1, cmd.Length - 1),
+					UseShellExecute = false,
+					RedirectStandardInput = true,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					CreateNoWindow = true
+				};
+				if (environment != null)
+				{
+					foreach (string str in environment)
+					{
+						int index = str.IndexOf('=');
+						psi.EnvironmentVariables[str.Substring(0, index)] = str.Substring(index + 1);
+					}
+				}
+				return Process.Start (psi);
+			}
+			catch (System.ComponentModel.Win32Exception ex)
+			{
+				throw new IOException(ex.Message);
+			}
+		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		internal static void Pipe(bool fromProcess, Stream from, Stream to)
+		internal static void Pipe(bool fromProcess, TextReader from, TextWriter to)
 		{
 			try
 			{
 				int SIZE = 4096;
-				byte[] buffer = new byte[SIZE];
+				char[] buffer = new char[SIZE];
 				for (; ; )
 				{
 					int n;
@@ -1185,205 +1202,72 @@ namespace Rhino.Tools.Shell
 		// Ignore errors on close. On Windows JVM may throw invalid
 		// refrence exception if process terminates too fast.
 		/// <exception cref="System.IO.IOException"></exception>
-		private static Stream ToInputStream(object value)
+		private static TextReader ToInputStream(object value)
 		{
-			Stream @is = null;
-			string s = null;
-			if (value is Wrapper)
+			var wrapper = value as Wrapper;
+			if (wrapper != null)
 			{
-				object unwrapped = ((Wrapper)value).Unwrap();
-				if (unwrapped is Stream)
+				object unwrapped = wrapper.Unwrap();
+				var inputStream = unwrapped as TextReader;
+				if (inputStream != null)
 				{
-					@is = (Stream)unwrapped;
+					return inputStream;
 				}
-				else
+				var data = unwrapped as byte[];
+				if (data != null)
 				{
-					if (unwrapped is byte[])
-					{
-						@is = new MemoryStream((byte[])unwrapped);
+					return new StreamReader(new MemoryStream(data));
 				}
-					else
+				var chars = unwrapped as char[];
+				if (chars != null)
 				{
-						if (unwrapped is TextReader)
-						{
-							s = ReadReader((TextReader)unwrapped);
-				}
-						else
-						{
-							if (unwrapped is char[])
-							{
-								s = new string((char[])unwrapped);
-			}
-		}
-					}
+					return new StringReader(new string(chars));
 				}
 			}
-			if (@is == null)
-			{
-				if (s == null)
-				{
-					s = ScriptRuntime.ToString(value);
-				}
-				@is = new MemoryStream(Sharpen.Runtime.GetBytesForString(s));
-			}
-			return @is;
+			
+			return new StringReader(ScriptRuntime.ToString(value));
 		}
 
-		private static Stream ToOutputStream(object value)
+		private static TextWriter ToOutputStream(object value)
 		{
-			Stream os = null;
-			if (value is Wrapper)
+			var wrapper = value as Wrapper;
+			if (wrapper != null)
 			{
-				object unwrapped = ((Wrapper)value).Unwrap();
-				if (unwrapped is Stream)
+				object unwrapped = wrapper.Unwrap();
+				var writer = unwrapped as TextWriter;
+				if (writer != null)
 				{
-					os = (Stream)unwrapped;
-				}
-			}
-			return os;
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
-		private static string ReadUrl(string filePath, string charCoding, bool urlIsFile)
-		{
-			int chunkLength;
-			Stream @is = null;
-			try
-			{
-				if (!urlIsFile)
-				{
-					Uri urlObj = new Uri(filePath);
-					URLConnection uc = urlObj.OpenConnection();
-					@is = uc.GetInputStream();
-					chunkLength = uc.GetContentLength();
-					if (chunkLength <= 0)
-					{
-						chunkLength = 1024;
-					}
-					if (charCoding == null)
-					{
-						string type = uc.GetContentType();
-						if (type != null)
-						{
-							charCoding = GetCharCodingFromType(type);
-						}
-					}
-				}
-				else
-				{
-					FilePath f = new FilePath(filePath);
-					if (!f.Exists())
-					{
-						throw new FileNotFoundException("File not found: " + filePath);
-					}
-					else
-					{
-						if (!f.CanRead())
-						{
-							throw new IOException("Cannot read file: " + filePath);
-						}
-					}
-					long length = f.Length();
-					chunkLength = (int)length;
-					if (chunkLength != length)
-					{
-						throw new IOException("Too big file size: " + length);
-					}
-					if (chunkLength == 0)
-					{
-						return string.Empty;
-					}
-					@is = new FileInputStream(f);
-				}
-				TextReader r;
-				if (charCoding == null)
-				{
-					r = new StreamReader(@is);
-				}
-				else
-				{
-					r = new StreamReader(@is, charCoding);
-				}
-				return ReadReader(r, chunkLength);
-			}
-			finally
-			{
-				if (@is != null)
-				{
-					@is.Close();
-				}
-			}
-		}
-
-		private static string GetCharCodingFromType(string type)
-		{
-			int i = type.IndexOf(';');
-			if (i >= 0)
-			{
-				int end = type.Length;
-				++i;
-				while (i != end && type[i] <= ' ')
-				{
-					++i;
-			}
-				string charset = "charset";
-				if (charset.RegionMatches(true, 0, type, i, charset.Length))
-				{
-					i += charset.Length;
-					while (i != end && type[i] <= ' ')
-					{
-						++i;
-		}
-					if (i != end && type[i] == '=')
-					{
-						++i;
-						while (i != end && type[i] <= ' ')
-						{
-							++i;
-						}
-						if (i != end)
-						{
-							// i is at the start of non-empty
-							// charCoding spec
-							while (type[end - 1] <= ' ')
-							{
-								--end;
-							}
-							return Sharpen.Runtime.Substring(type, i, end);
-						}
-					}
+					return writer;
 				}
 			}
 			return null;
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private static string ReadReader(TextReader reader)
+		private static string ReadUrl(string filePath, string encoding, bool urlIsFile)
 		{
-			return ReadReader(reader, 4096);
+			using (var @is = OpenStream(filePath, ref encoding, urlIsFile))
+			{
+				StreamReader r = encoding == null
+					? new StreamReader(@is)
+					: new StreamReader(@is, Encoding.GetEncoding(encoding));
+
+				return r.ReadToEnd();
+			}
 		}
 
-		/// <exception cref="System.IO.IOException"></exception>
-		private static string ReadReader(TextReader reader, int initialBufferSize)
+		private static Stream OpenStream(string filePath, ref string encoding, bool urlIsFile)
+		{
+			if (urlIsFile)
+				return File.OpenRead(filePath);
+
+			var response = (HttpWebResponse) WebRequest.Create(filePath).GetResponse();
+			var @is = response.GetResponseStream();
+			if (encoding == null)
 			{
-			char[] buffer = new char[initialBufferSize];
-			int offset = 0;
-			for (; ; )
-			{
-				int n = reader.Read(buffer, offset, buffer.Length - offset);
-				if (n < 0)
-				{
-					break;
+				encoding = response.ContentEncoding;
 			}
-				offset += n;
-				if (offset == buffer.Length)
-				{
-					char[] tmp = new char[buffer.Length * 2];
-					System.Array.Copy(buffer, 0, tmp, 0, offset);
-					buffer = tmp;
-		}
-			}
-			return new string(buffer, 0, offset);
+			return @is;
 		}
 
 		internal static Exception ReportRuntimeError(string msgId)
@@ -1397,75 +1281,5 @@ namespace Rhino.Tools.Shell
 			string message = ToolErrorReporter.GetMessage(msgId, msgArg);
 			return Context.ReportRuntimeError(message);
 		}
-	}
-
-	internal class Runner : Runnable
-	{
-		internal Runner(Scriptable scope, Function func, object[] args)
-		{
-			this.scope = scope;
-			f = func;
-			this.args = args;
-}
-
-		internal Runner(Scriptable scope, Script script)
-		{
-			this.scope = scope;
-			s = script;
-		}
-
-		public virtual void Run()
-		{
-			factory.Call(cx =>
-			{
-				if (f != null)
-				{
-					return f.Call(cx, scope, scope, args);
-				}
-				else
-				{
-					return s.Exec(cx, scope);
-				}
-			});
-		}
-
-		internal ContextFactory factory;
-
-		private Scriptable scope;
-
-		private Function f;
-
-		private Script s;
-
-		private object[] args;
-	}
-
-	internal class PipeThread : Sharpen.Thread
-	{
-		internal PipeThread(bool fromProcess, Stream from, Stream to)
-		{
-			SetDaemon(true);
-			this.fromProcess = fromProcess;
-			this.from = from;
-			this.to = to;
-		}
-
-		public override void Run()
-		{
-			try
-			{
-				Global.Pipe(fromProcess, from, to);
-			}
-			catch (IOException ex)
-			{
-				throw Context.ThrowAsScriptRuntimeEx(ex);
-			}
-		}
-
-		private bool fromProcess;
-
-		private Stream from;
-
-		private Stream to;
 	}
 }

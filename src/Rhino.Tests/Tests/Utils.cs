@@ -6,16 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using Rhino;
-using Rhino.Tests;
-using Sharpen;
+using System;
 
 namespace Rhino.Tests
 {
 	/// <summary>Misc utilities to make test code easier.</summary>
 	/// <remarks>Misc utilities to make test code easier.</remarks>
 	/// <author>Marc Guillemot</author>
-	public class Utils
+	public static class Utils
 	{
 		/// <summary>Runs the action successively with all available optimization levels</summary>
 		public static void RunWithAllOptimizationLevels(ContextAction action)
@@ -57,6 +55,7 @@ namespace Rhino.Tests
 		/// <summary>Execute the provided script in a fresh context as "myScript.js".</summary>
 		/// <remarks>Execute the provided script in a fresh context as "myScript.js".</remarks>
 		/// <param name="script">the script code</param>
+		/// <param name="optimizationLevel"></param>
 		internal static void ExecuteScript(string script, int optimizationLevel)
 		{
 			RunWithOptimizationLevel(cx =>

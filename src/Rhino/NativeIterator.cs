@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Rhino;
 using Sharpen;
@@ -19,7 +20,7 @@ namespace Rhino
 	/// http://developer.mozilla.org/en/docs/New_in_JavaScript_1.7#Iterators
 	/// </remarks>
 	/// <author>Norris Boyd</author>
-	[System.Serializable]
+	[Serializable]
 	public sealed class NativeIterator : IdScriptableObject
 	{
 		private const long serialVersionUID = -4136968203581667681L;
@@ -29,19 +30,19 @@ namespace Rhino
 		internal static void Init(ScriptableObject scope, bool @sealed)
 		{
 			// Iterator
-			Rhino.NativeIterator iterator = new Rhino.NativeIterator();
+			NativeIterator iterator = new NativeIterator();
 			iterator.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
 			// Generator
 			NativeGenerator.Init(scope, @sealed);
 			// StopIteration
-			NativeObject obj = new NativeIterator.StopIteration();
+			NativeObject obj = new StopIteration();
 			obj.SetPrototype(GetObjectPrototype(scope));
 			obj.SetParentScope(scope);
 			if (@sealed)
 			{
 				obj.SealObject();
 			}
-			ScriptableObject.DefineProperty(scope, STOP_ITERATION, obj, ScriptableObject.DONTENUM);
+			DefineProperty(scope, STOP_ITERATION, obj, DONTENUM);
 			// Use "associateValue" so that generators can continue to
 			// throw StopIteration even if the property of the global
 			// scope is replaced or deleted.
@@ -70,15 +71,15 @@ namespace Rhino
 		/// <returns>the StopIteration object</returns>
 		public static object GetStopIterationObject(Scriptable scope)
 		{
-			Scriptable top = ScriptableObject.GetTopLevelScope(scope);
-			return ScriptableObject.GetTopScopeValue(top, ITERATOR_TAG);
+			Scriptable top = GetTopLevelScope(scope);
+			return GetTopScopeValue(top, ITERATOR_TAG);
 		}
 
 		private const string STOP_ITERATION = "StopIteration";
 
 		public const string ITERATOR_PROPERTY_NAME = "__iterator__";
 
-		[System.Serializable]
+		[Serializable]
 		internal class StopIteration : NativeObject
 		{
 			private const long serialVersionUID = 2485151085722377663L;
@@ -90,7 +91,7 @@ namespace Rhino
 
 			public override bool HasInstance(Scriptable instance)
 			{
-				return instance is NativeIterator.StopIteration;
+				return instance is StopIteration;
 			}
 		}
 
@@ -185,11 +186,11 @@ namespace Rhino
 				// For objects that implement java.lang.Iterable or
 				// java.util.Iterator, have JavaScript Iterator call the underlying
 				// iteration methods
-				IEnumerator<object> iterator = VMBridge.instance.GetJavaIterator(cx, scope, obj);
+				IEnumerator iterator = GetEnumerator(cx, scope, obj);
 				if (iterator != null)
 				{
-					scope = ScriptableObject.GetTopLevelScope(scope);
-					return cx.GetWrapFactory().Wrap(cx, scope, new NativeIterator.WrappedJavaIterator(iterator, scope), typeof(NativeIterator.WrappedJavaIterator));
+					scope = GetTopLevelScope(scope);
+					return cx.GetWrapFactory().Wrap(cx, scope, new WrappedJavaIterator(iterator, scope), typeof(WrappedJavaIterator));
 				}
 				// Otherwise, just call the runtime routine
 				Scriptable jsIterator = ScriptRuntime.ToIterator(cx, scope, obj, keyOnly);
@@ -203,25 +204,25 @@ namespace Rhino
 			object objectIterator = ScriptRuntime.EnumInit(obj, cx, keyOnly ? ScriptRuntime.ENUMERATE_KEYS_NO_ITERATOR : ScriptRuntime.ENUMERATE_ARRAY_NO_ITERATOR);
 			ScriptRuntime.SetEnumNumbers(objectIterator, true);
 			NativeIterator result = new NativeIterator(objectIterator);
-			result.SetPrototype(ScriptableObject.GetClassPrototype(scope, result.GetClassName()));
+			result.SetPrototype(GetClassPrototype(scope, result.GetClassName()));
 			result.SetParentScope(scope);
 			return result;
 		}
 
 		private object Next(Context cx, Scriptable scope)
 		{
-			bool b = ScriptRuntime.EnumNext(this.objectIterator);
+			bool b = ScriptRuntime.EnumNext(objectIterator);
 			if (!b)
 			{
 				// Out of values. Throw StopIteration.
-				throw new JavaScriptException(NativeIterator.GetStopIterationObject(scope), null, 0);
+				throw new JavaScriptException(GetStopIterationObject(scope), null, 0);
 			}
-			return ScriptRuntime.EnumId(this.objectIterator, cx);
+			return ScriptRuntime.EnumId(objectIterator, cx);
 		}
 
 		public class WrappedJavaIterator
 		{
-			internal WrappedJavaIterator(IEnumerator<object> iterator, Scriptable scope)
+			internal WrappedJavaIterator(IEnumerator iterator, Scriptable scope)
 			{
 				this.iterator = iterator;
 				this.scope = scope;
@@ -229,12 +230,12 @@ namespace Rhino
 
 			public virtual object Next()
 			{
-				if (!iterator.HasNext())
+				if (!iterator.MoveNext())
 				{
 					// Out of values. Throw StopIteration.
-					throw new JavaScriptException(NativeIterator.GetStopIterationObject(scope), null, 0);
+					throw new JavaScriptException(GetStopIterationObject(scope), null, 0);
 				}
-				return iterator.Next();
+				return iterator.Current;
 			}
 
 			public virtual object __iterator__(bool b)
@@ -242,9 +243,38 @@ namespace Rhino
 				return this;
 			}
 
-			private IEnumerator<object> iterator;
+			private IEnumerator iterator;
 
 			private Scriptable scope;
+		}
+
+		/// <summary>
+		/// If "obj" is a java.util.Iterator or a java.lang.Iterable, return a
+		/// wrapping as a JavaScript Iterator.
+		/// </summary>
+		/// <remarks>
+		/// If "obj" is a java.util.Iterator or a java.lang.Iterable, return a
+		/// wrapping as a JavaScript Iterator. Otherwise, return null.
+		/// This method is in VMBridge since Iterable is a JDK 1.5 addition.
+		/// </remarks>
+		private static IEnumerator GetEnumerator(Context cx, Scriptable scope, object obj)
+		{
+			var wrapper = obj as Wrapper;
+			if (wrapper != null)
+			{
+				object unwrapped = wrapper.Unwrap();
+				var enumerator = unwrapped as IEnumerator;
+				if (enumerator != null)
+				{
+					return enumerator;
+				}
+				var enumerable = unwrapped as IEnumerable;
+				if (enumerable != null)
+				{
+					return enumerable.GetEnumerator();
+				}
+			}
+			return null;
 		}
 
 		// #string_id_map#

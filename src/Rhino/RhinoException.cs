@@ -8,7 +8,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Rhino;
 using Sharpen;
@@ -217,7 +219,7 @@ namespace Rhino
 		{
 			// Get stable reference to work properly with concurrent access
 			StringWriter writer = new StringWriter();
-			base.Sharpen.Runtime.PrintStackTrace(new PrintWriter(writer));
+			Sharpen.Runtime.PrintStackTrace(this, new PrintWriter(writer));
 			string origStackTrace = writer.ToString();
 			Evaluator e = Context.CreateInterpreter();
 			if (e != null)
@@ -239,7 +241,7 @@ namespace Rhino
 		public virtual string GetScriptStackTrace()
 		{
 			StringBuilder buffer = new StringBuilder();
-			string lineSeparator = SecurityUtilities.GetSystemProperty("line.separator");
+			string lineSeparator = Environment.NewLine;
 			ScriptStackElement[] stack = GetScriptStack();
 			foreach (ScriptStackElement elem in stack)
 			{
@@ -279,26 +281,27 @@ namespace Rhino
 				}
 			}
 			int interpreterStackIndex = 0;
-			StackTraceElement[] stack = GetStackTrace();
+
+			StackFrame[] stack = new StackTrace(this).GetFrames();
 			// Pattern to recover function name from java method name -
 			// see Codegen.getBodyMethodName()
 			// kudos to Marc Guillemot for coming up with this
 			Sharpen.Pattern pattern = Sharpen.Pattern.Compile("_c_(.*)_\\d+");
-			foreach (StackTraceElement e in stack)
+			foreach (var e in stack)
 			{
 				string fileName = e.GetFileName();
-				if (e.GetMethodName().StartsWith("_c_") && e.GetLineNumber() > -1 && fileName != null && !fileName.EndsWith(".java"))
+				if (e.GetMethod().Name.StartsWith("_c_") && e.GetFileLineNumber() > -1 && fileName != null && !fileName.EndsWith(".cs"))
 				{
-					string methodName = e.GetMethodName();
+					string methodName = e.GetMethod().Name;
 					Matcher match = pattern.Matcher(methodName);
 					// the method representing the main script is always "_c_script_0" -
 					// at least we hope so
 					methodName = !"_c_script_0".Equals(methodName) && match.Find() ? match.Group(1) : null;
-					list.Add(new ScriptStackElement(fileName, methodName, e.GetLineNumber()));
+					list.Add(new ScriptStackElement(fileName, methodName, e.GetFileLineNumber()));
 				}
 				else
 				{
-					if ("Rhino.Interpreter".Equals(e.GetClassName()) && "interpretLoop".Equals(e.GetMethodName()) && interpreterStack != null && interpreterStack.Length > interpreterStackIndex)
+					if ("Rhino.Interpreter".Equals(e.GetMethod().DeclaringType.FullName) && "InterpretLoop".Equals(e.GetMethod().Name) && interpreterStack != null && interpreterStack.Length > interpreterStackIndex)
 					{
 						foreach (ScriptStackElement elem in interpreterStack[interpreterStackIndex++])
 						{
@@ -307,14 +310,14 @@ namespace Rhino
 					}
 				}
 			}
-			return Sharpen.Collections.ToArray(list, new ScriptStackElement[list.Count]);
+			return list.ToArray();
 		}
 
-		public override void PrintStackTrace(PrintWriter s)
+		public void PrintStackTrace(PrintWriter s)
 		{
 			if (interpreterStackInfo == null)
 			{
-				base.Sharpen.Runtime.PrintStackTrace(s);
+				Sharpen.Runtime.PrintStackTrace(this, s);
 			}
 			else
 			{
@@ -322,11 +325,11 @@ namespace Rhino
 			}
 		}
 
-		public override void PrintStackTrace(TextWriter s)
+		public void PrintStackTrace(TextWriter s)
 		{
 			if (interpreterStackInfo == null)
 			{
-				base.Sharpen.Runtime.PrintStackTrace(s);
+				Sharpen.Runtime.PrintStackTrace(this, s);
 			}
 			else
 			{
@@ -370,8 +373,6 @@ namespace Rhino
 		{
 			useMozillaStackStyle = flag;
 		}
-
-		internal const long serialVersionUID = 1883500631321581169L;
 
 		private static bool useMozillaStackStyle = false;
 

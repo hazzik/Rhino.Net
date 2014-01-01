@@ -7,12 +7,8 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Rhino;
-using Rhino.CommonJS.Module;
-using Rhino.CommonJS.Module.Provider;
+using System.Runtime.Serialization;
 using Sharpen;
 
 namespace Rhino.CommonJS.Module.Provider
@@ -32,16 +28,14 @@ namespace Rhino.CommonJS.Module.Provider
 	/// </remarks>
 	/// <author>Attila Szegedi</author>
 	/// <version>$Id: SoftCachingModuleScriptProvider.java,v 1.3 2011/04/07 20:26:12 hannes%helma.at Exp $</version>
-	[System.Serializable]
+	[Serializable]
 	public class SoftCachingModuleScriptProvider : CachingModuleScriptProviderBase
 	{
-		private const long serialVersionUID = 1L;
-
-		[System.NonSerialized]
+		[NonSerialized]
 		private ReferenceQueue<Script> scriptRefQueue = new ReferenceQueue<Script>();
 
-		[System.NonSerialized]
-		private ConcurrentMap<string, SoftCachingModuleScriptProvider.ScriptReference> scripts = new ConcurrentHashMap<string, SoftCachingModuleScriptProvider.ScriptReference>(16, .75f, GetConcurrencyLevel());
+		[NonSerialized]
+		private ConcurrentMap<string, ScriptReference> scripts = new ConcurrentHashMap<string, ScriptReference>(16, .75f, GetConcurrencyLevel());
 
 		/// <summary>Creates a new module provider with the specified module source provider.</summary>
 		/// <remarks>Creates a new module provider with the specified module source provider.</remarks>
@@ -57,7 +51,7 @@ namespace Rhino.CommonJS.Module.Provider
 			// script.
 			for (; ; )
 			{
-				SoftCachingModuleScriptProvider.ScriptReference @ref = (SoftCachingModuleScriptProvider.ScriptReference)scriptRefQueue.Poll();
+				var @ref = (ScriptReference) scriptRefQueue.Poll();
 				if (@ref == null)
 				{
 					break;
@@ -67,15 +61,15 @@ namespace Rhino.CommonJS.Module.Provider
 			return base.GetModuleScript(cx, moduleId, uri, @base, paths);
 		}
 
-		protected internal override CachingModuleScriptProviderBase.CachedModuleScript GetLoadedModule(string moduleId)
+		protected internal override CachedModuleScript GetLoadedModule(string moduleId)
 		{
-			SoftCachingModuleScriptProvider.ScriptReference scriptRef = scripts.Get(moduleId);
+			ScriptReference scriptRef = scripts.Get(moduleId);
 			return scriptRef != null ? scriptRef.GetCachedModuleScript() : null;
 		}
 
 		protected internal override void PutLoadedModule(string moduleId, ModuleScript moduleScript, object validator)
 		{
-			scripts [moduleId] = new SoftCachingModuleScriptProvider.ScriptReference(moduleScript.GetScript(), moduleId, moduleScript.GetUri(), moduleScript.GetBase(), validator, scriptRefQueue);
+			scripts[moduleId] = new ScriptReference(moduleScript.GetScript(), moduleId, moduleScript.GetUri(), moduleScript.GetBase(), validator, scriptRefQueue);
 		}
 
 		private class ScriptReference : SoftReference<Script>
@@ -96,14 +90,14 @@ namespace Rhino.CommonJS.Module.Provider
 				this.validator = validator;
 			}
 
-			internal virtual CachingModuleScriptProviderBase.CachedModuleScript GetCachedModuleScript()
+			internal virtual CachedModuleScript GetCachedModuleScript()
 			{
 				Script script = Get();
 				if (script == null)
 				{
 					return null;
 				}
-				return new CachingModuleScriptProviderBase.CachedModuleScript(new ModuleScript(script, uri, @base), validator);
+				return new CachedModuleScript(new ModuleScript(script, uri, @base), validator);
 			}
 
 			internal virtual string GetModuleId()
@@ -114,14 +108,15 @@ namespace Rhino.CommonJS.Module.Provider
 
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
+		[OnDeserializing]
 		private void ReadObject(ObjectInputStream @in)
 		{
 			scriptRefQueue = new ReferenceQueue<Script>();
-			scripts = new ConcurrentHashMap<string, SoftCachingModuleScriptProvider.ScriptReference>();
-			IDictionary<string, CachingModuleScriptProviderBase.CachedModuleScript> serScripts = (IDictionary)@in.ReadObject();
-			foreach (KeyValuePair<string, CachingModuleScriptProviderBase.CachedModuleScript> entry in serScripts)
+			scripts = new ConcurrentHashMap<string, ScriptReference>();
+			IDictionary<string, CachedModuleScript> serScripts = (IDictionary<string, CachedModuleScript>) @in.ReadObject();
+			foreach (KeyValuePair<string, CachedModuleScript> entry in serScripts)
 			{
-				CachingModuleScriptProviderBase.CachedModuleScript cachedModuleScript = entry.Value;
+				CachedModuleScript cachedModuleScript = entry.Value;
 				PutLoadedModule(entry.Key, cachedModuleScript.GetModule(), cachedModuleScript.GetValidator());
 			}
 		}
@@ -129,13 +124,13 @@ namespace Rhino.CommonJS.Module.Provider
 		/// <exception cref="System.IO.IOException"></exception>
 		private void WriteObject(ObjectOutputStream @out)
 		{
-			IDictionary<string, CachingModuleScriptProviderBase.CachedModuleScript> serScripts = new Dictionary<string, CachingModuleScriptProviderBase.CachedModuleScript>();
-			foreach (KeyValuePair<string, SoftCachingModuleScriptProvider.ScriptReference> entry in scripts)
+			IDictionary<string, CachedModuleScript> serScripts = new Dictionary<string, CachedModuleScript>();
+			foreach (KeyValuePair<string, ScriptReference> entry in scripts)
 			{
-				CachingModuleScriptProviderBase.CachedModuleScript cachedModuleScript = entry.Value.GetCachedModuleScript();
+				CachedModuleScript cachedModuleScript = entry.Value.GetCachedModuleScript();
 				if (cachedModuleScript != null)
 				{
-					serScripts [entry.Key] = cachedModuleScript;
+					serScripts[entry.Key] = cachedModuleScript;
 				}
 			}
 			@out.WriteObject(serScripts);

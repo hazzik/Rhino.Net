@@ -8,10 +8,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -20,7 +22,7 @@ namespace Rhino
 	/// <author>Norris Boyd</author>
 	/// <seealso cref="NativeJavaObject">NativeJavaObject</seealso>
 	/// <seealso cref="NativeJavaClass">NativeJavaClass</seealso>
-	internal class JavaMembers
+	public class JavaMembers
 	{
 		internal JavaMembers(Scriptable scope, Type cl) : this(scope, cl, false)
 		{
@@ -36,8 +38,8 @@ namespace Rhino
 				{
 					throw Context.ReportRuntimeError1("msg.access.prohibited", cl.FullName);
 				}
-				this.members = new Dictionary<string, object>();
-				this.staticMembers = new Dictionary<string, object>();
+				members = new Dictionary<string, object>();
+				staticMembers = new Dictionary<string, object>();
 				this.cl = cl;
 				bool includePrivate = cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS);
 				Reflect(scope, includeProtected, includePrivate);
@@ -70,7 +72,7 @@ namespace Rhino
 			}
 			if (member == null)
 			{
-				member = this.GetExplicitFunction(scope, name, javaObject, isStatic);
+				member = GetExplicitFunction(scope, name, javaObject, isStatic);
 				if (member == null)
 				{
 					return ScriptableConstants.NOT_FOUND;
@@ -174,7 +176,7 @@ namespace Rhino
 				}
 				catch (MemberAccessException accessEx)
 				{
-					if (field.IsInitOnly)
+					if (field.IsInitOnly || field.IsLiteral)
 					{
 						// treat Java final the same as JavaScript [[READONLY]]
 						return;
@@ -191,7 +193,7 @@ namespace Rhino
 		internal virtual object[] GetIds(bool isStatic)
 		{
 			IDictionary<string, object> map = isStatic ? staticMembers : members;
-			return Sharpen.Collections.ToArray(map.Keys, new object[map.Count]);
+			return map.Keys.Cast<object>().ToArray();
 		}
 
 		internal static string JavaSignature(Type type)
@@ -213,7 +215,7 @@ namespace Rhino
 				string suffix = "[]";
 				if (arrayDimension == 1)
 				{
-					return System.String.Concat(name, suffix);
+					return String.Concat(name, suffix);
 				}
 				else
 				{
@@ -269,16 +271,16 @@ namespace Rhino
 			else
 			{
 				// Explicit request for an overloaded method
-				string trueName = Sharpen.Runtime.Substring(name, 0, sigStart);
+				string trueName = name.Substring(0, sigStart);
 				object obj = ht.Get(trueName);
 				if (!isStatic && obj == null)
 				{
 					// Try to get static member from instance (LC3)
 					obj = staticMembers.Get(trueName);
 				}
-				if (obj is NativeJavaMethod)
+				var njm = obj as NativeJavaMethod;
+				if (njm != null)
 				{
-					NativeJavaMethod njm = (NativeJavaMethod)obj;
 					methodsOrCtors = njm.methods;
 				}
 			}
@@ -310,7 +312,7 @@ namespace Rhino
 					NativeJavaConstructor fun = new NativeJavaConstructor(methodOrCtor);
 					fun.SetPrototype(prototype);
 					member = fun;
-					ht [name] = fun;
+					ht[name] = fun;
 				}
 				else
 				{
@@ -320,7 +322,7 @@ namespace Rhino
 					{
 						NativeJavaMethod fun = new NativeJavaMethod(methodOrCtor, name);
 						fun.SetPrototype(prototype);
-						ht [name] = fun;
+						ht[name] = fun;
 						member = fun;
 					}
 				}
@@ -338,12 +340,12 @@ namespace Rhino
 		/// </remarks>
 		private static MethodInfo[] DiscoverAccessibleMethods(Type clazz, bool includeProtected, bool includePrivate)
 		{
-			IDictionary<JavaMembers.MethodSignature, MethodInfo> map = new Dictionary<JavaMembers.MethodSignature, MethodInfo>();
+			IDictionary<MethodSignature, MethodInfo> map = new Dictionary<MethodSignature, MethodInfo>();
 			DiscoverAccessibleMethods(clazz, map, includeProtected, includePrivate);
-			return Sharpen.Collections.ToArray(map.Values, new MethodInfo[map.Count]);
+			return map.Values.ToArray();
 		}
 
-		private static void DiscoverAccessibleMethods(Type clazz, IDictionary<JavaMembers.MethodSignature, MethodInfo> map, bool includeProtected, bool includePrivate)
+		private static void DiscoverAccessibleMethods(Type clazz, IDictionary<MethodSignature, MethodInfo> map, bool includeProtected, bool includePrivate)
 		{
 			if (clazz.IsPublic || includePrivate)
 			{
@@ -355,18 +357,15 @@ namespace Rhino
 						{
 							try
 							{
-								MethodInfo[] methods = Sharpen.Runtime.GetDeclaredMethods(clazz);
+								MethodInfo[] methods = Runtime.GetDeclaredMethods(clazz);
 								foreach (MethodInfo method in methods)
 								{
 									if (method.IsPublic || method.IsFamily || includePrivate)
 									{
-										JavaMembers.MethodSignature sig = new JavaMembers.MethodSignature(method);
+										MethodSignature sig = new MethodSignature(method);
 										if (!map.ContainsKey(sig))
 										{
-											if (includePrivate && !method.IsAccessible())
-											{
-											}
-											map [sig] = method;
+											map[sig] = method;
 										}
 									}
 								}
@@ -380,10 +379,10 @@ namespace Rhino
 								MethodInfo[] methods = clazz.GetMethods();
 								foreach (MethodInfo method in methods)
 								{
-									JavaMembers.MethodSignature sig = new JavaMembers.MethodSignature(method);
+									MethodSignature sig = new MethodSignature(method);
 									if (!map.ContainsKey(sig))
 									{
-										map [sig] = method;
+										map[sig] = method;
 									}
 								}
 								break;
@@ -397,11 +396,11 @@ namespace Rhino
 						MethodInfo[] methods = clazz.GetMethods();
 						foreach (MethodInfo method in methods)
 						{
-							JavaMembers.MethodSignature sig = new JavaMembers.MethodSignature(method);
+							MethodSignature sig = new MethodSignature(method);
 							// Array may contain methods with same signature but different return value!
 							if (!map.ContainsKey(sig))
 							{
-								map [sig] = method;
+								map[sig] = method;
 							}
 						}
 					}
@@ -438,15 +437,15 @@ namespace Rhino
 				this.args = args;
 			}
 
-			internal MethodSignature(MethodInfo method) : this(method.Name, Sharpen.Runtime.GetParameterTypes(method))
+			internal MethodSignature(MethodInfo method) : this(method.Name, method.GetParameterTypes())
 			{
 			}
 
 			public override bool Equals(object o)
 			{
-				if (o is JavaMembers.MethodSignature)
+				if (o is MethodSignature)
 				{
-					JavaMembers.MethodSignature ms = (JavaMembers.MethodSignature)o;
+					MethodSignature ms = (MethodSignature)o;
 					return ms.name.Equals(name) && Arrays.Equals(args, ms.args);
 				}
 				return false;
@@ -472,7 +471,7 @@ namespace Rhino
 				object value = ht.Get(name);
 				if (value == null)
 				{
-					ht [name] = method;
+					ht[name] = method;
 				}
 				else
 				{
@@ -491,7 +490,7 @@ namespace Rhino
 						// staticMembers and members can only contain methods
 						overloadedMethods = new ObjArray();
 						overloadedMethods.Add(value);
-						ht [name] = overloadedMethods;
+						ht[name] = overloadedMethods;
 					}
 					overloadedMethods.Add(method);
 				}
@@ -502,7 +501,7 @@ namespace Rhino
 			{
 				bool isStatic = (tableCursor == 0);
 				IDictionary<string, object> ht = isStatic ? staticMembers : members;
-				foreach (KeyValuePair<string, object> entry in ht)
+				foreach (var entry in ht.ToArray())
 				{
 					MemberBox[] methodBoxes;
 					object value = entry.Value;
@@ -520,9 +519,9 @@ namespace Rhino
 							Kit.CodeBug();
 						}
 						methodBoxes = new MemberBox[N];
-						for (int i = 0; i != N; ++i)
+						for (int i = 0; i < N; i++)
 						{
-							MethodInfo method_1 = (MethodInfo)overloadedMethods.Get(i);
+							MethodInfo method_1 = (MethodInfo) overloadedMethods.Get(i);
 							methodBoxes[i] = new MemberBox(method_1);
 						}
 					}
@@ -531,7 +530,7 @@ namespace Rhino
 					{
 						ScriptRuntime.SetFunctionProtoAndParent(fun, scope);
 					}
-					ht [entry.Key] = fun;
+					ht[entry.Key] = fun;
 				}
 			}
 			// Reflect fields.
@@ -541,12 +540,12 @@ namespace Rhino
 				string name = field.Name;
 				try
 				{
-					bool isStatic = field.IsStatic;
+					bool isStatic = (field).IsStatic;
 					IDictionary<string, object> ht = isStatic ? staticMembers : members;
 					object member = ht.Get(name);
 					if (member == null)
 					{
-						ht [name] = field;
+						ht[name] = field;
 					}
 					else
 					{
@@ -567,8 +566,8 @@ namespace Rhino
 									fieldAndMethods = fmht;
 								}
 							}
-							fmht [name] = fam;
-							ht [name] = fam;
+							fmht[name] = fam;
+							ht[name] = fam;
 						}
 						else
 						{
@@ -583,7 +582,7 @@ namespace Rhino
 								// explicitly shadows it.
 								if (oldField.DeclaringType.IsAssignableFrom(field.DeclaringType))
 								{
-									ht [name] = field;
+									ht[name] = field;
 								}
 							}
 							else
@@ -617,7 +616,7 @@ namespace Rhino
 					if (memberIsGetMethod || memberIsIsMethod || memberIsSetMethod)
 					{
 						// Double check name component.
-						string nameComponent = Sharpen.Runtime.Substring(name, memberIsIsMethod ? 2 : 3);
+						string nameComponent = name.Substring(memberIsIsMethod ? 2 : 3);
 						if (nameComponent.Length == 0)
 						{
 							continue;
@@ -625,7 +624,7 @@ namespace Rhino
 						// Make the bean property name.
 						string beanPropertyName = nameComponent;
 						char ch0 = nameComponent[0];
-						if (System.Char.IsUpper(ch0))
+						if (Char.IsUpper(ch0))
 						{
 							if (nameComponent.Length == 1)
 							{
@@ -634,9 +633,9 @@ namespace Rhino
 							else
 							{
 								char ch1 = nameComponent[1];
-								if (!System.Char.IsUpper(ch1))
+								if (!Char.IsUpper(ch1))
 								{
-									beanPropertyName = System.Char.ToLower(ch0) + Sharpen.Runtime.Substring(nameComponent, 1);
+									beanPropertyName = Char.ToLower(ch0) + nameComponent.Substring(1);
 								}
 							}
 						}
@@ -650,7 +649,7 @@ namespace Rhino
 						if (v != null)
 						{
 							// A private field shouldn't mask a public getter/setter
-							if (!includePrivate || !Modifier.IsPrivate(v))
+							if (!includePrivate || !(v is MemberInfo) || !((MemberInfo) v).IsPrivate())
 							{
 								continue;
 							}
@@ -667,7 +666,7 @@ namespace Rhino
 						// setter
 						MemberBox setter = null;
 						NativeJavaMethod setters = null;
-						string setterName = System.String.Concat("set", nameComponent);
+						string setterName = String.Concat("set", nameComponent);
 						if (ht.ContainsKey(setterName))
 						{
 							// Is this value a method?
@@ -695,14 +694,14 @@ namespace Rhino
 						}
 						// Make the property.
 						BeanProperty bp = new BeanProperty(getter, setter, setters);
-						toAdd [beanPropertyName] = bp;
+						toAdd[beanPropertyName] = bp;
 					}
 				}
 				// Add the new bean properties.
 				foreach (string key in toAdd.Keys)
 				{
 					object value = toAdd.Get(key);
-					ht [key] = value;
+					ht[key] = value;
 				}
 			}
 			// Reflect constructors
@@ -747,14 +746,11 @@ namespace Rhino
 					{
 						// get all declared fields in this class, make them
 						// accessible, and save
-						FieldInfo[] declared = Sharpen.Runtime.GetDeclaredFields(currentClass);
+						FieldInfo[] declared = Runtime.GetDeclaredFields(currentClass);
 						foreach (FieldInfo field in declared)
 						{
 							if (includePrivate || field.IsPublic || field.IsFamily)
 							{
-								if (!field.IsAccessible())
-								{
-								}
 								fieldsList.Add(field);
 							}
 						}
@@ -762,7 +758,7 @@ namespace Rhino
 						// interfaces, since they can't have fields
 						currentClass = currentClass.BaseType;
 					}
-					return Sharpen.Collections.ToArray(fieldsList, new FieldInfo[fieldsList.Count]);
+					return fieldsList.ToArray();
 				}
 				catch (SecurityException)
 				{
@@ -774,7 +770,7 @@ namespace Rhino
 
 		private MemberBox FindGetter(bool isStatic, IDictionary<string, object> ht, string prefix, string propertyName)
 		{
-			string getterName = System.String.Concat(prefix, propertyName);
+			string getterName = String.Concat(prefix, propertyName);
 			if (ht.ContainsKey(getterName))
 			{
 				// Check that the getter is a method.
@@ -883,7 +879,7 @@ namespace Rhino
 			{
 				FieldAndMethods famNew = new FieldAndMethods(scope, fam.methods, fam.field);
 				famNew.javaObject = javaObject;
-				result [fam.field.Name] = famNew;
+				result[fam.field.Name] = famNew;
 			}
 			return result;
 		}
@@ -903,7 +899,7 @@ namespace Rhino
 					{
 						// member lookup for the original class failed because of
 						// missing privileges, cache the result so we don't try again
-						ct [dynamicType] = members;
+						ct[dynamicType] = members;
 					}
 					return members;
 				}
@@ -945,12 +941,12 @@ namespace Rhino
 			}
 			if (cache.IsCachingEnabled())
 			{
-				ct [cl] = members;
+				ct[cl] = members;
 				if (cl != dynamicType)
 				{
 					// member lookup for the original class failed because of
 					// missing privileges, cache the result so we don't try again
-					ct [dynamicType] = members;
+					ct[dynamicType] = members;
 				}
 			}
 			return members;
@@ -991,7 +987,7 @@ namespace Rhino
 		internal NativeJavaMethod setters;
 	}
 
-	[System.Serializable]
+	[Serializable]
 	internal class FieldAndMethods : NativeJavaMethod
 	{
 		internal const long serialVersionUID = -9222428244284796755L;
@@ -1000,7 +996,7 @@ namespace Rhino
 		{
 			this.field = field;
 			SetParentScope(scope);
-			SetPrototype(ScriptableObject.GetFunctionPrototype(scope));
+			SetPrototype(GetFunctionPrototype(scope));
 		}
 
 		public override object GetDefaultValue(Type hint)

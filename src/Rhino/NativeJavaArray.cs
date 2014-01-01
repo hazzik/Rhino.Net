@@ -19,19 +19,17 @@ namespace Rhino
 	/// <seealso cref="NativeJavaClass">NativeJavaClass</seealso>
 	/// <seealso cref="NativeJavaObject">NativeJavaObject</seealso>
 	/// <seealso cref="NativeJavaPackage">NativeJavaPackage</seealso>
-	[System.Serializable]
+	[Serializable]
 	public class NativeJavaArray : NativeJavaObject
 	{
-		internal const long serialVersionUID = -924022554283675333L;
-
 		public override string GetClassName()
 		{
 			return "JavaArray";
 		}
 
-		public static Rhino.NativeJavaArray Wrap(Scriptable scope, object array)
+		public static NativeJavaArray Wrap(Scriptable scope, Array array)
 		{
-			return new Rhino.NativeJavaArray(scope, array);
+			return new NativeJavaArray(scope, array);
 		}
 
 		public override object Unwrap()
@@ -39,7 +37,7 @@ namespace Rhino
 			return array;
 		}
 
-		public NativeJavaArray(Scriptable scope, object array) : base(scope, null, ScriptRuntime.ObjectClass)
+		public NativeJavaArray(Scriptable scope, Array array) : base(scope, null, ScriptRuntime.ObjectClass)
 		{
 			Type cl = array.GetType();
 			if (!cl.IsArray)
@@ -47,8 +45,8 @@ namespace Rhino
 				throw new Exception("Array expected");
 			}
 			this.array = array;
-			this.length = Sharpen.Runtime.GetArrayLength(array);
-			this.cls = cl.GetElementType();
+			length = array.Length;
+			cls = cl.GetElementType();
 		}
 
 		public override bool Has(string id, Scriptable start)
@@ -80,7 +78,7 @@ namespace Rhino
 			if (0 <= index && index < length)
 			{
 				Context cx = Context.GetContext();
-				object obj = Sharpen.Runtime.GetArrayValue(array, index);
+				object obj = array.GetValue(index);
 				return cx.GetWrapFactory().Wrap(cx, this, obj, cls);
 			}
 			return Undefined.instance;
@@ -99,7 +97,7 @@ namespace Rhino
 		{
 			if (0 <= index && index < length)
 			{
-				Sharpen.Runtime.SetArrayValue(array, index, Context.JsToJava(value, cls));
+				array.SetValue(Context.JsToJava(value, cls), index);
 			}
 			else
 			{
@@ -119,7 +117,7 @@ namespace Rhino
 			}
 			if (hint == ScriptRuntime.NumberClass)
 			{
-				return ScriptRuntime.NaNobj;
+				return ScriptRuntime.NaN;
 			}
 			return this;
 		}
@@ -149,12 +147,12 @@ namespace Rhino
 		{
 			if (prototype == null)
 			{
-				prototype = ScriptableObject.GetArrayPrototype(this.GetParentScope());
+				prototype = ScriptableObject.GetArrayPrototype(GetParentScope());
 			}
 			return prototype;
 		}
 
-		internal object array;
+		internal Array array;
 
 		internal int length;
 

@@ -8,10 +8,10 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using Rhino;
 using Sharpen;
 
 namespace Rhino
@@ -27,83 +27,71 @@ namespace Rhino
 	/// in some cases and provide serialization support.
 	/// </remarks>
 	/// <author>Igor Bukanov</author>
-	[System.Serializable]
-	internal sealed class MemberBox
+	[Serializable]
+	public sealed class MemberBox
 	{
-		[System.NonSerialized]
-		private MethodBase memberObject;
+		[NonSerialized]
+		internal MethodBase method;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		internal Type[] argTypes;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		internal object delegateTo;
 
-		[System.NonSerialized]
+		[NonSerialized]
 		internal bool vararg;
 
-		internal MemberBox(MethodInfo method)
+		internal MemberBox(MethodBase m)
 		{
-			Init(method);
+			Init(m);
 		}
 
-		internal MemberBox(ConstructorInfo constructor)
+		private void Init(MethodBase m)
 		{
-			Init(constructor);
-		}
-
-		private void Init(MethodInfo method)
-		{
-			this.memberObject = method;
-			this.argTypes = Sharpen.Runtime.GetParameterTypes(method);
-			this.vararg = VMBridge.instance.IsVarArgs(method);
-		}
-
-		private void Init(ConstructorInfo constructor)
-		{
-			this.memberObject = constructor;
-			this.argTypes = constructor.GetParameterTypes();
-			this.vararg = VMBridge.instance.IsVarArgs(constructor);
+			method = m;
+			argTypes = m.GetParameters().Select(p => p.ParameterType).ToArray();
+			vararg = IsVarArgs(m);
 		}
 
 		internal MethodInfo Method()
 		{
-			return (MethodInfo)memberObject;
+			return (MethodInfo)method;
 		}
 
 		internal ConstructorInfo Ctor()
 		{
-			return (ConstructorInfo)memberObject;
+			return (ConstructorInfo)method;
 		}
 
 		internal MethodBase Member()
 		{
-			return memberObject;
+			return method;
 		}
 
 		internal bool IsMethod()
 		{
-			return memberObject is MethodInfo;
+			return !method.IsConstructor;
 		}
 
 		internal bool IsCtor()
 		{
-			return memberObject is ConstructorInfo;
+			return method.IsConstructor;
 		}
 
 		internal bool IsStatic()
 		{
-			return memberObject.IsStatic;
+			return method.IsStatic;
 		}
 
 		internal string GetName()
 		{
-			return memberObject.Name;
+			return method.Name;
 		}
 
 		internal Type GetDeclaringClass()
 		{
-			return memberObject.DeclaringType;
+			return method.DeclaringType;
 		}
 
 		internal string ToJavaDeclaration()
@@ -111,10 +99,10 @@ namespace Rhino
 			StringBuilder sb = new StringBuilder();
 			if (IsMethod())
 			{
-				MethodInfo method = Method();
-				sb.Append(method.ReturnType);
+				MethodInfo m = Method();
+				sb.Append(m.ReturnType);
 				sb.Append(' ');
-				sb.Append(method.Name);
+				sb.Append(m.Name);
 			}
 			else
 			{
@@ -123,7 +111,7 @@ namespace Rhino
 				int lastDot = name.LastIndexOf('.');
 				if (lastDot >= 0)
 				{
-					name = Sharpen.Runtime.Substring(name, lastDot + 1);
+					name = name.Substring(lastDot + 1);
 				}
 				sb.Append(name);
 			}
@@ -133,35 +121,28 @@ namespace Rhino
 
 		public override string ToString()
 		{
-			return memberObject.ToString();
+			return method.ToString();
 		}
 
 		internal object Invoke(object target, object[] args)
 		{
-			MethodInfo method = Method();
+			MethodInfo m = Method();
 			try
 			{
 				try
 				{
-					return method.Invoke(target, args);
+					return m.Invoke(target, args);
 				}
 				catch (MemberAccessException ex)
 				{
-					MethodInfo accessible = SearchAccessibleMethod(method, argTypes);
+					MethodInfo accessible = SearchAccessibleMethod(m, argTypes);
 					if (accessible != null)
 					{
-						memberObject = accessible;
 						method = accessible;
-					}
-					else
-					{
-						if (!VMBridge.instance.TryToMakeAccessible(method))
-						{
-							throw Context.ThrowAsScriptRuntimeEx(ex);
-						}
+						m = accessible;
 					}
 					// Retry after recovery
-					return method.Invoke(target, args);
+					return m.Invoke(target, args);
 				}
 			}
 			catch (TargetInvocationException ite)
@@ -170,7 +151,7 @@ namespace Rhino
 				Exception e = ite;
 				do
 				{
-					e = ((TargetInvocationException)e).InnerException;
+					e = e.InnerException;
 				}
 				while ((e is TargetInvocationException));
 				if (e is ContinuationPending)
@@ -196,10 +177,6 @@ namespace Rhino
 				}
 				catch (MemberAccessException ex)
 				{
-					if (!VMBridge.instance.TryToMakeAccessible(ctor))
-					{
-						throw Context.ThrowAsScriptRuntimeEx(ex);
-					}
 				}
 				return ctor.NewInstance(args);
 			}
@@ -209,7 +186,7 @@ namespace Rhino
 			}
 		}
 
-		private static MethodInfo SearchAccessibleMethod(MethodBase method, Type[] @params)
+		private static MethodInfo SearchAccessibleMethod(MethodInfo method, Type[] @params)
 		{
 			if (method.IsPublic && !method.IsStatic)
 			{
@@ -270,22 +247,15 @@ namespace Rhino
 		private void ReadObject(ObjectInputStream @in)
 		{
 			@in.DefaultReadObject();
-			MemberInfo member = ReadMember(@in);
-			if (member is MethodInfo)
-			{
-				Init((MethodInfo)member);
-			}
-			else
-			{
-				Init((ConstructorInfo)member);
-			}
+			var member = (MethodBase) ReadMember(@in);
+			Init(member);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
 		private void WriteObject(ObjectOutputStream @out)
 		{
 			@out.DefaultWriteObject();
-			WriteMember(@out, memberObject);
+			WriteMember(@out, method);
 		}
 
 		/// <summary>Writes a Constructor or Method object.</summary>
@@ -313,7 +283,7 @@ namespace Rhino
 			@out.WriteObject(member.DeclaringType);
 			if (member is MethodInfo)
 			{
-				WriteParameters(@out, Sharpen.Runtime.GetParameterTypes(((MethodInfo)member)));
+				WriteParameters(@out, ((MethodInfo)member).GetParameterTypes());
 			}
 			else
 			{
@@ -364,9 +334,8 @@ namespace Rhino
 		private static void WriteParameters(ObjectOutputStream @out, Type[] parms)
 		{
 			@out.WriteShort(parms.Length);
-			for (int i = 0; i < parms.Length; i++)
+			foreach (var parm in parms)
 			{
-				Type parm = parms[i];
 				bool primitive = parm.IsPrimitive;
 				@out.WriteBoolean(primitive);
 				if (!primitive)
@@ -376,14 +345,14 @@ namespace Rhino
 				}
 				for (int j = 0; j < primitives.Length; j++)
 				{
-					if (parm.Equals(primitives[j]))
+					if (parm == primitives[j])
 					{
 						@out.WriteByte(j);
 						goto outer_continue;
 					}
 				}
 				throw new ArgumentException("Primitive " + parm + " not found");
-outer_continue: ;
+				outer_continue: ;
 			}
 outer_break: ;
 		}
@@ -405,6 +374,16 @@ outer_break: ;
 				result[i] = primitives[@in.ReadByte()];
 			}
 			return result;
+		}
+
+		private static bool IsVarArgs(MethodBase member)
+		{
+			foreach (ParameterInfo parameterInfo in member.GetParameters().Reverse())
+			{
+				var attributes = parameterInfo.GetCustomAttributes(typeof (ParamArrayAttribute));
+				return attributes != null && attributes.Any();
+			}
+			return false;
 		}
 	}
 }

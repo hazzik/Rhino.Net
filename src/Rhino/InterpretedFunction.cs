@@ -16,13 +16,11 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class InterpretedFunction : NativeFunction, Script
 	{
-		internal const long serialVersionUID = 541475680333911468L;
-
 		internal InterpreterData idata;
-
+#if ENCHANCED_SECURITY
 		internal SecurityController securityController;
-
 		internal object securityDomain;
+#endif
 
 		private InterpretedFunction(InterpreterData idata, object staticSecurityDomain)
 		{
@@ -30,6 +28,7 @@ namespace Rhino
 			// Always get Context from the current thread to
 			// avoid security breaches via passing mangled Context instances
 			// with bogus SecurityController
+#if ENCHANCED_SECURITY
 			Context cx = Context.GetContext();
 			SecurityController sc = cx.GetSecurityController();
 			object dynamicDomain;
@@ -47,13 +46,16 @@ namespace Rhino
 			}
 			this.securityController = sc;
 			this.securityDomain = dynamicDomain;
+#endif
 		}
 
 		private InterpretedFunction(Rhino.InterpretedFunction parent, int index)
 		{
 			this.idata = parent.idata.itsNestedFunctions[index];
+#if ENCHANCED_SECURITY
 			this.securityController = parent.securityController;
 			this.securityDomain = parent.securityDomain;
+#endif
 		}
 
 		/// <summary>Create script from compiled bytecode.</summary>

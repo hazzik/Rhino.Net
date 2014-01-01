@@ -12,8 +12,10 @@ using Sharpen;
 
 namespace Rhino.Tools.Shell
 {
+#if ENCHANCED_SECURITY
 	public abstract class SecurityProxy : SecurityController
 	{
 		protected internal abstract void CallProcessFileSecure(Context cx, Scriptable scope, string filename);
 	}
+#endif
 }

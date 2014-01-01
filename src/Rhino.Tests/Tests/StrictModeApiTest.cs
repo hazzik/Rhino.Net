@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using NUnit.Framework;
 using Rhino;
 using Rhino.Tests;
 using Sharpen;
@@ -15,7 +16,7 @@ namespace Rhino.Tests
 	/// <summary>Test of strict mode APIs.</summary>
 	/// <remarks>Test of strict mode APIs.</remarks>
 	/// <author>Norris Boyd</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class StrictModeApiTest
 	{
 		private ScriptableObject global;
@@ -40,10 +41,10 @@ namespace Rhino.Tests
 			}
 		}
 
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void TestStrictModeError()
 		{
-			contextFactory = new StrictModeApiTest.MyContextFactory();
+			contextFactory = new MyContextFactory();
 			Context cx = contextFactory.EnterContext();
 			try
 			{
@@ -51,11 +52,11 @@ namespace Rhino.Tests
 				try
 				{
 					RunScript("({}.nonexistent);");
-					NUnit.Framework.Assert.Fail();
+					Assert.Fail();
 				}
 				catch (EvaluatorException e)
 				{
-					NUnit.Framework.Assert.IsTrue(e.Message.StartsWith("Reference to undefined property"));
+					Assert.IsTrue(e.Message.StartsWith("Reference to undefined property"));
 				}
 			}
 			finally

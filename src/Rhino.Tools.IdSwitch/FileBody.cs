@@ -14,7 +14,7 @@ namespace Rhino.Tools.Idswitch
 {
 	public class FileBody
 	{
-		private class ReplaceItem
+		internal class ReplaceItem
 		{
 			internal FileBody.ReplaceItem next;
 

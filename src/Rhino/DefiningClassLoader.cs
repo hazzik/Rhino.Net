@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
+#if ENCHANCED_SECURITY
 using System;
 using Rhino;
 using Sharpen;
@@ -41,7 +41,7 @@ namespace Rhino
 		}
 
 		/// <exception cref="System.TypeLoadException"></exception>
-		protected override Type LoadClass(string name, bool resolve)
+		protected virtual Type LoadClass(string name, bool resolve)
 		{
 			Type cl = FindLoadedClass(name);
 			if (cl == null)
@@ -65,3 +65,5 @@ namespace Rhino
 		private readonly ClassLoader parentLoader;
 	}
 }
+
+#endif

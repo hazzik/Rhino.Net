@@ -204,7 +204,7 @@ namespace Rhino
 			}
 			sourceBuffer[sourceTop] = (char)L;
 			++sourceTop;
-			Sharpen.Runtime.GetCharsForString(str, 0, L, sourceBuffer, sourceTop);
+			str.CopyTo(0, sourceBuffer, sourceTop, L);
 			sourceTop = nextTop;
 		}
 
@@ -1047,7 +1047,7 @@ namespace Rhino
 			}
 			if (sb != null)
 			{
-				string str = Sharpen.Runtime.Substring(source, offset, offset + length);
+				string str = source.Substring(offset, length);
 				if (!asQuotedString)
 				{
 					sb.Append(str);

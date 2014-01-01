@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#if XML
 
 using System;
 using Rhino;
@@ -543,7 +544,7 @@ namespace Rhino.XmlImpl
 			{
 				return NewXML(XmlNode.CreateElement(options, GetDefaultNamespaceURI(Context.GetCurrentContext()), frag));
 			}
-			catch (SAXException e)
+			catch (Exception e)
 			{
 				throw ScriptRuntime.TypeError("Cannot parse XML: " + e.Message);
 			}
@@ -638,12 +639,12 @@ namespace Rhino.XmlImpl
 						{
 							frag = "<>" + frag + "</>";
 						}
-						frag = "<fragment>" + Sharpen.Runtime.Substring(frag, 2);
+						frag = "<fragment>" + frag.Substring(2);
 						if (!frag.EndsWith("</>"))
 						{
 							throw ScriptRuntime.TypeError("XML with anonymous tag missing end anonymous tag");
 						}
-						frag = Sharpen.Runtime.Substring(frag, 0, frag.Length - 3) + "</fragment>";
+						frag = frag.Substring(0, frag.Length - 3) + "</fragment>";
 						XML orgXML = NewXMLFromJs(frag);
 						// Now orphan the children and add them to our XMLList.
 						XMLList children = orgXML.Children();
@@ -814,3 +815,4 @@ namespace Rhino.XmlImpl
 		}
 	}
 }
+#endif

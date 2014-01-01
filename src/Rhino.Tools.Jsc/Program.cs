@@ -29,6 +29,7 @@ namespace Rhino.Tools.Jsc
 		/// </remarks>
 		public static void Main(string[] args)
 		{
+#if COMPILATION
 			Program main = new Program();
 			args = main.ProcessOptions(args);
 			if (args == null)
@@ -44,7 +45,10 @@ namespace Rhino.Tools.Jsc
 			{
 				main.ProcessSource(args);
 			}
+#endif
 		}
+
+#if COMPILATION
 
 		public Program()
 		{
@@ -129,7 +133,7 @@ namespace Rhino.Tools.Jsc
 				{
 					string name = args[i];
 					int end = name.Length;
-					if (end == 0 || !char.IsJavaIdentifierStart(name[0]))
+					if (end == 0 || !CharEx.IsJavaIdentifierStart(name[0]))
 					{
 						AddError("msg.invalid.classfile.name", name);
 						continue;
@@ -137,14 +141,14 @@ namespace Rhino.Tools.Jsc
 					for (int j = 1; j < end; j++)
 					{
 						char c = name[j];
-						if (!char.IsJavaIdentifierPart(c))
+						if (!CharEx.IsJavaIdentifierPart(c))
 						{
 							if (c == '.')
 							{
 								// check if it is the dot in .class
 								if (j == end - 6 && name.EndsWith(".class"))
 								{
-									name = Sharpen.Runtime.Substring(name, 0, j);
+									name = name.Substring(0, j);
 									break;
 								}
 							}
@@ -166,12 +170,12 @@ namespace Rhino.Tools.Jsc
 					for (int j = 0; j != end; ++j)
 					{
 						char c = pkg[j];
-						if (char.IsJavaIdentifierStart(c))
+						if (CharEx.IsJavaIdentifierStart(c))
 						{
 							for (++j; j != end; ++j)
 							{
 								c = pkg[j];
-								if (!char.IsJavaIdentifierPart(c))
+								if (!CharEx.IsJavaIdentifierPart(c))
 								{
 									break;
 								}
@@ -216,7 +220,7 @@ namespace Rhino.Tools.Jsc
 					{
 						try
 						{
-							list.Add(Sharpen.Runtime.GetType(className));
+							list.Add (Sharpen.Runtime.GetType(className));
 						}
 						catch (TypeLoadException e)
 						{
@@ -260,7 +264,7 @@ namespace Rhino.Tools.Jsc
 					AddError("msg.extension.not.js", filename);
 					return;
 				}
-				FilePath f = new FilePath(filename);
+				FileInfo f = new FileInfo(filename);
 				string source = ReadSource(f);
 				if (source == null)
 				{
@@ -269,36 +273,24 @@ namespace Rhino.Tools.Jsc
 				string mainClassName = targetName;
 				if (mainClassName == null)
 				{
-					string name = f.GetName();
-					string nojs = Sharpen.Runtime.Substring(name, 0, name.Length - 3);
+					string name = f.Name;
+					string nojs = name.Substring(0, name.Length - 3);
 					mainClassName = GetClassName(nojs);
 				}
 				if (targetPackage.Length != 0)
 				{
 					mainClassName = targetPackage + "." + mainClassName;
 				}
-				object[] compiled = compiler.CompileToClassFiles(source, filename, 1, mainClassName);
+				Tuple<string, byte[]>[] compiled = compiler.CompileToClassFiles(source, filename, 1, mainClassName);
 				if (compiled == null || compiled.Length == 0)
 				{
 					return;
 				}
-				FilePath targetTopDir = null;
-				if (destinationDir != null)
+				DirectoryInfo targetTopDir = destinationDir != null ? new DirectoryInfo(destinationDir) : f.Directory;
+				foreach (var tuple in compiled)
 				{
-					targetTopDir = new FilePath(destinationDir);
-				}
-				else
-				{
-					string parent = f.GetParent();
-					if (parent != null)
-					{
-						targetTopDir = new FilePath(parent);
-					}
-				}
-				for (int j = 0; j != compiled.Length; j += 2)
-				{
-					string className = (string)compiled[j];
-					byte[] bytes = (byte[])compiled[j + 1];
+					string className = tuple.Item1;
+					byte[] bytes = tuple.Item2;
 					FilePath outfile = GetOutputFile(targetTopDir, className);
 					try
 					{
@@ -320,21 +312,20 @@ namespace Rhino.Tools.Jsc
 			}
 		}
 
-		private string ReadSource(FilePath f)
+		private string ReadSource(FileSystemInfo f)
 		{
-			string absPath = f.GetAbsolutePath();
-			if (!f.IsFile())
+			if (!f.Exists)
 			{
-				AddError("msg.jsfile.not.found", absPath);
+				AddError("msg.jsfile.not.found", f.FullName);
 				return null;
 			}
 			try
 			{
-				return (string)SourceReader.ReadFileOrUrl(absPath, true, characterEncoding);
+				return SourceReader.ReadFileOrUrlAsString(f.FullName, characterEncoding);
 			}
 			catch (FileNotFoundException)
 			{
-				AddError("msg.couldnt.open", absPath);
+				AddError("msg.couldnt.open", f.FullName);
 			}
 			catch (IOException ioe)
 			{
@@ -343,11 +334,11 @@ namespace Rhino.Tools.Jsc
 			return null;
 		}
 
-		private FilePath GetOutputFile(FilePath parentDir, string className)
+		private static FilePath GetOutputFile(DirectoryInfo parentDir, string className)
 		{
 			string path = className.Replace('.', FilePath.separatorChar);
-			path = System.String.Concat(path, ".class");
-			FilePath f = new FilePath(parentDir, path);
+			path = String.Concat(path, ".class");
+			FilePath f = new FilePath(parentDir + "/" + path);
 			string dirPath = f.GetParent();
 			if (dirPath != null)
 			{
@@ -371,14 +362,14 @@ namespace Rhino.Tools.Jsc
 			char[] s = new char[name.Length + 1];
 			char c;
 			int j = 0;
-			if (!char.IsJavaIdentifierStart(name[0]))
+			if (!CharEx.IsJavaIdentifierStart(name[0]))
 			{
 				s[j++] = '_';
 			}
 			for (int i = 0; i < name.Length; i++, j++)
 			{
 				c = name[i];
-				if (char.IsJavaIdentifierPart(c))
+				if (CharEx.IsJavaIdentifierPart(c))
 				{
 					s[j] = c;
 				}
@@ -429,5 +420,6 @@ namespace Rhino.Tools.Jsc
 		private string destinationDir;
 
 		private string characterEncoding;
+#endif
 	}
 }

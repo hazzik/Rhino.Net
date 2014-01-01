@@ -7,7 +7,9 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Rhino;
 using Sharpen;
 
@@ -99,14 +101,14 @@ namespace Rhino.Tools.Shell
 			}
 			else
 			{
-				Runtime.GetProperties() [name] = ScriptRuntime.ToString(value);
+				Runtime.GetProperties()[name] = ScriptRuntime.ToString(value);
 			}
 		}
 
 		private object[] CollectIds()
 		{
-			IDictionary<object, object> props = Runtime.GetProperties();
-			return Sharpen.Collections.ToArray(props.Keys);
+			Hashtable props = Runtime.GetProperties();
+			return props.Keys.Cast<object>().ToArray();
 		}
 
 		public override object[] GetIds()

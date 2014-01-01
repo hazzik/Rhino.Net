@@ -6,9 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#if INTERFACE_ADAPTER
 using System;
 using System.Reflection;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -46,8 +48,7 @@ namespace Rhino
 			}
 			Scriptable topScope = ScriptRuntime.GetTopCallScope(cx);
 			ClassCache cache = ClassCache.Get(topScope);
-			Rhino.InterfaceAdapter adapter;
-			adapter = (Rhino.InterfaceAdapter)cache.GetInterfaceAdapter(cl);
+			InterfaceAdapter adapter = (Rhino.InterfaceAdapter) cache.GetInterfaceAdapter(cl);
 			ContextFactory cf = cx.GetFactory();
 			if (adapter == null)
 			{
@@ -78,12 +79,12 @@ namespace Rhino
 				adapter = new Rhino.InterfaceAdapter(cf, cl);
 				cache.CacheInterfaceAdapter(cl, adapter);
 			}
-			return VMBridge.instance.NewInterfaceProxy(adapter.proxyHelper, cf, adapter, @object, topScope);
+			return VMBridge.NewInterfaceProxy(adapter.proxyHelper, cf, adapter, @object, topScope);
 		}
 
 		private InterfaceAdapter(ContextFactory cf, Type cl)
 		{
-			this.proxyHelper = VMBridge.instance.GetInterfaceProxyHelper(cf, new Type[] { cl });
+			this.proxyHelper = VMBridge.GetInterfaceProxyHelper(cf, new Type[] { cl });
 		}
 
 		public virtual object Invoke(ContextFactory cf, object target, Scriptable topScope, object thisObject, MethodInfo method, object[] args)
@@ -94,16 +95,17 @@ namespace Rhino
 		internal virtual object InvokeImpl(Context cx, object target, Scriptable topScope, object thisObject, MethodInfo method, object[] args)
 		{
 			Callable function;
-			if (target is Callable)
+			var callable = target as Callable;
+			if (callable != null)
 			{
-				function = (Callable)target;
+				function = callable;
 			}
 			else
 			{
 				Scriptable s = (Scriptable)target;
 				string methodName = method.Name;
 				object value = ScriptableObject.GetProperty(s, methodName);
-				if (value == ScriptableObject.NOT_FOUND)
+				if (value == ScriptableConstants.NOT_FOUND)
 				{
 					// We really should throw an error here, but for the sake of
 					// compatibility with JavaAdapter we silently ignore undefined
@@ -157,3 +159,4 @@ namespace Rhino
 		}
 	}
 }
+#endif

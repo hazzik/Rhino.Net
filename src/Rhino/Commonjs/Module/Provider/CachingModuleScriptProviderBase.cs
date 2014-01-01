@@ -35,7 +35,7 @@ namespace Rhino.CommonJS.Module.Provider
 	{
 		private const long serialVersionUID = 1L;
 
-		private static readonly int loadConcurrencyLevel = Runtime.GetRuntime().AvailableProcessors() * 8;
+		private static readonly int loadConcurrencyLevel = Environment.ProcessorCount * 8;
 
 		private static readonly int loadLockShift;
 
@@ -89,29 +89,31 @@ namespace Rhino.CommonJS.Module.Provider
 			{
 				return null;
 			}
-			TextReader reader = moduleSource.GetReader();
-			try
+			using (TextReader reader = moduleSource.GetReader())
 			{
-				int idHash = moduleId.GetHashCode();
-				lock (loadLocks[((int)(((uint)idHash) >> loadLockShift)) & loadLockMask])
+				try
 				{
-					CachingModuleScriptProviderBase.CachedModuleScript cachedModule2 = GetLoadedModule(moduleId);
-					if (cachedModule2 != null)
+					int idHash = moduleId.GetHashCode();
+					lock (loadLocks[((int)(((uint)idHash) >> loadLockShift)) & loadLockMask])
 					{
-						if (!Equal(validator1, GetValidator(cachedModule2)))
+						CachingModuleScriptProviderBase.CachedModuleScript cachedModule2 = GetLoadedModule(moduleId);
+						if (cachedModule2 != null)
 						{
-							return cachedModule2.GetModule();
+							if (!Equal(validator1, GetValidator(cachedModule2)))
+							{
+								return cachedModule2.GetModule();
+							}
 						}
+						Uri sourceUri = moduleSource.GetUri();
+						ModuleScript moduleScript = new ModuleScript(cx.CompileReader(reader, sourceUri.ToString(), 1, moduleSource.GetSecurityDomain()), sourceUri, moduleSource.GetBase());
+						PutLoadedModule(moduleId, moduleScript, moduleSource.GetValidator());
+						return moduleScript;
 					}
-					Uri sourceUri = moduleSource.GetUri();
-					ModuleScript moduleScript = new ModuleScript(cx.CompileReader(reader, sourceUri.ToString(), 1, moduleSource.GetSecurityDomain()), sourceUri, moduleSource.GetBase());
-					PutLoadedModule(moduleId, moduleScript, moduleSource.GetValidator());
-					return moduleScript;
 				}
-			}
-			finally
-			{
-				reader.Close();
+				finally
+				{
+					reader.Close();
+				}
 			}
 		}
 

@@ -22,7 +22,7 @@ namespace Rhino.Tests
 			NativeArray array = new NativeArray(new string[] { "a", "b" });
 			object[] expectedIds = new object[] { 0, 1, "length" };
 			object[] actualIds = array.GetAllIds();
-			Assert.AssertArrayEquals(expectedIds, actualIds);
+			Assert.That(actualIds, Is.EquivalentTo(expectedIds));
 		}
 	}
 }

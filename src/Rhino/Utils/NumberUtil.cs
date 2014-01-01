@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Rhino
+namespace Rhino.Utils
 {
-	public static class NumberUtil
+    internal static class NumberUtil
 	{
 		public static bool IsNumber(this object value)
 		{

@@ -7,11 +7,12 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Rhino;
 using Rhino.Ast;
-using Sharpen;
+using Label = System.Reflection.Emit.Label;
 
 namespace Rhino
 {
@@ -97,7 +98,7 @@ namespace Rhino
 
 		public const int DESCENDANTS_FLAG = unchecked((int)(0x4));
 
-		private class PropListItem
+		public class PropListItem
 		{
 			internal Node.PropListItem next;
 
@@ -211,6 +212,11 @@ namespace Rhino
 		public virtual int GetType()
 		{
 			return type;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		/// <summary>Sets the node type and returns this node.</summary>
@@ -443,78 +449,6 @@ namespace Rhino
 
 		private static readonly Node NOT_SET = new Node(Token.ERROR);
 
-		/// <summary>Iterates over the children of this Node.</summary>
-		/// <remarks>
-		/// Iterates over the children of this Node.  Supports child removal.  Not
-		/// thread-safe.  If anyone changes the child list before the iterator
-		/// finishes, the results are undefined and probably bad.
-		/// </remarks>
-		public class NodeIterator : IEnumerator<Node>
-		{
-			private Node cursor;
-
-			private Node prev = Node.NOT_SET;
-
-			private Node prev2;
-
-			private bool removed = false;
-
-			public NodeIterator(Node _enclosing)
-			{
-				this._enclosing = _enclosing;
-				// points to node to be returned next
-				this.cursor = this._enclosing.first;
-			}
-
-			public virtual bool HasNext()
-			{
-				return this.cursor != null;
-			}
-
-			public virtual Node Next()
-			{
-				if (this.cursor == null)
-				{
-					throw new NoSuchElementException();
-				}
-				this.removed = false;
-				this.prev2 = this.prev;
-				this.prev = this.cursor;
-				this.cursor = this.cursor.next;
-				return this.prev;
-			}
-
-			public virtual void Remove()
-			{
-				if (this.prev == Node.NOT_SET)
-				{
-					throw new InvalidOperationException("next() has not been called");
-				}
-				if (this.removed)
-				{
-					throw new InvalidOperationException("remove() already called for current element");
-				}
-				if (this.prev == this._enclosing.first)
-				{
-					this._enclosing.first = this.prev.next;
-				}
-				else
-				{
-					if (this.prev == this._enclosing.last)
-					{
-						this.prev2.next = null;
-						this._enclosing.last = this.prev2;
-					}
-					else
-					{
-						this.prev2.next = this.cursor;
-					}
-				}
-			}
-
-			private readonly Node _enclosing;
-		}
-
 		/// <summary>
 		/// Returns an
 		/// <see cref="System.Collections.IEnumerator{E}">System.Collections.IEnumerator&lt;E&gt;</see>
@@ -522,7 +456,13 @@ namespace Rhino
 		/// </summary>
 		public virtual IEnumerator<Node> GetEnumerator()
 		{
-			return new Node.NodeIterator(this);
+			var cursor = first;
+			while (cursor != null)
+			{
+				var prev = cursor;
+				cursor = cursor.next;
+				yield return prev;
+			}
 		}
 
 		private static string PropToString(int propType)
@@ -708,7 +648,7 @@ namespace Rhino
 			return GetIntProp(LABEL_ID_PROP, -1);
 		}
 
-		public virtual void LabelId(int labelId)
+		public void LabelId(int labelId)
 		{
 			if (type != Token.TARGET && type != Token.YIELD)
 			{

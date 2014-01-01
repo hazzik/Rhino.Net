@@ -69,7 +69,7 @@ namespace Rhino
 		{
 			try
 			{
-				return System.Activator.CreateInstance(this.GetType());
+				return (Delegator) System.Activator.CreateInstance(this.GetType());
 			}
 			catch (Exception ex)
 			{
@@ -100,37 +100,37 @@ namespace Rhino
 			return obj.GetClassName();
 		}
 
-		/// <seealso cref="Scriptable.Get(string, Scriptable)">Scriptable.Get(string, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Get(string, SIScriptable">Scriptable.Get(string, IScriptable)</seealso>
 		public virtual object Get(string name, Scriptable start)
 		{
 			return obj.Get(name, start);
 		}
 
-		/// <seealso cref="Scriptable.Get(int, Scriptable)">Scriptable.Get(int, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Get(int, SIScriptable">Scriptable.Get(int, Scriptable)</seealso>
 		public virtual object Get(int index, Scriptable start)
 		{
 			return obj.Get(index, start);
 		}
 
-		/// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Has(string, SIScriptable">Scriptable.Has(string, Scriptable)</seealso>
 		public virtual bool Has(string name, Scriptable start)
 		{
 			return obj.Has(name, start);
 		}
 
-		/// <seealso cref="Scriptable.Has(int, Scriptable)">Scriptable.Has(int, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Has(int, SIScriptable">Scriptable.Has(int, Scriptable)</seealso>
 		public virtual bool Has(int index, Scriptable start)
 		{
 			return obj.Has(index, start);
 		}
 
-		/// <seealso cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</seealso>
+		/// <seealso cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</seealso>
 		public virtual void Put(string name, Scriptable start, object value)
 		{
 			obj.Put(name, start, value);
 		}
 
-		/// <seealso cref="Scriptable.Put(int, Scriptable, object)">Scriptable.Put(int, Scriptable, object)</seealso>
+		/// <seealso cref="Scriptable.Put(int,Scriptablee, object)">Scriptable.Put(int, Scriptable, object)</seealso>
 		public virtual void Put(int index, Scriptable start, object value)
 		{
 			obj.Put(index, start, value);
@@ -154,7 +154,7 @@ namespace Rhino
 			return obj.GetPrototype();
 		}
 
-		/// <seealso cref="Scriptable.SetPrototype(Scriptable)">Scriptable.SetPrototype(Scriptable)</seealso>
+		/// <seealso cref="Scriptable.SetPrototypeScriptablee)">Scriptable.SetPrototype(Scriptable)</seealso>
 		public virtual void SetPrototype(Scriptable prototype)
 		{
 			obj.SetPrototype(prototype);
@@ -166,7 +166,7 @@ namespace Rhino
 			return obj.GetParentScope();
 		}
 
-		/// <seealso cref="Scriptable.SetParentScope(Scriptable)">Scriptable.SetParentScope(Scriptable)</seealso>
+		/// <seealso cref="Scriptable.SetParentScopeScriptablee)">Scriptable.SetParentScope(Scriptable)</seealso>
 		public virtual void SetParentScope(Scriptable parent)
 		{
 			obj.SetParentScope(parent);
@@ -199,7 +199,7 @@ namespace Rhino
 			return (hint == null || hint == ScriptRuntime.ScriptableClass || hint == ScriptRuntime.FunctionClass) ? this : obj.GetDefaultValue(hint);
 		}
 
-		/// <seealso cref="Scriptable.HasInstance(Scriptable)">Scriptable.HasInstance(Scriptable)</seealso>
+		/// <seealso cref="Scriptable.HasInstanceScriptablee)">Scriptable.HasInstance(Scriptable)</seealso>
 		public virtual bool HasInstance(Scriptable instance)
 		{
 			return obj.HasInstance(instance);

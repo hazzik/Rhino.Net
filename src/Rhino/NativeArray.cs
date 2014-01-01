@@ -9,10 +9,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using System.Text;
-using Rhino;
-using Sharpen;
+using System.Threading;
+using Rhino.Utils;
 
 namespace Rhino
 {
@@ -20,34 +20,24 @@ namespace Rhino
 	/// <remarks>This class implements the Array native object.</remarks>
 	/// <author>Norris Boyd</author>
 	/// <author>Mike McCabe</author>
-	[System.Serializable]
-	public class NativeArray : IdScriptableObject, IList
+	[Serializable]
+	public class NativeArray : IdScriptableObject, IList, IList<object>
 	{
-		internal const long serialVersionUID = 7331366857676127338L;
-
 		private static readonly object ARRAY_TAG = "Array";
 
 		private static readonly int NEGATIVE_ONE = -1;
 
 		internal static void Init(Scriptable scope, bool @sealed)
 		{
-			Rhino.NativeArray obj = new Rhino.NativeArray(0);
+			NativeArray obj = new NativeArray(0);
 			obj.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
 		}
 
-		internal static int GetMaximumInitialCapacity()
-		{
-			return maximumInitialCapacity;
-		}
-
-		internal static void SetMaximumInitialCapacity(int maximumInitialCapacity)
-		{
-			Rhino.NativeArray.maximumInitialCapacity = maximumInitialCapacity;
-		}
+		internal static int MaximumInitialCapacity { get; set; }
 
 		public NativeArray(long lengthArg)
 		{
-			denseOnly = lengthArg <= maximumInitialCapacity;
+			denseOnly = lengthArg <= MaximumInitialCapacity;
 			if (denseOnly)
 			{
 				int intLength = (int)lengthArg;
@@ -56,7 +46,10 @@ namespace Rhino
 					intLength = DEFAULT_INITIAL_CAPACITY;
 				}
 				dense = new object[intLength];
-				Arrays.Fill(dense, ScriptableConstants.NOT_FOUND);
+				for (int i = 0; i < dense.Length; i++)
+				{
+					dense[i] = ScriptableConstants.NOT_FOUND;
+				}
 			}
 			length = lengthArg;
 		}
@@ -374,7 +367,7 @@ namespace Rhino
 
 					case ConstructorId_isArray:
 					{
-						return args.Length > 0 && (args[0] is Rhino.NativeArray);
+						return args.Length > 0 && (args[0] is NativeArray);
 					}
 
 					case Id_constructor:
@@ -512,16 +505,14 @@ again_break: ;
 
 		private static long ToArrayIndex(object id)
 		{
-			if (id is string)
+			var str = id as string;
+			if (str != null)
 			{
-				return ToArrayIndex((string)id);
+				return ToArrayIndex(str);
 			}
-			else
+			if (id.IsNumber())
 			{
-				if (id.IsNumber())
-				{
-					return ToArrayIndex(System.Convert.ToDouble(id));
-				}
+				return ToArrayIndex(Convert.ToDouble(id));
 			}
 			return -1;
 		}
@@ -533,7 +524,7 @@ again_break: ;
 			long index = ToArrayIndex(ScriptRuntime.ToNumber(id));
 			// Assume that ScriptRuntime.toString(index) is the same
 			// as java.lang.Long.toString(index) for long
-			if (System.Convert.ToString(index).Equals(id))
+			if (Convert.ToString(index).Equals(id))
 			{
 				return index;
 			}
@@ -544,7 +535,7 @@ again_break: ;
 		{
 			if (!Double.IsNaN(d))
 			{
-				long index = ScriptRuntime.ToUint32(d);
+				long index = ScriptRuntime.ToUInt32(d);
 				if (index == d && index != 4294967295L)
 				{
 					return index;
@@ -585,8 +576,11 @@ again_break: ;
 				}
 				capacity = Math.Max(capacity, (int)(dense.Length * GROW_FACTOR));
 				object[] newDense = new object[capacity];
-				System.Array.Copy(dense, 0, newDense, 0, dense.Length);
-				Arrays.Fill(newDense, dense.Length, newDense.Length, ScriptableConstants.NOT_FOUND);
+				Array.Copy(dense, 0, newDense, 0, dense.Length);
+				for (int i = dense.Length; i < newDense.Length; i++)
+				{
+					newDense[i] = ScriptableConstants.NOT_FOUND;
+				}
 				dense = newDense;
 			}
 			return true;
@@ -599,9 +593,9 @@ again_break: ;
 				if (index < dense.Length)
 				{
 					dense[index] = value;
-					if (this.length <= index)
+					if (length <= index)
 					{
-						this.length = (long)index + 1;
+						length = (long)index + 1;
 					}
 					return;
 				}
@@ -610,7 +604,7 @@ again_break: ;
 					if (denseOnly && index < dense.Length * GROW_FACTOR && EnsureCapacity(index + 1))
 					{
 						dense[index] = value;
-						this.length = (long)index + 1;
+						length = (long)index + 1;
 						return;
 					}
 					else
@@ -623,10 +617,10 @@ again_break: ;
 			if (start == this && (lengthAttr & READONLY) == 0)
 			{
 				// only set the array length if given an array index (ECMA 15.4.0)
-				if (this.length <= index)
+				if (length <= index)
 				{
 					// avoid overflowing index!
-					this.length = (long)index + 1;
+					length = (long)index + 1;
 				}
 			}
 		}
@@ -676,33 +670,27 @@ again_break: ;
 			{
 				// dense contains deleted elems, need to shrink the result
 				object[] tmp = new object[presentCount + superLength];
-				System.Array.Copy(ids, 0, tmp, 0, presentCount);
+				Array.Copy(ids, 0, tmp, 0, presentCount);
 				ids = tmp;
 			}
-			System.Array.Copy(superIds, 0, ids, presentCount, superLength);
+			Array.Copy(superIds, 0, ids, presentCount, superLength);
 			return ids;
 		}
 
 		public override object[] GetAllIds()
 		{
-			ICollection<object> allIds = new LinkedHashSet<object>(Arrays.AsList(this.GetIds()));
-			Sharpen.Collections.AddAll(allIds, Arrays.AsList(base.GetAllIds()));
-			return Sharpen.Collections.ToArray(allIds);
+			HashSet<object> allIds = new HashSet<object>(GetIds());
+			foreach (object t in base.GetAllIds())
+				allIds.Add(t);
+			return allIds.ToArray();
 		}
 
 		public virtual int[] GetIndexIds()
 		{
-			object[] ids = GetIds();
-			IList<int> indices = new List<int>(ids.Length);
-			foreach (object id in ids)
-			{
-				int int32Id = ScriptRuntime.ToInt32(id);
-				if (int32Id >= 0 && ScriptRuntime.ToString(int32Id).Equals(ScriptRuntime.ToString(id)))
-				{
-					indices.Add(int32Id);
-				}
-			}
-			return Sharpen.Collections.ToArray(indices, new int[indices.Count]);
+			return (from id in GetIds()
+				let int32Id = ScriptRuntime.ToInt32(id)
+				where int32Id >= 0 && ScriptRuntime.ToString(int32Id).Equals(ScriptRuntime.ToString(id))
+				select int32Id).ToArray();
 		}
 
 		public override object GetDefaultValue(Type hint)
@@ -785,31 +773,31 @@ again_break: ;
 		{
 			if (args.Length == 0)
 			{
-				return new Rhino.NativeArray(0);
+				return new NativeArray(0);
 			}
 			// Only use 1 arg as first element for version 1.2; for
 			// any other version (including 1.3) follow ECMA and use it as
 			// a length.
 			if (cx.GetLanguageVersion() == Context.VERSION_1_2)
 			{
-				return new Rhino.NativeArray(args);
+				return new NativeArray(args);
 			}
 			else
 			{
 				object arg0 = args[0];
 				if (args.Length > 1 || !(arg0.IsNumber()))
 				{
-					return new Rhino.NativeArray(args);
+					return new NativeArray(args);
 				}
 				else
 				{
-					long len = ScriptRuntime.ToUint32(arg0);
-					if (len != System.Convert.ToDouble(arg0))
+					long len = ScriptRuntime.ToUInt32(arg0);
+					if (len != Convert.ToDouble(arg0))
 					{
 						string msg = ScriptRuntime.GetMessage0("msg.arraylength.bad");
 						throw ScriptRuntime.ConstructError("RangeError", msg);
 					}
-					return new Rhino.NativeArray(len);
+					return new NativeArray(len);
 				}
 			}
 		}
@@ -851,7 +839,7 @@ again_break: ;
 				return;
 			}
 			double d = ScriptRuntime.ToNumber(val);
-			long longVal = ScriptRuntime.ToUint32(d);
+			long longVal = ScriptRuntime.ToUInt32(d);
 			if (longVal != d)
 			{
 				string msg = ScriptRuntime.GetMessage0("msg.arraylength.bad");
@@ -862,7 +850,10 @@ again_break: ;
 				if (longVal < length)
 				{
 					// downcast okay because denseOnly
-					Arrays.Fill(dense, (int)longVal, dense.Length, ScriptableConstants.NOT_FOUND);
+					for (long i = longVal; i < dense.Length; i++)
+					{
+						dense[i] = ScriptableConstants.NOT_FOUND;
+					}
 					length = longVal;
 					return;
 				}
@@ -902,7 +893,7 @@ again_break: ;
 						}
 						else
 						{
-							int index = System.Convert.ToInt32(((int)id));
+							int index = Convert.ToInt32(((int)id));
 							if (index >= longVal)
 							{
 								Delete(index);
@@ -931,12 +922,12 @@ again_break: ;
 			}
 			else
 			{
-				if (obj is Rhino.NativeArray)
+				if (obj is NativeArray)
 				{
-					return ((Rhino.NativeArray)obj).GetLength();
+					return ((NativeArray)obj).GetLength();
 				}
 			}
-			return ScriptRuntime.ToUint32(ScriptRuntime.GetObjectProp(obj, "length", cx));
+			return ScriptRuntime.ToUInt32(ScriptRuntime.GetObjectProp(obj, "length", cx));
 		}
 
 		private static object SetLengthProperty(Context cx, Scriptable target, long length)
@@ -953,7 +944,7 @@ again_break: ;
 			}
 			else
 			{
-				target.Delete(System.Convert.ToString(index));
+				target.Delete(Convert.ToString(index));
 			}
 		}
 
@@ -961,7 +952,7 @@ again_break: ;
 		{
 			if (index > int.MaxValue)
 			{
-				string id = System.Convert.ToString(index);
+				string id = Convert.ToString(index);
 				return ScriptRuntime.GetObjectProp(target, id, cx);
 			}
 			else
@@ -975,11 +966,11 @@ again_break: ;
 		{
 			if (index > int.MaxValue)
 			{
-				return ScriptableObject.GetProperty(target, System.Convert.ToString(index));
+				return GetProperty(target, Convert.ToString(index));
 			}
 			else
 			{
-				return ScriptableObject.GetProperty(target, (int)index);
+				return GetProperty(target, (int)index);
 			}
 		}
 
@@ -987,7 +978,7 @@ again_break: ;
 		{
 			if (index > int.MaxValue)
 			{
-				string id = System.Convert.ToString(index);
+				string id = Convert.ToString(index);
 				ScriptRuntime.SetObjectProp(target, id, value, cx);
 			}
 			else
@@ -1131,9 +1122,9 @@ again_break: ;
 			}
 			// if no args, use "," as separator
 			string separator = (args.Length < 1 || args[0] == Undefined.instance) ? "," : ScriptRuntime.ToString(args[0]);
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly)
 				{
 					StringBuilder sb = new StringBuilder();
@@ -1192,9 +1183,9 @@ again_break: ;
 		/// <summary>See ECMA 15.4.4.4</summary>
 		private static Scriptable Js_reverse(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly)
 				{
 					for (int i = 0, j = ((int)na.length) - 1; i < j; i++, j--)
@@ -1251,7 +1242,7 @@ again_break: ;
 			{
 				working[i] = GetRawElem(thisObj, i);
 			}
-			Arrays.Sort(working, comparator);
+			Array.Sort(working, comparator);
 			// copy the working array back into thisObj
 			for (int i_1 = 0; i_1 < length; ++i_1)
 			{
@@ -1273,13 +1264,13 @@ again_break: ;
 
 			public int Compare(object x, object y)
 			{
-				if (x == Scriptable.NOT_FOUND)
+				if (x == ScriptableConstants.NOT_FOUND)
 				{
-					return y == Scriptable.NOT_FOUND ? 0 : 1;
+					return y == ScriptableConstants.NOT_FOUND ? 0 : 1;
 				}
 				else
 				{
-					if (y == Scriptable.NOT_FOUND)
+					if (y == ScriptableConstants.NOT_FOUND)
 					{
 						return -1;
 					}
@@ -1335,13 +1326,13 @@ again_break: ;
 
 			public int Compare(object x, object y)
 			{
-				if (x == Scriptable.NOT_FOUND)
+				if (x == ScriptableConstants.NOT_FOUND)
 				{
-					return y == Scriptable.NOT_FOUND ? 0 : 1;
+					return y == ScriptableConstants.NOT_FOUND ? 0 : 1;
 				}
 				else
 				{
-					if (y == Scriptable.NOT_FOUND)
+					if (y == ScriptableConstants.NOT_FOUND)
 					{
 						return -1;
 					}
@@ -1370,9 +1361,9 @@ again_break: ;
 		/// <remarks>Non-ECMA methods.</remarks>
 		private static object Js_push(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.EnsureCapacity((int)na.length + args.Length))
 				{
 					for (int i = 0; i < args.Length; i++)
@@ -1403,9 +1394,9 @@ again_break: ;
 		private static object Js_pop(Context cx, Scriptable thisObj, object[] args)
 		{
 			object result;
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.length > 0)
 				{
 					na.length--;
@@ -1435,14 +1426,14 @@ again_break: ;
 
 		private static object Js_shift(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.length > 0)
 				{
 					na.length--;
 					object result = na.dense[0];
-					System.Array.Copy(na.dense, 1, na.dense, 0, (int)na.length);
+					Array.Copy(na.dense, 1, na.dense, 0, (int)na.length);
 					na.dense[(int)na.length] = ScriptableConstants.NOT_FOUND;
 					return result == ScriptableConstants.NOT_FOUND ? Undefined.instance : result;
 				}
@@ -1476,12 +1467,12 @@ again_break: ;
 
 		private static object Js_unshift(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.EnsureCapacity((int)na.length + args.Length))
 				{
-					System.Array.Copy(na.dense, 0, na.dense, args.Length, (int)na.length);
+					Array.Copy(na.dense, 0, na.dense, args.Length, (int)na.length);
 					for (int i = 0; i < args.Length; i++)
 					{
 						na.dense[i] = args[i];
@@ -1514,11 +1505,11 @@ again_break: ;
 
 		private static object Js_splice(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 		{
-			Rhino.NativeArray na = null;
+			NativeArray na = null;
 			bool denseMode = false;
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				na = (Rhino.NativeArray)thisObj;
+				na = (NativeArray)thisObj;
 				denseMode = na.denseOnly;
 			}
 			scope = GetTopLevelScope(scope);
@@ -1569,7 +1560,7 @@ again_break: ;
 					{
 						int intLen = (int)(end - begin);
 						object[] copy = new object[intLen];
-						System.Array.Copy(na.dense, (int)begin, copy, 0, intLen);
+						Array.Copy(na.dense, (int)begin, copy, 0, intLen);
 						result = cx.NewArray(scope, copy);
 					}
 					else
@@ -1604,14 +1595,17 @@ again_break: ;
 			long delta = argc - count;
 			if (denseMode && length + delta < int.MaxValue && na.EnsureCapacity((int)(length + delta)))
 			{
-				System.Array.Copy(na.dense, (int)end, na.dense, (int)(begin + argc), (int)(length - end));
+				Array.Copy(na.dense, (int)end, na.dense, (int)(begin + argc), (int)(length - end));
 				if (argc > 0)
 				{
-					System.Array.Copy(args, 2, na.dense, (int)begin, argc);
+					Array.Copy(args, 2, na.dense, (int)begin, argc);
 				}
 				if (delta < 0)
 				{
-					Arrays.Fill(na.dense, (int)(length + delta), (int)length, ScriptableConstants.NOT_FOUND);
+					for (int i = (int)(length + delta); i < (int)length; i++)
+					{
+						na.dense[i] = ScriptableConstants.NOT_FOUND;
+					}
 				}
 				na.length = length + delta;
 				return result;
@@ -1650,10 +1644,10 @@ again_break: ;
 			scope = GetTopLevelScope(scope);
 			Function ctor = ScriptRuntime.GetExistingCtor(cx, scope, "Array");
 			Scriptable result = ctor.Construct(cx, scope, ScriptRuntime.emptyArgs);
-			if (thisObj is Rhino.NativeArray && result is Rhino.NativeArray)
+			if (thisObj is NativeArray && result is NativeArray)
 			{
-				Rhino.NativeArray denseThis = (Rhino.NativeArray)thisObj;
-				Rhino.NativeArray denseResult = (Rhino.NativeArray)result;
+				NativeArray denseThis = (NativeArray)thisObj;
+				NativeArray denseResult = (NativeArray)result;
 				if (denseThis.denseOnly && denseResult.denseOnly)
 				{
 					// First calculate length of resulting array
@@ -1661,13 +1655,13 @@ again_break: ;
 					int length = (int)denseThis.length;
 					for (int i = 0; i < args.Length && canUseDense; i++)
 					{
-						if (args[i] is Rhino.NativeArray)
+						if (args[i] is NativeArray)
 						{
 							// only try to use dense approach for Array-like
 							// objects that are actually NativeArrays
-							Rhino.NativeArray arg = (Rhino.NativeArray)args[i];
+							NativeArray arg = (NativeArray)args[i];
 							canUseDense = arg.denseOnly;
-							length += arg.length;
+							length += (int) arg.length;
 						}
 						else
 						{
@@ -1676,14 +1670,14 @@ again_break: ;
 					}
 					if (canUseDense && denseResult.EnsureCapacity(length))
 					{
-						System.Array.Copy(denseThis.dense, 0, denseResult.dense, 0, (int)denseThis.length);
+						Array.Copy(denseThis.dense, 0, denseResult.dense, 0, (int)denseThis.length);
 						int cursor = (int)denseThis.length;
 						for (int i_1 = 0; i_1 < args.Length && canUseDense; i_1++)
 						{
-							if (args[i_1] is Rhino.NativeArray)
+							if (args[i_1] is NativeArray)
 							{
-								Rhino.NativeArray arg = (Rhino.NativeArray)args[i_1];
-								System.Array.Copy(arg.dense, 0, denseResult.dense, cursor, (int)arg.length);
+								NativeArray arg = (NativeArray)args[i_1];
+								Array.Copy(arg.dense, 0, denseResult.dense, cursor, (int)arg.length);
 								cursor += (int)arg.length;
 							}
 							else
@@ -1806,7 +1800,7 @@ again_break: ;
 
 		/// <summary>Implements the methods "indexOf" and "lastIndexOf".</summary>
 		/// <remarks>Implements the methods "indexOf" and "lastIndexOf".</remarks>
-		private object IndexOfHelper(Context cx, Scriptable thisObj, object[] args, bool isLast)
+		private static object IndexOfHelper(Context cx, Scriptable thisObj, object[] args, bool isLast)
 		{
 			object compareTo = args.Length > 0 ? args[0] : Undefined.instance;
 			long length = GetLengthProperty(cx, thisObj);
@@ -1864,9 +1858,9 @@ again_break: ;
 					}
 				}
 			}
-			if (thisObj is Rhino.NativeArray)
+			if (thisObj is NativeArray)
 			{
-				Rhino.NativeArray na = (Rhino.NativeArray)thisObj;
+				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly)
 				{
 					if (isLast)
@@ -1927,7 +1921,7 @@ again_break: ;
 				throw ScriptRuntime.NotFunctionError(callbackArg);
 			}
 			Function f = (Function)callbackArg;
-			Scriptable parent = ScriptableObject.GetTopLevelScope(f);
+			Scriptable parent = GetTopLevelScope(f);
 			Scriptable thisArg;
 			if (args.Length < 2 || args[1] == null || args[1] == Undefined.instance)
 			{
@@ -2030,7 +2024,7 @@ again_break: ;
 				throw ScriptRuntime.NotFunctionError(callbackArg);
 			}
 			Function f = (Function)callbackArg;
-			Scriptable parent = ScriptableObject.GetTopLevelScope(f);
+			Scriptable parent = GetTopLevelScope(f);
 			long length = GetLengthProperty(cx, thisObj);
 			// hack to serve both reduce and reduceRight with the same loop
 			bool movingLeft = id == Id_reduce;
@@ -2068,9 +2062,59 @@ again_break: ;
 			return IndexOf(o) > -1;
 		}
 
+		public void CopyTo(object[] a, int arrayIndex)
+		{
+			for (int i = 0; i < (int)length; i++)
+			{
+				a [i + arrayIndex] = this [i];
+			}
+		}
+
+		bool ICollection<object>.Remove(object item)
+		{
+			throw new NotSupportedException();
+		}
+
+		public void CopyTo(Array array, int index)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Count
+		{
+			get { return Size(); }
+		}
+
+		private object syncRoot = new object();
+
+		public object SyncRoot
+		{
+			get
+			{
+				if (syncRoot == null)
+					Interlocked.CompareExchange(ref syncRoot, new object(), null);
+				return syncRoot;
+			}
+		}
+
+		public bool IsSynchronized
+		{
+			get { return false; }
+		}
+
+		public bool IsReadOnly
+		{
+			get { return false; }
+		}
+
+		public bool IsFixedSize
+		{
+			get { return false; }
+		}
+
 		public virtual object[] ToArray()
 		{
-			return Sharpen.Collections.ToArray(this, ScriptRuntime.emptyArgs);
+			return ((IEnumerable<object>) this).ToArray();
 		}
 
 		public virtual object[] ToArray(object[] a)
@@ -2081,7 +2125,7 @@ again_break: ;
 				throw new InvalidOperationException();
 			}
 			int len = (int)longLen;
-			object[] array = a.Length >= len ? a : (object[])System.Array.CreateInstance(a.GetType().GetElementType(), len);
+			object[] array = a.Length >= len ? a : (object[])Array.CreateInstance(a.GetType().GetElementType(), len);
 			for (int i = 0; i < len; i++)
 			{
 				array[i] = this[i];
@@ -2108,7 +2152,7 @@ again_break: ;
 			{
 				throw new InvalidOperationException();
 			}
-			return (int)longLen;
+			return (int) longLen;
 		}
 
 		public override bool IsEmpty()
@@ -2176,182 +2220,65 @@ again_break: ;
 			return -1;
 		}
 
-		public virtual int LastIndexOf(object o)
-		{
-			long longLen = length;
-			if (longLen > int.MaxValue)
-			{
-				throw new InvalidOperationException();
-			}
-			int len = (int)longLen;
-			if (o == null)
-			{
-				for (int i = len - 1; i >= 0; i--)
-				{
-					if (this[i] == null)
-					{
-						return i;
-					}
-				}
-			}
-			else
-			{
-				for (int i = len - 1; i >= 0; i--)
-				{
-					if (o.Equals(this[i]))
-					{
-						return i;
-					}
-				}
-			}
-			return -1;
-		}
-
-		public virtual IEnumerator GetEnumerator()
-		{
-			return ListIterator(0);
-		}
-
-		public virtual Sharpen.ListIterator ListIterator()
-		{
-			return ListIterator(0);
-		}
-
-		public virtual Sharpen.ListIterator ListIterator(int start)
-		{
-			long longLen = length;
-			if (longLen > int.MaxValue)
-			{
-				throw new InvalidOperationException();
-			}
-			int len = (int)longLen;
-			if (start < 0 || start > len)
-			{
-				throw new IndexOutOfRangeException("Index: " + start);
-			}
-			return new _ListIterator_1788(start, len);
-		}
-
-		private sealed class _ListIterator_1788 : Sharpen.ListIterator
-		{
-			public _ListIterator_1788(int start, int len)
-			{
-				this.start = start;
-				this.len = len;
-				this.cursor = start;
-			}
-
-			internal int cursor;
-
-			public bool HasNext()
-			{
-				return this.cursor < len;
-			}
-
-			public object Next()
-			{
-				if (this.cursor == len)
-				{
-					throw new NoSuchElementException();
-				}
-				return this[this.cursor++];
-			}
-
-			public bool HasPrevious()
-			{
-				return this.cursor > 0;
-			}
-
-			public object Previous()
-			{
-				if (this.cursor == 0)
-				{
-					throw new NoSuchElementException();
-				}
-				return this[--this.cursor];
-			}
-
-			public int NextIndex()
-			{
-				return this.cursor;
-			}
-
-			public int PreviousIndex()
-			{
-				return this.cursor - 1;
-			}
-
-			public void Remove()
-			{
-				throw new NotSupportedException();
-			}
-
-			public void Add(object o)
-			{
-				throw new NotSupportedException();
-			}
-
-			public void Set(object o)
-			{
-				throw new NotSupportedException();
-			}
-
-			private readonly int start;
-
-			private readonly int len;
-		}
-
-		public virtual bool Add(object o)
+		public void RemoveAt(int index)
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual bool Remove(object o)
+		public object this[int i]
+		{
+			get { return Get(i); }
+			set
+			{
+				throw new NotImplementedException();
+				//Set(i, value);
+			}
+		}
+
+		public virtual IEnumerator<object> GetEnumerator()
+		{
+			for (var i = 0L; i < length; i++)
+			{
+				yield return Get(i);
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		int IList.Add(object o)
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual bool AddAll(ICollection c)
+		void IList.Remove(object o)
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual bool RemoveAll(ICollection c)
+		void ICollection<object>.Add(object item)
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual bool RetainAll(ICollection c)
+		void ICollection<object>.Clear()
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual void Clear()
+		void IList.Clear()
 		{
 			throw new NotSupportedException();
 		}
 
-		public virtual void Add(int index, object element)
+		void IList.Insert(int index, object element)
 		{
 			throw new NotSupportedException();
 		}
-
-		public virtual bool AddRange(int index, ICollection c)
-		{
-			throw new NotSupportedException();
-		}
-
-		public virtual object Set(int index, object element)
-		{
-			throw new NotSupportedException();
-		}
-
-		public virtual object Remove(int index)
-		{
-			throw new NotSupportedException();
-		}
-
-		public virtual IList SubList(int fromIndex, int toIndex)
+	   
+		void IList<object>.Insert(int index, object element)
 		{
 			throw new NotSupportedException();
 		}
@@ -2692,9 +2619,10 @@ L0_break: ;
 		/// <remarks>True if all numeric properties are stored in <code>dense</code>.</remarks>
 		private bool denseOnly;
 
-		/// <summary>The maximum size of <code>dense</code> that will be allocated initially.</summary>
-		/// <remarks>The maximum size of <code>dense</code> that will be allocated initially.</remarks>
-		private static int maximumInitialCapacity = 10000;
+		static NativeArray()
+		{
+			MaximumInitialCapacity = 10000;
+		}
 
 		/// <summary>The default capacity for <code>dense</code>.</summary>
 		/// <remarks>The default capacity for <code>dense</code>.</remarks>

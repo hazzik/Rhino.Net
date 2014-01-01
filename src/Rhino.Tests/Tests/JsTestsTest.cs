@@ -6,60 +6,84 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
+using System.Collections.Generic;
 using System.IO;
-using Rhino.Drivers;
-using Rhino.Tests;
-using Sharpen;
+using NUnit.Framework;
 
 namespace Rhino.Tests
 {
-	public class JsTestsTest : JsTestsBase
+	[TestFixture]
+	public sealed class JsTestsTest
 	{
-		internal static readonly string baseDirectory = "testsrc" + FilePath.separator + "jstests";
+		private const string BaseDirectory = "../../jstests";
 
-		internal const string jstestsExtension = ".jstest";
+		public int OptimizationLevel { private get; set; }
 
-		/// <exception cref="System.IO.IOException"></exception>
-		public virtual void RunJsTests()
+		public IEnumerable<FileInfo> JsTests
 		{
-			FilePath[] tests = TestUtils.RecursiveListFiles(new FilePath(baseDirectory), new _FileFilter_21());
-			RunJsTests(tests);
+			get { return new DirectoryInfo(BaseDirectory).EnumerateFiles("*.jstest", SearchOption.AllDirectories); }
 		}
 
-		private sealed class _FileFilter_21 : FileFilter
+		[TestCaseSource("JsTests")]
+		public void TestJsTestsInterpreted(FileInfo file)
 		{
-			public _FileFilter_21()
+			OptimizationLevel = -1;
+			RunJsTests(file);
+		}
+
+		[TestCaseSource("JsTests")]
+		public void TestJsTestsCompiled(FileInfo file)
+		{
+			OptimizationLevel = 0;
+			RunJsTests(file);
+		}
+
+		[TestCaseSource("JsTests")]
+		public void TestJsTestsOptimized(FileInfo file)
+		{
+			OptimizationLevel = 9;
+			RunJsTests(file);
+		}
+
+		private static void RunJsTest(Context cx, Scriptable shared, string name, string source)
+		{
+			// create a lightweight top-level scope
+			Scriptable scope = cx.NewObject(shared);
+			scope.SetPrototype(shared);
+			Console.Out.Write(name + ": ");
+			object result;
+			try
 			{
+				result = cx.EvaluateString(scope, source, "jstest input", 1, null);
 			}
-
-			public bool Accept(FilePath f)
+			catch (Exception)
 			{
-				return f.GetName().EndsWith(JsTestsTest.jstestsExtension);
+				Console.Out.WriteLine("FAILED");
+				throw;
 			}
+			Assert.IsTrue(result != null);
+			Assert.IsTrue("success".Equals(result));
+			Console.Out.WriteLine("passed");
 		}
 
-		/// <exception cref="System.IO.IOException"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestJsTestsInterpreted()
+		private void RunJsTests(FileInfo test)
 		{
-			SetOptimizationLevel(-1);
-			RunJsTests();
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestJsTestsCompiled()
-		{
-			SetOptimizationLevel(0);
-			RunJsTests();
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
-		[NUnit.Framework.Test]
-		public virtual void TestJsTestsOptimized()
-		{
-			SetOptimizationLevel(9);
-			RunJsTests();
+			ContextFactory factory = ContextFactory.GetGlobal();
+			Context cx = factory.EnterContext();
+			try
+			{
+				cx.SetOptimizationLevel(OptimizationLevel);
+				Scriptable shared = cx.InitStandardObjects();
+				using (var reader = test.OpenText())
+				{
+					RunJsTest(cx, shared, test.Name, reader.ReadToEnd());
+				}
+			}
+			finally
+			{
+				Context.Exit();
+			}
 		}
 	}
 }

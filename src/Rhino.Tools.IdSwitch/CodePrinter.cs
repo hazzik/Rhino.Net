@@ -11,7 +11,7 @@ using Sharpen;
 
 namespace Rhino.Tools.Idswitch
 {
-	internal class CodePrinter
+	public class CodePrinter
 	{
 		private const int LITERAL_CHAR_MAX_SIZE = 6;
 
@@ -107,7 +107,7 @@ namespace Rhino.Tools.Idswitch
 		{
 			int l = s.Length;
 			int pos = Add_area(l);
-			Sharpen.Runtime.GetCharsForString(s, 0, l, buffer, pos);
+			s.CopyTo(0, buffer, pos, l);
 		}
 
 		public void P(char[] array)

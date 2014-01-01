@@ -8,8 +8,10 @@
 
 using System;
 using System.IO;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.Serialization;
 using System.Text;
-using Org.Mozilla.Classfile;
 using Rhino;
 using Sharpen;
 
@@ -38,12 +40,22 @@ namespace Org.Mozilla.Classfile
 		/// due to a program size constraints rather than a likely bug in the
 		/// compiler.
 		/// </remarks>
-		[System.Serializable]
+		[Serializable]
 		public class ClassFileFormatException : Exception
 		{
-			private const long serialVersionUID = 1263998431033790599L;
+			public ClassFileFormatException()
+			{
+			}
 
-			internal ClassFileFormatException(string message) : base(message)
+			public ClassFileFormatException(string message) : base(message)
+			{
+			}
+
+			public ClassFileFormatException(string message, Exception inner) : base(message, inner)
+			{
+			}
+
+			protected ClassFileFormatException(SerializationInfo info, StreamingContext context) : base(info, context)
 			{
 			}
 		}
@@ -98,7 +110,7 @@ namespace Org.Mozilla.Classfile
 		public virtual void AddInterface(string interfaceName)
 		{
 			short interfaceIndex = itsConstantPool.AddClass(interfaceName);
-			itsInterfaces.Add(interfaceIndex);
+			itsInterfaces.Add(Sharpen.Extensions.ValueOf(interfaceIndex));
 		}
 
 		public const short ACC_PUBLIC = unchecked((int)(0x0001));
@@ -184,10 +196,11 @@ namespace Org.Mozilla.Classfile
 		/// </param>
 		public virtual void AddField(string fieldName, string type, short flags)
 		{
-			short fieldNameIndex = itsConstantPool.AddUtf8(fieldName);
-			short typeIndex = itsConstantPool.AddUtf8(type);
-			itsFields.Add(new ClassFileField(fieldNameIndex, typeIndex, flags));
+			var field = typeBuilder.DefineField(fieldName, Type.GetType(type), (FieldAttributes) flags);
+			itsFields.Add(field);
 		}
+
+		private TypeBuilder typeBuilder;
 
 		/// <summary>Add a field to the class.</summary>
 		/// <remarks>Add a field to the class.</remarks>
@@ -1540,7 +1553,7 @@ namespace Org.Mozilla.Classfile
 			{
 				throw new ArgumentException("Bad handlerLabel");
 			}
-			short catch_type_index = (catchClassName == null) ? 0 : itsConstantPool.AddClass(catchClassName);
+			short catch_type_index = (short) ((catchClassName == null) ? 0 : itsConstantPool.AddClass(catchClassName));
 			ExceptionTableEntry newEntry = new ExceptionTableEntry(startLabel, endLabel, handlerLabel, catch_type_index);
 			int N = itsExceptionTableTop;
 			if (N == 0)
@@ -3279,19 +3292,19 @@ namespace Org.Mozilla.Classfile
 			offset = PutInt16(itsInterfaces.Size(), data, offset);
 			for (int i = 0; i < itsInterfaces.Size(); i++)
 			{
-				int interfaceIndex = System.Convert.ToInt16(((short)(itsInterfaces.Get(i))));
+				int interfaceIndex = ((short)(itsInterfaces.Get(i)));
 				offset = PutInt16(interfaceIndex, data, offset);
 			}
 			offset = PutInt16(itsFields.Size(), data, offset);
-			for (int i_1 = 0; i_1 < itsFields.Size(); i_1++)
+			for (int i = 0; i < itsFields.Size(); i++)
 			{
-				ClassFileField field = (ClassFileField)itsFields.Get(i_1);
+				ClassFileField field = (ClassFileField)itsFields.Get(i);
 				offset = field.Write(data, offset);
 			}
 			offset = PutInt16(itsMethods.Size(), data, offset);
-			for (int i_2 = 0; i_2 < itsMethods.Size(); i_2++)
+			for (int i = 0; i < itsMethods.Size(); i++)
 			{
-				ClassFileMethod method = (ClassFileMethod)itsMethods.Get(i_2);
+				ClassFileMethod method = (ClassFileMethod)itsMethods.Get(i);
 				offset = method.Write(data, offset);
 			}
 			if (itsSourceFileNameIndex != 0)

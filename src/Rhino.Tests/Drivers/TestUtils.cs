@@ -9,17 +9,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Rhino;
-using Rhino.Drivers;
+using System.Linq;
 using Sharpen;
 
 namespace Rhino.Drivers
 {
-	public class TestUtils
+	public static class TestUtils
 	{
 		private static ContextFactory.GlobalSetter globalSetter;
 
-		public static void GrabContextFactoryGlobalSetter()
+		private static void GrabContextFactoryGlobalSetter()
 		{
 			if (globalSetter == null)
 			{
@@ -33,74 +32,60 @@ namespace Rhino.Drivers
 			globalSetter.SetContextFactoryGlobal(factory);
 		}
 
-		public static FilePath[] RecursiveListFiles(FilePath dir, FileFilter filter)
+		public static FileInfo[] RecursiveListFiles(DirectoryInfo directory, Predicate<FileInfo> filter)
 		{
-			if (!dir.IsDirectory())
-			{
-				throw new ArgumentException(dir + " is not a directory");
-			}
-			IList<FilePath> fileList = new List<FilePath>();
-			RecursiveListFilesHelper(dir, filter, fileList);
-			return Sharpen.Collections.ToArray(fileList, new FilePath[fileList.Count]);
+			return directory.EnumerateFiles("*", SearchOption.AllDirectories)
+				.Where(file => filter(file))
+				.ToArray();
 		}
 
-		public static void RecursiveListFilesHelper(FilePath dir, FileFilter filter, IList<FilePath> fileList)
+		public static IEnumerable<FileInfo> RecursiveListFiles(DirectoryInfo directory, string filter)
 		{
-			foreach (FilePath f in dir.ListFiles())
-			{
-				if (f.IsDirectory())
-				{
-					RecursiveListFilesHelper(f, filter, fileList);
-				}
-				else
-				{
-					if (filter.Accept(f))
-					{
-						fileList.Add(f);
-					}
-				}
-			}
+			return directory.GetFiles(filter, SearchOption.AllDirectories);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
 		public static void AddTestsFromFile(string filename, IList<string> list)
 		{
-			AddTestsFromStream(new FileInputStream(new FilePath(filename)), list);
+			using (var reader = File.OpenText(filename))
+			{
+				AddTestsFromStream(reader, list);
+			}
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
 		public static void AddTestsFromStream(Stream @in, IList<string> list)
 		{
-			Properties props = new Properties();
-			props.Load(@in);
-			foreach (object obj in props.Keys)
+			using (var reader = new StreamReader(@in))
 			{
-				list.Add(obj.ToString());
+				AddTestsFromStream(reader, list);
+			}
+		}
+	   
+		private static void AddTestsFromStream(TextReader reader, ICollection<string> list)
+		{
+			string line;
+			while ((line = reader.ReadLine()) != null)
+			{
+				list.Add(line);
 			}
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static string[] LoadTestsFromResource(string resource, string[] inherited)
+		public static string[] LoadTestsFromResource(string resource)
 		{
-			IList<string> list = inherited == null ? new List<string>() : new List<string>(Arrays.AsList(inherited));
-			Stream @in = typeof(StandardTests).GetResourceAsStream(resource);
+			IList<string> list = new List<string>();
+			Stream @in = typeof (StandardTests).GetResourceAsStream(resource);
 			if (@in != null)
 			{
 				AddTestsFromStream(@in, list);
 			}
-			return Sharpen.Collections.ToArray(list, new string[0]);
+			return list.ToArray();
 		}
 
 		public static bool Matches(string[] patterns, string path)
 		{
-			for (int i = 0; i < patterns.Length; i++)
-			{
-				if (path.StartsWith(patterns[i]))
-				{
-					return true;
-				}
-			}
-			return false;
+			return patterns.Any(path.StartsWith);
 		}
 	}
 }

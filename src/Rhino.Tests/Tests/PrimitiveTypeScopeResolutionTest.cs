@@ -6,6 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
+using NUnit.Framework;
 using Rhino;
 using Rhino.Tests;
 using Sharpen;
@@ -17,10 +19,10 @@ namespace Rhino.Tests
 	/// String primitive prototype wrongly resolved when used with many top scopes</a>
 	/// </summary>
 	/// <author>Marc Guillemot</author>
-	[NUnit.Framework.TestFixture]
+	[TestFixture]
 	public class PrimitiveTypeScopeResolutionTest
 	{
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void FunctionCall()
 		{
 			string str2 = "function f() {\n" + "String.prototype.foo = function() { return 'from 2' }; \n" + "var s2 = 's2';\n" + "var s2Foo = s2.foo();\n" + "if (s2Foo != 'from 2') throw 's2 got: ' + s2Foo;\n" + "}";
@@ -29,7 +31,7 @@ namespace Rhino.Tests
 			TestWithTwoScopes(str1, str2);
 		}
 
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void PropertyAccess()
 		{
 			string str2 = "function f() { String.prototype.foo = 'from 2'; \n" + "var s2 = 's2';\n" + "var s2Foo = s2.foo;\n" + "if (s2Foo != 'from 2') throw 's2 got: ' + s2Foo;\n" + "}";
@@ -38,7 +40,7 @@ namespace Rhino.Tests
 			TestWithTwoScopes(str1, str2);
 		}
 
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void ElementAccess()
 		{
 			string str2 = "function f() { String.prototype.foo = 'from 2'; \n" + "var s2 = 's2';\n" + "var s2Foo = s2['foo'];\n" + "if (s2Foo != 'from 2') throw 's2 got: ' + s2Foo;\n" + "}";
@@ -51,8 +53,8 @@ namespace Rhino.Tests
 		{
 			Utils.RunWithAllOptimizationLevels(cx =>
 			{
-				Scriptable scope1 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope1"));
-				Scriptable scope2 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope2"));
+				Scriptable scope1 = cx.InitStandardObjects(new MySimpleScriptableObject("scope1"));
+				Scriptable scope2 = cx.InitStandardObjects(new MySimpleScriptableObject("scope2"));
 				cx.EvaluateString(scope2, scriptScope2, "source2", 1, null);
 				scope1.Put("scope2", scope1, scope2);
 				return cx.EvaluateString(scope1, scriptScope1, "source1", 1, null);
@@ -60,7 +62,7 @@ namespace Rhino.Tests
 		}
 
 		/// <summary>Simple utility allowing to better see the concerned scope while debugging</summary>
-		[System.Serializable]
+		[Serializable]
 		internal class MySimpleScriptableObject : ScriptableObject
 		{
 			private const long serialVersionUID = 1L;
@@ -83,11 +85,9 @@ namespace Rhino.Tests
 			}
 		}
 
-		[System.Serializable]
+		[Serializable]
 		public class MyObject : ScriptableObject
 		{
-			private const long serialVersionUID = 1L;
-
 			public override string GetClassName()
 			{
 				return "MyObject";
@@ -95,7 +95,7 @@ namespace Rhino.Tests
 
 			public virtual object ReadPropFoo(Scriptable s)
 			{
-				return ScriptableObject.GetProperty(s, "foo");
+				return GetProperty(s, "foo");
 			}
 		}
 
@@ -104,19 +104,19 @@ namespace Rhino.Tests
 		/// to an object
 		/// </summary>
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public virtual void FunctionObjectPrimitiveToObject()
 		{
-			string scriptScope2 = "function f() {\n" + "String.prototype.foo = 'from 2'; \n" + "var s2 = 's2';\n" + "var s2Foo = s2.foo;\n" + "var s2FooReadByFunction = myObject.readPropFoo(s2);\n" + "if (s2Foo != s2FooReadByFunction)\n" + "throw 's2 got: ' + s2FooReadByFunction;\n" + "}";
+			string scriptScope2 = "function f() {\n" + "String.prototype.foo = 'from 2'; \n" + "var s2 = 's2';\n" + "var s2Foo = s2.foo;\n" + "var s2FooReadByFunction = myObject.ReadPropFoo(s2);\n" + "if (s2Foo != s2FooReadByFunction)\n" + "throw 's2 got: ' + s2FooReadByFunction;\n" + "}";
 			// define object with custom method
-			PrimitiveTypeScopeResolutionTest.MyObject myObject = new PrimitiveTypeScopeResolutionTest.MyObject();
-			string[] functionNames = new string[] { "readPropFoo" };
-			myObject.DefineFunctionProperties(functionNames, typeof(PrimitiveTypeScopeResolutionTest.MyObject), ScriptableObject.EMPTY);
+			MyObject myObject = new MyObject();
+			string[] functionNames = new string[] { "ReadPropFoo" };
+			myObject.DefineFunctionProperties(functionNames, typeof(MyObject), ScriptableObject.EMPTY);
 			string scriptScope1 = "String.prototype.foo = 'from 1'; scope2.f()";
 			Utils.RunWithAllOptimizationLevels(cx =>
 			{
-				Scriptable scope1 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope1"));
-				Scriptable scope2 = cx.InitStandardObjects(new PrimitiveTypeScopeResolutionTest.MySimpleScriptableObject("scope2"));
+				Scriptable scope1 = cx.InitStandardObjects(new MySimpleScriptableObject("scope1"));
+				Scriptable scope2 = cx.InitStandardObjects(new MySimpleScriptableObject("scope2"));
 				scope2.Put("myObject", scope2, myObject);
 				cx.EvaluateString(scope2, scriptScope2, "source2", 1, null);
 				scope1.Put("scope2", scope1, scope2);

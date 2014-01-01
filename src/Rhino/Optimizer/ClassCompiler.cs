@@ -5,12 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#if COMPILATION
 
 using System;
-using Rhino;
+using System.Collections.Generic;
 using Rhino.Ast;
-using Rhino.Optimizer;
-using Sharpen;
 
 namespace Rhino.Optimizer
 {
@@ -37,7 +36,7 @@ namespace Rhino.Optimizer
 				throw new ArgumentException();
 			}
 			this.compilerEnv = compilerEnv;
-			this.mainMethodClassName = Codegen.DEFAULT_MAIN_METHOD_CLASS;
+			this.mainMethodClassName = Codegen.DEFAULT_MAIN_METHOD_CLASS.FullName;
 		}
 
 		/// <summary>Set the class name to use for main method implementation.</summary>
@@ -57,7 +56,7 @@ namespace Rhino.Optimizer
 
 		/// <summary>Get the name of the class for main method implementation.</summary>
 		/// <remarks>Get the name of the class for main method implementation.</remarks>
-		/// <seealso cref="SetMainMethodClass(string)">SetMainMethodClass(string)</seealso>
+		/// <seealso cref="SetMainMethodClass">SetMainMethodClass(string)</seealso>
 		public virtual string GetMainMethodClass()
 		{
 			return mainMethodClassName;
@@ -134,42 +133,33 @@ namespace Rhino.Optimizer
 		/// array. The initial element of the array always holds
 		/// mainClassName and array[1] holds its byte code.
 		/// </returns>
-		public virtual object[] CompileToClassFiles(string source, string sourceLocation, int lineno, string mainClassName)
+		public virtual Tuple<string, byte[]>[] CompileToClassFiles(string source, string sourceLocation, int lineno, string mainClassName)
 		{
 			Parser p = new Parser(compilerEnv);
 			AstRoot ast = p.Parse(source, sourceLocation, lineno);
 			IRFactory irf = new IRFactory(compilerEnv);
 			ScriptNode tree = irf.TransformTree(ast);
 			// release reference to original parse tree & parser
-			irf = null;
-			ast = null;
-			p = null;
 			Type superClass = GetTargetExtends();
 			Type[] interfaces = GetTargetImplements();
-			string scriptClassName;
 			bool isPrimary = (interfaces == null && superClass == null);
-			if (isPrimary)
-			{
-				scriptClassName = mainClassName;
-			}
-			else
-			{
-				scriptClassName = MakeAuxiliaryClassName(mainClassName, "1");
-			}
+			string scriptClassName = isPrimary
+				? mainClassName
+				: MakeAuxiliaryClassName(mainClassName, "1");
 			Codegen codegen = new Codegen();
 			codegen.SetMainMethodClass(mainMethodClassName);
 			byte[] scriptClassBytes = codegen.CompileToClassFile(compilerEnv, scriptClassName, tree, tree.GetEncodedSource(), false);
 			if (isPrimary)
 			{
-				return new object[] { scriptClassName, scriptClassBytes };
+				return new[] { Tuple.Create(scriptClassName, scriptClassBytes) };
 			}
 			int functionCount = tree.GetFunctionCount();
 			ObjToIntMap functionNames = new ObjToIntMap(functionCount);
-			for (int i = 0; i != functionCount; ++i)
+			for (int i = 0; i < functionCount; i++)
 			{
 				FunctionNode ofn = tree.GetFunctionNode(i);
 				string name = ofn.GetName();
-				if (name != null && name.Length != 0)
+				if (!string.IsNullOrEmpty(name))
 				{
 					functionNames.Put(name, ofn.GetParamCount());
 				}
@@ -179,7 +169,7 @@ namespace Rhino.Optimizer
 				superClass = ScriptRuntime.ObjectClass;
 			}
 			byte[] mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassName);
-			return new object[] { mainClassName, mainClassBytes, scriptClassName, scriptClassBytes };
+			return new[] { Tuple.Create(mainClassName, mainClassBytes), Tuple.Create(scriptClassName, scriptClassBytes) };
 		}
 
 		private string mainMethodClassName;
@@ -191,3 +181,4 @@ namespace Rhino.Optimizer
 		private Type[] targetImplements;
 	}
 }
+#endif

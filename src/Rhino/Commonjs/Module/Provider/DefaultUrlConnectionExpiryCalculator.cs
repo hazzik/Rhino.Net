@@ -7,7 +7,7 @@
  */
 
 using System;
-using Rhino.CommonJS.Module.Provider;
+using System.Net;
 using Sharpen;
 
 namespace Rhino.CommonJS.Module.Provider
@@ -17,9 +17,9 @@ namespace Rhino.CommonJS.Module.Provider
 	/// The default heuristic for calculating cache expiry of URL-based resources.
 	/// It is simply configured with a default relative expiry, and each invocation
 	/// of
-	/// <see cref="CalculateExpiry(Sharpen.URLConnection)">CalculateExpiry(Sharpen.URLConnection)</see>
+	/// <see cref="CalculateExpiry">CalculateExpiry(Sharpen.URLConnection)</see>
 	/// returns
-	/// <see cref="Sharpen.Runtime.CurrentTimeMillis()">Sharpen.Runtime.CurrentTimeMillis()</see>
+	/// <see cref="Extensions.ToMillisecondsSinceEpoch(DateTime.UtcNow)">DateTime.UtcNow.ToMillisecondsSinceEpoch()</see>
 	/// incremented with the relative expiry.
 	/// </remarks>
 	/// <author>Attila Szegedi</author>
@@ -27,8 +27,6 @@ namespace Rhino.CommonJS.Module.Provider
 	[System.Serializable]
 	public class DefaultUrlConnectionExpiryCalculator : UrlConnectionExpiryCalculator
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly long relativeExpiry;
 
 		/// <summary>Creates a new default expiry calculator with one minute relative expiry.</summary>
@@ -55,9 +53,9 @@ namespace Rhino.CommonJS.Module.Provider
 			this.relativeExpiry = relativeExpiry;
 		}
 
-		public virtual long CalculateExpiry(URLConnection urlConnection)
+		public virtual long CalculateExpiry(HttpWebResponse response)
 		{
-			return Runtime.CurrentTimeMillis() + relativeExpiry;
+			return DateTime.UtcNow.ToMillisecondsSinceEpoch() + relativeExpiry;
 		}
 	}
 }

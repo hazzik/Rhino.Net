@@ -8,6 +8,7 @@
 
 using System;
 using System.IO;
+using NUnit.Framework;
 using Rhino;
 using Rhino.Serialize;
 using Rhino.Tests;
@@ -263,6 +264,7 @@ namespace Rhino.Tests
 			}
 		}
 
+/*
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
 		[NUnit.Framework.Test]
@@ -304,6 +306,7 @@ namespace Rhino.Tests
 				Context.Exit();
 			}
 		}
+*/
 
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
@@ -374,6 +377,7 @@ namespace Rhino.Tests
 			}
 		}
 
+/*
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
 		[NUnit.Framework.Test]
@@ -428,6 +432,7 @@ namespace Rhino.Tests
 				Context.Exit();
 			}
 		}
+*/
 
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>

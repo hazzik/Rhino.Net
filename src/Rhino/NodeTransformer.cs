@@ -502,7 +502,7 @@ siblingLoop_break: ;
 						// defined in the destructuring assignment
 						if (destructuringNames != null)
 						{
-							Sharpen.Collections.AddAll(list, destructuringNames);
+							list.AddRange(destructuringNames);
 							for (int i = 0; i < destructuringNames.Count; i++)
 							{
 								objectLiteral.AddChildToBack(new Node(Token.VOID, Node.NewNumber(0.0)));
@@ -523,7 +523,7 @@ siblingLoop_break: ;
 					}
 					objectLiteral.AddChildToBack(init);
 				}
-				objectLiteral.PutProp(Node.OBJECT_IDS_PROP, Sharpen.Collections.ToArray(list));
+				objectLiteral.PutProp(Node.OBJECT_IDS_PROP, list.ToArray());
 				newVars = new Node(Token.ENTERWITH, objectLiteral);
 				result.AddChildToBack(newVars);
 				result.AddChildToBack(new Node(Token.WITH, body));

@@ -8,6 +8,7 @@
 
 using System;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -83,7 +84,7 @@ namespace Rhino
 			Type cls = obj.GetType();
 			if (cls.IsArray)
 			{
-				return NativeJavaArray.Wrap(scope, obj);
+				return NativeJavaArray.Wrap(scope, (Array) obj);
 			}
 			return WrapAsJavaObject(cx, scope, obj, staticType);
 		}
@@ -103,7 +104,7 @@ namespace Rhino
 			Type cls = obj.GetType();
 			if (cls.IsArray)
 			{
-				return NativeJavaArray.Wrap(scope, obj);
+				return NativeJavaArray.Wrap(scope, (Array) obj);
 			}
 			return WrapAsJavaObject(cx, scope, obj, null);
 		}

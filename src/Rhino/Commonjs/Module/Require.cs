@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Rhino;
 using Rhino.CommonJS.Module;
@@ -37,7 +38,7 @@ namespace Rhino.CommonJS.Module
 	/// <h1>Making it available</h1>
 	/// In order to make the require() function available to your JavaScript
 	/// program, you need to invoke either
-	/// <see cref="Install(Rhino.Scriptable)">Install(Rhino.Scriptable)</see>
+	/// <see cref="Install(Scriptable)">Install(Rhino.Scriptable)</see>
 	/// or
 	/// <see cref="RequireMain(Rhino.Context, string)">RequireMain(Rhino.Context, string)</see>
 	/// .
@@ -76,7 +77,7 @@ namespace Rhino.CommonJS.Module
 		/// Creates a new instance of the require() function. Upon constructing it,
 		/// you will either want to install it in the global (or some other) scope
 		/// using
-		/// <see cref="Install(Rhino.Scriptable)">Install(Rhino.Scriptable)</see>
+		/// <see cref="Install(Scriptable)">Install(Rhino.Scriptable)</see>
 		/// , or alternatively, you can load the
 		/// program's main module using
 		/// <see cref="RequireMain(Rhino.Context, string)">RequireMain(Rhino.Context, string)</see>
@@ -157,20 +158,8 @@ namespace Rhino.CommonJS.Module
 				}
 				return mainExports;
 			}
-			ModuleScript moduleScript;
-			try
-			{
-				// try to get the module script to see if it is on the module path
-				moduleScript = moduleScriptProvider.GetModuleScript(cx, mainModuleId, null, null, paths);
-			}
-			catch (Exception x)
-			{
-				throw;
-			}
-			catch (Exception x)
-			{
-				throw new Exception(x);
-			}
+			// try to get the module script to see if it is on the module path
+			ModuleScript moduleScript = moduleScriptProvider.GetModuleScript(cx, mainModuleId, null, null, paths);
 			if (moduleScript != null)
 			{
 				mainExports = GetExportedModuleInterface(cx, mainModuleId, null, null, true);
@@ -192,12 +181,12 @@ namespace Rhino.CommonJS.Module
 					// if not an absolute uri resolve to a file path
 					if (mainUri == null || !mainUri.IsAbsoluteUri)
 					{
-						FilePath file = new FilePath(mainModuleId);
-						if (!file.IsFile())
+						FileInfo file = new FileInfo(mainModuleId);
+						if (!file.Exists)
 						{
-							throw ScriptRuntime.ThrowError(cx, nativeScope, "Module \"" + mainModuleId + "\" not found.");
+							throw ScriptRuntime.ThrowError(cx, nativeScope, string.Format("Module \"{0}\" not found.", mainModuleId));
 						}
-						mainUri = file.ToURI();
+						mainUri = new Uri(file.FullName);
 					}
 					mainExports = GetExportedModuleInterface(cx, mainUri.ToString(), mainUri, null, true);
 				}
@@ -334,7 +323,7 @@ namespace Rhino.CommonJS.Module
 				// "require" must contain at least the exports that the foreign
 				// module has prepared before the call to require that led to the
 				// current module's execution."
-				threadLoadingModules [id] = exports;
+				threadLoadingModules[id] = exports;
 				try
 				{
 					// Support non-standard Node.js feature to allow modules to
@@ -342,14 +331,14 @@ namespace Rhino.CommonJS.Module
 					Scriptable newExports = ExecuteModuleScript(cx, id, exports, moduleScript, isMain);
 					if (exports != newExports)
 					{
-						threadLoadingModules [id] = newExports;
+						threadLoadingModules[id] = newExports;
 						exports = newExports;
 					}
 				}
 				catch (Exception e)
 				{
 					// Throw loaded module away if there was an exception
-					Sharpen.Collections.Remove(threadLoadingModules, id);
+					threadLoadingModules.Remove(id);
 					throw;
 				}
 				finally
@@ -362,7 +351,8 @@ namespace Rhino.CommonJS.Module
 						// globally available as soon as it loads) prevents other
 						// threads from observing a partially loaded circular
 						// dependency of a module that completed loading.
-						exportedModuleInterfaces.PutAll(threadLoadingModules);
+						foreach (var val in threadLoadingModules)
+							exportedModuleInterfaces[val.Key] = val.Value;
 						loadingModuleInterfaces.Value = null;
 					}
 				}
@@ -423,10 +413,6 @@ namespace Rhino.CommonJS.Module
 					throw ScriptRuntime.ThrowError(cx, nativeScope, "Module \"" + id + "\" not found.");
 				}
 				return moduleScript;
-			}
-			catch (Exception e)
-			{
-				throw;
 			}
 			catch (Exception e)
 			{

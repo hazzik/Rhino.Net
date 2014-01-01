@@ -9,10 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Rhino;
 using Rhino.Ast;
 using Rhino.Debug;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -109,16 +111,21 @@ namespace Rhino
 					Kit.CodeBug();
 				}
 				Interpreter.CallFrame copy;
-				copy = (Interpreter.CallFrame)Clone();
+				copy = (Interpreter.CallFrame) MemberwiseClone();
 				// clone stack but keep varSource to point to values
 				// from this frame to share variables.
-				copy.stack = stack.Clone();
-				copy.stackAttributes = stackAttributes.Clone();
-				copy.sDbl = sDbl.Clone();
+				copy.stack = (object[]) stack.Clone();
+				copy.stackAttributes = (int[]) stackAttributes.Clone();
+				copy.sDbl = (double[]) sDbl.Clone();
 				copy.frozen = false;
 				return copy;
 			}
+
+			public object Clone()
+			{
+				return MemberwiseClone();
 			}
+		}
 
 		[System.Serializable]
 		private sealed class ContinuationJump
@@ -228,7 +235,7 @@ namespace Rhino
 			if (bytecode != itsData)
 			{
 				Kit.CodeBug();
-		}
+			}
 			return InterpretedFunction.CreateScript(itsData, staticSecurityDomain);
 		}
 
@@ -246,17 +253,17 @@ namespace Rhino
 			return InterpretedFunction.CreateFunction(cx, scope, itsData, staticSecurityDomain);
 		}
 
-		private static int GetShort(byte[] iCode, int pc)
+		private static int GetShort(sbyte[] iCode, int pc)
 		{
 			return (iCode[pc] << 8) | (iCode[pc + 1] & unchecked((int)(0xFF)));
 		}
 
-		private static int GetIndex(byte[] iCode, int pc)
+		private static int GetIndex(sbyte[] iCode, int pc)
 		{
 			return ((iCode[pc] & unchecked((int)(0xFF))) << 8) | (iCode[pc + 1] & unchecked((int)(0xFF)));
 		}
 
-		private static int GetInt(byte[] iCode, int pc)
+		private static int GetInt(sbyte[] iCode, int pc)
 		{
 			return (iCode[pc] << 24) | ((iCode[pc + 1] & unchecked((int)(0xFF))) << 16) | ((iCode[pc + 2] & unchecked((int)(0xFF))) << 8) | (iCode[pc + 3] & unchecked((int)(0xFF)));
 		}
@@ -320,7 +327,7 @@ namespace Rhino
 		internal static void DumpICode(InterpreterData idata)
 		{
 			return;
-			byte[] iCode = idata.itsICode;
+			sbyte[] iCode = idata.itsICode;
 			int iCodeLength = iCode.Length;
 			string[] strings = idata.itsStringTable;
 			TextWriter @out = System.Console.Out;
@@ -705,7 +712,7 @@ namespace Rhino
 		internal static int[] GetLineNumbers(InterpreterData data)
 		{
 			UintMap presentLines = new UintMap();
-			byte[] iCode = data.itsICode;
+			sbyte[] iCode = data.itsICode;
 			int iCodeLength = iCode.Length;
 			for (int pc = 0; pc != iCodeLength; )
 			{
@@ -803,7 +810,7 @@ namespace Rhino
 		{
 			string tag = "Rhino.Interpreter.interpretLoop";
 			StringBuilder sb = new StringBuilder(nativeStackTrace.Length + 1000);
-			string lineSeparator = SecurityUtilities.GetSystemProperty("line.separator");
+			string lineSeparator = Environment.NewLine;
 			Interpreter.CallFrame[] array = (Interpreter.CallFrame[])ex.interpreterStackInfo;
 			int[] linePC = ex.interpreterLineData;
 			int arrayIndex = array.Length;
@@ -828,7 +835,7 @@ namespace Rhino
 						break;
 					}
 				}
-				sb.Append(Sharpen.Runtime.Substring(nativeStackTrace, offset, pos));
+				sb.Append(nativeStackTrace.Substring(offset, pos - offset));
 				offset = pos;
 				Interpreter.CallFrame frame = array[arrayIndex];
 				while (frame != null)
@@ -841,7 +848,7 @@ namespace Rhino
 					InterpreterData idata = frame.idata;
 					sb.Append(lineSeparator);
 					sb.Append("\tat script");
-					if (idata.itsName != null && idata.itsName.Length != 0)
+					if (!string.IsNullOrEmpty(idata.itsName))
 					{
 						sb.Append('.');
 						sb.Append(idata.itsName);
@@ -859,7 +866,7 @@ namespace Rhino
 					frame = frame.parentFrame;
 				}
 			}
-			sb.Append(Sharpen.Runtime.Substring(nativeStackTrace, offset));
+			sb.Append(nativeStackTrace.Substring(offset));
 			return sb.ToString();
 		}
 
@@ -867,7 +874,7 @@ namespace Rhino
 		{
 			ScriptStackElement[][] stack = GetScriptStackElements(ex);
 			IList<string> list = new List<string>(stack.Length);
-			string lineSeparator = SecurityUtilities.GetSystemProperty("line.separator");
+			string lineSeparator = Environment.NewLine;
 			foreach (ScriptStackElement[] group in stack)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -913,16 +920,16 @@ namespace Rhino
 					{
 						lineNumber = GetIndex(idata.itsICode, pc);
 					}
-					if (idata.itsName != null && idata.itsName.Length != 0)
+					if (!string.IsNullOrEmpty(idata.itsName))
 					{
 						functionName = idata.itsName;
 					}
 					frame = frame.parentFrame;
-					group.Add(new ScriptStackElement(fileName, functionName, lineNumber));
+					@group.Add(new ScriptStackElement(fileName, functionName, lineNumber));
 				}
-				list.Add(Sharpen.Collections.ToArray(group, new ScriptStackElement[group.Count]));
+				list.Add(@group.ToArray());
 			}
-			return Sharpen.Collections.ToArray(list, new ScriptStackElement[list.Count][]);
+			return list.ToArray();
 		}
 
 		internal static string GetEncodedSource(InterpreterData idata)
@@ -931,7 +938,7 @@ namespace Rhino
 			{
 				return null;
 			}
-			return Sharpen.Runtime.Substring(idata.encodedSource, idata.encodedSourceStart, idata.encodedSourceEnd);
+			return idata.encodedSource.Substring(idata.encodedSourceStart, idata.encodedSourceEnd - idata.encodedSourceStart);
 		}
 
 		private static void InitFunction(Context cx, Scriptable scope, InterpretedFunction parent, int index)
@@ -947,6 +954,7 @@ namespace Rhino
 			{
 				Kit.CodeBug();
 			}
+#if ENCHANCED_SECURITY
 			if (cx.interpreterSecurityDomain != ifun.securityDomain)
 			{
 				object savedDomain = cx.interpreterSecurityDomain;
@@ -960,6 +968,7 @@ namespace Rhino
 					cx.interpreterSecurityDomain = savedDomain;
 				}
 			}
+#endif
 			Interpreter.CallFrame frame = new Interpreter.CallFrame();
 			InitFrame(cx, scope, thisObj, args, null, 0, args.Length, ifun, null, frame);
 			frame.isContinuationsTopFrame = cx.isContinuationsTopCall;
@@ -1115,7 +1124,7 @@ namespace Rhino
 					object[] vars = frame.varSource.stack;
 					double[] varDbls = frame.varSource.sDbl;
 					int[] varAttributes = frame.varSource.stackAttributes;
-					byte[] iCode = frame.idata.itsICode;
+					sbyte[] iCode = frame.idata.itsICode;
 					string[] strings = frame.idata.itsStringTable;
 					// Use local for stackTop as well. Since execption handlers
 					// can only exist at statement level where stack is empty,
@@ -1129,7 +1138,7 @@ namespace Rhino
 						// Exception handler assumes that PC is already incremented
 						// pass the instruction start when it searches the
 						// exception handler
-						int op = iCode[frame.pc++];
+						int op = (sbyte) iCode [frame.pc++];
 						switch (op)
 						{
 							case Icode_GENERATOR:
@@ -1413,7 +1422,7 @@ namespace Rhino
 								double lDbl = Stack_double(frame, stackTop - 1);
 								int rIntValue = Stack_int32(frame, stackTop) & unchecked((int)(0x1F));
 								stack[--stackTop] = DBL_MRK;
-								sDbl[stackTop] = (long)(((ulong)ScriptRuntime.ToUint32(lDbl)) >> rIntValue);
+								sDbl[stackTop] = (long)(((ulong)ScriptRuntime.ToUInt32(lDbl)) >> rIntValue);
 								goto Loop_continue;
 							}
 
@@ -1705,7 +1714,9 @@ namespace Rhino
 								if (fun is InterpretedFunction)
 								{
 									InterpretedFunction ifun = (InterpretedFunction)fun;
+									#if ENCHANCED_SECURITY
 									if (frame.fnOrScript.securityDomain == ifun.securityDomain)
+									#endif
 									{
 										Interpreter.CallFrame callParentFrame = frame;
 										Interpreter.CallFrame calleeFrame = new Interpreter.CallFrame();
@@ -1777,7 +1788,9 @@ namespace Rhino
 										if (applyCallable is InterpretedFunction)
 										{
 											InterpretedFunction iApplyCallable = (InterpretedFunction)applyCallable;
+#if ENCHANCED_SECURITY
 											if (frame.fnOrScript.securityDomain == iApplyCallable.securityDomain)
+#endif
 											{
 												frame = InitFrameForApplyOrCall(cx, frame, indexReg, stack, sDbl, stackTop, op, calleeScope, ifun, iApplyCallable);
 												goto StateLoop_continue;
@@ -1796,7 +1809,9 @@ namespace Rhino
 									if (noSuchMethodMethod is InterpretedFunction)
 									{
 										InterpretedFunction ifun = (InterpretedFunction)noSuchMethodMethod;
+#if ENCHANCED_SECURITY
 										if (frame.fnOrScript.securityDomain == ifun.securityDomain)
+#endif
 										{
 											frame = InitFrameForNoSuchMethod(cx, frame, indexReg, stack, sDbl, stackTop, op, funThisObj, calleeScope, noSuchMethodShim, ifun);
 											goto StateLoop_continue;
@@ -1823,7 +1838,9 @@ namespace Rhino
 								if (lhs is InterpretedFunction)
 								{
 									InterpretedFunction f = (InterpretedFunction)lhs;
+#if ENCHANCED_SECURITY
 									if (frame.fnOrScript.securityDomain == f.securityDomain)
+#endif
 									{
 										Scriptable newInstance = f.CreateObject(cx, frame.scope);
 										Interpreter.CallFrame calleeFrame = new Interpreter.CallFrame();
@@ -1865,13 +1882,13 @@ namespace Rhino
 								{
 									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
 								}
-								stack[stackTop] = ScriptRuntime.Typeof(lhs);
+								stack[stackTop] = ScriptRuntime.TypeOf(lhs);
 								goto Loop_continue;
 							}
 
 							case Icode_TYPEOFNAME:
 							{
-								stack[++stackTop] = ScriptRuntime.TypeofName(frame.scope, stringReg);
+								stack[++stackTop] = ScriptRuntime.TypeOfName(frame.scope, stringReg);
 								goto Loop_continue;
 							}
 
@@ -2567,6 +2584,9 @@ withoutExceptions_break: ;
 						throwable = ex;
 						exState = EX_FINALLY_STATE;
 					}
+					//TODO: Handle correctly
+/*
+ *
 					catch (Exception ex)
 					{
 						// Error from instruction counting
@@ -2575,6 +2595,7 @@ withoutExceptions_break: ;
 						cjump_1 = null;
 						exState = EX_NO_JS_STATE;
 					}
+*/
 				}
 				if (frame.debuggerFrame != null && throwable is Exception)
 				{
@@ -2661,15 +2682,8 @@ StateLoop_break: ;
 			}
 			if (throwable != null)
 			{
-				if (throwable is Exception)
-				{
-					throw (Exception)throwable;
-				}
-				else
-				{
 				// Must be instance of Error or code bug
 				throw (Exception) throwable;
-			}
 			}
 			return (interpreterResult != DBL_MRK) ? interpreterResult : ScriptRuntime.WrapNumber(interpreterResultDbl);
 		}
@@ -2902,7 +2916,7 @@ object_compare_break: ;
 			return stackTop;
 		}
 
-		private static int DoElemIncDec(Context cx, Interpreter.CallFrame frame, byte[] iCode, object[] stack, double[] sDbl, int stackTop)
+		private static int DoElemIncDec(Context cx, Interpreter.CallFrame frame, sbyte[] iCode, object[] stack, double[] sDbl, int stackTop)
 		{
 			object rhs = stack[stackTop];
 			if (rhs == UniqueTag.DOUBLE_MARK)
@@ -2920,7 +2934,7 @@ object_compare_break: ;
 			return stackTop;
 		}
 
-		private static int DoCallSpecial(Context cx, Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, byte[] iCode, int indexReg)
+		private static int DoCallSpecial(Context cx, Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, sbyte[] iCode, int indexReg)
 		{
 			int callType = iCode[frame.pc] & unchecked((int)(0xFF));
 			bool isNew = (iCode[frame.pc + 1] != 0);
@@ -3559,9 +3573,9 @@ object_compare_break: ;
 			{
 				// Clean the stack part and space beyond stack if any
 				// of the old array to allow to GC objects there
-				for (int i = emptyStackTop + 1; i_2 != stack.Length; ++i_2)
+				for (int i = emptyStackTop + 1; i != stack.Length; ++i)
 				{
-					stack[i_2] = null;
+					stack[i] = null;
 				}
 			}
 			EnterFrame(cx, frame, args, false);
@@ -3797,18 +3811,12 @@ object_compare_break: ;
 		private static bool Stack_boolean(Interpreter.CallFrame frame, int i)
 		{
 			object x = frame.stack[i];
-			if (x == true)
+			if (x is bool)
 			{
-				return true;
+				return (bool) x;
 			}
 			else
 			{
-				if (x == false)
-				{
-					return false;
-				}
-				else
-				{
 				if (x == UniqueTag.DOUBLE_MARK)
 				{
 					double d = frame.sDbl[i];
@@ -3829,18 +3837,10 @@ object_compare_break: ;
 						}
 						else
 						{
-								if (x is bool)
-								{
-									return ((bool)x);
-								}
-								else
-								{
 							return ScriptRuntime.ToBoolean(x);
 						}
 					}
 				}
-			}
-		}
 			}
 		}
 

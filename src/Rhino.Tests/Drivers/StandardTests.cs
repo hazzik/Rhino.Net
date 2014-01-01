@@ -7,8 +7,9 @@
  */
 
 using System;
+using System.IO;
+using System.Linq;
 using NUnit.Framework;
-using Rhino.Drivers;
 using Rhino.Tools.Shell;
 using Sharpen;
 
@@ -34,14 +35,13 @@ namespace Rhino.Drivers
 			return suite;
 		}
 
-		private static void AddSuites(TestSuite topLevel, FilePath testDir, string[] excludes, int optimizationLevel)
+		private static void AddSuites(TestSuite topLevel, DirectoryInfo testDir, string[] excludes, int optimizationLevel)
 		{
-			FilePath[] subdirs = testDir.ListFiles(ShellTest.DIRECTORY_FILTER);
-			Arrays.Sort(subdirs);
-			for (int i = 0; i < subdirs.Length; i++)
+			DirectoryInfo[] subdirs = testDir.GetDirectories().Where(ShellTest.DIRECTORY_FILTER).ToArray();
+			Array.Sort(subdirs);
+			foreach (DirectoryInfo subdir in subdirs)
 			{
-				FilePath subdir = subdirs[i];
-				string name = subdir.GetName();
+				string name = subdir.Name;
 				if (TestUtils.Matches(excludes, name))
 				{
 					continue;
@@ -52,50 +52,49 @@ namespace Rhino.Drivers
 			}
 		}
 
-		private static void AddCategories(TestSuite suite, FilePath suiteDir, string prefix, string[] excludes, int optimizationLevel)
+		private static void AddCategories(TestSuite suite, DirectoryInfo suiteDir, string prefix, string[] excludes, int optimizationLevel)
 		{
-			FilePath[] subdirs = suiteDir.ListFiles(ShellTest.DIRECTORY_FILTER);
-			Arrays.Sort(subdirs);
-			for (int i = 0; i < subdirs.Length; i++)
+			DirectoryInfo[] subdirs = suiteDir.GetDirectories().Where(ShellTest.DIRECTORY_FILTER).ToArray();
+			Array.Sort(subdirs);
+			foreach (DirectoryInfo subdir in subdirs)
 			{
-				FilePath subdir = subdirs[i];
-				string name = subdir.GetName();
+				string name = subdir.Name;
 				TestSuite testCategory = new TestSuite(name);
 				AddTests(testCategory, subdir, prefix + name + "/", excludes, optimizationLevel);
 				suite.AddTest(testCategory);
 			}
 		}
 
-		private static void AddTests(TestSuite suite, FilePath suiteDir, string prefix, string[] excludes, int optimizationLevel)
+		private static void AddTests(TestSuite suite, DirectoryInfo suiteDir, string prefix, string[] excludes, int optimizationLevel)
 		{
-			FilePath[] jsFiles = suiteDir.ListFiles(ShellTest.TEST_FILTER);
-			Arrays.Sort(jsFiles);
-			for (int i = 0; i < jsFiles.Length; i++)
+			FileInfo[] jsFiles = suiteDir.GetFiles().Where(ShellTest.TEST_FILTER).ToArray();
+			Array.Sort(jsFiles);
+			foreach (FileInfo jsFile in jsFiles)
 			{
-				FilePath jsFile = jsFiles[i];
-				string name = jsFile.GetName();
+				string name = jsFile.Name;
 				if (!TestUtils.Matches(excludes, prefix + name))
 				{
-					suite.AddTest(new StandardTests.JsTestCase(jsFile, optimizationLevel));
+					throw new NotImplementedException();
+//		            suite.AddTest(new JsTestCase(jsFile, optimizationLevel));
 				}
 			}
 		}
 
 		public class JunitStatus : ShellTest.Status
 		{
-			public sealed override void Running(FilePath jsFile)
+			public sealed override void Running(FileInfo jsFile)
 			{
 			}
 
 			//    do nothing
 			public sealed override void Failed(string s)
 			{
-				NUnit.Framework.Assert.Fail(s);
+				Assert.Fail(s);
 			}
 
 			public sealed override void ExitCodesWere(int expected, int actual)
 			{
-				NUnit.Framework.Assert.AreEqual(expected, actual, "Unexpected exit code");
+				Assert.AreEqual(expected, actual, "Unexpected exit code");
 			}
 
 			public sealed override void OutputWas(string s)
@@ -106,7 +105,7 @@ namespace Rhino.Drivers
 			// tests.
 			public sealed override void Threw(Exception t)
 			{
-				NUnit.Framework.Assert.Fail(ShellTest.GetStackTrace(t));
+				Assert.Fail(ShellTest.GetStackTrace(t));
 			}
 
 			public sealed override void TimedOut()
@@ -115,43 +114,41 @@ namespace Rhino.Drivers
 			}
 		}
 
-		[NUnit.Framework.TestFixture]
+		[TestFixture]
 		public sealed class JsTestCase
 		{
-			private readonly FilePath jsFile;
+			private readonly FileInfo jsFile;
 
 			private readonly int optimizationLevel;
 
-			internal JsTestCase(FilePath jsFile, int optimizationLevel) : base(jsFile.GetName() + (optimizationLevel == 1 ? "-compiled" : "-interpreted"))
+			internal JsTestCase(FileInfo jsFile, int optimizationLevel) 
+				//: base(jsFile.Name + (optimizationLevel == 1 ? "-compiled" : "-interpreted"))
 			{
 				this.jsFile = jsFile;
 				this.optimizationLevel = optimizationLevel;
-			}
-
-			public override int CountTestCases()
-			{
-				return 1;
 			}
 
 			public class ShellTestParameters : ShellTest.Parameters
 			{
 				public override int GetTimeoutMilliseconds()
 				{
-					if (Runtime.GetProperty("mozilla.js.tests.timeout") != null)
+					var timeout = Runtime.GetProperty("mozilla.js.tests.timeout");
+					if (timeout != null)
 					{
-						return System.Convert.ToInt32(Runtime.GetProperty("mozilla.js.tests.timeout"));
+						return Convert.ToInt32(timeout);
 					}
 					return 60000;
 				}
 			}
 
 			/// <exception cref="System.Exception"></exception>
-			public override void RunBare()
+			//[TestCaseSource("")]
+			public void RunBare()
 			{
 				ShellContextFactory shellContextFactory = new ShellContextFactory();
 				shellContextFactory.SetOptimizationLevel(optimizationLevel);
-				StandardTests.JsTestCase.ShellTestParameters @params = new StandardTests.JsTestCase.ShellTestParameters();
-				ShellTest.Run(shellContextFactory, jsFile, @params, new StandardTests.JunitStatus());
+				ShellTestParameters @params = new ShellTestParameters();
+				ShellTest.Run(shellContextFactory, jsFile, @params, new JunitStatus());
 			}
 		}
 	}

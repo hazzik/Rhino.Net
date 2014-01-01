@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using Rhino;
 using Rhino.Ast;
@@ -38,7 +39,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class ArrayLiteral : AstNode, DestructuringForm
 	{
-		private static readonly IList<AstNode> NO_ELEMS = Sharpen.Collections.UnmodifiableList(new List<AstNode>());
+		private static readonly IList<AstNode> NO_ELEMS = new List<AstNode>().AsReadOnly();
 
 		private IList<AstNode> elements;
 

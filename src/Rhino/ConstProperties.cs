@@ -58,8 +58,8 @@ namespace Rhino
 		/// <param name="name">the name of the property</param>
 		/// <param name="start">the object whose property is being set</param>
 		/// <param name="value">value to set the property to</param>
-		/// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
-		/// <seealso cref="Scriptable.Get(string, Scriptable)">Scriptable.Get(string, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Has(string, SIScriptable">Scriptable.Has(string, Scriptable)</seealso>
+		/// <seealso cref="Scriptable.Get(string, SIScriptable">Scriptable.Get(string, Scriptable)</seealso>
 		/// <seealso cref="ScriptableObject.PutProperty(Scriptable, string, object)">ScriptableObject.PutProperty(Scriptable, string, object)</seealso>
 		/// <seealso cref="Context.ToObject(object, Scriptable)">Context.ToObject(object, Scriptable)</seealso>
 		void PutConst(string name, Scriptable start, object value);

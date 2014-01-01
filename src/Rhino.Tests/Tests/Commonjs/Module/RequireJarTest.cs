@@ -7,7 +7,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using NUnit.Framework;
 using Rhino;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
@@ -21,7 +23,7 @@ namespace Rhino.Tests.CommonJS.Module
 	public class RequireJarTest : RequireTest
 	{
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public override void TestSandboxed()
 		{
 			Context cx = CreateContext();
@@ -33,7 +35,7 @@ namespace Rhino.Tests.CommonJS.Module
 			try
 			{
 				require.RequireMain(cx, "blah");
-				NUnit.Framework.Assert.Fail();
+				Assert.Fail();
 			}
 			catch (InvalidOperationException)
 			{
@@ -49,26 +51,26 @@ namespace Rhino.Tests.CommonJS.Module
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public override void TestNonSandboxed()
 		{
 			Context cx = CreateContext();
 			Scriptable scope = cx.InitStandardObjects();
 			Require require = GetSandboxedRequire(cx, scope, false);
-			string jsFile = GetType().GetResource("testNonSandboxed.js").ToExternalForm();
+			string jsFile = GetType().Assembly.GetManifestResourceStream("testNonSandboxed.js").ToString();
 			ScriptableObject.PutProperty(scope, "moduleUri", jsFile);
 			require.RequireMain(cx, "testNonSandboxed");
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public override void TestVariousUsageErrors()
 		{
 			TestWithSandboxedRequire("testNoArgsRequire");
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public override void TestRelativeId()
 		{
 			Context cx = CreateContext();
@@ -79,7 +81,7 @@ namespace Rhino.Tests.CommonJS.Module
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
+		[Test]
 		public override void TestSetMainForAlreadyLoadedModule()
 		{
 			Context cx = CreateContext();
@@ -90,11 +92,11 @@ namespace Rhino.Tests.CommonJS.Module
 			try
 			{
 				require.RequireMain(cx, "assert");
-				NUnit.Framework.Assert.Fail();
+				Assert.Fail();
 			}
 			catch (InvalidOperationException e)
 			{
-				NUnit.Framework.Assert.AreEqual(e.Message, "Attempt to set main module after it was loaded");
+				Assert.AreEqual(e.Message, "Attempt to set main module after it was loaded");
 			}
 		}
 
@@ -119,13 +121,13 @@ namespace Rhino.Tests.CommonJS.Module
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		private Require GetSandboxedRequire(Context cx, Scriptable scope, bool sandboxed)
 		{
-			return new Require(cx, cx.InitStandardObjects(), new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(Collections<>.Singleton(GetDirectory()), null)), null, null, true);
+			return new Require(cx, cx.InitStandardObjects(), new StrongCachingModuleScriptProvider(new UrlModuleSourceProvider(new List<Uri> (1) { GetDirectory() }, null)), null, null, true);
 		}
 
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		private Uri GetDirectory()
 		{
-			string jarFileLoc = GetType().GetResource("modules.jar").ToURI().ToString();
+			string jarFileLoc = GetType().GetResource("modules.jar").ToString();
 			string jarParent = "jar:" + jarFileLoc + "!/";
 			return new Uri(jarParent);
 		}

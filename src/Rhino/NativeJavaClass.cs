@@ -32,7 +32,7 @@ namespace Rhino
 	/// <seealso cref="NativeJavaArray">NativeJavaArray</seealso>
 	/// <seealso cref="NativeJavaObject">NativeJavaObject</seealso>
 	/// <seealso cref="NativeJavaPackage">NativeJavaPackage</seealso>
-	[System.Serializable]
+	[Serializable]
 	public class NativeJavaClass : NativeJavaObject, Function
 	{
 		internal const long serialVersionUID = -6460763940409461664L;
@@ -129,7 +129,7 @@ namespace Rhino
 		{
 			if (hint == null || hint == ScriptRuntime.StringClass)
 			{
-				return this.ToString();
+				return ToString();
 			}
 			if (hint == ScriptRuntime.BooleanClass)
 			{
@@ -137,7 +137,7 @@ namespace Rhino
 			}
 			if (hint == ScriptRuntime.NumberClass)
 			{
-				return ScriptRuntime.NaNobj;
+				return ScriptRuntime.NaN;
 			}
 			return this;
 		}
@@ -193,6 +193,7 @@ namespace Rhino
 				string msg = string.Empty;
 				try
 				{
+#if INTERFACE_ADAPTER
 					// When running on Android create an InterfaceAdapter since our
 					// bytecode generation won't work on Dalvik VM.
 					if ("Dalvik".Equals(Runtime.GetProperty("java.vm.name")) && classObject.IsInterface)
@@ -200,6 +201,7 @@ namespace Rhino
 						object obj = CreateInterfaceAdapter(classObject, ScriptableObject.EnsureScriptableObject(args[0]));
 						return cx.GetWrapFactory().WrapAsJavaObject(cx, scope, obj, null);
 					}
+#endif
 					// use JavaAdapter to construct a new class on the fly that
 					// implements/extends this interface/abstract class.
 					object v = topLevel.Get("JavaAdapter", topLevel);
@@ -244,23 +246,23 @@ namespace Rhino
 				{
 					newArgs[i] = Context.JsToJava(args[i], argTypes[i]);
 				}
-				object varArgs;
+				Array varArgs;
 				// Handle special situation where a single variable parameter
 				// is given and it is a Java or ECMA array.
 				if (args.Length == argTypes.Length && (args[args.Length - 1] == null || args[args.Length - 1] is NativeArray || args[args.Length - 1] is NativeJavaArray))
 				{
 					// convert the ECMA array into a native array
-					varArgs = Context.JsToJava(args[args.Length - 1], argTypes[argTypes.Length - 1]);
+					varArgs = (Array) Context.JsToJava(args[args.Length - 1], argTypes[argTypes.Length - 1]);
 				}
 				else
 				{
 					// marshall the variable parameter
 					Type componentType = argTypes[argTypes.Length - 1].GetElementType();
-					varArgs = System.Array.CreateInstance(componentType, args.Length - argTypes.Length + 1);
-					for (int i_1 = 0; i_1 < Sharpen.Runtime.GetArrayLength(varArgs); i_1++)
+					varArgs = Array.CreateInstance(componentType, args.Length - argTypes.Length + 1);
+					for (int i = 0; i < varArgs.Length; i++)
 					{
-						object value = Context.JsToJava(args[argTypes.Length - 1 + i_1], componentType);
-						Sharpen.Runtime.SetArrayValue(varArgs, i_1, value);
+						object value = Context.JsToJava(args[argTypes.Length - 1 + i], componentType);
+						varArgs.SetValue(value, i);
 					}
 				}
 				// add varargs
@@ -279,7 +281,7 @@ namespace Rhino
 					{
 						if (args == origArgs)
 						{
-							args = origArgs.Clone();
+							args = (object[]) origArgs.Clone();
 						}
 						args[i] = x;
 					}
@@ -307,7 +309,7 @@ namespace Rhino
 		/// </remarks>
 		public override bool HasInstance(Scriptable value)
 		{
-			if (value is Wrapper && !(value is Rhino.NativeJavaClass))
+			if (value is Wrapper && !(value is NativeJavaClass))
 			{
 				object instance = ((Wrapper)value).Unwrap();
 				return GetClassObject().IsInstanceOfType(instance);

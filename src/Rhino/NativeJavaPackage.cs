@@ -27,8 +27,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeJavaPackage : ScriptableObject
 	{
-		internal const long serialVersionUID = 7445054382212031523L;
-
 		internal NativeJavaPackage(bool internalUsage, string packageName, ClassLoader classLoader)
 		{
 			this.packageName = packageName;
@@ -159,6 +157,7 @@ namespace Rhino
 			return ToString();
 		}
 
+#if SERIALIZATION
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
 		private void ReadObject(ObjectInputStream @in)
@@ -166,6 +165,7 @@ namespace Rhino
 			@in.DefaultReadObject();
 			this.classLoader = Context.GetCurrentContext().GetApplicationClassLoader();
 		}
+#endif
 
 		public override string ToString()
 		{

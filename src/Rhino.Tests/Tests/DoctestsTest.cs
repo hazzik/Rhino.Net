@@ -9,11 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework.Runners;
-using Rhino;
-using Rhino.Drivers;
+using NUnit.Framework;
 using Rhino.Tools.Shell;
-using Sharpen;
 
 namespace Rhino.Tests
 {
@@ -25,84 +22,49 @@ namespace Rhino.Tests
 	/// expected outputs.
 	/// </remarks>
 	/// <author>Norris Boyd</author>
-	[NUnit.Framework.TestFixture]
-	public class DoctestsTest
+	[TestFixture]
+	public sealed class DoctestsTest
 	{
-		internal static readonly string baseDirectory = "testsrc" + FilePath.separator + "doctests";
+		private const string BaseDirectory = "../../doctests";
 
-		internal const string doctestsExtension = ".doctest";
-
-		internal string name;
-
-		internal string source;
-
-		internal int optimizationLevel;
-
-		public DoctestsTest(string name, string source, int optimizationLevel)
+		/// <exception cref="System.IO.IOException"></exception>
+		private static string LoadFile(FileInfo f)
 		{
-			this.name = name;
-			this.source = source;
-			this.optimizationLevel = optimizationLevel;
-		}
-
-		public static FilePath[] GetDoctestFiles()
-		{
-			return TestUtils.RecursiveListFiles(new FilePath(baseDirectory), new _FileFilter_49());
-		}
-
-		private sealed class _FileFilter_49 : FileFilter
-		{
-			public _FileFilter_49()
+			using (var reader = f.OpenText())
 			{
-			}
-
-			public bool Accept(FilePath f)
-			{
-				return f.GetName().EndsWith(Rhino.Tests.DoctestsTest.doctestsExtension);
+				return reader.ReadToEnd();
 			}
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static string LoadFile(FilePath f)
+		public static IEnumerable<object[]> DoctestValues()
 		{
-			int length = (int)f.Length();
-			// don't worry about very long files
-			char[] buf = new char[length];
-			new FileReader(f).Read(buf, 0, length);
-			return new string(buf);
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
-		[Parameterized.Parameters]
-		public static ICollection<object[]> DoctestValues()
-		{
-			FilePath[] doctests = GetDoctestFiles();
-			IList<object[]> result = new List<object[]>();
-			foreach (FilePath f in doctests)
+			var directory = new DirectoryInfo(BaseDirectory);
+			var doctests = directory.EnumerateFiles("*.doctest", SearchOption.AllDirectories);
+			var result = new List<object[]>();
+			foreach (FileInfo f in doctests)
 			{
-				string contents = LoadFile(f);
-				result.Add(new object[] { f.GetName(), contents, -1 });
-				result.Add(new object[] { f.GetName(), contents, 0 });
-				result.Add(new object[] { f.GetName(), contents, 9 });
+				result.Add(new object[] { f, -1 });
+				result.Add(new object[] { f, 0 });
+				result.Add(new object[] { f, 9 });
 			}
 			return result;
 		}
 
 		// move "@Parameters" to this method to test a single doctest
 		/// <exception cref="System.IO.IOException"></exception>
-		public static ICollection<object[]> SingleDoctest()
+		public static IEnumerable<object[]> SingleDoctest()
 		{
-			IList<object[]> result = new List<object[]>();
-			FilePath f = new FilePath(baseDirectory, "Counter.doctest");
-			string contents = LoadFile(f);
-			result.Add(new object[] { f.GetName(), contents, -1 });
-			return result;
+			FileInfo f = new FileInfo(BaseDirectory + "/" + "Counter.doctest");
+			return new[] { new object[] { f, -1 } };
 		}
 
 		/// <exception cref="System.Exception"></exception>
-		[NUnit.Framework.Test]
-		public virtual void RunDoctest()
+		[TestCaseSource("DoctestValues")]
+		//[TestCaseSource("SingleDoctest")] // uncomment this to test a single doctest
+		public void RunDoctest(FileInfo file, int optimizationLevel)
 		{
+			var source =  LoadFile(file);
 			ContextFactory factory = ContextFactory.GetGlobal();
 			Context cx = factory.EnterContext();
 			try
@@ -110,13 +72,13 @@ namespace Rhino.Tests
 				cx.SetOptimizationLevel(optimizationLevel);
 				Global global = new Global(cx);
 				// global.runDoctest throws an exception on any failure
-				int testsPassed = global.RunDoctest(cx, global, source, name, 1);
-				System.Console.Out.WriteLine(name + "(" + optimizationLevel + "): " + testsPassed + " passed.");
-				NUnit.Framework.Assert.IsTrue(testsPassed > 0);
+				int testsPassed = global.RunDoctest(cx, global, source, file.Name, 1);
+				Console.Out.WriteLine(file.Name + "(" + optimizationLevel + "): " + testsPassed + " passed.");
+				Assert.IsTrue(testsPassed > 0);
 			}
 			catch (Exception ex)
 			{
-				System.Console.Out.WriteLine(name + "(" + optimizationLevel + "): FAILED due to " + ex);
+				Console.Out.WriteLine(file.Name + "(" + optimizationLevel + "): FAILED due to " + ex);
 				throw;
 			}
 			finally

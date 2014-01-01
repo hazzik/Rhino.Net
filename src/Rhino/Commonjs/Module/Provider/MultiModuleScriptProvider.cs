@@ -8,8 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using Rhino;
-using Rhino.CommonJS.Module;
+using System.Linq;
 using Sharpen;
 
 namespace Rhino.CommonJS.Module.Provider
@@ -29,12 +28,7 @@ namespace Rhino.CommonJS.Module.Provider
 		/// <param name="providers">the providers to multiplex.</param>
 		public MultiModuleScriptProvider(IEnumerable<ModuleScriptProvider> providers)
 		{
-			IList<ModuleScriptProvider> l = new List<ModuleScriptProvider>();
-			foreach (ModuleScriptProvider provider in providers)
-			{
-				l.Add(provider);
-			}
-			this.providers = Sharpen.Collections.ToArray(l, new ModuleScriptProvider[l.Count]);
+			this.providers = providers.ToArray();
 		}
 
 		/// <exception cref="System.Exception"></exception>
