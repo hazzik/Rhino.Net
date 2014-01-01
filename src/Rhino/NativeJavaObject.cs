@@ -90,7 +90,7 @@ namespace Rhino
 
 		public virtual object Get(int index, Scriptable start)
 		{
-			throw members.ReportMemberNotFound(Sharpen.Extensions.ToString(index));
+			throw members.ReportMemberNotFound(index.ToString());
 		}
 
 		public virtual void Put(string name, Scriptable start, object value)
@@ -110,7 +110,7 @@ namespace Rhino
 
 		public virtual void Put(int index, Scriptable start, object value)
 		{
-			throw members.ReportMemberNotFound(Sharpen.Extensions.ToString(index));
+			throw members.ReportMemberNotFound(index.ToString());
 		}
 
 		public virtual bool HasInstance(Scriptable value)

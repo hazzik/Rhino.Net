@@ -993,7 +993,7 @@ namespace Rhino
 			}
 			if ((@base < 2) || (@base > 36))
 			{
-				throw Context.ReportRuntimeError1("msg.bad.radix", Sharpen.Extensions.ToString(@base));
+				throw Context.ReportRuntimeError1("msg.bad.radix", @base.ToString());
 			}
 			if (@base != 10)
 			{

@@ -2322,7 +2322,7 @@ namespace Rhino.Tools.Debugger
 			FontMetrics metrics = GetFontMetrics(font);
 			int h = metrics.GetHeight();
 			int lineCount = textArea.GetLineCount() + 1;
-			string dummy = Sharpen.Extensions.ToString(lineCount);
+			string dummy = lineCount.ToString();
 			if (dummy.Length < 2)
 			{
 				dummy = "99";
@@ -2349,7 +2349,7 @@ namespace Rhino.Tools.Debugger
 			int ascent = metrics.GetMaxAscent();
 			int h = metrics.GetHeight();
 			int lineCount = textArea.GetLineCount() + 1;
-			string dummy = Sharpen.Extensions.ToString(lineCount);
+			string dummy = lineCount.ToString();
 			if (dummy.Length < 2)
 			{
 				dummy = "99";
@@ -2373,7 +2373,7 @@ namespace Rhino.Tools.Debugger
 				{
 				}
 				bool isBreakPoint = fileWindow.IsBreakPoint(i + 1);
-				text = Sharpen.Extensions.ToString(i + 1) + " ";
+				text = (i + 1).ToString() + " ";
 				int y = i * h;
 				g.SetColor(Color.blue);
 				g.DrawString(text, 0, y + ascent);

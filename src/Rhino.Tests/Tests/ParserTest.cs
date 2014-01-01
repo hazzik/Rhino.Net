@@ -936,7 +936,7 @@ namespace Rhino.Tests
 			string js = string.Empty;
 			for (int i = 0; i < 100; i++)
 			{
-				string stri = Sharpen.Extensions.ToString(i);
+				string stri = i.ToString();
 				js += "/** Some comment for a" + stri + " */" + "var a" + stri + " = " + stri + ";\n";
 			}
 			AstRoot root = ParseAsReader(js);

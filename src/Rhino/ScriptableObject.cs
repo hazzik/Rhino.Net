@@ -2461,7 +2461,7 @@ namespace Rhino
 			{
 				return;
 			}
-			string str = (name != null) ? name : Sharpen.Extensions.ToString(index);
+			string str = (name != null) ? name : index.ToString();
 			throw Context.ReportRuntimeError1("msg.modify.sealed", str);
 		}
 
@@ -3130,7 +3130,7 @@ namespace Rhino
 			ScriptableObject.Slot slot = GetSlot(name, index, accessType);
 			if (slot == null)
 			{
-				string str = (name != null ? name : Sharpen.Extensions.ToString(index));
+				string str = (name != null ? name : index.ToString());
 				throw Context.ReportRuntimeError1("msg.prop.not.found", str);
 			}
 			return slot;

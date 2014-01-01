@@ -124,7 +124,7 @@ namespace Rhino.Tools.Idswitch
 
 		public virtual void P(int i)
 		{
-			P(Sharpen.Extensions.ToString(i));
+			P(i.ToString());
 		}
 
 		public virtual void Qchar(int c)
