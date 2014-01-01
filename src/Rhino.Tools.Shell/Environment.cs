@@ -99,7 +99,7 @@ namespace Rhino.Tools.Shell
 			}
 			else
 			{
-				Runtime.GetProperties().Put(name, ScriptRuntime.ToString(value));
+				Runtime.GetProperties() [name] = ScriptRuntime.ToString(value);
 			}
 		}
 

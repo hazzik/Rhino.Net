@@ -180,7 +180,7 @@ namespace Rhino.Optimizer
 								{
 									possibleDirectCalls = new Dictionary<string, OptFunctionNode>();
 								}
-								possibleDirectCalls.Put(name, ofn);
+								possibleDirectCalls [name] = ofn;
 							}
 						}
 					}
@@ -3682,9 +3682,9 @@ namespace Rhino.Optimizer
 					finallys = new Dictionary<Node, BodyCodegen.FinallyReturnPoint>();
 				}
 				// add the finally target to hashtable
-				finallys.Put(finallyTarget, ret);
+				finallys [finallyTarget] = ret;
 				// add the finally node as well to the hash table
-				finallys.Put(finallyTarget.GetNext(), ret);
+				finallys [finallyTarget.GetNext()] = ret;
 			}
 			while (child != null)
 			{

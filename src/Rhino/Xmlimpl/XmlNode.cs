@@ -434,13 +434,13 @@ namespace Rhino.XmlImpl
 			{
 				if (map.Get(n.prefix) == null)
 				{
-					map.Put(n.prefix, n.uri);
+					map [n.prefix] = n.uri;
 				}
 				//    TODO    I think this is analogous to the other way, but have not really thought it through ... should local scope
 				//            matter more than outer scope?
 				if (uriToPrefix.Get(n.uri) == null)
 				{
-					uriToPrefix.Put(n.uri, n.prefix);
+					uriToPrefix [n.uri] = n.prefix;
 				}
 			}
 

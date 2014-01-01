@@ -118,7 +118,7 @@ namespace Rhino.Optimizer
 							Block.FatBlock fb = NewFatBlock(beginNodeIndex, i - 1);
 							if (statementNodes[beginNodeIndex].GetType() == Token.TARGET)
 							{
-								theTargetBlocks.Put(statementNodes[beginNodeIndex], fb);
+								theTargetBlocks [statementNodes[beginNodeIndex]] = fb;
 							}
 							theBlocks.Add(fb);
 							// start the next block at this node
@@ -134,7 +134,7 @@ namespace Rhino.Optimizer
 						Block.FatBlock fb = NewFatBlock(beginNodeIndex, i);
 						if (statementNodes[beginNodeIndex].GetType() == Token.TARGET)
 						{
-							theTargetBlocks.Put(statementNodes[beginNodeIndex], fb);
+							theTargetBlocks [statementNodes[beginNodeIndex]] = fb;
 						}
 						theBlocks.Add(fb);
 						// start the next block at the next node
@@ -148,7 +148,7 @@ namespace Rhino.Optimizer
 				Block.FatBlock fb = NewFatBlock(beginNodeIndex, statementNodes.Length - 1);
 				if (statementNodes[beginNodeIndex].GetType() == Token.TARGET)
 				{
-					theTargetBlocks.Put(statementNodes[beginNodeIndex], fb);
+					theTargetBlocks [statementNodes[beginNodeIndex]] = fb;
 				}
 				theBlocks.Add(fb);
 			}

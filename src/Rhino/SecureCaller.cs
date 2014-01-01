@@ -49,7 +49,7 @@ namespace Rhino
 				if (classLoaderMap == null)
 				{
 					classLoaderMap = new WeakHashMap<ClassLoader, SoftReference<SecureCaller>>();
-					callers.Put(codeSource, classLoaderMap);
+					callers [codeSource] = classLoaderMap;
 				}
 			}
 			SecureCaller caller;
@@ -71,7 +71,7 @@ namespace Rhino
 						// Run in doPrivileged as we'll be checked for
 						// "createClassLoader" runtime permission
 						caller = (SecureCaller)AccessController.DoPrivileged(new _PrivilegedExceptionAction_82(classLoader, codeSource));
-						classLoaderMap.Put(classLoader, new SoftReference<SecureCaller>(caller));
+						classLoaderMap [classLoader] = new SoftReference<SecureCaller>(caller);
 					}
 					catch (PrivilegedActionException ex)
 					{

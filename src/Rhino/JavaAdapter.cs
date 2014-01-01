@@ -363,7 +363,7 @@ namespace Rhino
 				adapterClass = LoadAdapterClass(adapterName, code);
 				if (cache.IsCachingEnabled())
 				{
-					generated.Put(sig, adapterClass);
+					generated [sig] = adapterClass;
 				}
 			}
 			return adapterClass;

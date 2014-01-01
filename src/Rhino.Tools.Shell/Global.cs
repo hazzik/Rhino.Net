@@ -568,7 +568,7 @@ namespace Rhino.Tools.Shell
 				string mapping = doctestCanonicalizations.Get(expectedGroup);
 				if (mapping == null)
 				{
-					doctestCanonicalizations.Put(expectedGroup, actualGroup);
+					((IDictionary<,>) doctestCanonicalizations) [expectedGroup] = actualGroup;
 					expected = expected.Replace(expectedGroup, actualGroup);
 				}
 				else
@@ -767,8 +767,8 @@ namespace Rhino.Tools.Shell
 							else
 							{
 								int ikey = System.Convert.ToInt32(keyObj);
-							    key = ikey.ToString();
-							    val = ScriptableObject.GetProperty(envHash, ikey);
+								key = ikey.ToString();
+								val = ScriptableObject.GetProperty(envHash, ikey);
 							}
 							if (val == ScriptableObject.NOT_FOUND)
 							{

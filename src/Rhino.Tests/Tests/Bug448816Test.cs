@@ -28,10 +28,10 @@ namespace Rhino.Tests
 		{
 			// set up a reference map
 			reference = new LinkedHashMap<object, object>();
-			reference.Put("a", "a");
-			reference.Put("b", true);
-			reference.Put("c", new Dictionary<object, object>());
-			reference.Put(1, 42);
+			reference ["a"] = "a";
+			reference ["b"] = true;
+			reference ["c"] = new Dictionary<object, object>();
+			reference [1] = 42;
 			// get a js object as map
 			Context context = Context.Enter();
 			ScriptableObject scope = context.InitStandardObjects();

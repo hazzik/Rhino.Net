@@ -182,7 +182,7 @@ namespace Rhino.Tools.Debugger
 		{
 			if (frame != this)
 			{
-				toplevels.Put(key, frame);
+				toplevels [key] = frame;
 			}
 		}
 
@@ -521,7 +521,7 @@ namespace Rhino.Tools.Debugger
 			bool activate = true;
 			string url = sourceInfo.Url();
 			FileWindow w = new FileWindow(this, sourceInfo);
-			fileWindows.Put(url, w);
+			fileWindows [url] = w;
 			if (line != -1)
 			{
 				if (currentWindow != null)

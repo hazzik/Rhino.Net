@@ -451,7 +451,7 @@ check_break: ;
 				object current = h.Get(key);
 				if (current == null)
 				{
-					h.Put(key, initialValue);
+					h [key] = initialValue;
 				}
 				else
 				{

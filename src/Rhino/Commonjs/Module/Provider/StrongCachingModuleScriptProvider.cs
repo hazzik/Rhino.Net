@@ -46,7 +46,7 @@ namespace Rhino.CommonJS.Module.Provider
 
 		protected internal override void PutLoadedModule(string moduleId, ModuleScript moduleScript, object validator)
 		{
-			modules.Put(moduleId, new CachingModuleScriptProviderBase.CachedModuleScript(moduleScript, validator));
+			modules [moduleId] = new CachingModuleScriptProviderBase.CachedModuleScript(moduleScript, validator);
 		}
 	}
 }

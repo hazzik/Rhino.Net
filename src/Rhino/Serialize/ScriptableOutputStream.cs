@@ -49,7 +49,7 @@ namespace Rhino.Serialize
 			// API class
 			this.scope = scope;
 			table = new Dictionary<object, string>();
-			table.Put(scope, string.Empty);
+			table [scope] = string.Empty;
 			EnableReplaceObject(true);
 			ExcludeStandardObjectNames();
 		}
@@ -94,7 +94,7 @@ namespace Rhino.Serialize
 				{
 					throw new ArgumentException("Object for excluded name " + name + " is not a Scriptable, it is " + obj.GetType().FullName);
 				}
-				table.Put(obj, name);
+				table [obj] = name;
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace Rhino.Serialize
 			{
 				throw new ArgumentException("Object for excluded name " + name + " not found.");
 			}
-			table.Put(obj, name);
+			table [obj] = name;
 		}
 
 		/// <summary>Returns true if the name is excluded from serialization.</summary>

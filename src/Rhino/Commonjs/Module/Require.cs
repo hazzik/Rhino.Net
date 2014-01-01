@@ -334,7 +334,7 @@ namespace Rhino.CommonJS.Module
 				// "require" must contain at least the exports that the foreign
 				// module has prepared before the call to require that led to the
 				// current module's execution."
-				threadLoadingModules.Put(id, exports);
+				threadLoadingModules [id] = exports;
 				try
 				{
 					// Support non-standard Node.js feature to allow modules to
@@ -342,7 +342,7 @@ namespace Rhino.CommonJS.Module
 					Scriptable newExports = ExecuteModuleScript(cx, id, exports, moduleScript, isMain);
 					if (exports != newExports)
 					{
-						threadLoadingModules.Put(id, newExports);
+						threadLoadingModules [id] = newExports;
 						exports = newExports;
 					}
 				}

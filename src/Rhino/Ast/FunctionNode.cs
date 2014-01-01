@@ -381,7 +381,7 @@ namespace Rhino.Ast
 			{
 				liveLocals = new Dictionary<Node, int[]>();
 			}
-			liveLocals.Put(node, locals);
+			liveLocals [node] = locals;
 		}
 
 		public override int AddFunction(Rhino.Ast.FunctionNode fnNode)

@@ -206,7 +206,7 @@ namespace Rhino
 					{
 						interfaceAdapterCache = new ConcurrentHashMap<Type, object>(16, 0.75f, 1);
 					}
-					interfaceAdapterCache.Put(cl, iadapter);
+					interfaceAdapterCache [cl] = iadapter;
 				}
 			}
 		}

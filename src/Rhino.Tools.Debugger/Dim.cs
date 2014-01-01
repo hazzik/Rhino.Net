@@ -397,14 +397,14 @@ openStream_break: ;
 				{
 					sourceInfo.CopyBreakpointsFrom(old);
 				}
-				urlToSourceInfo.Put(url, sourceInfo);
+				urlToSourceInfo [url] = sourceInfo;
 				for (int i = 0; i != sourceInfo.FunctionSourcesTop(); ++i)
 				{
 					Dim.FunctionSource fsource = sourceInfo.FunctionSource(i);
 					string name = fsource.Name();
 					if (name.Length != 0)
 					{
-						functionNames.Put(name, fsource);
+						functionNames [name] = fsource;
 					}
 				}
 			}
@@ -413,7 +413,7 @@ openStream_break: ;
 				for (int i = 0; i != functions.Length; ++i)
 				{
 					Dim.FunctionSource fsource = sourceInfo.FunctionSource(i);
-					functionToSource.Put(functions[i], fsource);
+					functionToSource [functions[i]] = fsource;
 				}
 			}
 			callback.UpdateSourceText(sourceInfo);

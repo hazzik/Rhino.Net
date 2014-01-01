@@ -75,7 +75,7 @@ namespace Rhino.CommonJS.Module.Provider
 
 		protected internal override void PutLoadedModule(string moduleId, ModuleScript moduleScript, object validator)
 		{
-			scripts.Put(moduleId, new SoftCachingModuleScriptProvider.ScriptReference(moduleScript.GetScript(), moduleId, moduleScript.GetUri(), moduleScript.GetBase(), validator, scriptRefQueue));
+			scripts [moduleId] = new SoftCachingModuleScriptProvider.ScriptReference(moduleScript.GetScript(), moduleId, moduleScript.GetUri(), moduleScript.GetBase(), validator, scriptRefQueue);
 		}
 
 		private class ScriptReference : SoftReference<Script>
@@ -135,7 +135,7 @@ namespace Rhino.CommonJS.Module.Provider
 				CachingModuleScriptProviderBase.CachedModuleScript cachedModuleScript = entry.Value.GetCachedModuleScript();
 				if (cachedModuleScript != null)
 				{
-					serScripts.Put(entry.Key, cachedModuleScript);
+					serScripts [entry.Key] = cachedModuleScript;
 				}
 			}
 			@out.WriteObject(serScripts);

@@ -864,7 +864,7 @@ bodyLoop_break: ;
 					}
 					string pname = currentScriptOrFn.GetNextTempName();
 					DefineSymbol(Token.LP, pname, false);
-					destructuring.Put(pname, expr);
+					destructuring [pname] = expr;
 				}
 				else
 				{
@@ -2181,7 +2181,7 @@ switchLoop_break: ;
 				}
 			}
 			bundle.AddLabel(label);
-			labelSet.Put(name, bundle);
+			labelSet [name] = bundle;
 		}
 
 		/// <summary>Found a name in a statement context.</summary>

@@ -310,7 +310,7 @@ namespace Rhino
 					NativeJavaConstructor fun = new NativeJavaConstructor(methodOrCtor);
 					fun.SetPrototype(prototype);
 					member = fun;
-					ht.Put(name, fun);
+					ht [name] = fun;
 				}
 				else
 				{
@@ -320,7 +320,7 @@ namespace Rhino
 					{
 						NativeJavaMethod fun = new NativeJavaMethod(methodOrCtor, name);
 						fun.SetPrototype(prototype);
-						ht.Put(name, fun);
+						ht [name] = fun;
 						member = fun;
 					}
 				}
@@ -366,7 +366,7 @@ namespace Rhino
 											if (includePrivate && !method.IsAccessible())
 											{
 											}
-											map.Put(sig, method);
+											map [sig] = method;
 										}
 									}
 								}
@@ -383,7 +383,7 @@ namespace Rhino
 									JavaMembers.MethodSignature sig = new JavaMembers.MethodSignature(method);
 									if (!map.ContainsKey(sig))
 									{
-										map.Put(sig, method);
+										map [sig] = method;
 									}
 								}
 								break;
@@ -401,7 +401,7 @@ namespace Rhino
 							// Array may contain methods with same signature but different return value!
 							if (!map.ContainsKey(sig))
 							{
-								map.Put(sig, method);
+								map [sig] = method;
 							}
 						}
 					}
@@ -472,7 +472,7 @@ namespace Rhino
 				object value = ht.Get(name);
 				if (value == null)
 				{
-					ht.Put(name, method);
+					ht [name] = method;
 				}
 				else
 				{
@@ -491,7 +491,7 @@ namespace Rhino
 						// staticMembers and members can only contain methods
 						overloadedMethods = new ObjArray();
 						overloadedMethods.Add(value);
-						ht.Put(name, overloadedMethods);
+						ht [name] = overloadedMethods;
 					}
 					overloadedMethods.Add(method);
 				}
@@ -531,7 +531,7 @@ namespace Rhino
 					{
 						ScriptRuntime.SetFunctionProtoAndParent(fun, scope);
 					}
-					ht.Put(entry.Key, fun);
+					ht [entry.Key] = fun;
 				}
 			}
 			// Reflect fields.
@@ -546,7 +546,7 @@ namespace Rhino
 					object member = ht.Get(name);
 					if (member == null)
 					{
-						ht.Put(name, field);
+						ht [name] = field;
 					}
 					else
 					{
@@ -567,8 +567,8 @@ namespace Rhino
 									fieldAndMethods = fmht;
 								}
 							}
-							fmht.Put(name, fam);
-							ht.Put(name, fam);
+							fmht [name] = fam;
+							ht [name] = fam;
 						}
 						else
 						{
@@ -583,7 +583,7 @@ namespace Rhino
 								// explicitly shadows it.
 								if (oldField.DeclaringType.IsAssignableFrom(field.DeclaringType))
 								{
-									ht.Put(name, field);
+									ht [name] = field;
 								}
 							}
 							else
@@ -695,14 +695,14 @@ namespace Rhino
 						}
 						// Make the property.
 						BeanProperty bp = new BeanProperty(getter, setter, setters);
-						toAdd.Put(beanPropertyName, bp);
+						toAdd [beanPropertyName] = bp;
 					}
 				}
 				// Add the new bean properties.
 				foreach (string key in toAdd.Keys)
 				{
 					object value = toAdd.Get(key);
-					ht.Put(key, value);
+					ht [key] = value;
 				}
 			}
 			// Reflect constructors
@@ -883,7 +883,7 @@ namespace Rhino
 			{
 				FieldAndMethods famNew = new FieldAndMethods(scope, fam.methods, fam.field);
 				famNew.javaObject = javaObject;
-				result.Put(fam.field.Name, famNew);
+				result [fam.field.Name] = famNew;
 			}
 			return result;
 		}
@@ -903,7 +903,7 @@ namespace Rhino
 					{
 						// member lookup for the original class failed because of
 						// missing privileges, cache the result so we don't try again
-						ct.Put(dynamicType, members);
+						ct [dynamicType] = members;
 					}
 					return members;
 				}
@@ -945,12 +945,12 @@ namespace Rhino
 			}
 			if (cache.IsCachingEnabled())
 			{
-				ct.Put(cl, members);
+				ct [cl] = members;
 				if (cl != dynamicType)
 				{
 					// member lookup for the original class failed because of
 					// missing privileges, cache the result so we don't try again
-					ct.Put(dynamicType, members);
+					ct [dynamicType] = members;
 				}
 			}
 			return members;

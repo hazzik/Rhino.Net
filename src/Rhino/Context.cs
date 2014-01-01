@@ -2097,7 +2097,7 @@ namespace Rhino
 				{
 					threadLocalMap = new Dictionary<object, object>();
 				}
-				threadLocalMap.Put(key, value);
+				threadLocalMap [key] = value;
 			}
 		}
 

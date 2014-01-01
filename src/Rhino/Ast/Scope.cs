@@ -184,7 +184,7 @@ namespace Rhino.Ast
 			{
 				Symbol sym = entry.Value;
 				sym.SetContainingTable(dest);
-				dst.Put(entry.Key, sym);
+				dst [entry.Key] = sym;
 			}
 		}
 
@@ -233,7 +233,7 @@ namespace Rhino.Ast
 				throw new ArgumentException("null symbol name");
 			}
 			EnsureSymbolTable();
-			symbolTable.Put(symbol.GetName(), symbol);
+			symbolTable [symbol.GetName()] = symbol;
 			symbol.SetContainingTable(this);
 			top.AddSymbol(symbol);
 		}
