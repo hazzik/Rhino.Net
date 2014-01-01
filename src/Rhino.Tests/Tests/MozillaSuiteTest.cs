@@ -121,7 +121,7 @@ namespace Rhino.Tests
 				FilePath[] tests = GetTestFiles(optLevels[i]);
 				foreach (FilePath f in tests)
 				{
-					result.AddItem(new object[] { f, optLevels[i] });
+					result.Add(new object[] { f, optLevels[i] });
 				}
 			}
 			return result;
@@ -135,7 +135,7 @@ namespace Rhino.Tests
 			int SINGLE_TEST_OPTIMIZATION_LEVEL = -1;
 			IList<object[]> result = new List<object[]>();
 			FilePath f = new FilePath(GetTestDir(), SINGLE_TEST_FILE);
-			result.AddItem(new object[] { f, SINGLE_TEST_OPTIMIZATION_LEVEL });
+			result.Add(new object[] { f, SINGLE_TEST_OPTIMIZATION_LEVEL });
 			return result;
 		}
 
@@ -236,7 +236,7 @@ namespace Rhino.Tests
 							// strip off testDir
 							string canonicalized = Sharpen.Runtime.Substring(testFile.GetAbsolutePath(), absolutePathLength);
 							canonicalized = canonicalized.Replace('\\', '/');
-							skippedPassed.AddItem(canonicalized);
+							skippedPassed.Add(canonicalized);
 						}
 						catch
 						{

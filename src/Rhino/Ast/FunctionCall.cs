@@ -129,7 +129,7 @@ namespace Rhino.Ast
 			{
 				arguments = new List<AstNode>();
 			}
-			arguments.AddItem(arg);
+			arguments.Add(arg);
 			arg.SetParent(this);
 		}
 

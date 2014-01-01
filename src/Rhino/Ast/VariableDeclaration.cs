@@ -112,7 +112,7 @@ namespace Rhino.Ast
 		public virtual void AddVariable(VariableInitializer v)
 		{
 			AssertNotNull(v);
-			variables.AddItem(v);
+			variables.Add(v);
 			v.SetParent(this);
 		}
 

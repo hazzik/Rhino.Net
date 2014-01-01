@@ -682,7 +682,7 @@ namespace Rhino.Tools.Debugger
 				string location = "\"" + shortName + "\", line " + lineNumber;
 				ctx.InsertItemAt(location, i);
 				location = "\"" + url + "\", line " + lineNumber;
-				toolTips.AddItem(location);
+				toolTips.Add(location);
 			}
 			context.EnableUpdate();
 			ctx.SetSelectedIndex(0);
@@ -1288,7 +1288,7 @@ namespace Rhino.Tools.Debugger
 				{
 					if (text.Trim().Length > 0)
 					{
-						history.AddItem(text);
+						history.Add(text);
 						historyIndex = history.Count;
 					}
 					Append("\n");
@@ -2739,8 +2739,8 @@ namespace Rhino.Tools.Debugger
 			this.debugGui = debugGui;
 			expressions = Sharpen.Collections.SynchronizedList(new List<string>());
 			values = Sharpen.Collections.SynchronizedList(new List<string>());
-			expressions.AddItem(string.Empty);
-			values.AddItem(string.Empty);
+			expressions.Add(string.Empty);
+			values.Add(string.Empty);
 		}
 
 		/// <summary>Returns the number of columns in the table (2).</summary>
@@ -2825,8 +2825,8 @@ namespace Rhino.Tools.Debugger
 					UpdateModel();
 					if (row + 1 == expressions.Count)
 					{
-						expressions.AddItem(string.Empty);
-						values.AddItem(string.Empty);
+						expressions.Add(string.Empty);
+						values.Add(string.Empty);
 						FireTableRowsInserted(row + 1, row + 1);
 					}
 					break;
@@ -3863,11 +3863,11 @@ namespace Rhino.Tools.Debugger
 				}
 				if (i_3 != 0)
 				{
-					interruptOnlyItems.AddItem(item);
+					interruptOnlyItems.Add(item);
 				}
 				else
 				{
-					runOnlyItems.AddItem(item);
+					runOnlyItems.Add(item);
 				}
 				debugMenu.Add(item);
 			}

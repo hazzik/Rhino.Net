@@ -98,7 +98,7 @@ namespace Rhino.Ast
 		public virtual void AddLoop(GeneratorExpressionLoop acl)
 		{
 			AssertNotNull(acl);
-			loops.AddItem(acl);
+			loops.Add(acl);
 			acl.SetParent(this);
 		}
 

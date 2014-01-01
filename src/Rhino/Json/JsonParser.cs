@@ -239,7 +239,7 @@ namespace Rhino.Json
 						{
 							throw new JsonParser.ParseException("Missing comma in array literal");
 						}
-						list.AddItem(ReadValue());
+						list.Add(ReadValue());
 						needsComma = true;
 						break;
 					}

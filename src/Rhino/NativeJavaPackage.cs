@@ -153,7 +153,7 @@ namespace Rhino
 						{
 							negativeCache = new HashSet<string>();
 						}
-						negativeCache.AddItem(name);
+						negativeCache.Add(name);
 					}
 				}
 				if (newValue != null)

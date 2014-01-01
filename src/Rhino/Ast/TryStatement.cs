@@ -141,7 +141,7 @@ namespace Rhino.Ast
 			{
 				catchClauses = new List<CatchClause>();
 			}
-			catchClauses.AddItem(clause);
+			catchClauses.Add(clause);
 			clause.SetParent(this);
 		}
 

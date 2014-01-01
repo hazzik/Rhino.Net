@@ -105,7 +105,7 @@ namespace Rhino.Ast
 		public virtual void AddLoop(ArrayComprehensionLoop acl)
 		{
 			AssertNotNull(acl);
-			loops.AddItem(acl);
+			loops.Add(acl);
 			acl.SetParent(this);
 		}
 

@@ -251,7 +251,7 @@ namespace Rhino.Ast
 			{
 				functions = new List<FunctionNode>();
 			}
-			functions.AddItem(fnNode);
+			functions.Add(fnNode);
 			return functions.Count - 1;
 		}
 
@@ -282,7 +282,7 @@ namespace Rhino.Ast
 			{
 				regexps = new List<RegExpLiteral>();
 			}
-			regexps.AddItem(re);
+			regexps.Add(re);
 			re.PutIntProp(REGEXP_PROP, regexps.Count - 1);
 		}
 
@@ -348,7 +348,7 @@ namespace Rhino.Ast
 			{
 				paramCount++;
 			}
-			symbols.AddItem(symbol);
+			symbols.Add(symbol);
 		}
 
 		public virtual IList<Symbol> GetSymbols()
@@ -386,7 +386,7 @@ namespace Rhino.Ast
 						Symbol symbol = symbols[i];
 						if (symbol.GetContainingTable() == this)
 						{
-							newSymbols.AddItem(symbol);
+							newSymbols.Add(symbol);
 						}
 					}
 				}

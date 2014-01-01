@@ -436,7 +436,7 @@ namespace Rhino
 					{
 						skipIndexes = new List<int>();
 					}
-					skipIndexes.AddItem(i);
+					skipIndexes.Add(i);
 				}
 				if (i < elems.Count - 1)
 				{
@@ -485,7 +485,7 @@ namespace Rhino
 				IList<Node> kids = new List<Node>();
 				foreach (Node kid in node)
 				{
-					kids.AddItem(Transform((AstNode)kid));
+					kids.Add(Transform((AstNode)kid));
 				}
 				node.RemoveChildren();
 				foreach (Node kid_1 in kids)

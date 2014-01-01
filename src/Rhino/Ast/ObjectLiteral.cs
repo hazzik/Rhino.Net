@@ -120,7 +120,7 @@ namespace Rhino.Ast
 			{
 				elements = new List<ObjectProperty>();
 			}
-			elements.AddItem(element);
+			elements.Add(element);
 			element.SetParent(this);
 		}
 

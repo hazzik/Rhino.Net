@@ -493,7 +493,7 @@ namespace Rhino.Tools.Idswitch
 			string value = new string(array, id_start, id_end - id_start);
 			IdValuePair pair = new IdValuePair(name, value);
 			pair.SetLineNumber(body.GetLineNumber());
-			all_pairs.AddItem(pair);
+			all_pairs.Add(pair);
 		}
 
 		private static bool Is_white_space(int c)

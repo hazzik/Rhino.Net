@@ -2854,7 +2854,7 @@ namespace Rhino
 			{
 				activationNames = new HashSet<string>();
 			}
-			activationNames.AddItem(name);
+			activationNames.Add(name);
 		}
 
 		/// <summary>

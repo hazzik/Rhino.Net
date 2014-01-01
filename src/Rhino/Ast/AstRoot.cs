@@ -110,7 +110,7 @@ namespace Rhino.Ast
 			{
 				comments = new TreeSet<Comment>(new AstNode.PositionComparator());
 			}
-			comments.AddItem(comment);
+			comments.Add(comment);
 			comment.SetParent(this);
 		}
 

@@ -3062,7 +3062,7 @@ namespace Rhino.Optimizer
 			AddGoto(target, ByteCode.GOTO);
 			int retLabel = cfw.AcquireLabel();
 			cfw.MarkLabel(retLabel);
-			ret.jsrPoints.AddItem(Sharpen.Extensions.ValueOf(retLabel));
+			ret.jsrPoints.Add(Sharpen.Extensions.ValueOf(retLabel));
 		}
 
 		private void GenerateArrayLiteralFactory(Node node, int count)
@@ -3103,7 +3103,7 @@ namespace Rhino.Optimizer
 				{
 					literals = new List<Node>();
 				}
-				literals.AddItem(node);
+				literals.Add(node);
 				string methodName = codegen.GetBodyMethodName(scriptOrFn) + "_literal" + literals.Count;
 				cfw.AddALoad(funObjLocal);
 				cfw.AddALoad(contextLocal);
@@ -3150,7 +3150,7 @@ namespace Rhino.Optimizer
 				{
 					literals = new List<Node>();
 				}
-				literals.AddItem(node);
+				literals.Add(node);
 				string methodName = codegen.GetBodyMethodName(scriptOrFn) + "_literal" + literals.Count;
 				cfw.AddALoad(funObjLocal);
 				cfw.AddALoad(contextLocal);
@@ -3880,7 +3880,7 @@ namespace Rhino.Optimizer
 			{
 				Node fBlock = this._enclosing.GetFinallyAtTarget(node.GetFinally());
 				BodyCodegen.ExceptionManager.ExceptionInfo ei = new BodyCodegen.ExceptionManager.ExceptionInfo(this, node, fBlock);
-				this.exceptionInfo.AddItem(ei);
+				this.exceptionInfo.Add(ei);
 			}
 
 			/// <summary>

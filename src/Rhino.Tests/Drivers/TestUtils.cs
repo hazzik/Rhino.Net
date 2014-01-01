@@ -56,7 +56,7 @@ namespace Rhino.Drivers
 				{
 					if (filter.Accept(f))
 					{
-						fileList.AddItem(f);
+						fileList.Add(f);
 					}
 				}
 			}
@@ -75,7 +75,7 @@ namespace Rhino.Drivers
 			props.Load(@in);
 			foreach (object obj in props.Keys)
 			{
-				list.AddItem(obj.ToString());
+				list.Add(obj.ToString());
 			}
 		}
 

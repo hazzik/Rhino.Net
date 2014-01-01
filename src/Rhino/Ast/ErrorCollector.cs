@@ -45,7 +45,7 @@ namespace Rhino.Ast
 		/// <inheritDoc></inheritDoc>
 		public virtual void Warning(string message, string sourceName, int offset, int length)
 		{
-			errors.AddItem(new ParseProblem(ParseProblem.Type.Warning, message, sourceName, offset, length));
+			errors.Add(new ParseProblem(ParseProblem.Type.Warning, message, sourceName, offset, length));
 		}
 
 		/// <summary>This is not called during AST generation.</summary>
@@ -63,7 +63,7 @@ namespace Rhino.Ast
 		/// <inheritDoc></inheritDoc>
 		public virtual void Error(string message, string sourceName, int fileOffset, int length)
 		{
-			errors.AddItem(new ParseProblem(ParseProblem.Type.Error, message, sourceName, fileOffset, length));
+			errors.Add(new ParseProblem(ParseProblem.Type.Error, message, sourceName, fileOffset, length));
 		}
 
 		/// <inheritDoc></inheritDoc>

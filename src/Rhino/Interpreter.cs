@@ -876,7 +876,7 @@ namespace Rhino
 					elem.RenderJavaStyle(sb);
 					sb.Append(lineSeparator);
 				}
-				list.AddItem(sb.ToString());
+				list.Add(sb.ToString());
 			}
 			return list;
 		}
@@ -918,9 +918,9 @@ namespace Rhino
 						functionName = idata.itsName;
 					}
 					frame = frame.parentFrame;
-					group.AddItem(new ScriptStackElement(fileName, functionName, lineNumber));
+					group.Add(new ScriptStackElement(fileName, functionName, lineNumber));
 				}
-				list.AddItem(Sharpen.Collections.ToArray(group, new ScriptStackElement[group.Count]));
+				list.Add(Sharpen.Collections.ToArray(group, new ScriptStackElement[group.Count]));
 			}
 			return Sharpen.Collections.ToArray(list, new ScriptStackElement[list.Count][]);
 		}

@@ -93,7 +93,7 @@ namespace Rhino.Ast
 		public virtual void AddLabel(Label label)
 		{
 			AssertNotNull(label);
-			labels.AddItem(label);
+			labels.Add(label);
 			label.SetParent(this);
 		}
 

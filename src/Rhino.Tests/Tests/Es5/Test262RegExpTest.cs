@@ -46,16 +46,16 @@ namespace Rhino.Tests.Es5
 		public virtual void TestS15_10_2_11_A1_T2()
 		{
 			IList<string> sources = new List<string>();
-			sources.AddItem("/\\1/.exec('');");
-			sources.AddItem("/\\2/.exec('');");
-			sources.AddItem("/\\3/.exec('');");
-			sources.AddItem("/\\4/.exec('');");
-			sources.AddItem("/\\5/.exec('');");
-			sources.AddItem("/\\6/.exec('');");
-			sources.AddItem("/\\7/.exec('');");
-			sources.AddItem("/\\8/.exec('');");
-			sources.AddItem("/\\9/.exec('');");
-			sources.AddItem("/\\10/.exec('');");
+			sources.Add("/\\1/.exec('');");
+			sources.Add("/\\2/.exec('');");
+			sources.Add("/\\3/.exec('');");
+			sources.Add("/\\4/.exec('');");
+			sources.Add("/\\5/.exec('');");
+			sources.Add("/\\6/.exec('');");
+			sources.Add("/\\7/.exec('');");
+			sources.Add("/\\8/.exec('');");
+			sources.Add("/\\9/.exec('');");
+			sources.Add("/\\10/.exec('');");
 			string sourceName = "Conformance/15_Native/15.10_RegExp_Objects/15.10.2_Pattern_Semantics/15.10.2.11_DecimalEscape/S15.10.2.11_A1_T2.js";
 			foreach (string source in sources)
 			{

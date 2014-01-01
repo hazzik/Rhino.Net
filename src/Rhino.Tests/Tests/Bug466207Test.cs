@@ -28,11 +28,11 @@ namespace Rhino.Tests
 		{
 			// set up a reference map
 			reference = new List<object>();
-			reference.AddItem("a");
-			reference.AddItem(true);
-			reference.AddItem(new Dictionary<object, object>());
-			reference.AddItem(42);
-			reference.AddItem("a");
+			reference.Add("a");
+			reference.Add(true);
+			reference.Add(new Dictionary<object, object>());
+			reference.Add(42);
+			reference.Add("a");
 			// get a js object as map
 			Context context = Context.Enter();
 			ScriptableObject scope = context.InitStandardObjects();

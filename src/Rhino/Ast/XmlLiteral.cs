@@ -90,7 +90,7 @@ namespace Rhino.Ast
 		public virtual void AddFragment(XmlFragment fragment)
 		{
 			AssertNotNull(fragment);
-			fragments.AddItem(fragment);
+			fragments.Add(fragment);
 			fragment.SetParent(this);
 		}
 

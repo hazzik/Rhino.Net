@@ -515,7 +515,7 @@ siblingLoop_break: ;
 					{
 						throw Kit.CodeBug();
 					}
-					list.AddItem(ScriptRuntime.GetIndexObject(current.GetString()));
+					list.Add(ScriptRuntime.GetIndexObject(current.GetString()));
 					Node init = current.GetFirstChild();
 					if (init == null)
 					{

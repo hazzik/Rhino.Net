@@ -305,7 +305,7 @@ namespace Rhino
 					// the method representing the main script is always "_c_script_0" -
 					// at least we hope so
 					methodName = !"_c_script_0".Equals(methodName) && match.Find() ? match.Group(1) : null;
-					list.AddItem(new ScriptStackElement(fileName, methodName, e.GetLineNumber()));
+					list.Add(new ScriptStackElement(fileName, methodName, e.GetLineNumber()));
 				}
 				else
 				{
@@ -313,7 +313,7 @@ namespace Rhino
 					{
 						foreach (ScriptStackElement elem in interpreterStack[interpreterStackIndex++])
 						{
-							list.AddItem(elem);
+							list.Add(elem);
 						}
 					}
 				}

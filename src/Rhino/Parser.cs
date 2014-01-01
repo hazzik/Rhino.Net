@@ -303,7 +303,7 @@ namespace Rhino
 				currentJsDocComment = commentNode;
 			}
 			commentNode.SetLineno(lineno);
-			scannedComments.AddItem(commentNode);
+			scannedComments.Add(commentNode);
 		}
 
 		private Comment GetAndResetJsDoc()
@@ -502,12 +502,12 @@ namespace Rhino
 			{
 				loopSet = new List<Loop>();
 			}
-			loopSet.AddItem(loop);
+			loopSet.Add(loop);
 			if (loopAndSwitchSet == null)
 			{
 				loopAndSwitchSet = new List<Jump>();
 			}
-			loopAndSwitchSet.AddItem(loop);
+			loopAndSwitchSet.Add(loop);
 			PushScope(loop);
 			if (currentLabel != null)
 			{
@@ -539,7 +539,7 @@ namespace Rhino
 			{
 				loopAndSwitchSet = new List<Jump>();
 			}
-			loopAndSwitchSet.AddItem(node);
+			loopAndSwitchSet.Add(node);
 		}
 
 		private void ExitSwitch()
@@ -883,7 +883,7 @@ bodyLoop_break: ;
 							{
 								AddError("msg.dup.param.strict", paramName);
 							}
-							paramNames.AddItem(paramName);
+							paramNames.Add(paramName);
 						}
 					}
 					else
@@ -1770,7 +1770,7 @@ switchLoop_break: ;
 					{
 						clauses = new List<CatchClause>();
 					}
-					clauses.AddItem(catchNode);
+					clauses.Add(catchNode);
 				}
 			}
 			else
@@ -2959,7 +2959,7 @@ switchLoop_break: ;
 					{
 						try
 						{
-							result.AddItem(GeneratorExpression(en, 0, true));
+							result.Add(GeneratorExpression(en, 0, true));
 						}
 						catch (IOException)
 						{
@@ -2968,7 +2968,7 @@ switchLoop_break: ;
 					else
 					{
 						// #TODO
-						result.AddItem(en);
+						result.Add(en);
 					}
 				}
 				while (MatchToken(Token.COMMA));
@@ -3644,7 +3644,7 @@ tailLoop_break: ;
 					}
 					else
 					{
-						elements.AddItem(new EmptyExpression(ts.tokenBeg, 1));
+						elements.Add(new EmptyExpression(ts.tokenBeg, 1));
 						skipCount++;
 					}
 				}
@@ -3686,7 +3686,7 @@ tailLoop_break: ;
 								{
 									ReportError("msg.no.bracket.arg");
 								}
-								elements.AddItem(AssignExpr());
+								elements.Add(AssignExpr());
 								after_lb_or_comma = false;
 								afterComma = -1;
 							}
@@ -3713,7 +3713,7 @@ tailLoop_break: ;
 			IList<ArrayComprehensionLoop> loops = new List<ArrayComprehensionLoop>();
 			while (PeekToken() == Token.FOR)
 			{
-				loops.AddItem(ArrayComprehensionLoop());
+				loops.Add(ArrayComprehensionLoop());
 			}
 			int ifPos = -1;
 			Parser.ConditionData data = null;
@@ -3835,7 +3835,7 @@ tailLoop_break: ;
 			IList<GeneratorExpressionLoop> loops = new List<GeneratorExpressionLoop>();
 			while (PeekToken() == Token.FOR)
 			{
-				loops.AddItem(GeneratorExpressionLoop());
+				loops.Add(GeneratorExpressionLoop());
 			}
 			int ifPos = -1;
 			Parser.ConditionData data = null;
@@ -3993,13 +3993,13 @@ tailLoop_break: ;
 								propertyName = ts.GetString();
 								ObjectProperty objectProp = GetterSetterProperty(ppos, pname, isGet);
 								pname.SetJsDocNode(jsdocNode);
-								elems.AddItem(objectProp);
+								elems.Add(objectProp);
 							}
 						}
 						else
 						{
 							name.SetJsDocNode(jsdocNode);
-							elems.AddItem(PlainProperty(name, tt));
+							elems.Add(PlainProperty(name, tt));
 						}
 						break;
 					}
@@ -4024,7 +4024,7 @@ tailLoop_break: ;
 						{
 							propertyName = ts.GetString();
 							pname_1.SetJsDocNode(jsdocNode);
-							elems.AddItem(PlainProperty(pname_1, tt));
+							elems.Add(PlainProperty(pname_1, tt));
 						}
 						break;
 					}
@@ -4039,8 +4039,8 @@ tailLoop_break: ;
 							{
 								AddError("msg.dup.obj.lit.prop.strict", propertyName);
 							}
-							getterNames.AddItem(propertyName);
-							setterNames.AddItem(propertyName);
+							getterNames.Add(propertyName);
+							setterNames.Add(propertyName);
 							break;
 						}
 
@@ -4050,7 +4050,7 @@ tailLoop_break: ;
 							{
 								AddError("msg.dup.obj.lit.prop.strict", propertyName);
 							}
-							getterNames.AddItem(propertyName);
+							getterNames.Add(propertyName);
 							break;
 						}
 
@@ -4060,7 +4060,7 @@ tailLoop_break: ;
 							{
 								AddError("msg.dup.obj.lit.prop.strict", propertyName);
 							}
-							setterNames.AddItem(propertyName);
+							setterNames.Add(propertyName);
 							break;
 						}
 					}
@@ -4591,7 +4591,7 @@ commaLoop_break: ;
 					if (variableType != -1)
 					{
 						DefineSymbol(variableType, name, true);
-						destructuringNames.AddItem(name);
+						destructuringNames.Add(name);
 					}
 				}
 				else
@@ -4654,7 +4654,7 @@ commaLoop_break: ;
 					if (variableType != -1)
 					{
 						DefineSymbol(variableType, name, true);
-						destructuringNames.AddItem(name);
+						destructuringNames.Add(name);
 					}
 				}
 				else

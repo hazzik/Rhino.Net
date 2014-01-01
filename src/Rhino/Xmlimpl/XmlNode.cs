@@ -471,7 +471,7 @@ namespace Rhino.Xmlimpl
 					Rhino.Xmlimpl.XmlNode.Namespace n = Rhino.Xmlimpl.XmlNode.Namespace.Create(prefix, uri);
 					if (!n.IsEmpty())
 					{
-						rv.AddItem(n);
+						rv.Add(n);
 					}
 				}
 				return Sharpen.Collections.ToArray(rv, new Rhino.Xmlimpl.XmlNode.Namespace[rv.Count]);
@@ -696,7 +696,7 @@ namespace Rhino.Xmlimpl
 				System.Xml.XmlNode node = nodes.Item(i);
 				if (filter.Accept(node))
 				{
-					rv.AddItem(CreateImpl(node));
+					rv.Add(CreateImpl(node));
 				}
 			}
 			return Sharpen.Collections.ToArray(rv, new Rhino.Xmlimpl.XmlNode[rv.Count]);
@@ -1064,7 +1064,7 @@ namespace Rhino.Xmlimpl
 
 			private void _add(Rhino.Xmlimpl.XmlNode n)
 			{
-				list.AddItem(n);
+				list.Add(n);
 			}
 
 			internal virtual Rhino.Xmlimpl.XmlNode Item(int index)

@@ -539,13 +539,13 @@ namespace Rhino
 				{
 					// Make sure we don't add a final method to the list
 					// of overridable methods.
-					skip.AddItem(methodKey);
+					skip.Add(methodKey);
 					continue;
 				}
 				if (Modifier.IsPublic(mods) || Modifier.IsProtected(mods))
 				{
-					list.AddItem(methods[i]);
-					skip.AddItem(methodKey);
+					list.Add(methods[i]);
+					skip.Add(methodKey);
 				}
 			}
 		}

@@ -156,7 +156,7 @@ namespace Rhino.Tools.Shell
 			string[] args = ProcessOptions(origArgs);
 			if (processStdin)
 			{
-				fileList.AddItem(null);
+				fileList.Add(null);
 			}
 			if (!global.initialized)
 			{
@@ -294,7 +294,7 @@ namespace Rhino.Tools.Shell
 				if (!arg.StartsWith("-"))
 				{
 					processStdin = false;
-					fileList.AddItem(arg);
+					fileList.Add(arg);
 					mainModule = arg;
 					string[] result = new string[args.Length - i - 1];
 					System.Array.Copy(args, i + 1, result, 0, args.Length - i - 1);
@@ -420,7 +420,7 @@ namespace Rhino.Tools.Shell
 					{
 						modulePath = new List<string>();
 					}
-					modulePath.AddItem(args[i]);
+					modulePath.Add(args[i]);
 					useRequire = true;
 					continue;
 				}
@@ -439,11 +439,11 @@ namespace Rhino.Tools.Shell
 					}
 					if (args[i].Equals("-"))
 					{
-						fileList.AddItem(null);
+						fileList.Add(null);
 					}
 					else
 					{
-						fileList.AddItem(args[i]);
+						fileList.Add(args[i]);
 						mainModule = args[i];
 					}
 					continue;

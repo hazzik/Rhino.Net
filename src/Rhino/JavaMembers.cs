@@ -759,7 +759,7 @@ namespace Rhino
 								if (!field.IsAccessible())
 								{
 								}
-								fieldsList.AddItem(field);
+								fieldsList.Add(field);
 							}
 						}
 						// walk up superclass chain.  no need to deal specially with

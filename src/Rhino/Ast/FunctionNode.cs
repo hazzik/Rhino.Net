@@ -217,7 +217,7 @@ namespace Rhino.Ast
 			{
 				@params = new List<AstNode>();
 			}
-			@params.AddItem(param);
+			@params.Add(param);
 			param.SetParent(this);
 		}
 
@@ -362,7 +362,7 @@ namespace Rhino.Ast
 			{
 				generatorResumePoints = new List<Node>();
 			}
-			generatorResumePoints.AddItem(target);
+			generatorResumePoints.Add(target);
 		}
 
 		public virtual IList<Node> GetResumptionPoints()

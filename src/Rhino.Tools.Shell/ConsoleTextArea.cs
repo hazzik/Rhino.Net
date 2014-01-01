@@ -170,7 +170,7 @@ namespace Rhino.Tools.Shell
 				}
 				if (segment.count > 0)
 				{
-					history.AddItem(segment.ToString());
+					history.Add(segment.ToString());
 				}
 				historyIndex = history.Count;
 				inPipe.Write(segment.array, segment.offset, segment.count);

@@ -576,7 +576,7 @@ namespace Rhino.Tools.Shell
 					{
 						id += "(";
 					}
-					candidates.AddItem(id);
+					candidates.Add(id);
 				}
 			}
 			return buffer.Length - lastPart.Length;

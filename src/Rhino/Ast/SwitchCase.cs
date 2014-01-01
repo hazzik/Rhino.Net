@@ -157,7 +157,7 @@ namespace Rhino.Ast
 			}
 			int end = statement.GetPosition() + statement.GetLength();
 			this.SetLength(end - this.GetPosition());
-			statements.AddItem(statement);
+			statements.Add(statement);
 			statement.SetParent(this);
 		}
 

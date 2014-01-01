@@ -220,7 +220,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (node is XmlProcessingInstruction)
 			{
-				list.AddItem(node);
+				list.Add(node);
 			}
 			if (node.ChildNodes != null)
 			{
@@ -235,7 +235,7 @@ namespace Rhino.Xmlimpl
 		{
 			if (node is XmlComment)
 			{
-				list.AddItem(node);
+				list.Add(node);
 			}
 			if (node.ChildNodes != null)
 			{
@@ -265,7 +265,7 @@ namespace Rhino.Xmlimpl
 				}
 				if (text.Data.Length == 0)
 				{
-					toRemove.AddItem(node);
+					toRemove.Add(node);
 				}
 			}
 			if (node.ChildNodes != null)
@@ -525,12 +525,12 @@ namespace Rhino.Xmlimpl
 				}
 				if (e.ChildNodes.Item(i_2) is XmlText)
 				{
-					toIndent.AddItem(e.ChildNodes.Item(i_2));
+					toIndent.Add(e.ChildNodes.Item(i_2));
 				}
 				else
 				{
 					indentChildren = true;
-					toIndent.AddItem(e.ChildNodes.Item(i_2));
+					toIndent.Add(e.ChildNodes.Item(i_2));
 				}
 			}
 			if (indentChildren)
@@ -546,7 +546,7 @@ namespace Rhino.Xmlimpl
 			{
 				if (nodes.Item(i_4) is XmlElement)
 				{
-					list.AddItem((XmlElement)nodes.Item(i_4));
+					list.Add((XmlElement)nodes.Item(i_4));
 				}
 			}
 			foreach (XmlElement elem in list)

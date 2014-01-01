@@ -1585,7 +1585,7 @@ namespace Rhino
 				{
 					throw Context.ReportRuntimeError2("duplicate.defineClass.name", name, propName);
 				}
-				names.AddItem(propName);
+				names.Add(propName);
 				name = propName;
 				if (annotation is JSGetter || prefix == getterPrefix)
 				{

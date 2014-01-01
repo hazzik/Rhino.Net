@@ -81,9 +81,9 @@ namespace Rhino.Tests
 			foreach (FilePath f in doctests)
 			{
 				string contents = LoadFile(f);
-				result.AddItem(new object[] { f.GetName(), contents, -1 });
-				result.AddItem(new object[] { f.GetName(), contents, 0 });
-				result.AddItem(new object[] { f.GetName(), contents, 9 });
+				result.Add(new object[] { f.GetName(), contents, -1 });
+				result.Add(new object[] { f.GetName(), contents, 0 });
+				result.Add(new object[] { f.GetName(), contents, 9 });
 			}
 			return result;
 		}
@@ -95,7 +95,7 @@ namespace Rhino.Tests
 			IList<object[]> result = new List<object[]>();
 			FilePath f = new FilePath(baseDirectory, "Counter.doctest");
 			string contents = LoadFile(f);
-			result.AddItem(new object[] { f.GetName(), contents, -1 });
+			result.Add(new object[] { f.GetName(), contents, -1 });
 			return result;
 		}
 

@@ -317,7 +317,7 @@ namespace Rhino.Drivers
 
 			private void AddError(string @string, string string0, int i, string string1, int i0)
 			{
-				errors.AddItem(new ShellTest.Status.JsError(@string, string0, i, string1, i0));
+				errors.Add(new ShellTest.Status.JsError(@string, string0, i, string1, i0));
 			}
 
 			public virtual void Warning(string @string, string string0, int i, string string1, int i0)

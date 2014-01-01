@@ -150,7 +150,7 @@ namespace Rhino.Ast
 			{
 				cases = new List<SwitchCase>();
 			}
-			cases.AddItem(switchCase);
+			cases.Add(switchCase);
 			switchCase.SetParent(this);
 		}
 

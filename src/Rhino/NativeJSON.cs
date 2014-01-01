@@ -328,13 +328,13 @@ namespace Rhino
 						object v = replacerArray.Get(i, replacerArray);
 						if (v is string || v is Number)
 						{
-							propertyList.AddItem(v);
+							propertyList.Add(v);
 						}
 						else
 						{
 							if (v is NativeString || v is NativeNumber)
 							{
-								propertyList.AddItem(ScriptRuntime.ToString(v));
+								propertyList.Add(ScriptRuntime.ToString(v));
 							}
 						}
 					}
@@ -506,7 +506,7 @@ namespace Rhino
 						member = member + " ";
 					}
 					member = member + strP;
-					partial.AddItem(member);
+					partial.Add(member);
 				}
 			}
 			string finalValue;
@@ -556,11 +556,11 @@ namespace Rhino
 				}
 				if (strP == Undefined.instance)
 				{
-					partial.AddItem("null");
+					partial.Add("null");
 				}
 				else
 				{
-					partial.AddItem(strP);
+					partial.Add(strP);
 				}
 			}
 			string finalValue;

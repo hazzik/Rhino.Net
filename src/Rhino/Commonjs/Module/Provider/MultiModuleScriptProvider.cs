@@ -32,7 +32,7 @@ namespace Rhino.Commonjs.Module.Provider
 			IList<ModuleScriptProvider> l = new List<ModuleScriptProvider>();
 			foreach (ModuleScriptProvider provider in providers)
 			{
-				l.AddItem(provider);
+				l.Add(provider);
 			}
 			this.providers = Sharpen.Collections.ToArray(l, new ModuleScriptProvider[l.Count]);
 		}

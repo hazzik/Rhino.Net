@@ -155,11 +155,10 @@
 -methodMapping java.net.URI.relativize MakeRelativeUri
 -methodMapping java.nio.charset.Charset.forName Sharpen.Extensions.GetEncoding
 -methodMapping java.util.AbstractList.addAll AddRange 
--methodMapping java.util.ArrayList.addAll AddRange      
+-methodMapping java.util.ArrayList.addAll AddRange
 -methodMapping java.util.ArrayList.remove RemoveAt
 -methodMapping java.util.ArrayList.removeElement Remove
 -methodMapping java.util.Arrays.binarySearch System.Array.BinarySearch
--methodMapping java.util.Collection.add AddItem
 -methodMapping java.util.concurrent.Semaphore.acquire WaitOne
 -methodMapping java.util.concurrent.Semaphore.Semaphore Sharpen.Extensions.CreateSemaphore
 -methodMapping java.util.Date.Date(long) Sharpen.Extensions.CreateDate
@@ -167,7 +166,7 @@
 -methodMapping java.util.IList<>.remove RemoveAt
 -methodMapping java.util.Iterator.hasNext HasNext
 -methodMapping java.util.Iterator.next Next
--methodMapping java.util.List.addAll AddRange 
+-methodMapping java.util.List.addAll AddRange
 -methodMapping java.util.List<>.remove RemoveAt
 -methodMapping java.util.Locale.Locale(String,String,String) Sharpen.Extensions.CreateLocale
 -methodMapping java.util.Random.nextInt Next

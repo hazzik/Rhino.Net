@@ -476,7 +476,7 @@ namespace Rhino.Xmlimpl
 					int cChildren = childList.Length();
 					for (int j = 0; j < cChildren; j++)
 					{
-						list.AddItem(childList.Item(j));
+						list.Add(childList.Item(j));
 					}
 				}
 			}

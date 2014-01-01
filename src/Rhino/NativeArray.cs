@@ -699,7 +699,7 @@ again_break: ;
 				int int32Id = ScriptRuntime.ToInt32(id);
 				if (int32Id >= 0 && ScriptRuntime.ToString(int32Id).Equals(ScriptRuntime.ToString(id)))
 				{
-					indices.AddItem(int32Id);
+					indices.Add(int32Id);
 				}
 			}
 			return Sharpen.Collections.ToArray(indices, new int[indices.Count]);
@@ -2307,7 +2307,7 @@ again_break: ;
 			private readonly int len;
 		}
 
-		public virtual bool AddItem(object o)
+		public virtual bool Add(object o)
 		{
 			throw new NotSupportedException();
 		}

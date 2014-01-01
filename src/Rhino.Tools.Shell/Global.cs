@@ -143,7 +143,7 @@ namespace Rhino.Tools.Shell
 							// avoid loading from unintended locations
 							uri = new Uri(uri + "/");
 						}
-						uris.AddItem(uri);
+						uris.Add(uri);
 					}
 					catch (URISyntaxException usx)
 					{

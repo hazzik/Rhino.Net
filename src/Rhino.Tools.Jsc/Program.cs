@@ -218,7 +218,7 @@ namespace Rhino.Tools.Jsc
 						string className = st.NextToken();
 						try
 						{
-							list.AddItem(Sharpen.Runtime.GetType(className));
+							list.Add(Sharpen.Runtime.GetType(className));
 						}
 						catch (TypeLoadException e)
 						{

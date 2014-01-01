@@ -70,7 +70,7 @@ namespace Rhino.Drivers
 					}
 					else
 					{
-						list.AddItem(tests[i]);
+						list.Add(tests[i]);
 					}
 				}
 				return Sharpen.Collections.ToArray(list, new string[0]);
@@ -113,7 +113,7 @@ namespace Rhino.Drivers
 						bool isTopLevel = prefix.Length == 0;
 						if (ShellTest.TEST_FILTER.Accept(files[i]) && Matches(path) && !Excluded(path) && !isTopLevel)
 						{
-							rv.AddItem(new JsDriver.Tests.Script(path, files[i]));
+							rv.Add(new JsDriver.Tests.Script(path, files[i]));
 						}
 					}
 				}
@@ -783,9 +783,9 @@ namespace Rhino.Drivers
 					this.array = array;
 					if (!flag && !array)
 					{
-						this.values.AddItem(unspecified);
+						this.values.Add(unspecified);
 					}
-					this._enclosing.options.AddItem(this);
+					this._enclosing.options.Add(this);
 				}
 
 				internal virtual JsDriver.Arguments.Option Ignored()
@@ -840,7 +840,7 @@ namespace Rhino.Drivers
 							{
 								while (arguments.Count > 0 && !arguments[0].StartsWith("-"))
 								{
-									this.values.AddItem(arguments.Remove(0));
+									this.values.Add(arguments.Remove(0));
 								}
 							}
 							else

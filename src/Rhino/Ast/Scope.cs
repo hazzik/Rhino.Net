@@ -101,7 +101,7 @@ namespace Rhino.Ast
 			{
 				childScopes = new List<Rhino.Ast.Scope>();
 			}
-			childScopes.AddItem(child);
+			childScopes.Add(child);
 			child.SetParentScope(this);
 		}
 
@@ -288,7 +288,7 @@ namespace Rhino.Ast
 			Node n = GetFirstChild();
 			while (n != null)
 			{
-				stmts.AddItem((AstNode)n);
+				stmts.Add((AstNode)n);
 				n = n.GetNext();
 			}
 			return stmts;
