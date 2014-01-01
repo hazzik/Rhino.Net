@@ -119,7 +119,7 @@ namespace Rhino.CommonJS.Module.Provider
 			scriptRefQueue = new ReferenceQueue<Script>();
 			scripts = new ConcurrentHashMap<string, SoftCachingModuleScriptProvider.ScriptReference>();
 			IDictionary<string, CachingModuleScriptProviderBase.CachedModuleScript> serScripts = (IDictionary)@in.ReadObject();
-			foreach (KeyValuePair<string, CachingModuleScriptProviderBase.CachedModuleScript> entry in serScripts.EntrySet())
+			foreach (KeyValuePair<string, CachingModuleScriptProviderBase.CachedModuleScript> entry in serScripts)
 			{
 				CachingModuleScriptProviderBase.CachedModuleScript cachedModuleScript = entry.Value;
 				PutLoadedModule(entry.Key, cachedModuleScript.GetModule(), cachedModuleScript.GetValidator());
@@ -130,7 +130,7 @@ namespace Rhino.CommonJS.Module.Provider
 		private void WriteObject(ObjectOutputStream @out)
 		{
 			IDictionary<string, CachingModuleScriptProviderBase.CachedModuleScript> serScripts = new Dictionary<string, CachingModuleScriptProviderBase.CachedModuleScript>();
-			foreach (KeyValuePair<string, SoftCachingModuleScriptProvider.ScriptReference> entry in scripts.EntrySet())
+			foreach (KeyValuePair<string, SoftCachingModuleScriptProvider.ScriptReference> entry in scripts)
 			{
 				CachingModuleScriptProviderBase.CachedModuleScript cachedModuleScript = entry.Value.GetCachedModuleScript();
 				if (cachedModuleScript != null)

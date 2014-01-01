@@ -68,7 +68,7 @@ namespace Rhino.Tests
 		public virtual void TestCollections()
 		{
 			NUnit.Framework.Assert.AreEqual(map.Keys, reference.Keys);
-			NUnit.Framework.Assert.AreEqual(map.EntrySet(), reference.EntrySet());
+			NUnit.Framework.Assert.AreEqual(map, reference);
 			// java.util.Collection does not imply overriding equals(), so:
 			NUnit.Framework.Assert.IsTrue(map.Values.ContainsAll(reference.Values));
 			NUnit.Framework.Assert.IsTrue(reference.Values.ContainsAll(map.Values));
@@ -95,7 +95,7 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestEntryIterator()
 		{
-			CompareIterators(map.EntrySet().GetEnumerator(), reference.EntrySet().GetEnumerator());
+			CompareIterators(map.GetEnumerator(), reference.GetEnumerator());
 		}
 
 		[NUnit.Framework.Test]

@@ -527,7 +527,7 @@ namespace Rhino.Tools.Shell
 			{
 				return true;
 			}
-			foreach (KeyValuePair<string, string> entry in doctestCanonicalizations.EntrySet())
+			foreach (KeyValuePair<string, string> entry in (ICollection<KeyValuePair<string, string>>) doctestCanonicalizations)
 			{
 				expected = expected.Replace(entry.Key, entry.Value);
 			}

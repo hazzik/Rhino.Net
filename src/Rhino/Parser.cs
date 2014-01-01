@@ -897,7 +897,7 @@ bodyLoop_break: ;
 			{
 				Node destructuringNode = new Node(Token.COMMA);
 				// Add assignment helper for each destructuring parameter
-				foreach (KeyValuePair<string, Node> param in destructuring.EntrySet())
+				foreach (KeyValuePair<string, Node> param in destructuring)
 				{
 					Node assign = CreateDestructuringAssignment(Token.VAR, param.Value, CreateName(param.Key));
 					destructuringNode.AddChildToBack(assign);

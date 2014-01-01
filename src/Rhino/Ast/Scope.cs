@@ -180,7 +180,7 @@ namespace Rhino.Ast
 			{
 				CodeBug();
 			}
-			foreach (KeyValuePair<string, Symbol> entry in src.EntrySet())
+			foreach (KeyValuePair<string, Symbol> entry in src)
 			{
 				Symbol sym = entry.Value;
 				sym.SetContainingTable(dest);

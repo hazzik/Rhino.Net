@@ -502,7 +502,7 @@ namespace Rhino
 			{
 				bool isStatic = (tableCursor == 0);
 				IDictionary<string, object> ht = isStatic ? staticMembers : members;
-				foreach (KeyValuePair<string, object> entry in ht.EntrySet())
+				foreach (KeyValuePair<string, object> entry in ht)
 				{
 					MemberBox[] methodBoxes;
 					object value = entry.Value;

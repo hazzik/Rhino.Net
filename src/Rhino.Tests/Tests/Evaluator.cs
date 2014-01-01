@@ -33,7 +33,7 @@ namespace Rhino.Tests
 				Scriptable scope = cx.InitStandardObjects();
 				if (bindings != null)
 				{
-					foreach (KeyValuePair<string, Scriptable> entry in bindings.EntrySet())
+					foreach (KeyValuePair<string, Scriptable> entry in bindings)
 					{
 						Scriptable @object = entry.Value;
 						@object.SetParentScope(scope);
