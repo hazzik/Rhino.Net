@@ -866,7 +866,7 @@ namespace Rhino
 		public IList<string> GetScriptStack(RhinoException ex)
 		{
 			ScriptStackElement[][] stack = GetScriptStackElements(ex);
-			IList<string> list = new AList<string>(stack.Length);
+			IList<string> list = new List<string>(stack.Length);
 			string lineSeparator = SecurityUtilities.GetSystemProperty("line.separator");
 			foreach (ScriptStackElement[] group in stack)
 			{
@@ -887,7 +887,7 @@ namespace Rhino
 			{
 				return null;
 			}
-			IList<ScriptStackElement[]> list = new AList<ScriptStackElement[]>();
+			IList<ScriptStackElement[]> list = new List<ScriptStackElement[]>();
 			Interpreter.CallFrame[] array = (Interpreter.CallFrame[])ex.interpreterStackInfo;
 			int[] linePC = ex.interpreterLineData;
 			int arrayIndex = array.Length;
@@ -896,7 +896,7 @@ namespace Rhino
 			{
 				--arrayIndex;
 				Interpreter.CallFrame frame = array[arrayIndex];
-				IList<ScriptStackElement> group = new AList<ScriptStackElement>();
+				IList<ScriptStackElement> group = new List<ScriptStackElement>();
 				while (frame != null)
 				{
 					if (linePCIndex == 0)

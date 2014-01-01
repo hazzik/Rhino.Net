@@ -45,7 +45,7 @@ namespace Rhino.Tests.Es5
 		[NUnit.Framework.Test]
 		public virtual void TestS15_10_2_11_A1_T2()
 		{
-			IList<string> sources = new AList<string>();
+			IList<string> sources = new List<string>();
 			sources.AddItem("/\\1/.exec('');");
 			sources.AddItem("/\\2/.exec('');");
 			sources.AddItem("/\\3/.exec('');");

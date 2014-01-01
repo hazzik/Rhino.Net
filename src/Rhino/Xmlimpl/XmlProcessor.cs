@@ -289,7 +289,7 @@ namespace Rhino.Xmlimpl
 				XmlDocument document = builder.Parse(new InputSource(new StringReader(syntheticXml)));
 				if (ignoreProcessingInstructions)
 				{
-					IList<System.Xml.XmlNode> list = new AList<System.Xml.XmlNode>();
+					IList<System.Xml.XmlNode> list = new List<System.Xml.XmlNode>();
 					AddProcessingInstructionsTo(list, document);
 					foreach (System.Xml.XmlNode node in list)
 					{
@@ -298,7 +298,7 @@ namespace Rhino.Xmlimpl
 				}
 				if (ignoreComments)
 				{
-					IList<System.Xml.XmlNode> list = new AList<System.Xml.XmlNode>();
+					IList<System.Xml.XmlNode> list = new List<System.Xml.XmlNode>();
 					AddCommentsTo(list, document);
 					foreach (System.Xml.XmlNode node in list)
 					{
@@ -311,7 +311,7 @@ namespace Rhino.Xmlimpl
 					//    Refers to element-only content models, which means we would need to have a validating parser and DTD or schema
 					//    so that it would know which whitespace to ignore.
 					//    Instead we will try to delete it ourselves.
-					IList<System.Xml.XmlNode> list = new AList<System.Xml.XmlNode>();
+					IList<System.Xml.XmlNode> list = new List<System.Xml.XmlNode>();
 					AddTextNodesToRemoveAndTrim(list, document);
 					foreach (System.Xml.XmlNode node in list)
 					{
@@ -515,7 +515,7 @@ namespace Rhino.Xmlimpl
 			string beforeContent = s.ToString();
 			//    We "mark" all the nodes first; if we tried to do this loop otherwise, it would behave unexpectedly (the inserted nodes
 			//    would contribute to the length and it might never terminate).
-			AList<System.Xml.XmlNode> toIndent = new AList<System.Xml.XmlNode>();
+			List<System.Xml.XmlNode> toIndent = new List<System.Xml.XmlNode>();
 			bool indentChildren = false;
 			for (int i_2 = 0; i_2 < e.ChildNodes.Count; i_2++)
 			{
@@ -541,7 +541,7 @@ namespace Rhino.Xmlimpl
 				}
 			}
 			XmlNodeList nodes = e.ChildNodes;
-			AList<XmlElement> list = new AList<XmlElement>();
+			List<XmlElement> list = new List<XmlElement>();
 			for (int i_4 = 0; i_4 < nodes.Count; i_4++)
 			{
 				if (nodes.Item(i_4) is XmlElement)

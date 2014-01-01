@@ -205,7 +205,7 @@ namespace Rhino.Json
 				pos += 1;
 				return cx.NewArray(scope, 0);
 			}
-			IList<object> list = new AList<object>();
+			IList<object> list = new List<object>();
 			bool needsComma = false;
 			while (pos < length)
 			{

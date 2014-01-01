@@ -744,7 +744,7 @@ namespace Rhino
 			{
 				try
 				{
-					IList<FieldInfo> fieldsList = new AList<FieldInfo>();
+					IList<FieldInfo> fieldsList = new List<FieldInfo>();
 					Type currentClass = cl;
 					while (currentClass != null)
 					{

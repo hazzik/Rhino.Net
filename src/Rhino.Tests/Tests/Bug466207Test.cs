@@ -27,7 +27,7 @@ namespace Rhino.Tests
 		protected virtual void SetUp()
 		{
 			// set up a reference map
-			reference = new AList<object>();
+			reference = new List<object>();
 			reference.AddItem("a");
 			reference.AddItem(true);
 			reference.AddItem(new Dictionary<object, object>());

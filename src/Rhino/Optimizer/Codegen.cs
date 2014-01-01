@@ -5580,7 +5580,7 @@ namespace Rhino.Optimizer
 
 		internal class FinallyReturnPoint
 		{
-			public IList<int> jsrPoints = new AList<int>();
+			public IList<int> jsrPoints = new List<int>();
 
 			public int tableLabel = 0;
 			// special known locals. If you add a new local here, be sure

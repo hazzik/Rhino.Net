@@ -61,7 +61,7 @@ namespace Rhino.Drivers
 			/// <exception cref="System.IO.IOException"></exception>
 			private string[] GetTestList(string[] tests)
 			{
-				AList<string> list = new AList<string>();
+				List<string> list = new List<string>();
 				for (int i = 0; i < tests.Length; i++)
 				{
 					if (tests[i].StartsWith("@"))
@@ -144,7 +144,7 @@ namespace Rhino.Drivers
 
 			internal virtual JsDriver.Tests.Script[] GetFiles()
 			{
-				AList<JsDriver.Tests.Script> rv = new AList<JsDriver.Tests.Script>();
+				List<JsDriver.Tests.Script> rv = new List<JsDriver.Tests.Script>();
 				AddFiles(rv, string.Empty, testDirectory);
 				return Sharpen.Collections.ToArray(rv, new JsDriver.Tests.Script[0]);
 			}
@@ -717,7 +717,7 @@ namespace Rhino.Drivers
 
 		private class Arguments
 		{
-			private AList<JsDriver.Arguments.Option> options = new AList<JsDriver.Arguments.Option>();
+			private List<JsDriver.Arguments.Option> options = new List<JsDriver.Arguments.Option>();
 
 			private JsDriver.Arguments.Option bugUrl;
 
@@ -770,7 +770,7 @@ namespace Rhino.Drivers
 
 				private bool ignored;
 
-				private AList<string> values = new AList<string>();
+				private List<string> values = new List<string>();
 
 				internal Option(Arguments _enclosing, string letterOption, string wordOption, bool array, bool flag, string unspecified)
 				{
@@ -1013,7 +1013,7 @@ namespace Rhino.Drivers
 		/// <exception cref="System.Exception"></exception>
 		public static void Main(string[] args)
 		{
-			AList<string> arguments = new AList<string>();
+			List<string> arguments = new List<string>();
 			Sharpen.Collections.AddAll(arguments, Arrays.AsList(args));
 			JsDriver.Arguments clArguments = new JsDriver.Arguments();
 			clArguments.Process(arguments);

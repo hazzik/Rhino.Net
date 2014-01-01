@@ -32,7 +32,7 @@ namespace Rhino.Tools.Idswitch
 
 		private const int STRING_TAG = 3;
 
-		private readonly IList<IdValuePair> all_pairs = new AList<IdValuePair>();
+		private readonly IList<IdValuePair> all_pairs = new List<IdValuePair>();
 
 		private ToolErrorReporter R;
 

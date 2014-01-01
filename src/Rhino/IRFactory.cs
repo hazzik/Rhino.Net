@@ -434,7 +434,7 @@ namespace Rhino
 				{
 					if (skipIndexes == null)
 					{
-						skipIndexes = new AList<int>();
+						skipIndexes = new List<int>();
 					}
 					skipIndexes.AddItem(i);
 				}
@@ -482,7 +482,7 @@ namespace Rhino
 			}
 			try
 			{
-				IList<Node> kids = new AList<Node>();
+				IList<Node> kids = new List<Node>();
 				foreach (Node kid in node)
 				{
 					kids.AddItem(Transform((AstNode)kid));

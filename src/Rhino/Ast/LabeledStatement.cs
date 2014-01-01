@@ -27,7 +27,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class LabeledStatement : AstNode
 	{
-		private IList<Label> labels = new AList<Label>();
+		private IList<Label> labels = new List<Label>();
 
 		private AstNode statement;
 

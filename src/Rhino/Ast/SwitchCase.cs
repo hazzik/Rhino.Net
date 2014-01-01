@@ -153,7 +153,7 @@ namespace Rhino.Ast
 			AssertNotNull(statement);
 			if (statements == null)
 			{
-				statements = new AList<AstNode>();
+				statements = new List<AstNode>();
 			}
 			int end = statement.GetPosition() + statement.GetLength();
 			this.SetLength(end - this.GetPosition());

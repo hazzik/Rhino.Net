@@ -356,7 +356,7 @@ namespace Rhino
 			}
 		}
 
-		private static readonly Type[] primitives = new Type[] { typeof(bool), typeof(byte), typeof(char), typeof(double), typeof(float), typeof(int), typeof(long), typeof(short), typeof(void) };
+		private static readonly Type[] primitives = new Type[] { typeof(bool), typeof(sbyte), typeof(char), typeof(double), typeof(float), typeof(int), typeof(long), typeof(short), typeof(void) };
 
 		/// <summary>Writes an array of parameter types to the stream.</summary>
 		/// <remarks>

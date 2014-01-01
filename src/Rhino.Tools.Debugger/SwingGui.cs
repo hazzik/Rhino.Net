@@ -1248,7 +1248,7 @@ namespace Rhino.Tools.Debugger
 		public EvalTextArea(SwingGui debugGui)
 		{
 			this.debugGui = debugGui;
-			history = Sharpen.Collections.SynchronizedList(new AList<string>());
+			history = Sharpen.Collections.SynchronizedList(new List<string>());
 			Document doc = GetDocument();
 			doc.AddDocumentListener(this);
 			AddKeyListener(this);
@@ -2737,8 +2737,8 @@ namespace Rhino.Tools.Debugger
 		public MyTableModel(SwingGui debugGui)
 		{
 			this.debugGui = debugGui;
-			expressions = Sharpen.Collections.SynchronizedList(new AList<string>());
-			values = Sharpen.Collections.SynchronizedList(new AList<string>());
+			expressions = Sharpen.Collections.SynchronizedList(new List<string>());
+			values = Sharpen.Collections.SynchronizedList(new List<string>());
 			expressions.AddItem(string.Empty);
 			values.AddItem(string.Empty);
 		}
@@ -3380,7 +3380,7 @@ namespace Rhino.Tools.Debugger
 			JLabel label = new JLabel("Context:");
 			context = new JComboBox();
 			context.SetLightWeightPopupEnabled(false);
-			toolTips = Sharpen.Collections.SynchronizedList(new AList<string>());
+			toolTips = Sharpen.Collections.SynchronizedList(new List<string>());
 			label.SetBorder(context.GetBorder());
 			context.AddActionListener(this);
 			context.SetActionCommand("ContextSwitch");
@@ -3769,11 +3769,11 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Items that are enabled only when interrupted.</summary>
 		/// <remarks>Items that are enabled only when interrupted.</remarks>
-		private IList<JMenuItem> interruptOnlyItems = Sharpen.Collections.SynchronizedList(new AList<JMenuItem>());
+		private IList<JMenuItem> interruptOnlyItems = Sharpen.Collections.SynchronizedList(new List<JMenuItem>());
 
 		/// <summary>Items that are enabled only when running.</summary>
 		/// <remarks>Items that are enabled only when running.</remarks>
-		private IList<JMenuItem> runOnlyItems = Sharpen.Collections.SynchronizedList(new AList<JMenuItem>());
+		private IList<JMenuItem> runOnlyItems = Sharpen.Collections.SynchronizedList(new List<JMenuItem>());
 
 		/// <summary>The debugger GUI.</summary>
 		/// <remarks>The debugger GUI.</remarks>

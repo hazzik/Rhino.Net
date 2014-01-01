@@ -40,7 +40,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class ObjectLiteral : AstNode, DestructuringForm
 	{
-		private static readonly IList<ObjectProperty> NO_ELEMS = Sharpen.Collections.UnmodifiableList(new AList<ObjectProperty>());
+		private static readonly IList<ObjectProperty> NO_ELEMS = Sharpen.Collections.UnmodifiableList(new List<ObjectProperty>());
 
 		private IList<ObjectProperty> elements;
 
@@ -118,7 +118,7 @@ namespace Rhino.Ast
 			AssertNotNull(element);
 			if (elements == null)
 			{
-				elements = new AList<ObjectProperty>();
+				elements = new List<ObjectProperty>();
 			}
 			elements.AddItem(element);
 			element.SetParent(this);

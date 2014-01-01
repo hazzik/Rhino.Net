@@ -30,7 +30,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class TryStatement : AstNode
 	{
-		private static readonly IList<CatchClause> NO_CATCHES = Sharpen.Collections.UnmodifiableList(new AList<CatchClause>());
+		private static readonly IList<CatchClause> NO_CATCHES = Sharpen.Collections.UnmodifiableList(new List<CatchClause>());
 
 		private AstNode tryBlock;
 
@@ -139,7 +139,7 @@ namespace Rhino.Ast
 			AssertNotNull(clause);
 			if (catchClauses == null)
 			{
-				catchClauses = new AList<CatchClause>();
+				catchClauses = new List<CatchClause>();
 			}
 			catchClauses.AddItem(clause);
 			clause.SetParent(this);

@@ -42,7 +42,7 @@ namespace Rhino.Tools.Shell
 
 		internal static bool processStdin = true;
 
-		internal static IList<string> fileList = new AList<string>();
+		internal static IList<string> fileList = new List<string>();
 
 		internal static IList<string> modulePath;
 
@@ -418,7 +418,7 @@ namespace Rhino.Tools.Shell
 					}
 					if (modulePath == null)
 					{
-						modulePath = new AList<string>();
+						modulePath = new List<string>();
 					}
 					modulePath.AddItem(args[i]);
 					useRequire = true;

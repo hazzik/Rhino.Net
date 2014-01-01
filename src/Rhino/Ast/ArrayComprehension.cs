@@ -25,7 +25,7 @@ namespace Rhino.Ast
 	{
 		private AstNode result;
 
-		private IList<ArrayComprehensionLoop> loops = new AList<ArrayComprehensionLoop>();
+		private IList<ArrayComprehensionLoop> loops = new List<ArrayComprehensionLoop>();
 
 		private AstNode filter;
 

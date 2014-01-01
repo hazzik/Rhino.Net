@@ -22,7 +22,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class FunctionCall : AstNode
 	{
-		protected internal static readonly IList<AstNode> NO_ARGS = Sharpen.Collections.UnmodifiableList(new AList<AstNode>());
+		protected internal static readonly IList<AstNode> NO_ARGS = Sharpen.Collections.UnmodifiableList(new List<AstNode>());
 
 		protected internal AstNode target;
 
@@ -127,7 +127,7 @@ namespace Rhino.Ast
 			AssertNotNull(arg);
 			if (arguments == null)
 			{
-				arguments = new AList<AstNode>();
+				arguments = new List<AstNode>();
 			}
 			arguments.AddItem(arg);
 			arg.SetParent(this);

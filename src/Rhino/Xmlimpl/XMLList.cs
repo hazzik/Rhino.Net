@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections.Generic;
 using System.Text;
 using Rhino;
 using Rhino.Xml;
@@ -465,7 +466,7 @@ namespace Rhino.Xmlimpl
 
 		internal override Rhino.Xmlimpl.XMLList Children()
 		{
-			AList<XML> list = new AList<XML>();
+			List<XML> list = new List<XML>();
 			for (int i = 0; i < Length(); i++)
 			{
 				XML xml = GetXmlFromAnnotation(i);

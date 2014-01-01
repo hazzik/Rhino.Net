@@ -40,7 +40,7 @@ namespace Rhino.Ast
 
 		private IList<FunctionNode> EMPTY_LIST = Sharpen.Collections.EmptyList();
 
-		private IList<Symbol> symbols = new AList<Symbol>(4);
+		private IList<Symbol> symbols = new List<Symbol>(4);
 
 		private int paramCount = 0;
 
@@ -249,7 +249,7 @@ namespace Rhino.Ast
 			}
 			if (functions == null)
 			{
-				functions = new AList<FunctionNode>();
+				functions = new List<FunctionNode>();
 			}
 			functions.AddItem(fnNode);
 			return functions.Count - 1;
@@ -280,7 +280,7 @@ namespace Rhino.Ast
 			}
 			if (regexps == null)
 			{
-				regexps = new AList<RegExpLiteral>();
+				regexps = new List<RegExpLiteral>();
 			}
 			regexps.AddItem(re);
 			re.PutIntProp(REGEXP_PROP, regexps.Count - 1);
@@ -375,7 +375,7 @@ namespace Rhino.Ast
 		{
 			if (!flattenAllTables)
 			{
-				IList<Symbol> newSymbols = new AList<Symbol>();
+				IList<Symbol> newSymbols = new List<Symbol>();
 				if (this.symbolTable != null)
 				{
 					// Just replace "symbols" with the symbols in this object's

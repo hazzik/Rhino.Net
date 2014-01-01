@@ -212,7 +212,7 @@ namespace Rhino.Tools.Jsc
 					// TODO: allow for multiple comma-separated interfaces.
 					string targetImplements = args[i];
 					StringTokenizer st = new StringTokenizer(targetImplements, ",");
-					IList<Type> list = new AList<Type>();
+					IList<Type> list = new List<Type>();
 					while (st.HasMoreTokens())
 					{
 						string className = st.NextToken();

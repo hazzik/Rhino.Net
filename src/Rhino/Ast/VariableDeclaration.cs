@@ -49,7 +49,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class VariableDeclaration : AstNode
 	{
-		private IList<VariableInitializer> variables = new AList<VariableInitializer>();
+		private IList<VariableInitializer> variables = new List<VariableInitializer>();
 
 		private bool isStatement;
 

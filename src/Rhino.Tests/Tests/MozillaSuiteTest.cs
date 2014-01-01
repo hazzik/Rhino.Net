@@ -114,7 +114,7 @@ namespace Rhino.Tests
 		[Parameterized.Parameters]
 		public static ICollection<object[]> MozillaSuiteValues()
 		{
-			IList<object[]> result = new AList<object[]>();
+			IList<object[]> result = new List<object[]>();
 			int[] optLevels = OPT_LEVELS;
 			for (int i = 0; i < optLevels.Length; i++)
 			{
@@ -133,7 +133,7 @@ namespace Rhino.Tests
 		{
 			string SINGLE_TEST_FILE = "e4x/Expressions/11.1.1.js";
 			int SINGLE_TEST_OPTIMIZATION_LEVEL = -1;
-			IList<object[]> result = new AList<object[]>();
+			IList<object[]> result = new List<object[]>();
 			FilePath f = new FilePath(GetTestDir(), SINGLE_TEST_FILE);
 			result.AddItem(new object[] { f, SINGLE_TEST_OPTIMIZATION_LEVEL });
 			return result;
@@ -226,7 +226,7 @@ namespace Rhino.Tests
 					HashSet<FilePath> diff = new HashSet<FilePath>(Arrays.AsList(allTests));
 					FilePath[] testFiles = GetTestFiles(optLevel);
 					diff.RemoveAll(Arrays.AsList(testFiles));
-					AList<string> skippedPassed = new AList<string>();
+					List<string> skippedPassed = new List<string>();
 					int absolutePathLength = testDir.GetAbsolutePath().Length + 1;
 					foreach (FilePath testFile in diff)
 					{

@@ -279,7 +279,7 @@ namespace Rhino
 		/// <since>1.7R3</since>
 		public virtual ScriptStackElement[] GetScriptStack()
 		{
-			IList<ScriptStackElement> list = new AList<ScriptStackElement>();
+			IList<ScriptStackElement> list = new List<ScriptStackElement>();
 			ScriptStackElement[][] interpreterStack = null;
 			if (interpreterStackInfo != null)
 			{

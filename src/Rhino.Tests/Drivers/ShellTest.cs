@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Rhino;
 using Rhino.Drivers;
@@ -307,7 +308,7 @@ namespace Rhino.Drivers
 		{
 			private ErrorReporter original;
 
-			private AList<ShellTest.Status.JsError> errors = new AList<ShellTest.Status.JsError>();
+			private List<ShellTest.Status.JsError> errors = new List<ShellTest.Status.JsError>();
 
 			internal ErrorReporterWrapper(ErrorReporter original)
 			{

@@ -475,7 +475,7 @@ siblingLoop_break: ;
 			{
 				result = new Node(isExpression ? Token.WITHEXPR : Token.BLOCK);
 				result = ReplaceCurrent(parent, previous, scopeNode, result);
-				AList<object> list = new AList<object>();
+				List<object> list = new List<object>();
 				Node objectLiteral = new Node(Token.OBJECTLIT);
 				for (Node v = vars.GetFirstChild(); v != null; v = v.GetNext())
 				{

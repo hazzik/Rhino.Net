@@ -295,7 +295,7 @@ namespace Rhino
 		{
 			if (scannedComments == null)
 			{
-				scannedComments = new AList<Comment>();
+				scannedComments = new List<Comment>();
 			}
 			Comment commentNode = new Comment(ts.tokenBeg, ts.GetTokenLength(), ts.commentType, comment);
 			if (ts.commentType == Token.CommentType.JSDOC && compilerEnv.IsRecordingLocalJsDocComments())
@@ -500,12 +500,12 @@ namespace Rhino
 		{
 			if (loopSet == null)
 			{
-				loopSet = new AList<Loop>();
+				loopSet = new List<Loop>();
 			}
 			loopSet.AddItem(loop);
 			if (loopAndSwitchSet == null)
 			{
-				loopAndSwitchSet = new AList<Jump>();
+				loopAndSwitchSet = new List<Jump>();
 			}
 			loopAndSwitchSet.AddItem(loop);
 			PushScope(loop);
@@ -537,7 +537,7 @@ namespace Rhino
 		{
 			if (loopAndSwitchSet == null)
 			{
-				loopAndSwitchSet = new AList<Jump>();
+				loopAndSwitchSet = new List<Jump>();
 			}
 			loopAndSwitchSet.AddItem(node);
 		}
@@ -1768,7 +1768,7 @@ switchLoop_break: ;
 					catchNode.SetLength(tryEnd - catchPos);
 					if (clauses == null)
 					{
-						clauses = new AList<CatchClause>();
+						clauses = new List<CatchClause>();
 					}
 					clauses.AddItem(catchNode);
 				}
@@ -2943,7 +2943,7 @@ switchLoop_break: ;
 			{
 				return null;
 			}
-			IList<AstNode> result = new AList<AstNode>();
+			IList<AstNode> result = new List<AstNode>();
 			bool wasInForInit = inForInit;
 			inForInit = false;
 			try
@@ -3626,7 +3626,7 @@ tailLoop_break: ;
 			}
 			int pos = ts.tokenBeg;
 			int end = ts.tokenEnd;
-			IList<AstNode> elements = new AList<AstNode>();
+			IList<AstNode> elements = new List<AstNode>();
 			ArrayLiteral pn = new ArrayLiteral(pos);
 			bool after_lb_or_comma = true;
 			int afterComma = -1;
@@ -3710,7 +3710,7 @@ tailLoop_break: ;
 		/// <exception cref="System.IO.IOException"></exception>
 		private AstNode ArrayComprehension(AstNode result, int pos)
 		{
-			IList<ArrayComprehensionLoop> loops = new AList<ArrayComprehensionLoop>();
+			IList<ArrayComprehensionLoop> loops = new List<ArrayComprehensionLoop>();
 			while (PeekToken() == Token.FOR)
 			{
 				loops.AddItem(ArrayComprehensionLoop());
@@ -3832,7 +3832,7 @@ tailLoop_break: ;
 		/// <exception cref="System.IO.IOException"></exception>
 		private AstNode GeneratorExpression(AstNode result, int pos, bool inFunctionParams)
 		{
-			IList<GeneratorExpressionLoop> loops = new AList<GeneratorExpressionLoop>();
+			IList<GeneratorExpressionLoop> loops = new List<GeneratorExpressionLoop>();
 			while (PeekToken() == Token.FOR)
 			{
 				loops.AddItem(GeneratorExpressionLoop());
@@ -3946,7 +3946,7 @@ tailLoop_break: ;
 			int pos = ts.tokenBeg;
 			int lineno = ts.lineno;
 			int afterComma = -1;
-			IList<ObjectProperty> elems = new AList<ObjectProperty>();
+			IList<ObjectProperty> elems = new List<ObjectProperty>();
 			ICollection<string> getterNames = null;
 			ICollection<string> setterNames = null;
 			if (this.inUseStrictDirective)
@@ -4523,7 +4523,7 @@ commaLoop_break: ;
 			}
 			Node comma = new Node(Token.COMMA);
 			result.AddChildToBack(comma);
-			IList<string> destructuringNames = new AList<string>();
+			IList<string> destructuringNames = new List<string>();
 			bool empty = true;
 			switch (left.GetType())
 			{

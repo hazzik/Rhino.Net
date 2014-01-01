@@ -28,7 +28,7 @@ namespace Rhino.Ast
 	/// <author>Steve Yegge</author>
 	public class ErrorCollector : IdeErrorReporter
 	{
-		private IList<ParseProblem> errors = new AList<ParseProblem>();
+		private IList<ParseProblem> errors = new List<ParseProblem>();
 
 		/// <summary>This is not called during AST generation.</summary>
 		/// <remarks>

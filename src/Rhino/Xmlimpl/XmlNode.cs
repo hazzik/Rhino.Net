@@ -464,7 +464,7 @@ namespace Rhino.Xmlimpl
 
 			internal virtual Rhino.Xmlimpl.XmlNode.Namespace[] GetNamespaces()
 			{
-				AList<Rhino.Xmlimpl.XmlNode.Namespace> rv = new AList<Rhino.Xmlimpl.XmlNode.Namespace>();
+				List<Rhino.Xmlimpl.XmlNode.Namespace> rv = new List<Rhino.Xmlimpl.XmlNode.Namespace>();
 				foreach (string prefix in map.Keys)
 				{
 					string uri = map.Get(prefix);
@@ -689,7 +689,7 @@ namespace Rhino.Xmlimpl
 
 		internal virtual Rhino.Xmlimpl.XmlNode[] GetMatchingChildren(Rhino.Xmlimpl.XmlNode.Filter filter)
 		{
-			AList<Rhino.Xmlimpl.XmlNode> rv = new AList<Rhino.Xmlimpl.XmlNode>();
+			List<Rhino.Xmlimpl.XmlNode> rv = new List<Rhino.Xmlimpl.XmlNode>();
 			XmlNodeList nodes = this.dom.ChildNodes;
 			for (int i = 0; i < nodes.Count; i++)
 			{
@@ -1059,7 +1059,7 @@ namespace Rhino.Xmlimpl
 
 			internal InternalList()
 			{
-				list = new AList<Rhino.Xmlimpl.XmlNode>();
+				list = new List<Rhino.Xmlimpl.XmlNode>();
 			}
 
 			private void _add(Rhino.Xmlimpl.XmlNode n)

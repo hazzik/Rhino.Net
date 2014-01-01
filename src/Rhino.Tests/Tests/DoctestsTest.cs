@@ -77,7 +77,7 @@ namespace Rhino.Tests
 		public static ICollection<object[]> DoctestValues()
 		{
 			FilePath[] doctests = GetDoctestFiles();
-			IList<object[]> result = new AList<object[]>();
+			IList<object[]> result = new List<object[]>();
 			foreach (FilePath f in doctests)
 			{
 				string contents = LoadFile(f);
@@ -92,7 +92,7 @@ namespace Rhino.Tests
 		/// <exception cref="System.IO.IOException"></exception>
 		public static ICollection<object[]> SingleDoctest()
 		{
-			IList<object[]> result = new AList<object[]>();
+			IList<object[]> result = new List<object[]>();
 			FilePath f = new FilePath(baseDirectory, "Counter.doctest");
 			string contents = LoadFile(f);
 			result.AddItem(new object[] { f.GetName(), contents, -1 });

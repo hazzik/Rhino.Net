@@ -27,7 +27,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class XmlLiteral : AstNode
 	{
-		private IList<XmlFragment> fragments = new AList<XmlFragment>();
+		private IList<XmlFragment> fragments = new List<XmlFragment>();
 
 		public XmlLiteral()
 		{

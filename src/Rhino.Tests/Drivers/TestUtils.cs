@@ -39,7 +39,7 @@ namespace Rhino.Drivers
 			{
 				throw new ArgumentException(dir + " is not a directory");
 			}
-			IList<FilePath> fileList = new AList<FilePath>();
+			IList<FilePath> fileList = new List<FilePath>();
 			RecursiveListFilesHelper(dir, filter, fileList);
 			return Sharpen.Collections.ToArray(fileList, new FilePath[fileList.Count]);
 		}
@@ -82,7 +82,7 @@ namespace Rhino.Drivers
 		/// <exception cref="System.IO.IOException"></exception>
 		public static string[] LoadTestsFromResource(string resource, string[] inherited)
 		{
-			IList<string> list = inherited == null ? new AList<string>() : new AList<string>(Arrays.AsList(inherited));
+			IList<string> list = inherited == null ? new List<string>() : new List<string>(Arrays.AsList(inherited));
 			InputStream @in = typeof(StandardTests).GetResourceAsStream(resource);
 			if (@in != null)
 			{

@@ -69,7 +69,7 @@ namespace Rhino.Ast
 			SETTER
 		}
 
-		private static readonly IList<AstNode> NO_PARAMS = Sharpen.Collections.UnmodifiableList(new AList<AstNode>());
+		private static readonly IList<AstNode> NO_PARAMS = Sharpen.Collections.UnmodifiableList(new List<AstNode>());
 
 		private Name functionName;
 
@@ -215,7 +215,7 @@ namespace Rhino.Ast
 			AssertNotNull(param);
 			if (@params == null)
 			{
-				@params = new AList<AstNode>();
+				@params = new List<AstNode>();
 			}
 			@params.AddItem(param);
 			param.SetParent(this);
@@ -360,7 +360,7 @@ namespace Rhino.Ast
 		{
 			if (generatorResumePoints == null)
 			{
-				generatorResumePoints = new AList<Node>();
+				generatorResumePoints = new List<Node>();
 			}
 			generatorResumePoints.AddItem(target);
 		}

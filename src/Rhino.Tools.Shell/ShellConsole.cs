@@ -18,7 +18,7 @@ using Sharpen;
 
 namespace Rhino.Tools.Shell
 {
-	/// <author>AndrÃ© Bargull</author>
+	/// <author>AndrГ© Bargull</author>
 	public abstract class ShellConsole
 	{
 		private static readonly Type[] NO_ARG = new Type[] {  };

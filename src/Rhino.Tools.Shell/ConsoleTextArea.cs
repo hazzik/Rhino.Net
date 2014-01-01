@@ -131,7 +131,7 @@ namespace Rhino.Tools.Shell
 
 		public ConsoleTextArea(string[] argv) : base()
 		{
-			history = new AList<string>();
+			history = new List<string>();
 			console1 = new ConsoleWriter(this);
 			console2 = new ConsoleWriter(this);
 			@out = new TextWriter(console1, true);

@@ -499,7 +499,7 @@ namespace Rhino
 
 		internal static MethodInfo[] GetOverridableMethods(Type clazz)
 		{
-			AList<MethodInfo> list = new AList<MethodInfo>();
+			List<MethodInfo> list = new List<MethodInfo>();
 			HashSet<string> skip = new HashSet<string>();
 			// Check superclasses before interfaces so we always choose
 			// implemented methods over abstract ones, even if a subclass
@@ -519,7 +519,7 @@ namespace Rhino
 			return Sharpen.Collections.ToArray(list, new MethodInfo[list.Count]);
 		}
 
-		private static void AppendOverridableMethods(Type c, AList<MethodInfo> list, HashSet<string> skip)
+		private static void AppendOverridableMethods(Type c, List<MethodInfo> list, HashSet<string> skip)
 		{
 			MethodInfo[] methods = Sharpen.Runtime.GetDeclaredMethods(c);
 			for (int i = 0; i < methods.Length; i++)

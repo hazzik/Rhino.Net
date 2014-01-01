@@ -693,7 +693,7 @@ again_break: ;
 		public virtual int[] GetIndexIds()
 		{
 			object[] ids = GetIds();
-			IList<int> indices = new AList<int>(ids.Length);
+			IList<int> indices = new List<int>(ids.Length);
 			foreach (object id in ids)
 			{
 				int int32Id = ScriptRuntime.ToInt32(id);

@@ -99,7 +99,7 @@ namespace Rhino.Ast
 		{
 			if (childScopes == null)
 			{
-				childScopes = new AList<Rhino.Ast.Scope>();
+				childScopes = new List<Rhino.Ast.Scope>();
 			}
 			childScopes.AddItem(child);
 			child.SetParentScope(this);
@@ -284,7 +284,7 @@ namespace Rhino.Ast
 		/// </exception>
 		public virtual IList<AstNode> GetStatements()
 		{
-			IList<AstNode> stmts = new AList<AstNode>();
+			IList<AstNode> stmts = new List<AstNode>();
 			Node n = GetFirstChild();
 			while (n != null)
 			{

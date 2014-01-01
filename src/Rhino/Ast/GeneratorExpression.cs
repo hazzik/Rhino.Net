@@ -18,7 +18,7 @@ namespace Rhino.Ast
 	{
 		private AstNode result;
 
-		private IList<GeneratorExpressionLoop> loops = new AList<GeneratorExpressionLoop>();
+		private IList<GeneratorExpressionLoop> loops = new List<GeneratorExpressionLoop>();
 
 		private AstNode filter;
 

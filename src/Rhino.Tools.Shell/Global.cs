@@ -124,7 +124,7 @@ namespace Rhino.Tools.Shell
 		{
 			RequireBuilder rb = new RequireBuilder();
 			rb.SetSandboxed(sandboxed);
-			IList<Uri> uris = new AList<Uri>();
+			IList<Uri> uris = new List<Uri>();
 			if (modulePath != null)
 			{
 				foreach (string path in modulePath)

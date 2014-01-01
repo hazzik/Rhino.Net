@@ -35,7 +35,7 @@ namespace Rhino.Ast
 	/// </remarks>
 	public class SwitchStatement : Jump
 	{
-		private static readonly IList<SwitchCase> NO_CASES = Sharpen.Collections.UnmodifiableList(new AList<SwitchCase>());
+		private static readonly IList<SwitchCase> NO_CASES = Sharpen.Collections.UnmodifiableList(new List<SwitchCase>());
 
 		private AstNode expression;
 
@@ -148,7 +148,7 @@ namespace Rhino.Ast
 			AssertNotNull(switchCase);
 			if (cases == null)
 			{
-				cases = new AList<SwitchCase>();
+				cases = new List<SwitchCase>();
 			}
 			cases.AddItem(switchCase);
 			switchCase.SetParent(this);
