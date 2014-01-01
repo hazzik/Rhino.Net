@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -522,7 +522,7 @@ namespace Rhino.Tools.Shell
 			if (method.Equals(this.completeMethod))
 			{
 				int result = Complete((string)args[0], System.Convert.ToInt32(((int)args[1])), (IList<string>)args[2]);
-				return Sharpen.Extensions.ValueOf(result);
+				return result;
 			}
 			throw new MissingMethodException(method.ToString());
 		}

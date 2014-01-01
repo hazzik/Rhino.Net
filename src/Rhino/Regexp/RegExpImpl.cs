@@ -135,11 +135,11 @@ namespace Rhino.RegExp
 				result = re.ExecuteRegExp(cx, scope, reImpl, str, indexp, NativeRegExp.TEST);
 				if (result != null && result.Equals(true))
 				{
-					result = Sharpen.Extensions.ValueOf(reImpl.leftContext.length);
+					result = reImpl.leftContext.length;
 				}
 				else
 				{
-					result = Sharpen.Extensions.ValueOf(-1);
+					result = -1;
 				}
 			}
 			else
@@ -306,7 +306,7 @@ again_break: ;
 						args[i + 1] = Undefined.instance;
 					}
 				}
-				args[parenCount + 1] = Sharpen.Extensions.ValueOf(reImpl.leftContext.length);
+				args[parenCount + 1] = reImpl.leftContext.length;
 				args[parenCount + 2] = rdata.str;
 				// This is a hack to prevent expose of reImpl data to
 				// JS function which can run new regexps modifing

@@ -602,7 +602,7 @@ namespace Rhino
 			object listeners = propertyListeners;
 			if (listeners != null && version != this.version)
 			{
-				FirePropertyChangeImpl(listeners, languageVersionProperty, Sharpen.Extensions.ValueOf(this.version), Sharpen.Extensions.ValueOf(version));
+				FirePropertyChangeImpl(listeners, languageVersionProperty, this.version, version);
 			}
 			this.version = version;
 		}

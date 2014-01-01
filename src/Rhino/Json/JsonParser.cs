@@ -445,11 +445,11 @@ namespace Rhino.Json
 			int ival = (int)dval;
 			if (ival == dval)
 			{
-				return Sharpen.Extensions.ValueOf(ival);
+				return ival;
 			}
 			else
 			{
-				return Sharpen.Extensions.ValueOf(dval);
+				return dval;
 			}
 		}
 

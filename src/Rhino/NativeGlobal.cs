@@ -472,7 +472,7 @@ namespace Rhino
 			s = Sharpen.Runtime.Substring(s, start, i);
 			try
 			{
-				return Sharpen.Extensions.ValueOf(s);
+				return s;
 			}
 			catch (FormatException)
 			{

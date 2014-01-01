@@ -32,7 +32,7 @@ namespace Rhino
 			ScriptableObject.PutProperty(obj, "name", "Error");
 			ScriptableObject.PutProperty(obj, "message", string.Empty);
 			ScriptableObject.PutProperty(obj, "fileName", string.Empty);
-			ScriptableObject.PutProperty(obj, "lineNumber", Sharpen.Extensions.ValueOf(0));
+			ScriptableObject.PutProperty(obj, "lineNumber", 0);
 			obj.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
 		}
 
@@ -52,7 +52,7 @@ namespace Rhino
 					if (arglen >= 3)
 					{
 						int line = ScriptRuntime.ToInt32(args[2]);
-						ScriptableObject.PutProperty(obj, "lineNumber", Sharpen.Extensions.ValueOf(line));
+						ScriptableObject.PutProperty(obj, "lineNumber", line);
 					}
 				}
 			}

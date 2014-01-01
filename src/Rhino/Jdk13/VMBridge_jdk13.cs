@@ -145,11 +145,11 @@ namespace Rhino.Jdk13
 					if (methodName.Equals("equals"))
 					{
 						object other = args[0];
-						return Sharpen.Extensions.ValueOf(proxy == other);
+						return proxy == other;
 					}
 					if (methodName.Equals("hashCode"))
 					{
-						return Sharpen.Extensions.ValueOf(target.GetHashCode());
+						return target.GetHashCode();
 					}
 					if (methodName.Equals("toString"))
 					{

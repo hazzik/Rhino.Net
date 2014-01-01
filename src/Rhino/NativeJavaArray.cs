@@ -65,7 +65,7 @@ namespace Rhino
 		{
 			if (id.Equals("length"))
 			{
-				return Sharpen.Extensions.ValueOf(length);
+				return length;
 			}
 			object result = base.Get(id, start);
 			if (result == ScriptableConstants.NOT_FOUND && !ScriptableObject.HasProperty(GetPrototype(), id))
@@ -130,7 +130,7 @@ namespace Rhino
 			int i = length;
 			while (--i >= 0)
 			{
-				result[i] = Sharpen.Extensions.ValueOf(i);
+				result[i] = i;
 			}
 			return result;
 		}

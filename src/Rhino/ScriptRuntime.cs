@@ -303,7 +303,7 @@ namespace Rhino
 
 		public static int WrapInt(int i)
 		{
-			return Sharpen.Extensions.ValueOf(i);
+			return i;
 		}
 
 		public static double WrapNumber(double x)
@@ -1589,7 +1589,7 @@ namespace Rhino
 			long indexTest = IndexFromString(s);
 			if (indexTest >= 0)
 			{
-				return Sharpen.Extensions.ValueOf((int)indexTest);
+				return (int)indexTest;
 			}
 			return s;
 		}
@@ -1607,7 +1607,7 @@ namespace Rhino
 			int i = (int)d;
 			if (i == d)
 			{
-				return Sharpen.Extensions.ValueOf(i);
+				return i;
 			}
 			return ToString(d);
 		}
@@ -2374,7 +2374,7 @@ childScopesChecks_break: ;
 						continue;
 					}
 					// must have been deleted
-					x.currentId = x.enumNumbers ? (object)(Sharpen.Extensions.ValueOf(intId)) : intId.ToString();
+					x.currentId = x.enumNumbers ? (object)intId : intId.ToString();
 				}
 				return true;
 			}
@@ -3908,7 +3908,7 @@ search_break: ;
 			object[] args;
 			if (line > 0)
 			{
-				args = new object[] { errorMsg, sourceUri, Sharpen.Extensions.ValueOf(line) };
+				args = new object[] { errorMsg, sourceUri, line };
 			}
 			else
 			{
@@ -4574,7 +4574,7 @@ search_break: ;
 		{
 			int[] linep = new int[] { 0 };
 			string filename = Context.GetSourcePositionFromStack(linep);
-			Scriptable error = NewBuiltinObject(cx, scope, TopLevel.Builtins.Error, new object[] { message, filename, Sharpen.Extensions.ValueOf(linep[0]) });
+			Scriptable error = NewBuiltinObject(cx, scope, TopLevel.Builtins.Error, new object[] { message, filename, linep[0] });
 			return new JavaScriptException(error, filename, linep[0]);
 		}
 

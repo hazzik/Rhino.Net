@@ -39,7 +39,7 @@ namespace Rhino.Tests
 					((Callable)cont).Call(cx, scope, scope, new object[] { null });
 				}
 				NUnit.Framework.Assert.AreEqual(counter, 5);
-				NUnit.Framework.Assert.AreEqual(Sharpen.Extensions.ValueOf(3), ScriptableObject.GetProperty(scope, "result"));
+				NUnit.Framework.Assert.AreEqual(3, ScriptableObject.GetProperty(scope, "result"));
 			}
 			finally
 			{
@@ -70,7 +70,7 @@ namespace Rhino.Tests
 					cx.ResumeContinuation(cont, scope, null);
 				}
 				NUnit.Framework.Assert.AreEqual(counter, 5);
-				NUnit.Framework.Assert.AreEqual(Sharpen.Extensions.ValueOf(3), ScriptableObject.GetProperty(scope, "result"));
+				NUnit.Framework.Assert.AreEqual(3, ScriptableObject.GetProperty(scope, "result"));
 			}
 			finally
 			{

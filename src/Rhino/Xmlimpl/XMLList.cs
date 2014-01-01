@@ -386,7 +386,7 @@ namespace Rhino.XmlImpl
 				enumObjs = new object[Length()];
 				for (int i = 0; i < enumObjs.Length; i++)
 				{
-					enumObjs[i] = Sharpen.Extensions.ValueOf(i);
+					enumObjs[i] = i;
 				}
 			}
 			return enumObjs;

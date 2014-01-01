@@ -107,7 +107,7 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				return new object[] { Sharpen.Extensions.ValueOf(0) };
+				return new object[] { 0 };
 			}
 		}
 

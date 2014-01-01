@@ -39,7 +39,7 @@ namespace Rhino
 				}
 				if (!error.Has("lineNumber", error))
 				{
-					error.Put("lineNumber", error, Sharpen.Extensions.ValueOf(lineNumber));
+					error.Put("lineNumber", error, lineNumber);
 				}
 				// set stack property, see bug #549604
 				error.SetStackProvider(this);

@@ -287,7 +287,7 @@ namespace Rhino
 					mantissa = -mantissa;
 				}
 				exp -= 1075;
-				BigInteger x = Sharpen.Extensions.ValueOf(mantissa);
+				BigInteger x = mantissa;
 				if (exp > 0)
 				{
 					x = x.ShiftLeft(exp);
@@ -329,17 +329,17 @@ namespace Rhino
 				}
 				s2 += Bias + P;
 				//            JS_ASSERT(-s2 < e);
-				BigInteger mlo = Sharpen.Extensions.ValueOf(1);
+				BigInteger mlo = 1;
 				BigInteger mhi = mlo;
 				if ((word1 == 0) && ((word0 & Bndry_mask) == 0) && ((word0 & (Exp_mask & Exp_mask << 1)) != 0))
 				{
 					s2 += Log2P;
-					mhi = Sharpen.Extensions.ValueOf(1 << Log2P);
+					mhi = 1 << Log2P;
 				}
 				b = b.ShiftLeft(e[0] + s2);
-				BigInteger s = Sharpen.Extensions.ValueOf(1);
+				BigInteger s = 1;
 				s = s.ShiftLeft(s2);
-				BigInteger bigBase = Sharpen.Extensions.ValueOf(@base);
+				BigInteger bigBase = @base;
 				bool done = false;
 				do
 				{
@@ -421,7 +421,7 @@ namespace Rhino
 		// XXXX the C version built a cache of these
 		internal static BigInteger Pow5mult(BigInteger b, int k)
 		{
-			return System.Numerics.BigInteger.Multiply(b, System.Numerics.BigInteger.Pow(Sharpen.Extensions.ValueOf(5), k));
+			return System.Numerics.BigInteger.Multiply(b, System.Numerics.BigInteger.Pow(5, k));
 		}
 
 		internal static bool RoundOff(StringBuilder buf)
@@ -883,7 +883,7 @@ namespace Rhino
 				}
 				b2 += i;
 				s2 += i;
-				mhi = Sharpen.Extensions.ValueOf(1);
+				mhi = 1;
 			}
 			if (m2 > 0 && s2 > 0)
 			{
@@ -912,7 +912,7 @@ namespace Rhino
 					b = Pow5mult(b, b5);
 				}
 			}
-			S = Sharpen.Extensions.ValueOf(1);
+			S = 1;
 			if (s5 > 0)
 			{
 				S = Pow5mult(S, s5);
@@ -971,17 +971,17 @@ namespace Rhino
 				if (b.CompareTo(S) < 0)
 				{
 					k--;
-					b = System.Numerics.BigInteger.Multiply(b, Sharpen.Extensions.ValueOf(10));
+					b = System.Numerics.BigInteger.Multiply(b, 10);
 					if (leftright)
 					{
-						mhi = System.Numerics.BigInteger.Multiply(mhi, Sharpen.Extensions.ValueOf(10));
+						mhi = System.Numerics.BigInteger.Multiply(mhi, 10);
 					}
 					ilim = ilim1;
 				}
 			}
 			if (ilim <= 0 && mode > 2)
 			{
-				if ((ilim < 0) || ((i = b.CompareTo(S = System.Numerics.BigInteger.Multiply(S, Sharpen.Extensions.ValueOf(5)))) < 0) || ((i == 0 && !biasUp)))
+				if ((ilim < 0) || ((i = b.CompareTo(S = System.Numerics.BigInteger.Multiply(S, 5))) < 0) || ((i == 0 && !biasUp)))
 				{
 					buf.Length = 0;
 					buf.Append('0');
@@ -1077,15 +1077,15 @@ namespace Rhino
 					{
 						break;
 					}
-					b = System.Numerics.BigInteger.Multiply(b, Sharpen.Extensions.ValueOf(10));
+					b = System.Numerics.BigInteger.Multiply(b, 10);
 					if (mlo == mhi)
 					{
-						mlo = mhi = System.Numerics.BigInteger.Multiply(mhi, Sharpen.Extensions.ValueOf(10));
+						mlo = mhi = System.Numerics.BigInteger.Multiply(mhi, 10);
 					}
 					else
 					{
-						mlo = System.Numerics.BigInteger.Multiply(mlo, Sharpen.Extensions.ValueOf(10));
-						mhi = System.Numerics.BigInteger.Multiply(mhi, Sharpen.Extensions.ValueOf(10));
+						mlo = System.Numerics.BigInteger.Multiply(mlo, 10);
+						mhi = System.Numerics.BigInteger.Multiply(mhi, 10);
 					}
 				}
 			}
@@ -1102,7 +1102,7 @@ namespace Rhino
 					{
 						break;
 					}
-					b = System.Numerics.BigInteger.Multiply(b, Sharpen.Extensions.ValueOf(10));
+					b = System.Numerics.BigInteger.Multiply(b, 10);
 				}
 			}
 			b = b.ShiftLeft(1);

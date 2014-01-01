@@ -414,7 +414,7 @@ namespace Rhino
 				{
 					object arg = args.Length < 1 ? Undefined.instance : args[0];
 					ScriptableObject obj = EnsureScriptableObject(arg);
-					return Sharpen.Extensions.ValueOf(obj.IsExtensible());
+					return obj.IsExtensible();
 				}
 
 				case ConstructorId_preventExtensions:

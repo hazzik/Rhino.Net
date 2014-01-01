@@ -62,7 +62,7 @@ namespace Rhino
 				}
 				if (staticType == typeof(char))
 				{
-					return Sharpen.Extensions.ValueOf(((char)obj));
+					return (char)obj;
 				}
 				return obj;
 			}

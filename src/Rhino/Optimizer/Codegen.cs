@@ -93,7 +93,7 @@ namespace Rhino.Optimizer
 			try
 			{
 				ConstructorInfo ctor = cl.GetConstructors()[0];
-				object[] initArgs = new object[] { scope, cx, Sharpen.Extensions.ValueOf(0) };
+				object[] initArgs = new object[] { scope, cx, 0 };
 				f = (NativeFunction)ctor.NewInstance(initArgs);
 			}
 			catch (Exception ex)
@@ -3062,7 +3062,7 @@ namespace Rhino.Optimizer
 			AddGoto(target, ByteCode.GOTO);
 			int retLabel = cfw.AcquireLabel();
 			cfw.MarkLabel(retLabel);
-			ret.jsrPoints.Add(Sharpen.Extensions.ValueOf(retLabel));
+			ret.jsrPoints.Add(retLabel);
 		}
 
 		private void GenerateArrayLiteralFactory(Node node, int count)

@@ -3481,7 +3481,7 @@ namespace Rhino
 					{
 						a = new object[s.Length];
 					}
-					a[c++] = slot.name != null ? slot.name : Sharpen.Extensions.ValueOf(slot.indexOrHash);
+					a[c++] = slot.name != null ? slot.name : slot.indexOrHash;
 				}
 				slot = slot.orderedNext;
 				while (slot != null && slot.wasDeleted)

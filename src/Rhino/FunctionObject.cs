@@ -214,7 +214,7 @@ namespace Rhino
 					{
 						return arg;
 					}
-					return Sharpen.Extensions.ValueOf(ScriptRuntime.ToInt32(arg));
+					return ScriptRuntime.ToInt32(arg);
 				}
 
 				case JAVA_BOOLEAN_TYPE:

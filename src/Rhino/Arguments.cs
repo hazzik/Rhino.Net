@@ -33,7 +33,7 @@ namespace Rhino
 			SetParentScope(parent);
 			SetPrototype(ScriptableObject.GetObjectPrototype(parent));
 			args = activation.originalArgs;
-			lengthObj = Sharpen.Extensions.ValueOf(args.Length);
+			lengthObj = args.Length;
 			NativeFunction f = activation.function;
 			calleeObj = f;
 			Scriptable topLevel = GetTopLevelScope(parent);
@@ -417,7 +417,7 @@ L0_break: ;
 					{
 						if (present == null || !present[i_1])
 						{
-							ids[offset] = Sharpen.Extensions.ValueOf(i_1);
+							ids[offset] = i_1;
 							++offset;
 						}
 					}

@@ -27,7 +27,7 @@ namespace Rhino
 
 		private static readonly object ARRAY_TAG = "Array";
 
-		private static readonly int NEGATIVE_ONE = Sharpen.Extensions.ValueOf(-1);
+		private static readonly int NEGATIVE_ONE = -1;
 
 		internal static void Init(Scriptable scope, bool @sealed)
 		{
@@ -668,7 +668,7 @@ again_break: ;
 				// Replace existing elements by their indexes
 				if (dense[i] != ScriptableConstants.NOT_FOUND)
 				{
-					ids[presentCount] = Sharpen.Extensions.ValueOf(i);
+					ids[presentCount] = i;
 					++presentCount;
 				}
 			}
@@ -712,7 +712,7 @@ again_break: ;
 				Context cx = Context.GetContext();
 				if (cx.GetLanguageVersion() == Context.VERSION_1_2)
 				{
-					return Sharpen.Extensions.ValueOf(length);
+					return length;
 				}
 			}
 			return base.GetDefaultValue(hint);
@@ -1875,7 +1875,7 @@ again_break: ;
 						{
 							if (na.dense[i] != ScriptableConstants.NOT_FOUND && ScriptRuntime.ShallowEq(na.dense[i], compareTo))
 							{
-								return Sharpen.Extensions.ValueOf(i);
+								return i;
 							}
 						}
 					}
@@ -1885,7 +1885,7 @@ again_break: ;
 						{
 							if (na.dense[i] != ScriptableConstants.NOT_FOUND && ScriptRuntime.ShallowEq(na.dense[i], compareTo))
 							{
-								return Sharpen.Extensions.ValueOf(i);
+								return i;
 							}
 						}
 					}
@@ -1899,7 +1899,7 @@ again_break: ;
 					object val = GetRawElem(thisObj, i);
 					if (val != ScriptableConstants.NOT_FOUND && ScriptRuntime.ShallowEq(val, compareTo))
 					{
-						return Sharpen.Extensions.ValueOf(i);
+						return i;
 					}
 				}
 			}
@@ -1910,7 +1910,7 @@ again_break: ;
 					object val = GetRawElem(thisObj, i);
 					if (val != ScriptableConstants.NOT_FOUND && ScriptRuntime.ShallowEq(val, compareTo))
 					{
-						return Sharpen.Extensions.ValueOf(i);
+						return i;
 					}
 				}
 			}
@@ -1950,7 +1950,7 @@ again_break: ;
 					continue;
 				}
 				innerArgs[0] = elem;
-				innerArgs[1] = Sharpen.Extensions.ValueOf(i);
+				innerArgs[1] = i;
 				innerArgs[2] = thisObj;
 				object result = f.Call(cx, parent, thisArg, innerArgs);
 				switch (id)

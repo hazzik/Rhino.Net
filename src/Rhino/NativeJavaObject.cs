@@ -774,7 +774,7 @@ namespace Rhino
 							// not other JS objects converted to strings
 							if (((CharSequence)value).Length == 1)
 							{
-								return Sharpen.Extensions.ValueOf(((CharSequence)value)[0]);
+								return ((CharSequence)value)[0];
 							}
 							else
 							{
@@ -974,7 +974,7 @@ namespace Rhino
 				{
 					return value;
 				}
-				return Sharpen.Extensions.ValueOf((char)ToInteger(value, ScriptRuntime.CharacterClass, char.MinValue, char.MaxValue));
+				return (char)ToInteger(value, ScriptRuntime.CharacterClass, char.MinValue, char.MaxValue);
 			}
 			// Double, Float
 			if (type == ScriptRuntime.ObjectClass || type == ScriptRuntime.DoubleClass || type == typeof(double))
@@ -1024,7 +1024,7 @@ namespace Rhino
 				}
 				else
 				{
-					return Sharpen.Extensions.ValueOf((int)ToInteger(value, ScriptRuntime.IntegerClass, int.MinValue, int.MaxValue));
+					return (int)ToInteger(value, ScriptRuntime.IntegerClass, int.MinValue, int.MaxValue);
 				}
 			}
 			if (type == ScriptRuntime.LongClass || type == typeof(long))
@@ -1037,7 +1037,7 @@ namespace Rhino
 				{
 					double max = System.BitConverter.Int64BitsToDouble(unchecked((long)(0x43dfffffffffffffL)));
 					double min = System.BitConverter.Int64BitsToDouble(unchecked((long)(0xc3e0000000000000L)));
-					return Sharpen.Extensions.ValueOf(ToInteger(value, ScriptRuntime.LongClass, min, max));
+					return ToInteger(value, ScriptRuntime.LongClass, min, max);
 				}
 			}
 			if (type == ScriptRuntime.ShortClass || type == typeof(short))
@@ -1048,7 +1048,7 @@ namespace Rhino
 				}
 				else
 				{
-					return Sharpen.Extensions.ValueOf((short)ToInteger(value, ScriptRuntime.ShortClass, short.MinValue, short.MaxValue));
+					return (short)ToInteger(value, ScriptRuntime.ShortClass, short.MinValue, short.MaxValue);
 				}
 			}
 			if (type == ScriptRuntime.ByteClass || type == typeof(byte))
@@ -1059,7 +1059,7 @@ namespace Rhino
 				}
 				else
 				{
-					return Sharpen.Extensions.ValueOf(unchecked((byte)ToInteger(value, ScriptRuntime.ByteClass, byte.MinValue, byte.MaxValue)));
+					return unchecked((byte)ToInteger(value, ScriptRuntime.ByteClass, byte.MinValue, byte.MaxValue));
 				}
 			}
 			return ToDouble(value);

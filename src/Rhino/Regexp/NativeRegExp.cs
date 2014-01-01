@@ -2908,7 +2908,7 @@ switchStatement_break: ;
 			}
 			if (!(matchType == TEST))
 			{
-				obj.Put("index", obj, Sharpen.Extensions.ValueOf(start + gData.skipped));
+				obj.Put("index", obj, start + gData.skipped);
 				obj.Put("input", obj, str);
 			}
 			if (res.lastMatch == null)
