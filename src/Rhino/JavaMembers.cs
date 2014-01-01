@@ -174,7 +174,7 @@ namespace Rhino
 				}
 				catch (MemberAccessException accessEx)
 				{
-					if ((field.Attributes & Modifier.FINAL) != 0)
+					if (field.IsInitOnly)
 					{
 						// treat Java final the same as JavaScript [[READONLY]]
 						return;
@@ -345,7 +345,7 @@ namespace Rhino
 
 		private static void DiscoverAccessibleMethods(Type clazz, IDictionary<JavaMembers.MethodSignature, MethodInfo> map, bool includeProtected, bool includePrivate)
 		{
-			if (Modifier.IsPublic(clazz.Attributes) || includePrivate)
+			if (clazz.IsPublic || includePrivate)
 			{
 				try
 				{
@@ -358,8 +358,7 @@ namespace Rhino
 								MethodInfo[] methods = Sharpen.Runtime.GetDeclaredMethods(clazz);
 								foreach (MethodInfo method in methods)
 								{
-									int mods = method.Attributes;
-									if (Modifier.IsPublic(mods) || Modifier.IsProtected(mods) || includePrivate)
+									if (method.IsPublic || method.IsFamily || includePrivate)
 									{
 										JavaMembers.MethodSignature sig = new JavaMembers.MethodSignature(method);
 										if (!map.ContainsKey(sig))
@@ -467,8 +466,7 @@ namespace Rhino
 			MethodInfo[] methods = DiscoverAccessibleMethods(cl, includeProtected, includePrivate);
 			foreach (MethodInfo method in methods)
 			{
-				int mods = method.Attributes;
-				bool isStatic = Modifier.IsStatic(mods);
+				bool isStatic = method.IsStatic;
 				IDictionary<string, object> ht = isStatic ? staticMembers : members;
 				string name = method.Name;
 				object value = ht.Get(name);
@@ -541,10 +539,9 @@ namespace Rhino
 			foreach (FieldInfo field in fields)
 			{
 				string name = field.Name;
-				int mods = field.Attributes;
 				try
 				{
-					bool isStatic = Modifier.IsStatic(mods);
+					bool isStatic = field.IsStatic;
 					IDictionary<string, object> ht = isStatic ? staticMembers : members;
 					object member = ht.Get(name);
 					if (member == null)
@@ -653,7 +650,7 @@ namespace Rhino
 						if (v != null)
 						{
 							// A private field shouldn't mask a public getter/setter
-							if (!includePrivate || !(v is MemberInfo) || !Modifier.IsPrivate(((MemberInfo)v).Attributes))
+							if (!includePrivate || !Modifier.IsPrivate(v))
 							{
 								continue;
 							}
@@ -753,8 +750,7 @@ namespace Rhino
 						FieldInfo[] declared = Sharpen.Runtime.GetDeclaredFields(currentClass);
 						foreach (FieldInfo field in declared)
 						{
-							int mod = field.Attributes;
-							if (includePrivate || Modifier.IsPublic(mod) || Modifier.IsProtected(mod))
+							if (includePrivate || field.IsPublic || field.IsFamily)
 							{
 								if (!field.IsAccessible())
 								{

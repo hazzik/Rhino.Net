@@ -387,8 +387,7 @@ namespace Rhino
 			ConstructorInfo[] ctors = superClass.GetDeclaredConstructors();
 			foreach (ConstructorInfo ctor in ctors)
 			{
-				int mod = ctor.Attributes;
-				if (Modifier.IsPublic(mod) || Modifier.IsProtected(mod))
+				if (ctor.IsPublic || ctor.IsFamily)
 				{
 					GenerateCtor(cfw, adapterName, superName, ctor);
 				}
@@ -407,8 +406,7 @@ namespace Rhino
 				for (int j = 0; j < methods.Length; j++)
 				{
 					MethodInfo method = methods[j];
-					int mods = method.Attributes;
-					if (Modifier.IsStatic(mods) || Modifier.IsFinal(mods))
+					if (method.IsStatic || method.IsFinal)
 					{
 						continue;
 					}
@@ -448,11 +446,10 @@ namespace Rhino
 			for (int j_1 = 0; j_1 < methods_1.Length; j_1++)
 			{
 				MethodInfo method = methods_1[j_1];
-				int mods = method.Attributes;
 				// if a method is marked abstract, must implement it or the
 				// resulting class won't be instantiable. otherwise, if the object
 				// has a property of the same name, then an override is intended.
-				bool isAbstractMethod = Modifier.IsAbstract(mods);
+				bool isAbstractMethod = method.IsAbstract;
 				string methodName = method.Name;
 				if (isAbstractMethod || functionNames.Has(methodName))
 				{
@@ -529,19 +526,18 @@ namespace Rhino
 					continue;
 				}
 				// skip this method
-				int mods = methods[i].Attributes;
-				if (Modifier.IsStatic(mods))
+				if (methods[i].IsStatic)
 				{
 					continue;
 				}
-				if (Modifier.IsFinal(mods))
+				if (methods[i].IsFinal)
 				{
 					// Make sure we don't add a final method to the list
 					// of overridable methods.
 					skip.Add(methodKey);
 					continue;
 				}
-				if (Modifier.IsPublic(mods) || Modifier.IsProtected(mods))
+				if (methods[i].IsPublic || methods[i].IsFamily)
 				{
 					list.Add(methods[i]);
 					skip.Add(methodKey);
@@ -658,10 +654,10 @@ namespace Rhino
 				ScriptableObject global = ScriptRuntime.GetGlobal(cx);
 				script.Exec(cx, global);
 				return global;
-			);
+			});
 		}
 
-		private static void GenerateCtor<_T0>(ClassFileWriter cfw, string adapterName, string superName, ConstructorInfo superCtor)
+		private static void GenerateCtor(ClassFileWriter cfw, string adapterName, string superName, ConstructorInfo superCtor)
 		{
 			short locals = 3;
 			// this + factory + delegee

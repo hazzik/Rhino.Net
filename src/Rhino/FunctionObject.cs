@@ -346,7 +346,7 @@ namespace Rhino
 			int count = 0;
 			for (int i = 0; i < methods.Length; i++)
 			{
-				if (sawSecurityException ? methods[i].DeclaringType != clazz : !Modifier.IsPublic(methods[i].Attributes))
+				if (sawSecurityException ? methods[i].DeclaringType != clazz : !methods[i].IsPublic)
 				{
 					methods[i] = null;
 				}

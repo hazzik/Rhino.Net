@@ -9,7 +9,6 @@
 using System;
 using System.Reflection;
 using System.Text;
-using Rhino;
 using Sharpen;
 
 namespace Rhino
@@ -29,8 +28,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeJavaMethod : BaseFunction
 	{
-		internal const long serialVersionUID = -3440381785576412928L;
-
 		internal NativeJavaMethod(MemberBox[] methods)
 		{
 			this.functionName = methods[0].GetName();
@@ -416,12 +413,12 @@ namespace Rhino
 							bestFitIndex = extraBestFits[j_1];
 						}
 						MemberBox bestFit = methodsOrCtors[bestFitIndex];
-						if (cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS) && (bestFit.Member().Attributes & Modifier.PUBLIC) != (member.Member().Attributes & Modifier.PUBLIC))
+						if (cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS) && (bestFit.Member().Attributes & MethodAttributes.Public) != (member.Member().Attributes & MethodAttributes.Public))
 						{
 							// When FEATURE_ENHANCED_JAVA_ACCESS gives us access
 							// to non-public members, continue to prefer public
 							// methods in overloading
-							if ((bestFit.Member().Attributes & Modifier.PUBLIC) == 0)
+							if (!bestFit.Member().IsPublic)
 							{
 								++betterCount;
 							}

@@ -30,10 +30,8 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class MemberBox
 	{
-		internal const long serialVersionUID = 6358550398665688245L;
-
 		[System.NonSerialized]
-		private MemberInfo memberObject;
+		private MethodBase memberObject;
 
 		[System.NonSerialized]
 		internal Type[] argTypes;
@@ -61,7 +59,7 @@ namespace Rhino
 			this.vararg = VMBridge.instance.IsVarArgs(method);
 		}
 
-		private void Init<_T0>(ConstructorInfo constructor)
+		private void Init(ConstructorInfo constructor)
 		{
 			this.memberObject = constructor;
 			this.argTypes = constructor.GetParameterTypes();
@@ -78,7 +76,7 @@ namespace Rhino
 			return (ConstructorInfo)memberObject;
 		}
 
-		internal MemberInfo Member()
+		internal MethodBase Member()
 		{
 			return memberObject;
 		}
@@ -95,7 +93,7 @@ namespace Rhino
 
 		internal bool IsStatic()
 		{
-			return Modifier.IsStatic(memberObject.Attributes);
+			return memberObject.IsStatic;
 		}
 
 		internal string GetName()
@@ -121,7 +119,7 @@ namespace Rhino
 			else
 			{
 				ConstructorInfo ctor = Ctor();
-				string name = ((Type)ctor.DeclaringType).FullName;
+				string name = ctor.DeclaringType.FullName;
 				int lastDot = name.LastIndexOf('.');
 				if (lastDot >= 0)
 				{
@@ -211,20 +209,19 @@ namespace Rhino
 			}
 		}
 
-		private static MethodInfo SearchAccessibleMethod(MethodInfo method, Type[] @params)
+		private static MethodInfo SearchAccessibleMethod(MethodBase method, Type[] @params)
 		{
-			int modifiers = method.Attributes;
-			if (Modifier.IsPublic(modifiers) && !Modifier.IsStatic(modifiers))
+			if (method.IsPublic && !method.IsStatic)
 			{
 				Type c = method.DeclaringType;
-				if (!Modifier.IsPublic(c.Attributes))
+				if (!c.IsPublic)
 				{
 					string name = method.Name;
 					Type[] intfs = c.GetInterfaces();
 					for (int i = 0, N = intfs.Length; i != N; ++i)
 					{
 						Type intf = intfs[i];
-						if (Modifier.IsPublic(intf.Attributes))
+						if (intf.IsPublic)
 						{
 							try
 							{
@@ -245,13 +242,12 @@ namespace Rhino
 						{
 							break;
 						}
-						if (Modifier.IsPublic(c.Attributes))
+						if (c.IsPublic)
 						{
 							try
 							{
 								MethodInfo m = c.GetMethod(name, @params);
-								int mModifiers = m.Attributes;
-								if (Modifier.IsPublic(mModifiers) && !Modifier.IsStatic(mModifiers))
+								if (m.IsPublic && !m.IsStatic)
 								{
 									return m;
 								}

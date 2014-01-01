@@ -171,8 +171,7 @@ namespace Rhino
 		public virtual Scriptable Construct(Context cx, Scriptable scope, object[] args)
 		{
 			Type classObject = GetClassObject();
-			int modifiers = classObject.Attributes;
-			if (!(Modifier.IsInterface(modifiers) || Modifier.IsAbstract(modifiers)))
+			if (!(classObject.IsInterface || classObject.IsAbstract))
 			{
 				NativeJavaMethod ctors = members.ctors;
 				int index = ctors.FindCachedFunction(cx, args);

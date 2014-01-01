@@ -1360,13 +1360,13 @@ namespace Rhino
 					continue;
 				}
 				Type[] parmTypes = Sharpen.Runtime.GetParameterTypes(method);
-				if (parmTypes.Length == 3 && parmTypes[0] == ScriptRuntime.ContextClass && parmTypes[1] == ScriptRuntime.ScriptableClass && parmTypes[2] == typeof(bool) && Modifier.IsStatic(method.Attributes))
+				if (parmTypes.Length == 3 && parmTypes[0] == ScriptRuntime.ContextClass && parmTypes[1] == ScriptRuntime.ScriptableClass && parmTypes[2] == typeof(bool) && method.IsStatic)
 				{
-					object[] args = new object[] { Context.GetContext(), scope, @sealed ? true : false };
+					object[] args = new object[] { Context.GetContext(), scope, @sealed };
 					method.Invoke(null, args);
 					return null;
 				}
-				if (parmTypes.Length == 1 && parmTypes[0] == ScriptRuntime.ScriptableClass && Modifier.IsStatic(method.Attributes))
+				if (parmTypes.Length == 1 && parmTypes[0] == ScriptRuntime.ScriptableClass && method.IsStatic)
 				{
 					object[] args = new object[] { scope };
 					method.Invoke(null, args);
@@ -1407,7 +1407,7 @@ namespace Rhino
 			if (mapInheritance)
 			{
 				Type superClass = clazz.BaseType;
-				if (ScriptRuntime.ScriptableClass.IsAssignableFrom(superClass) && !Modifier.IsAbstract(superClass.Attributes))
+				if (ScriptRuntime.ScriptableClass.IsAssignableFrom(superClass) && !superClass.IsAbstract)
 				{
 					Type superScriptable = ExtendsScriptable(superClass);
 					string name = ScriptableObject.DefineClass(scope, superScriptable, @sealed, mapInheritance);
@@ -1486,7 +1486,7 @@ namespace Rhino
 				if (name.Equals("finishInit"))
 				{
 					Type[] parmTypes = Sharpen.Runtime.GetParameterTypes(method_1);
-					if (parmTypes.Length == 3 && parmTypes[0] == ScriptRuntime.ScriptableClass && parmTypes[1] == typeof(FunctionObject) && parmTypes[2] == ScriptRuntime.ScriptableClass && Modifier.IsStatic(method_1.Attributes))
+					if (parmTypes.Length == 3 && parmTypes[0] == ScriptRuntime.ScriptableClass && parmTypes[1] == typeof(FunctionObject) && parmTypes[2] == ScriptRuntime.ScriptableClass && method_1.IsStatic)
 					{
 						finishInit = method_1;
 						continue;
@@ -1578,7 +1578,7 @@ namespace Rhino
 					((ScriptableObject)proto).DefineProperty(name, null, method_1, setter, attr);
 					continue;
 				}
-				if (isStatic && !Modifier.IsStatic(method_1.Attributes))
+				if (isStatic && !method_1.IsStatic)
 				{
 					throw Context.ReportRuntimeError("jsStaticFunction must be used with static method.");
 				}
@@ -1855,7 +1855,7 @@ namespace Rhino
 			{
 				getterBox = new MemberBox(getter);
 				bool delegatedForm;
-				if (!Modifier.IsStatic(getter.Attributes))
+				if (!getter.IsStatic)
 				{
 					delegatedForm = (delegateTo != null);
 					getterBox.delegateTo = delegateTo;
@@ -1913,7 +1913,7 @@ namespace Rhino
 				}
 				setterBox = new MemberBox(setter);
 				bool delegatedForm;
-				if (!Modifier.IsStatic(setter.Attributes))
+				if (!setter.IsStatic)
 				{
 					delegatedForm = (delegateTo != null);
 					setterBox.delegateTo = delegateTo;

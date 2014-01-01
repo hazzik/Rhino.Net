@@ -144,6 +144,7 @@
     <Compile Include="CommonJS\Module\Provider\UrlModuleSourceProvider.cs" />
     <Compile Include="CommonJS\Module\Require.cs" />
     <Compile Include="CommonJS\Module\RequireBuilder.cs" />
+    <Compile Include="Compatibility\Modifier.cs" />
     <Compile Include="CompilerEnvirons.cs" />
     <Compile Include="ConsString.cs" />
     <Compile Include="ConstProperties.cs" />
