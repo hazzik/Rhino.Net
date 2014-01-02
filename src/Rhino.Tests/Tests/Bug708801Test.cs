@@ -225,7 +225,7 @@ namespace Rhino.Tests
 		/// and returns the transformed and optimized
 		/// <see cref="Rhino.Ast.ScriptNode">Rhino.Ast.ScriptNode</see>
 		/// </summary>
-		private static ScriptNode Compile(Context context, CharSequence source)
+		private static ScriptNode Compile(Context context, string source)
 		{
 			string mainMethodClassName = "Main";
 			string scriptClassName = "Main";
@@ -258,7 +258,7 @@ namespace Rhino.Tests
 		/// contains
 		/// <code>v</code>
 		/// </summary>
-		private static void AssertNumberVars(Context context, CharSequence source, params string[] numbers)
+		private static void AssertNumberVars(Context context, string source, params string[] numbers)
 		{
 			// wrap source in function
 			ScriptNode tree = Compile(context, "function f(o, fn){" + source + "}");

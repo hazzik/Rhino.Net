@@ -2434,13 +2434,13 @@ namespace Rhino.Optimizer
 						{
 							if (child.GetType() == Token.STRING)
 							{
-								AddScriptRuntimeInvoke("add", "(Ljava/lang/CharSequence;" + "Ljava/lang/Object;" + ")Ljava/lang/CharSequence;");
+								AddScriptRuntimeInvoke("add", "(Ljava/lang/string;" + "Ljava/lang/Object;" + ")Ljava/lang/string;");
 							}
 							else
 							{
 								if (child.GetNext().GetType() == Token.STRING)
 								{
-									AddScriptRuntimeInvoke("add", "(Ljava/lang/Object;" + "Ljava/lang/CharSequence;" + ")Ljava/lang/CharSequence;");
+									AddScriptRuntimeInvoke("add", "(Ljava/lang/Object;" + "Ljava/lang/string;" + ")Ljava/lang/string;");
 								}
 								else
 								{

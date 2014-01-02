@@ -3878,11 +3878,11 @@ object_compare_break: ;
 					}
 					else
 					{
-						if (lhs is CharSequence || rhs is CharSequence)
+						if (lhs is string || rhs is string)
 						{
-							CharSequence lstr = ScriptRuntime.ToCharSequence(lhs);
-							CharSequence rstr = ScriptRuntime.ToCharSequence(rhs);
-							stack[stackTop] = new ConsString(lstr, rstr);
+							string lstr = ScriptRuntime.ToCharSequence(lhs);
+							string rstr = ScriptRuntime.ToCharSequence(rhs);
+							stack[stackTop] = lstr + rstr;
 						}
 						else
 						{
@@ -3909,17 +3909,17 @@ object_compare_break: ;
 			}
 			else
 			{
-				if (lhs is CharSequence)
+				if (lhs is string)
 				{
-					CharSequence lstr = (CharSequence)lhs;
-					CharSequence rstr = ScriptRuntime.ToCharSequence(d);
+					string lstr = (string)lhs;
+					string rstr = ScriptRuntime.ToCharSequence(d);
 					if (leftRightOrder)
 					{
-						stack[stackTop] = new ConsString(lstr, rstr);
+						stack[stackTop] = lstr + rstr;
 					}
 					else
 					{
-						stack[stackTop] = new ConsString(rstr, lstr);
+						stack[stackTop] = rstr + lstr;
 					}
 				}
 				else

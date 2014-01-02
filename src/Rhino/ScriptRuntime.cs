@@ -332,9 +332,9 @@ namespace Rhino
 				{
 					return false;
 				}
-				if (val is CharSequence)
+				if (val is string)
 				{
-					return ((CharSequence)val).Length != 0;
+					return ((string)val).Length != 0;
 				}
 				if (val.IsNumber())
 				{
@@ -390,7 +390,7 @@ namespace Rhino
 				{
 					return ToNumber((string)val);
 				}
-				if (val is CharSequence)
+				if (val is string)
 				{
 					return ToNumber(val.ToString());
 				}
@@ -903,13 +903,13 @@ namespace Rhino
 			return !TokenStream.IsKeyword(s);
 		}
 
-		public static CharSequence ToCharSequence(object val)
+		public static string ToCharSequence(object val)
 		{
 			if (val is NativeString)
 			{
 				return ((NativeString)val).ToCharSequence();
 			}
-			return val is CharSequence ? (CharSequence)val : ToString(val);
+			return val is string ? (string)val : ToString(val);
 		}
 
 		/// <summary>Convert the value to a string.</summary>
@@ -933,7 +933,7 @@ namespace Rhino
 				{
 					return (string)val;
 				}
-				if (val is CharSequence)
+				if (val is string)
 				{
 					return val.ToString();
 				}
@@ -1024,7 +1024,7 @@ namespace Rhino
 			{
 				return "undefined";
 			}
-			if (value is CharSequence)
+			if (value is string)
 			{
 				string escaped = EscapeString(value.ToString());
 				StringBuilder sb = new StringBuilder(escaped.Length + 2);
@@ -1213,10 +1213,10 @@ namespace Rhino
 			{
 				return (Scriptable)val;
 			}
-			if (val is CharSequence)
+			if (val is string)
 			{
 				// FIXME we want to avoid toString() here, especially for concat()
-				NativeString result = new NativeString((CharSequence)val);
+				NativeString result = new NativeString((string)val);
 				SetBuiltinProtoAndParent(result, scope, TopLevel.Builtins.String);
 				return result;
 			}
@@ -2832,7 +2832,7 @@ childScopesChecks_break: ;
 				return Undefined.instance;
 			}
 			object x = args[0];
-			if (!(x is CharSequence))
+			if (!(x is string))
 			{
 				if (cx.HasFeature(Context.FEATURE_STRICT_MODE) || cx.HasFeature(Context.FEATURE_STRICT_EVAL))
 				{
@@ -2890,7 +2890,7 @@ childScopesChecks_break: ;
 			{
 				return (value is Callable) ? "function" : "object";
 			}
-			if (value is CharSequence)
+			if (value is string)
 			{
 				return "string";
 			}
@@ -2956,7 +2956,7 @@ childScopesChecks_break: ;
 			{
 				val2 = ((Scriptable)val2).GetDefaultValue(null);
 			}
-			if (!(val1 is CharSequence) && !(val2 is CharSequence))
+			if (!(val1 is string) && !(val2 is string))
 			{
 				if ((val1.IsNumber()) && (val2.IsNumber()))
 				{
@@ -2967,17 +2967,17 @@ childScopesChecks_break: ;
 					return WrapNumber(ToNumber(val1) + ToNumber(val2));
 				}
 			}
-			return new ConsString(ToCharSequence(val1), ToCharSequence(val2));
+			return ToCharSequence(val1) + ToCharSequence(val2);
 		}
 
-		public static CharSequence Add(CharSequence val1, object val2)
+		public static string Add(string val1, object val2)
 		{
-			return new ConsString(val1, ToCharSequence(val2));
+			return val1 + ToCharSequence(val2);
 		}
 
-		public static CharSequence Add(object val1, CharSequence val2)
+		public static string Add(object val1, string val2)
 		{
-			return new ConsString(ToCharSequence(val1), val2);
+			return ToCharSequence(val1) + val2;
 		}
 
 		public static object NameIncrDecr(Scriptable scopeChain, string id, Context cx, int incrDecrMask)
@@ -3207,9 +3207,9 @@ search_break: ;
 					}
 					else
 					{
-						if (x is CharSequence)
+						if (x is string)
 						{
-							return EqString((CharSequence)x, y);
+							return EqString((string)x, y);
 						}
 						else
 						{
@@ -3285,9 +3285,9 @@ search_break: ;
 											}
 											else
 											{
-												if (y is CharSequence)
+												if (y is string)
 												{
-													return EqString((CharSequence)y, x);
+													return EqString((string)y, x);
 												}
 											}
 										}
@@ -3328,7 +3328,7 @@ search_break: ;
 					}
 					else
 					{
-						if (y is CharSequence)
+						if (y is string)
 						{
 							return x == ToNumber(y);
 						}
@@ -3365,7 +3365,7 @@ search_break: ;
 			}
 		}
 
-		private static bool EqString(CharSequence x, object y)
+		private static bool EqString(string x, object y)
 		{
 			for (; ; )
 			{
@@ -3375,9 +3375,9 @@ search_break: ;
 				}
 				else
 				{
-					if (y is CharSequence)
+					if (y is string)
 					{
-						CharSequence c = (CharSequence)y;
+						string c = (string)y;
 						return x.Length == c.Length && x.ToString().Equals(c.ToString());
 					}
 					else
@@ -3446,9 +3446,9 @@ search_break: ;
 				}
 				else
 				{
-					if (x is CharSequence)
+					if (x is string)
 					{
-						if (y is CharSequence)
+						if (y is string)
 						{
 							return x.ToString().Equals(y.ToString());
 						}
@@ -3558,7 +3558,7 @@ search_break: ;
 				{
 					val2 = ((Scriptable)val2).GetDefaultValue(NumberClass);
 				}
-				if (val1 is CharSequence && val2 is CharSequence)
+				if (val1 is string && val2 is string)
 				{
 					return string.CompareOrdinal(val1.ToString(), val2.ToString()) < 0;
 				}
@@ -3587,7 +3587,7 @@ search_break: ;
 				{
 					val2 = ((Scriptable)val2).GetDefaultValue(NumberClass);
 				}
-				if (val1 is CharSequence && val2 is CharSequence)
+				if (val1 is string && val2 is string)
 				{
 					return string.CompareOrdinal(val1.ToString(), val2.ToString()) <= 0;
 				}

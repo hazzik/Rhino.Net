@@ -27,7 +27,7 @@ namespace Rhino.Tools.Shell
 
 		private static readonly Type[] STRING_ARG = new Type[] { typeof(string) };
 
-		private static readonly Type[] CHARSEQ_ARG = new Type[] { typeof(CharSequence) };
+		private static readonly Type[] CHARSEQ_ARG = new Type[] { typeof(string) };
 
 		protected internal ShellConsole()
 		{

@@ -434,14 +434,14 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestConsStringSerialization()
 		{
-			ConsString r1 = new ConsString("foo", "bar");
+			string r1 = "foo" + "bar";
 			MemoryStream baos = new MemoryStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
 			oos.WriteObject(r1);
 			oos.Flush();
 			MemoryStream bais = new MemoryStream(baos.ToArray());
 			ObjectInputStream ois = new ObjectInputStream(bais);
-			CharSequence r2 = (CharSequence)ois.ReadObject();
+			string r2 = (string)ois.ReadObject();
 			NUnit.Framework.Assert.AreEqual("still the same at the other end", r1.ToString(), r2.ToString());
 		}
 	}

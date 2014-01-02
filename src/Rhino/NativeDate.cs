@@ -1864,7 +1864,7 @@ namespace Rhino
 					arg0 = ((Scriptable)arg0).GetDefaultValue(null);
 				}
 				double date;
-				if (arg0 is CharSequence)
+				if (arg0 is string)
 				{
 					// it's a string; parse it.
 					date = Date_parseString(arg0.ToString());

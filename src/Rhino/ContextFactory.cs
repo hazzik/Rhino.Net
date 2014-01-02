@@ -487,7 +487,7 @@ namespace Rhino
 		protected internal virtual object DoTopCall(Callable callable, Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 		{
 			object result = callable.Call(cx, scope, thisObj, args);
-			return result is ConsString ? result.ToString() : result;
+			return result;
 		}
 
 		/// <summary>

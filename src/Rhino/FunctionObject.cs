@@ -416,14 +416,6 @@ namespace Rhino
 			object result;
 			bool checkMethodResult = false;
 			int argsLength = args.Length;
-			for (int i = 0; i < argsLength; i++)
-			{
-				// flatten cons-strings before passing them as arguments
-				if (args[i] is ConsString)
-				{
-					args[i] = args[i].ToString();
-				}
-			}
 			if (parmsLength < 0)
 			{
 				if (parmsLength == VARARGS_METHOD)

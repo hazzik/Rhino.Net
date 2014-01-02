@@ -36,7 +36,7 @@ namespace Rhino
 			obj.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
 		}
 
-		internal NativeString(CharSequence s)
+		internal NativeString(string s)
 		{
 			@string = s;
 		}
@@ -442,7 +442,7 @@ namespace Rhino
 
 					case Id_constructor:
 					{
-						CharSequence s = (args.Length >= 1) ? ScriptRuntime.ToCharSequence(args[0]) : string.Empty;
+						string s = (args.Length >= 1) ? ScriptRuntime.ToCharSequence(args[0]) : string.Empty;
 						if (thisObj == null)
 						{
 							// new String(val) creates a new String object.
@@ -456,13 +456,13 @@ namespace Rhino
 					case Id_valueOf:
 					{
 						// ECMA 15.5.4.2: 'the toString function is not generic.
-						CharSequence cs = RealThis(thisObj, f).@string;
+						string cs = RealThis(thisObj, f).@string;
 						return cs is string ? cs : cs.ToString();
 					}
 
 					case Id_toSource:
 					{
-						CharSequence s = RealThis(thisObj, f).@string;
+						string s = RealThis(thisObj, f).@string;
 						return "(new String(\"" + ScriptRuntime.EscapeString(s.ToString()) + "\"))";
 					}
 
@@ -470,7 +470,7 @@ namespace Rhino
 					case Id_charCodeAt:
 					{
 						// See ECMA 15.5.4.[4,5]
-						CharSequence target = ScriptRuntime.ToCharSequence(thisObj);
+						string target = ScriptRuntime.ToCharSequence(thisObj);
 						double pos = ScriptRuntime.ToInteger(args, 0);
 						if (pos < 0 || pos >= target.Length)
 						{
@@ -715,7 +715,7 @@ again_break: ;
 			return result.ToString();
 		}
 
-		public CharSequence ToCharSequence()
+		public string ToCharSequence()
 		{
 			return @string;
 		}
@@ -779,7 +779,7 @@ again_break: ;
 			return target.LastIndexOf(search, (int)end);
 		}
 
-		private static CharSequence Js_substring(Context cx, CharSequence target, object[] args)
+		private static string Js_substring(Context cx, string target, object[] args)
 		{
 			int length = target.Length;
 			double start = ScriptRuntime.ToInteger(args, 0);
@@ -837,7 +837,7 @@ again_break: ;
 			return @string.Length;
 		}
 
-		private static CharSequence Js_substr(CharSequence target, object[] args)
+		private static string Js_substr(string target, object[] args)
 		{
 			if (args.Length < 1)
 			{
@@ -915,7 +915,7 @@ again_break: ;
 			return result.ToString();
 		}
 
-		private static CharSequence Js_slice(CharSequence target, object[] args)
+		private static string Js_slice(string target, object[] args)
 		{
 			if (args.Length != 0)
 			{
@@ -1426,7 +1426,7 @@ L0_break: ;
 
 		private const int ConstructorId_toLocaleLowerCase = -Id_toLocaleLowerCase;
 
-		private CharSequence @string;
+		private string @string;
 		// #/string_id_map#
 	}
 }

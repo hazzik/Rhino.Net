@@ -430,7 +430,7 @@ namespace Rhino
 			{
 				return "false";
 			}
-			if (value is CharSequence)
+			if (value is string)
 			{
 				return Quote(value.ToString());
 			}

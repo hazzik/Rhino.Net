@@ -605,7 +605,7 @@ namespace Rhino
 				}
 				else
 				{
-					if (value is CharSequence)
+					if (value is string)
 					{
 						return JSTYPE_STRING;
 					}
@@ -772,9 +772,9 @@ namespace Rhino
 							// character
 							// Placed here because it applies *only* to JS strings,
 							// not other JS objects converted to strings
-							if (((CharSequence)value).Length == 1)
+							if (((string)value).Length == 1)
 							{
-								return ((CharSequence)value)[0];
+								return ((string)value)[0];
 							}
 							else
 							{

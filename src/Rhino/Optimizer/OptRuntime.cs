@@ -82,11 +82,11 @@ namespace Rhino.Optimizer
 			{
 				val1 = ((Scriptable)val1).GetDefaultValue(null);
 			}
-			if (!(val1 is CharSequence))
+			if (!(val1 is string))
 			{
 				return WrapDouble(ToNumber(val1) + val2);
 			}
-			return new ConsString((CharSequence)val1, ToString(val2));
+			return (string) val1 + ToString(val2);
 		}
 
 		public static object Add(double val1, object val2)
@@ -95,11 +95,11 @@ namespace Rhino.Optimizer
 			{
 				val2 = ((Scriptable)val2).GetDefaultValue(null);
 			}
-			if (!(val2 is CharSequence))
+			if (!(val2 is string))
 			{
 				return WrapDouble(ToNumber(val2) + val1);
 			}
-			return new ConsString(ToString(val1), (CharSequence)val2);
+			return ToString(val1) + (string) val2;
 		}
 
 		public static object ElemIncrDecr(object obj, double index, Context cx, int incrDecrMask)

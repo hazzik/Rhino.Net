@@ -32,7 +32,7 @@ namespace Rhino.Tests
 			Context.Exit();
 		}
 
-		private AstRoot Parse(CharSequence cs)
+		private AstRoot Parse(string cs)
 		{
 			CompilerEnvirons compilerEnv = new CompilerEnvirons();
 			compilerEnv.InitFromContext(cx);
@@ -41,7 +41,7 @@ namespace Rhino.Tests
 			return p.Parse(cs.ToString(), "<eval>", 1);
 		}
 
-		private string ToSource(CharSequence cs)
+		private string ToSource(string cs)
 		{
 			return Parse(cs).ToSource();
 		}
