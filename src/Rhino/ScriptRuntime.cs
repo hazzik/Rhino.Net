@@ -933,9 +933,9 @@ namespace Rhino
 				{
 					return (string)val;
 				}
-				if (val is string)
+				if (val is bool)
 				{
-					return val.ToString();
+					return ((bool) val) ? "true" : "false";
 				}
 				if (val.IsNumber())
 				{
