@@ -266,7 +266,7 @@ namespace Rhino
 			if (lfloor == dfloor)
 			{
 				// int part fits long
-				intDigits = System.Convert.ToString((negative) ? -lfloor : lfloor, @base);
+				intDigits = BigIntegerEx.ToString((negative) ? -lfloor : lfloor, @base);
 			}
 			else
 			{
