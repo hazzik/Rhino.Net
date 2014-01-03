@@ -60,9 +60,68 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="opt-1.tests" />
+    <EmbeddedResource Include="opt0.tests" />
+    <EmbeddedResource Include="opt1.skip" />
+    <EmbeddedResource Include="opt9.tests" />
+    <EmbeddedResource Include="base.skip" />
     <None Include="packages.config" />
+    <None Include="Tests\CommonJS\Module\1.0\README" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Tests\CommonJS\Module\1.0\absolute\b.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\absolute\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\absolute\submodule\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\absolute\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\cyclic\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\cyclic\b.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\cyclic\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\cyclic\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\determinism\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\determinism\submodule\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\determinism\submodule\b.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\determinism\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\exactExports\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\exactExports\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\exactExports\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\hasOwnProperty\hasOwnProperty.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\hasOwnProperty\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\hasOwnProperty\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\hasOwnProperty\toString.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\method\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\method\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\method\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\missing\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\missing\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\monkeys\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\monkeys\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\monkeys\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\nested\a\b\c\d.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\nested\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\nested\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\relative\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\relative\submodule\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\relative\submodule\b.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\relative\test.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\transitive\a.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\transitive\b.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\transitive\c.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\transitive\program.js" />
+    <Content Include="Tests\CommonJS\Module\1.0\transitive\test.js" />
+    <Content Include="Tests\CommonJS\Module\assert.js" />
+    <Content Include="Tests\CommonJS\Module\console.js" />
+    <Content Include="Tests\CommonJS\Module\modules.jar" />
+    <Content Include="Tests\CommonJS\Module\system.js" />
+    <Content Include="Tests\CommonJS\Module\testNoArgsRequire.js" />
+    <Content Include="Tests\CommonJS\Module\testNonSandboxed.js" />
+    <Content Include="Tests\CommonJS\Module\testRelativeId.js" />
+    <Content Include="Tests\CommonJS\Module\testSandboxed.js" />
+    <Content Include="Tests\CommonJS\Module\testSetMainForAlreadyLoadedModule.js" />
+    <Content Include="Tests\CommonJS\Module\util.js" />
+    <Content Include="Tests\CommonJS\Module\x\modx.js" />
+    <Content Include="Tests\CommonJS\Module\x\modz.js" />
+    <Content Include="Tests\CommonJS\Module\x\y\mody.js" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Drivers\JsDriver.cs" />
     <Compile Include="Drivers\ShellTest.cs" />

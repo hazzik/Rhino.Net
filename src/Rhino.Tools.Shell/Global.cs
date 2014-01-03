@@ -91,7 +91,7 @@ namespace Rhino.Tools.Shell
 			// Define some global functions particular to the shell. Note
 			// that these functions are not part of ECMA.
 			InitStandardObjects(cx, sealedStdLib);
-			string[] names = new string[] { "DefineClass", "Deserialize", "Doctest", "Gc", "Help", "Load", "LoadClass", "Print", "Quit", "ReadFile", "ReadUrl", "RunCommand", "Seal", "Serialize", "Spawn", "Sync", "ToInt32", "Version" };
+			string[] names = new string[] { "defineClass", "deserialize", "doctest", "gc", "help", "load", "loadClass", "print", "quit", "readFile", "readUrl", "runCommand", "seal", "serialize", "spawn", "sync", "toInt32", "version" };
 			DefineFunctionProperties(names, typeof(Global), DONTENUM);
 			// Set up "environment" in the global scope to provide access to the
 			// System environment variables.
@@ -461,10 +461,10 @@ namespace Rhino.Tools.Shell
 				}
 				TextWriter savedOut = GetOut();
 				TextWriter savedErr = GetErr();
-				MemoryStream @out = new MemoryStream();
-				MemoryStream err = new MemoryStream();
-				SetOut(new StreamWriter(@out));
-				SetErr(new StreamWriter(err));
+				StringBuilder @out = new StringBuilder();
+				StringBuilder err = new StringBuilder();
+				SetOut(new StringWriter(@out));
+				SetErr(new StringWriter(err));
 				string resultString = string.Empty;
 				ErrorReporter savedErrorReporter = cx.GetErrorReporter();
 				cx.SetErrorReporter(new ToolErrorReporter(false, GetErr()));
@@ -522,8 +522,6 @@ namespace Rhino.Tools.Shell
 		/// </returns>
 		private bool DoctestOutputMatches(string expected, string actual)
 		{
-			throw new NotImplementedException();
-			/*
 			expected = expected.Trim();
 			actual = actual.Trim().Replace("\r\n", "\n");
 			if (expected == actual)
@@ -566,8 +564,8 @@ namespace Rhino.Tools.Shell
 				{
 					return false;
 				}
-				string expectedGroup = expectedMatcher.Group();
-				string actualGroup = actualMatcher.Group();
+				string expectedGroup = expectedMatcher.Group(0);
+				string actualGroup = actualMatcher.Group(0);
 				string mapping = doctestCanonicalizations.Get(expectedGroup);
 				if (mapping == null)
 				{
@@ -586,7 +584,7 @@ namespace Rhino.Tools.Shell
 				{
 					return true;
 				}
-			} */
+			}
 		}
 
 		/// <summary>

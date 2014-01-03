@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Sharpen;
 
 namespace Rhino.Drivers
@@ -54,7 +55,7 @@ namespace Rhino.Drivers
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static void AddTestsFromStream(Stream @in, IList<string> list)
+		private static void AddTestsFromStream(InputStream @in, ICollection<string> list)
 		{
 			using (var reader = new StreamReader(@in))
 			{
@@ -74,8 +75,8 @@ namespace Rhino.Drivers
 		/// <exception cref="System.IO.IOException"></exception>
 		public static string[] LoadTestsFromResource(string resource)
 		{
-			IList<string> list = new List<string>();
-			Stream @in = typeof (StandardTests).GetResourceAsStream(resource);
+			var list = new List<string>();
+			Stream @in = typeof (TestUtils).Assembly.GetManifestResourceStream("Rhino" + resource.Replace("/", "."));//.GetResourceAsStream(resource);
 			if (@in != null)
 			{
 				AddTestsFromStream(@in, list);

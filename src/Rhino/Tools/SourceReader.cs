@@ -53,7 +53,7 @@ namespace Rhino.Tools
 			{
 				encoding = DetectEncoding(defaultEncoding, data, url, contentType);
 			}
-			string strResult = Runtime.GetEncoding(encoding).GetString(data);
+			string strResult = Runtime.GetEncoding(encoding ?? "utf-8").GetString(data);
 			// Skip BOM
 			if (strResult.Length > 0 && strResult [0] == '\uFEFF')
 			{

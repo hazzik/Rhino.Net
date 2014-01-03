@@ -46,7 +46,7 @@ namespace Rhino.Tests
 		public static DirectoryInfo GetTestDir()
 		{
 			DirectoryInfo testDir;
-			var property = Runtime.GetProperty("mozilla.js.tests");
+            var property = @"..\..\mozilla\tests";
 			if (property != null)
 			{
 				testDir = new DirectoryInfo(property);
@@ -80,12 +80,12 @@ namespace Rhino.Tests
 		public static FileInfo[] GetTestFiles(int optimizationLevel)
 		{
 			DirectoryInfo testDir = GetTestDir();
-			string[] tests = TestUtils.LoadTestsFromResource("/" + GetTestFilename(optimizationLevel));
+			string[] tests =  TestUtils.LoadTestsFromResource("/" + GetTestFilename(optimizationLevel));
 			Array.Sort(tests, string.CompareOrdinal);
 			FileInfo[] files = new FileInfo[tests.Length];
 			for (int i = 0; i < files.Length; i++)
 			{
-				files[i] = new FileInfo(testDir.FullName + "/" + tests[i]);
+				files[i] = new FileInfo(testDir.FullName + "/" + tests[i].TrimEnd(':'));
 			}
 			return files;
 		}
