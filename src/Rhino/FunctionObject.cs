@@ -281,13 +281,16 @@ namespace Rhino
 			for (int i = 0, N = methods.Length; i != N; ++i)
 			{
 				MethodInfo method = methods[i];
-				if (method != null && name.Equals(method.Name))
+				if (method != null)
 				{
-					if (found != null)
+					if (name == method.Name || char.ToUpperInvariant(name[0]) + name.Substring(1) == method.Name)
 					{
-						throw Context.ReportRuntimeError2("msg.no.overload", name, method.DeclaringType.FullName);
+						if (found != null)
+						{
+							throw Context.ReportRuntimeError2("msg.no.overload", name, method.DeclaringType.FullName);
+						}
+						found = method;
 					}
-					found = method;
 				}
 			}
 			return found;
