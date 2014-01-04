@@ -473,13 +473,18 @@ namespace Rhino
 			{
 				if (radix == 10)
 				{
+					var value = s.Substring(start, end - start);
 					try
 					{
-						return System.Double.Parse(s.Substring(start, end - start));
+						return System.Double.Parse(value, CultureInfo.InvariantCulture);
 					}
 					catch (FormatException)
 					{
 						return NaN;
+					}
+					catch (OverflowException)
+					{
+						return value.StartsWith("-") ? double.NegativeInfinity : Double.PositiveInfinity;
 					}
 				}
 				else
@@ -712,11 +717,15 @@ namespace Rhino
 			}
 			try
 			{
-				return System.Double.Parse(sub);
+				return System.Double.Parse(sub, CultureInfo.InvariantCulture);
 			}
 			catch (FormatException)
 			{
 				return NaN;
+			}
+			catch (OverflowException)
+			{
+				return sub.StartsWith("-") ? double.NegativeInfinity : double.PositiveInfinity;
 			}
 		}
 

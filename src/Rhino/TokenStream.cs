@@ -1051,12 +1051,17 @@ L0_break: ;
 						try
 						{
 							// Use Java conversion to number from string...
-							dval = System.Double.Parse(numString);
+							dval = System.Double.Parse(numString, CultureInfo.InvariantCulture);
 						}
 						catch (FormatException)
 						{
 							parser.AddError("msg.caught.nfe");
 							return Token.ERROR;
+						}
+						catch (OverflowException)
+						{
+							//Probably we have Infinity here.
+							dval = numString.StartsWith("-") ? double.NegativeInfinity : double.PositiveInfinity;
 						}
 					}
 					else
