@@ -40,7 +40,7 @@ namespace Rhino.CommonJS.Module.Provider
 			string encoding = null;
 			if (mimeType != null)
 			{
-				string[] tokens = mimeType.Split(";");
+				string[] tokens = mimeType.Split(';');
 				if (tokens.Length > 0)
 				{
 					contentType = tokens[0].Trim();

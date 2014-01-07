@@ -166,7 +166,7 @@ namespace Rhino.Serialize
 
 		internal static object LookupQualifiedName(Scriptable scope, string qualifiedName)
 		{
-			string[] names = qualifiedName.Split(".");
+			string[] names = qualifiedName.Split('.');
 			object result = scope;
 			foreach (string name in names)
 			{

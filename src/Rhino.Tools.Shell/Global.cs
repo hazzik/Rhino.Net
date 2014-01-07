@@ -431,7 +431,7 @@ namespace Rhino.Tools.Shell
 		public virtual int RunDoctest(Context cx, Scriptable scope, string session, string sourceName, int lineNumber)
 		{
 			doctestCanonicalizations = new Dictionary<string, string>();
-			string[] lines = session.Split("[\n\r]+");
+			string[] lines = session.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 			string prompt0 = this.prompts[0].Trim();
 			string prompt1 = this.prompts[1].Trim();
 			int testCount = 0;
@@ -767,7 +767,7 @@ namespace Rhino.Tools.Shell
 							else
 							{
 								int ikey = System.Convert.ToInt32(keyObj);
-								key = ikey.ToString();
+								key = Extensions.ToString(ikey);
 								val = ScriptableObject.GetProperty(envHash, ikey);
 							}
 							if (val == ScriptableObject.NOT_FOUND)
@@ -972,7 +972,7 @@ namespace Rhino.Tools.Shell
 		{
 			if (!LoadJLine(cs))
 			{
-				console = ShellConsole.GetConsole(GetIn(), GetErr(), cs);
+			console = ShellConsole.GetConsole(GetIn(), GetErr(), cs);
 			}
 			return console;
 		}
@@ -984,8 +984,8 @@ namespace Rhino.Tools.Shell
 				if (LoadJLine(Encoding.Default))
 				{
 					inStream = console.GetIn();
-				}
 			}
+		}
 			return inStream == null ? Runtime.@in : inStream;
 		}
 
@@ -1110,8 +1110,8 @@ namespace Rhino.Tools.Shell
 			finally
 			{
 				p.Destroy();
-			}
-		}
+					}
+					}
 
 		/// <exception cref="System.IO.IOException"></exception>
 		internal static void Pipe(bool fromProcess, Stream from, Stream to)
@@ -1201,20 +1201,20 @@ namespace Rhino.Tools.Shell
 					if (unwrapped is byte[])
 					{
 						@is = new MemoryStream((byte[])unwrapped);
-					}
+				}
 					else
-					{
+				{
 						if (unwrapped is TextReader)
 						{
 							s = ReadReader((TextReader)unwrapped);
-						}
+				}
 						else
 						{
 							if (unwrapped is char[])
 							{
 								s = new string((char[])unwrapped);
-							}
-						}
+			}
+		}
 					}
 				}
 			}
@@ -1325,7 +1325,7 @@ namespace Rhino.Tools.Shell
 				while (i != end && type[i] <= ' ')
 				{
 					++i;
-				}
+			}
 				string charset = "charset";
 				if (charset.RegionMatches(true, 0, type, i, charset.Length))
 				{
@@ -1333,7 +1333,7 @@ namespace Rhino.Tools.Shell
 					while (i != end && type[i] <= ' ')
 					{
 						++i;
-					}
+		}
 					if (i != end && type[i] == '=')
 					{
 						++i;
@@ -1365,7 +1365,7 @@ namespace Rhino.Tools.Shell
 
 		/// <exception cref="System.IO.IOException"></exception>
 		private static string ReadReader(TextReader reader, int initialBufferSize)
-		{
+			{
 			char[] buffer = new char[initialBufferSize];
 			int offset = 0;
 			for (; ; )
@@ -1374,14 +1374,14 @@ namespace Rhino.Tools.Shell
 				if (n < 0)
 				{
 					break;
-				}
+			}
 				offset += n;
 				if (offset == buffer.Length)
 				{
 					char[] tmp = new char[buffer.Length * 2];
 					System.Array.Copy(buffer, 0, tmp, 0, offset);
 					buffer = tmp;
-				}
+		}
 			}
 			return new string(buffer, 0, offset);
 		}
@@ -1406,7 +1406,7 @@ namespace Rhino.Tools.Shell
 			this.scope = scope;
 			f = func;
 			this.args = args;
-		}
+}
 
 		internal Runner(Scriptable scope, Script script)
 		{
