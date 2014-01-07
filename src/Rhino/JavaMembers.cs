@@ -41,7 +41,7 @@ namespace Rhino
 				members = new Dictionary<string, object>();
 				staticMembers = new Dictionary<string, object>();
 				this.cl = cl;
-				bool includePrivate = cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS);
+				bool includePrivate = cx.HasFeature(LanguageFeatures.EnhancedJavaAccess);
 				Reflect(scope, includeProtected, includePrivate);
 			}
 			finally

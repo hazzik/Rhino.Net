@@ -383,7 +383,7 @@ namespace Rhino
 
 					case Id_toString:
 					{
-						return ToStringHelper(cx, scope, thisObj, cx.HasFeature(Context.FEATURE_TO_STRING_AS_SOURCE), false);
+						return ToStringHelper(cx, scope, thisObj, cx.HasFeature(LanguageFeatures.ToStringAsSource), false);
 					}
 
 					case Id_toLocaleString:

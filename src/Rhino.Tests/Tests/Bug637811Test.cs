@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,12 +31,12 @@ namespace Rhino.Tests
 			{
 			}
 
-			protected override bool HasFeature(Context cx, int featureIndex)
+			protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 			{
 				switch (featureIndex)
 				{
-					case Context.FEATURE_STRICT_MODE:
-					case Context.FEATURE_WARNING_AS_ERROR:
+					case LanguageFeatures.StrictMode:
+					case LanguageFeatures.WarningAsError:
 					{
 						return true;
 					}

@@ -2944,7 +2944,7 @@ switchStatement_break: ;
 
 		private static void ReportWarning(Context cx, string messageId, string arg)
 		{
-			if (cx.HasFeature(Context.FEATURE_STRICT_MODE))
+			if (cx.HasFeature(LanguageFeatures.StrictMode))
 			{
 				string msg = ScriptRuntime.GetMessage1(messageId, arg);
 				Context.ReportWarning(msg);

@@ -70,25 +70,25 @@ namespace Rhino
 	/// return cx;
 	/// }
 	/// // Override
-	/// <see cref="HasFeature(Context, int)">HasFeature(Context, int)</see>
+	/// <see cref="HasFeature">HasFeature(Context, int)</see>
 	/// public boolean hasFeature(Context cx, int featureIndex)
 	/// {
 	/// // Turn on maximum compatibility with MSIE scripts
 	/// switch (featureIndex) {
 	/// case
-	/// <see cref="Context.FEATURE_NON_ECMA_GET_YEAR">Context.FEATURE_NON_ECMA_GET_YEAR</see>
+	/// <see cref="LanguageFeatures.NonEcmaGetYear">Context.NON_ECMA_GET_YEAR</see>
 	/// :
 	/// return true;
 	/// case
-	/// <see cref="Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME">Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME</see>
+	/// <see cref="LanguageFeatures.MemberExprAsFunctionName">Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME</see>
 	/// :
 	/// return true;
 	/// case
-	/// <see cref="Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER">Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER</see>
+	/// <see cref="LanguageFeatures.ReservedKeywordAsIdentifier">Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER</see>
 	/// :
 	/// return true;
 	/// case
-	/// <see cref="Context.FEATURE_PARENT_PROTO_PROPERTIES">Context.FEATURE_PARENT_PROTO_PROPERTIES</see>
+	/// <see cref="LanguageFeatures.ParentProtoProperties">Context.FEATURE_PARENT_PROTO_PROPERTIES</see>
 	/// :
 	/// return false;
 	/// }
@@ -264,82 +264,82 @@ namespace Rhino
 
 		/// <summary>
 		/// Implementation of
-		/// <see cref="Context.HasFeature(int)">Context.HasFeature(int)</see>
+		/// <see cref="Context.HasFeature">Context.HasFeature(int)</see>
 		/// .
 		/// This can be used to customize
 		/// <see cref="Context">Context</see>
 		/// without introducing
 		/// additional subclasses.
 		/// </summary>
-		protected internal virtual bool HasFeature(Context cx, int featureIndex)
+		protected internal virtual bool HasFeature(Context cx, LanguageFeatures featureIndex)
 		{
 			LanguageVersion version;
 			switch (featureIndex)
 			{
-				case Context.FEATURE_NON_ECMA_GET_YEAR:
+				case LanguageFeatures.NonEcmaGetYear:
 				{
 					version = cx.GetLanguageVersion();
 					return (version == LanguageVersion.VERSION_1_0 || version == LanguageVersion.VERSION_1_1 || version == LanguageVersion.VERSION_1_2);
 				}
 
-				case Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME:
+				case LanguageFeatures.MemberExprAsFunctionName:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER:
+				case LanguageFeatures.ReservedKeywordAsIdentifier:
 				{
 					return true;
 				}
 
-				case Context.FEATURE_TO_STRING_AS_SOURCE:
+				case LanguageFeatures.ToStringAsSource:
 				{
 					version = cx.GetLanguageVersion();
 					return version == LanguageVersion.VERSION_1_2;
 				}
 
-				case Context.FEATURE_PARENT_PROTO_PROPERTIES:
+				case LanguageFeatures.ParentProtoProperties:
 				{
 					return true;
 				}
 
-				case Context.FEATURE_E4X:
+				case LanguageFeatures.E4X:
 				{
 					version = cx.GetLanguageVersion();
 					return (version == LanguageVersion.VERSION_DEFAULT || version >= LanguageVersion.VERSION_1_6);
 				}
 
-				case Context.FEATURE_DYNAMIC_SCOPE:
+				case LanguageFeatures.DynamicScope:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_STRICT_VARS:
+				case LanguageFeatures.StrictVars:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_STRICT_EVAL:
+				case LanguageFeatures.StrictEval:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_LOCATION_INFORMATION_IN_ERROR:
+				case LanguageFeatures.LocationInformationInError:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_STRICT_MODE:
+				case LanguageFeatures.StrictMode:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_WARNING_AS_ERROR:
+				case LanguageFeatures.WarningAsError:
 				{
 					return false;
 				}
 
-				case Context.FEATURE_ENHANCED_JAVA_ACCESS:
+				case LanguageFeatures.EnhancedJavaAccess:
 				{
 					return false;
 				}

@@ -25,14 +25,14 @@ namespace Rhino.Tests
 
 		internal class MyContextFactory : ContextFactory
 		{
-			protected override bool HasFeature(Context cx, int featureIndex)
+			protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 			{
 				switch (featureIndex)
 				{
-					case Context.FEATURE_STRICT_MODE:
-					case Context.FEATURE_STRICT_VARS:
-					case Context.FEATURE_STRICT_EVAL:
-					case Context.FEATURE_WARNING_AS_ERROR:
+					case LanguageFeatures.StrictMode:
+					case LanguageFeatures.StrictVars:
+					case LanguageFeatures.StrictEval:
+					case LanguageFeatures.WarningAsError:
 					{
 						return true;
 					}

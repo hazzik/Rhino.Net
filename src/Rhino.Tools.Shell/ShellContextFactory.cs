@@ -31,28 +31,28 @@ namespace Rhino.Tools.Shell
 
 		private string characterEncoding;
 
-		protected override bool HasFeature(Context cx, int featureIndex)
+		protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 		{
 			switch (featureIndex)
 			{
-				case Context.FEATURE_STRICT_VARS:
-				case Context.FEATURE_STRICT_EVAL:
-				case Context.FEATURE_STRICT_MODE:
+				case LanguageFeatures.StrictVars:
+				case LanguageFeatures.StrictEval:
+				case LanguageFeatures.StrictMode:
 				{
 					return strictMode;
 				}
 
-				case Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER:
+				case LanguageFeatures.ReservedKeywordAsIdentifier:
 				{
 					return allowReservedKeywords;
 				}
 
-				case Context.FEATURE_WARNING_AS_ERROR:
+				case LanguageFeatures.WarningAsError:
 				{
 					return warningAsError;
 				}
 
-				case Context.FEATURE_LOCATION_INFORMATION_IN_ERROR:
+				case LanguageFeatures.LocationInformationInError:
 				{
 					return generatingDebug;
 				}

@@ -555,7 +555,7 @@ namespace Rhino
 						t = YearFromTime(t);
 						if (id == Id_getYear)
 						{
-							if (cx.HasFeature(Context.FEATURE_NON_ECMA_GET_YEAR))
+							if (cx.HasFeature(LanguageFeatures.NonEcmaGetYear))
 							{
 								if (1900 <= t && t < 2000)
 								{

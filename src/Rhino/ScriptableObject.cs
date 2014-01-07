@@ -263,7 +263,7 @@ namespace Rhino
 				{
 					if (getter != null)
 					{
-						if (Context.GetContext().HasFeature(Context.FEATURE_STRICT_MODE))
+						if (Context.GetContext().HasFeature(LanguageFeatures.StrictMode))
 						{
 							// Based on TC39 ES3.1 Draft of 9-Feb-2009, 8.12.4, step 2,
 							// we should throw a TypeError in this case.

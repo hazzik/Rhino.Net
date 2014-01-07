@@ -85,9 +85,9 @@ namespace Rhino.Tests
 
 		private class DynamicScopeContextFactory : ContextFactory
 		{
-			protected override bool HasFeature(Context cx, int featureIndex)
+			protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 			{
-				if (featureIndex == Context.FEATURE_DYNAMIC_SCOPE)
+				if (featureIndex == LanguageFeatures.DynamicScope)
 				{
 					return true;
 				}

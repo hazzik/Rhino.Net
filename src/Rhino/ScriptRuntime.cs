@@ -187,7 +187,7 @@ namespace Rhino
 			NativeScript.Init(scope, @sealed);
 			NativeIterator.Init(scope, @sealed);
 			// Also initializes NativeGenerator
-			bool withXml = cx.HasFeature(Context.FEATURE_E4X) && cx.GetE4xImplementationFactory() != null;
+			bool withXml = cx.HasFeature(LanguageFeatures.E4X) && cx.GetE4xImplementationFactory() != null;
 			// define lazy-loaded properties using their class name
 			new LazilyLoadedCtor(scope, "RegExp", "Rhino.RegExp.NativeRegExp", @sealed, true);
 			new LazilyLoadedCtor(scope, "Packages", "Rhino.NativeJavaTopPackage", @sealed, true);
@@ -1728,7 +1728,7 @@ namespace Rhino
 			object result = ScriptableObject.GetProperty(obj, property);
 			if (result == ScriptableConstants.NOT_FOUND)
 			{
-				if (cx.HasFeature(Context.FEATURE_STRICT_MODE))
+				if (cx.HasFeature(LanguageFeatures.StrictMode))
 				{
 					Context.ReportWarning(ScriptRuntime.GetMessage1("msg.ref.undefined.prop", property));
 				}
@@ -2159,7 +2159,7 @@ childScopesChecks_break: ;
 				// "newname = 7;", where 'newname' has not yet
 				// been defined, creates a new property in the
 				// top scope unless strict mode is specified.
-				if (cx.HasFeature(Context.FEATURE_STRICT_MODE) || cx.HasFeature(Context.FEATURE_STRICT_VARS))
+				if (cx.HasFeature(LanguageFeatures.StrictMode) || cx.HasFeature(LanguageFeatures.StrictVars))
 				{
 					Context.ReportWarning(ScriptRuntime.GetMessage1("msg.assn.create.strict", id));
 				}
@@ -2835,7 +2835,7 @@ childScopesChecks_break: ;
 			object x = args[0];
 			if (!(x is string))
 			{
-				if (cx.HasFeature(Context.FEATURE_STRICT_MODE) || cx.HasFeature(Context.FEATURE_STRICT_EVAL))
+				if (cx.HasFeature(LanguageFeatures.StrictMode) || cx.HasFeature(LanguageFeatures.StrictEval))
 				{
 					throw Context.ReportRuntimeError0("msg.eval.nonstring.strict");
 				}
@@ -3640,7 +3640,7 @@ search_break: ;
 			}
 			object result;
 			cx.topCallScope = ScriptableObject.GetTopLevelScope(scope);
-			cx.useDynamicScope = cx.HasFeature(Context.FEATURE_DYNAMIC_SCOPE);
+			cx.useDynamicScope = cx.HasFeature(LanguageFeatures.DynamicScope);
 			ContextFactory f = cx.GetFactory();
 			try
 			{
@@ -3870,9 +3870,9 @@ search_break: ;
 					}
 					else
 					{
-						if (cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS))
+						if (cx.HasFeature(LanguageFeatures.EnhancedJavaAccess))
 						{
-							// With FEATURE_ENHANCED_JAVA_ACCESS, scripts can catch
+							// With EnhancedJavaAccess, scripts can catch
 							// all exception types
 							re = new WrappedException(t);
 							errorName = "JavaException";

@@ -200,7 +200,7 @@ namespace Rhino
 				case Id_toString:
 				{
 					// For now just alias toString
-					if (cx.HasFeature(Context.FEATURE_TO_STRING_AS_SOURCE))
+					if (cx.HasFeature(LanguageFeatures.ToStringAsSource))
 					{
 						string s = ScriptRuntime.DefaultObjectToSource(cx, scope, thisObj, args);
 						int L = s.Length;

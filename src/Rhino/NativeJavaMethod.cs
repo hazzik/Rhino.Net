@@ -415,9 +415,9 @@ namespace Rhino
 							bestFitIndex = extraBestFits[j_1];
 						}
 						MemberBox bestFit = methodsOrCtors[bestFitIndex];
-						if (cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS) && (bestFit.Member().Attributes & MethodAttributes.Public) != (member.Member().Attributes & MethodAttributes.Public))
+						if (cx.HasFeature(LanguageFeatures.EnhancedJavaAccess) && (bestFit.Member().Attributes & MethodAttributes.Public) != (member.Member().Attributes & MethodAttributes.Public))
 						{
-							// When FEATURE_ENHANCED_JAVA_ACCESS gives us access
+							// When EnhancedJavaAccess gives us access
 							// to non-public members, continue to prefer public
 							// methods in overloading
 							if ((bestFit.Member().Attributes & MethodAttributes.Public) == 0)

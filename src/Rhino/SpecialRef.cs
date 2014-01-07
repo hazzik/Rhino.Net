@@ -59,7 +59,7 @@ namespace Rhino
 					throw new ArgumentException(name);
 				}
 			}
-			if (!cx.HasFeature(Context.FEATURE_PARENT_PROTO_PROPERTIES))
+			if (!cx.HasFeature(LanguageFeatures.ParentProtoProperties))
 			{
 				// Clear special after checking for valid name!
 				type = SPECIAL_NONE;

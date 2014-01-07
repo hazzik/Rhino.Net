@@ -37,11 +37,11 @@ namespace Rhino
 			SetErrorReporter(cx.GetErrorReporter());
 			languageVersion = cx.GetLanguageVersion();
 			generateDebugInfo = (!cx.IsGeneratingDebugChanged() || cx.IsGeneratingDebug());
-			reservedKeywordAsIdentifier = cx.HasFeature(Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER);
-			allowMemberExprAsFunctionName = cx.HasFeature(Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME);
-			strictMode = cx.HasFeature(Context.FEATURE_STRICT_MODE);
-			warningAsError = cx.HasFeature(Context.FEATURE_WARNING_AS_ERROR);
-			xmlAvailable = cx.HasFeature(Context.FEATURE_E4X);
+			reservedKeywordAsIdentifier = cx.HasFeature(LanguageFeatures.ReservedKeywordAsIdentifier);
+			allowMemberExprAsFunctionName = cx.HasFeature(LanguageFeatures.MemberExprAsFunctionName);
+			strictMode = cx.HasFeature(LanguageFeatures.StrictMode);
+			warningAsError = cx.HasFeature(LanguageFeatures.WarningAsError);
+			xmlAvailable = cx.HasFeature(LanguageFeatures.E4X);
 			optimizationLevel = cx.GetOptimizationLevel();
 			generatingSource = cx.IsGeneratingSource();
 			activationNames = cx.activationNames;

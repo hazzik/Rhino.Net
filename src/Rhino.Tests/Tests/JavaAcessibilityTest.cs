@@ -44,9 +44,9 @@ namespace Rhino.Tests
 			{
 			}
 
-			protected override bool HasFeature(Context cx, int featureIndex)
+			protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 			{
-				if (featureIndex == Context.FEATURE_ENHANCED_JAVA_ACCESS)
+				if (featureIndex == LanguageFeatures.EnhancedJavaAccess)
 				{
 					return true;
 				}

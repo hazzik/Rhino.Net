@@ -18,11 +18,11 @@ namespace Rhino.Tests
 	{
 		internal class MyFactory : ContextFactory
 		{
-			protected override bool HasFeature(Context cx, int featureIndex)
+			protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 			{
 				switch (featureIndex)
 				{
-					case Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME:
+					case LanguageFeatures.MemberExprAsFunctionName:
 					{
 						return true;
 					}

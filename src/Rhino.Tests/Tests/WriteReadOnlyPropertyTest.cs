@@ -66,9 +66,9 @@ namespace Rhino.Tests
 				this.acceptWriteReadOnly = acceptWriteReadOnly;
 			}
 
-			protected override bool HasFeature(Context cx, int featureIndex)
+			protected override bool HasFeature(Context cx, LanguageFeatures featureIndex)
 			{
-				if (Context.FEATURE_STRICT_MODE == featureIndex)
+				if (LanguageFeatures.StrictMode == featureIndex)
 				{
 					return !acceptWriteReadOnly;
 				}

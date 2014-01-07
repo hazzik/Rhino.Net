@@ -2546,13 +2546,13 @@ withoutExceptions_break: ;
 								{
 									if (throwable is Exception)
 									{
-										exState = cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS) ? EX_CATCH_STATE : EX_FINALLY_STATE;
+										exState = cx.HasFeature(LanguageFeatures.EnhancedJavaAccess) ? EX_CATCH_STATE : EX_FINALLY_STATE;
 									}
 									else
 									{
 										if (throwable is Exception)
 										{
-											exState = cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS) ? EX_CATCH_STATE : EX_NO_JS_STATE;
+											exState = cx.HasFeature(LanguageFeatures.EnhancedJavaAccess) ? EX_CATCH_STATE : EX_NO_JS_STATE;
 										}
 										else
 										{
@@ -2564,7 +2564,7 @@ withoutExceptions_break: ;
 											}
 											else
 											{
-												exState = cx.HasFeature(Context.FEATURE_ENHANCED_JAVA_ACCESS) ? EX_CATCH_STATE : EX_FINALLY_STATE;
+												exState = cx.HasFeature(LanguageFeatures.EnhancedJavaAccess) ? EX_CATCH_STATE : EX_FINALLY_STATE;
 											}
 										}
 									}

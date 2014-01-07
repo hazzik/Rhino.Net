@@ -13,12 +13,12 @@ namespace Rhino.Tests
 {
 	/// <summary>
 	/// A class with private/protected/package private members, to test the Rhino
-	/// feature Context.FEATURE_ENHANCED_JAVA_ACCESS, that allows bypassing Java
+	/// feature Context.EnhancedJavaAccess, that allows bypassing Java
 	/// member access restrictions.
 	/// </summary>
 	/// <remarks>
 	/// A class with private/protected/package private members, to test the Rhino
-	/// feature Context.FEATURE_ENHANCED_JAVA_ACCESS, that allows bypassing Java
+	/// feature Context.EnhancedJavaAccess, that allows bypassing Java
 	/// member access restrictions.
 	/// </remarks>
 	/// <author>Donna Malayeri</author>
