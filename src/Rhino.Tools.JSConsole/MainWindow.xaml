@@ -1,0 +1,25 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:jsConsole="clr-namespace:Rhino.Tools.JsConsole"
+        x:Class="Rhino.Tools.JsConsole.MainWindow"
+        Title="Rhino.Net JavaScript Console" Height="350" Width="525" Loaded="WindowLoaded">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu IsMainMenu="True" Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Load..." Click="LoadClick" />
+                <MenuItem Header="E_xit" Click="ExitClick" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Cu_t" Click="CutClick"/>
+                <MenuItem Header="_Copy" Click="CopyClick" />
+                <MenuItem Header="_Paste" Click="PasteClick" />
+            </MenuItem>
+        </Menu>
+        <jsConsole:ConsoleTextArea x:Name="ConsoleTextArea" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" HorizontalAlignment="Stretch" FontFamily="Lucida Console" x:FieldModifier="private" />
+    </Grid>
+</Window>
