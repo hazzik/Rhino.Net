@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Rhino;
 using Rhino.Ast;
 using Sharpen;
@@ -884,7 +885,7 @@ namespace Rhino
 			if (labels.Count > 1)
 			{
 				// more than one label
-				foreach (Label lb in labels.SubList(1, labels.Count))
+				foreach (Label lb in labels.Skip(1))
 				{
 					decompiler.AddEOL(Token.COLON);
 					decompiler.AddName(lb.GetName());
