@@ -72,7 +72,7 @@ namespace Rhino.Tests
 				}
 				catch (Exception ee)
 				{
-					Runtime.PrintStackTrace(ee);
+					Console.WriteLine(ee);
 				}
 				finally
 				{

@@ -1281,7 +1281,7 @@ namespace Rhino.Tools.Debugger
 				}
 				catch (BadLocationException ignored)
 				{
-					Sharpen.Runtime.PrintStackTrace(ignored);
+					Console.WriteLine(ignored);
 				}
 				string text = segment.ToString();
 				if (debugGui.dim.StringIsCompilableUnit(text))

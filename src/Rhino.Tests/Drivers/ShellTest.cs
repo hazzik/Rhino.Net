@@ -33,9 +33,7 @@ namespace Rhino.Drivers
 
 		public static string GetStackTrace(Exception t)
 		{
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			Runtime.PrintStackTrace(t, new StreamWriter(bytes));
-			return Encoding.UTF8.GetString(bytes.ToByteArray());
+			return t.ToString();
 		}
 
 		private static void RunFileIfExists(Context cx, Scriptable global, FileInfo f)

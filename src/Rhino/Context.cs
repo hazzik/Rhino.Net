@@ -837,10 +837,9 @@ namespace Rhino
 			int[] linep = new int[] { 0 };
 			string filename = GetSourcePositionFromStack(linep);
 			TextWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			pw.WriteLine(message);
-			Sharpen.Runtime.PrintStackTrace(t, pw);
-			pw.Flush();
+			sw.WriteLine(message);
+			sw.WriteLine(t);
+			sw.Flush();
 			Rhino.Context.ReportWarning(sw.ToString(), filename, linep[0], null, 0);
 		}
 
@@ -2604,10 +2603,7 @@ namespace Rhino
 					return evaluator.GetSourcePositionFromStack(cx, linep);
 				}
 			}
-			StringWriter writer = new StringWriter();
-			Exception re = new Exception();
-			Sharpen.Runtime.PrintStackTrace(re, new PrintWriter(writer));
-			string s = writer.ToString();
+			string s = new Exception().ToString();
 			int open = -1;
 			int close = -1;
 			int colon = -1;

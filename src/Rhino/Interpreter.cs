@@ -2491,7 +2491,7 @@ Loop_break: ;
 					if (throwable != null)
 					{
 						// This is serious bug and it is better to track it ASAP
-						Sharpen.Runtime.PrintStackTrace(ex, System.Console.Error);
+						System.Console.Error.WriteLine(ex);
 						throw new InvalidOperationException();
 					}
 					throwable = ex;
@@ -3691,7 +3691,7 @@ object_compare_break: ;
 				catch (Exception ex)
 				{
 					System.Console.Error.WriteLine("RHINO USAGE WARNING: onExit terminated with exception");
-					Sharpen.Runtime.PrintStackTrace(ex, System.Console.Error);
+					System.Console.Error.WriteLine(ex);
 				}
 			}
 		}

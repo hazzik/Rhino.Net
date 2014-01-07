@@ -86,7 +86,7 @@ namespace Rhino.Tools.Shell
 			}
 			catch (SecurityException ex)
 			{
-				Sharpen.Runtime.PrintStackTrace(ex, System.Console.Error);
+				System.Console.Error.WriteLine(ex);
 			}
 			int result = Exec(args);
 			if (result != 0)
@@ -149,7 +149,7 @@ namespace Rhino.Tools.Shell
 				catch (VirtualMachineError ex)
 				{
 					// Treat StackOverflow and OutOfMemory as runtime errors
-					Sharpen.Runtime.PrintStackTrace(ex);
+					Console.WriteLine(ex);
 					string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 					Context.ReportError(msg);
 					exitCode = EXITCODE_RUNTIME_ERROR;
@@ -175,7 +175,7 @@ namespace Rhino.Tools.Shell
 			catch (VirtualMachineError ex)
 			{
 				// Treat StackOverflow and OutOfMemory as runtime errors
-				Sharpen.Runtime.PrintStackTrace(ex);
+				Console.WriteLine(ex);
 				string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 				Context.ReportError(msg);
 				exitCode = EXITCODE_RUNTIME_ERROR;
@@ -563,7 +563,7 @@ goodUsage_break: ;
 					catch (VirtualMachineError ex)
 					{
 						// Treat StackOverflow and OutOfMemory as runtime errors
-						Runtime.PrintStackTrace(ex);
+						Console.WriteLine(ex);
 						string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 						Context.ReportError(msg);
 						exitCode = EXITCODE_RUNTIME_ERROR;
@@ -604,7 +604,7 @@ goodUsage_break: ;
 			catch (VirtualMachineError ex)
 			{
 				// Treat StackOverflow and OutOfMemory as runtime errors
-				Runtime.PrintStackTrace(ex);
+				Console.WriteLine(ex);
 				string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 				Context.ReportError(msg);
 				exitCode = EXITCODE_RUNTIME_ERROR;

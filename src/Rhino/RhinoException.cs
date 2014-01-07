@@ -218,9 +218,7 @@ namespace Rhino
 		private string GenerateStackTrace()
 		{
 			// Get stable reference to work properly with concurrent access
-			StringWriter writer = new StringWriter();
-			Sharpen.Runtime.PrintStackTrace(this, new PrintWriter(writer));
-			string origStackTrace = writer.ToString();
+			string origStackTrace = ToString();
 			Evaluator e = Context.CreateInterpreter();
 			if (e != null)
 			{
@@ -317,7 +315,7 @@ namespace Rhino
 		{
 			if (interpreterStackInfo == null)
 			{
-				Sharpen.Runtime.PrintStackTrace(this, s);
+				s.WriteLine(this);
 			}
 			else
 			{
@@ -329,7 +327,7 @@ namespace Rhino
 		{
 			if (interpreterStackInfo == null)
 			{
-				Sharpen.Runtime.PrintStackTrace(this, s);
+				s.WriteLine(this);
 			}
 			else
 			{

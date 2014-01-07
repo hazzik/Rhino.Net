@@ -164,7 +164,7 @@ namespace Rhino.Tools
 			if (ex is WrappedException)
 			{
 				WrappedException we = (WrappedException)ex;
-				Sharpen.Runtime.PrintStackTrace(we, err);
+				err.WriteLine(we);
 			}
 			else
 			{

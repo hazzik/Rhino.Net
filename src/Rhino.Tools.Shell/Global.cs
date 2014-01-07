@@ -238,7 +238,7 @@ namespace Rhino.Tools.Shell
 				catch (VirtualMachineError ex)
 				{
 					// Treat StackOverflow and OutOfMemory as runtime errors
-					Runtime.PrintStackTrace(ex);
+					Console.WriteLine(ex);
 					string msg = ToolErrorReporter.GetMessage("msg.uncaughtJSException", ex.ToString());
 					throw Context.ReportRuntimeError(msg);
 				}

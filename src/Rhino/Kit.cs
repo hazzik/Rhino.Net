@@ -581,7 +581,7 @@ check_break: ;
 		{
 			Exception ex = new InvalidOperationException("FAILED ASSERTION");
 			// Print stack trace ASAP
-			Runtime.PrintStackTrace(ex, Console.Error);
+			Console.Error.WriteLine(ex);
 			throw ex;
 		}
 
@@ -598,7 +598,7 @@ check_break: ;
 			msg = "FAILED ASSERTION: " + msg;
 			Exception ex = new InvalidOperationException(msg);
 			// Print stack trace ASAP
-			Runtime.PrintStackTrace(ex, Console.Error);
+			Console.Error.WriteLine(ex);
 			throw ex;
 		}
 	}
