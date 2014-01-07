@@ -87,7 +87,7 @@ namespace Rhino.Tests
 		private static void TestIt(string script, object expected)
 		{
 			Utils.RunWithAllOptimizationLevels(cx =>
-			{
+		{
 				ScriptableObject scope = cx.InitStandardObjects();
 				object o = cx.EvaluateString(scope, script, "myScript.js", 1, null);
 				Assert.AreEqual(expected, o);

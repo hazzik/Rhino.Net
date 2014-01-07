@@ -2,7 +2,6 @@
 using System.IO;
 using System.Numerics;
 using System.Xml;
-using Sharpen;
 
 namespace Rhino
 {

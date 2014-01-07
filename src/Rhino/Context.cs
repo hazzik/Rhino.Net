@@ -2253,15 +2253,11 @@ namespace Rhino
 			{
 				p.calledByCompileFunction = true;
 			}
-			AstRoot ast;
-			if (sourceString != null)
-			{
-				ast = p.Parse(sourceString, sourceName, lineno);
-			}
-			else
-			{
-				ast = p.Parse(sourceReader, sourceName, lineno);
-			}
+			
+			AstRoot ast = sourceString != null
+				? p.Parse(sourceString, sourceName, lineno)
+				: p.Parse(sourceReader, sourceName, lineno);
+
 			if (returnFunction)
 			{
 				// parser no longer adds function to script node
@@ -2275,24 +2271,35 @@ namespace Rhino
 			}
 			IRFactory irf = new IRFactory(compilerEnv, compilationErrorReporter);
 			ScriptNode tree = irf.TransformTree(ast);
-			// discard everything but the IR tree
-			p = null;
-			ast = null;
-			irf = null;
 			if (compiler == null)
 			{
 				compiler = CreateCompiler();
 			}
-			object bytecode = compiler.Compile(compilerEnv, tree, tree.GetEncodedSource(), returnFunction);
+			
+			Action<object> debuggerNotificationAction = o => NotifyDebugger(sourceString, o);
+			object result;
+			if (returnFunction)
+			{
+				result = compiler.CreateFunctionObject(compilerEnv, tree, this, scope, securityDomain, debuggerNotificationAction);
+			}
+			else
+			{
+				result = compiler.CreateScriptObject(compilerEnv, tree, securityDomain, debuggerNotificationAction);
+			}
+			return result;
+		}
+
+		private void NotifyDebugger(string sourceString, object bytecode)
+		{
 			if (debugger != null)
 			{
 				if (sourceString == null)
 				{
 					Kit.CodeBug();
 				}
-				if (bytecode is DebuggableScript)
+				var dscript = bytecode as DebuggableScript;
+				if (dscript != null)
 				{
-					DebuggableScript dscript = (DebuggableScript)bytecode;
 					NotifyDebugger_r(this, dscript, sourceString);
 				}
 				else
@@ -2300,16 +2307,6 @@ namespace Rhino
 					throw new Exception("NOT SUPPORTED");
 				}
 			}
-			object result;
-			if (returnFunction)
-			{
-				result = compiler.CreateFunctionObject(this, scope, bytecode, securityDomain);
-			}
-			else
-			{
-				result = compiler.CreateScriptObject(bytecode, securityDomain);
-			}
-			return result;
 		}
 
 		private static void NotifyDebugger_r(Context cx, DebuggableScript dscript, string debugSource)

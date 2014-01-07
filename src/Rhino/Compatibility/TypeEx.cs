@@ -15,7 +15,7 @@ namespace Rhino
 			return new ClassLoader();
 		}
 
-	    public static FieldInfo GetDeclaredField(this Type type, string value)
+		public static FieldInfo GetDeclaredField(this Type type, string value)
 		{
 			return type.GetField(value, BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 		}

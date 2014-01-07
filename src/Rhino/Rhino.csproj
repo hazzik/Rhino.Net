@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;COMPILATION</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -129,8 +129,10 @@
     <Compile Include="Ast\Yield.cs" />
     <Compile Include="BaseFunction.cs" />
     <Compile Include="BoundFunction.cs" />
+    <Compile Include="ByteCode.cs" />
     <Compile Include="Callable.cs" />
     <Compile Include="ClassCache.cs" />
+    <Compile Include="ClassFileWriter.cs" />
     <Compile Include="ClassShutter.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="CommonJS\Module\ModuleScope.cs" />
@@ -230,6 +232,7 @@
     <Compile Include="ObjArray.cs" />
     <Compile Include="ObjToIntMap.cs" />
     <Compile Include="Optimizer\Block.cs" />
+    <Compile Include="Optimizer\BodyCodegen.cs" />
     <Compile Include="Optimizer\ClassCompiler.cs" />
     <Compile Include="Optimizer\Codegen.cs" />
     <Compile Include="Optimizer\OptFunctionNode.cs" />

@@ -4,7 +4,7 @@ namespace Rhino
 {
 	internal static class ILGeneratorEx
 	{
-		public static void EmitLdloc(this ILGenerator il, int local)
+		public static void EmitLoadLocal(this ILGenerator il, int local)
 		{
 			if (local == 0)
 			{
@@ -32,7 +32,7 @@ namespace Rhino
 			}
 		}
 
-		public static void EmitLdarg(this ILGenerator il, int argument)
+		public static void EmitLoadArgument(this ILGenerator il, int argument)
 		{
 			if (argument == 0)
 			{
@@ -60,7 +60,7 @@ namespace Rhino
 			}
 		}
 
-		public static void EmitStarg(this ILGenerator il, int argument)
+		public static void EmitStoreArgument(this ILGenerator il, int argument)
 		{
 			if (argument < 256)
 			{
@@ -72,7 +72,7 @@ namespace Rhino
 			}
 		}
 
-		public static void EmitStloc(this ILGenerator il, int local)
+		public static void EmitStoreLocal(this ILGenerator il, int local)
 		{
 			if (local == 0)
 			{
@@ -168,12 +168,12 @@ namespace Rhino
 			il.Emit(value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
 		}
 
-		public static void EmitStloc(this ILGenerator il, LocalBuilder local)
+		public static void EmitStoreLocal(this ILGenerator il, LocalBuilder local)
 		{
 			il.Emit(OpCodes.Stloc, local);
 		}
 
-		public static void EmitLdloc(this ILGenerator il, LocalBuilder local)
+		public static void EmitLoadLocal(this ILGenerator il, LocalBuilder local)
 		{
 			il.Emit(OpCodes.Ldloc, local);
 		}

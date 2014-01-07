@@ -11,18 +11,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Rhino;
 using Rhino.Ast;
 using Rhino.Debug;
 using Rhino.Utils;
-using Sharpen;
 
 namespace Rhino
 {
 	public sealed class Interpreter : Icode, Evaluator
 	{
-		internal InterpreterData itsData;
-
 		internal const int EXCEPTION_TRY_START_SLOT = 0;
 
 		internal const int EXCEPTION_TRY_END_SLOT = 1;
@@ -219,34 +215,25 @@ namespace Rhino
 			}
 		}
 
-		public object Compile(CompilerEnvirons compilerEnv, ScriptNode tree, string encodedSource, bool returnFunction)
+		public Script CreateScriptObject(CompilerEnvirons compilerEnv, ScriptNode tree, object staticSecurityDomain, Action<object> debug)
 		{
 			CodeGenerator cgen = new CodeGenerator();
-			itsData = cgen.Compile(compilerEnv, tree, encodedSource, returnFunction);
-			return itsData;
+			var idata = cgen.Compile(compilerEnv, tree, tree.GetEncodedSource(), false);
+			debug(idata);
+			return InterpretedFunction.CreateScript(idata, staticSecurityDomain);
 		}
 
-		public Script CreateScriptObject(object bytecode, object staticSecurityDomain)
+		public Function CreateFunctionObject(CompilerEnvirons compilerEnv, ScriptNode tree, Context cx, Scriptable scope, object staticSecurityDomain, Action<object> debug)
 		{
-			if (bytecode != itsData)
-			{
-				Kit.CodeBug();
-			}
-			return InterpretedFunction.CreateScript(itsData, staticSecurityDomain);
+			CodeGenerator cgen = new CodeGenerator();
+			var idata = cgen.Compile(compilerEnv, tree, tree.GetEncodedSource(), true);
+			debug(idata);
+			return InterpretedFunction.CreateFunction(cx, scope, idata, staticSecurityDomain);
 		}
 
 		public void SetEvalScriptFlag(Script script)
 		{
 			((InterpretedFunction)script).idata.evalScriptFlag = true;
-		}
-
-		public Function CreateFunctionObject(Context cx, Scriptable scope, object bytecode, object staticSecurityDomain)
-		{
-			if (bytecode != itsData)
-			{
-				Kit.CodeBug();
-			}
-			return InterpretedFunction.CreateFunction(cx, scope, itsData, staticSecurityDomain);
 		}
 
 		private static int GetShort(sbyte[] iCode, int pc)

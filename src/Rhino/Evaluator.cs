@@ -6,10 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
 using System.Collections.Generic;
-using Rhino;
 using Rhino.Ast;
-using Sharpen;
 
 namespace Rhino
 {
@@ -33,6 +32,10 @@ namespace Rhino
 		/// </remarks>
 		/// <param name="compilerEnv">Compiler environment</param>
 		/// <param name="tree">parse tree</param>
+		/// <param name="cx">Current context</param>
+		/// <param name="scope">scope of the function</param>
+		/// <param name="staticSecurityDomain">security domain</param>
+		/// <param name="debug"></param>
 		/// <param name="encodedSource">encoding of the source code for decompilation</param>
 		/// <param name="returnFunction">if true, compiling a function</param>
 		/// <returns>
@@ -40,23 +43,37 @@ namespace Rhino
 		/// createFunctionObject or createScriptObject, depending on the
 		/// value of returnFunction
 		/// </returns>
-		object Compile(CompilerEnvirons compilerEnv, ScriptNode tree, string encodedSource, bool returnFunction);
-
 		/// <summary>Create a function object.</summary>
 		/// <remarks>Create a function object.</remarks>
-		/// <param name="cx">Current context</param>
-		/// <param name="scope">scope of the function</param>
 		/// <param name="bytecode">opaque object returned by compile</param>
-		/// <param name="staticSecurityDomain">security domain</param>
 		/// <returns>Function object that can be called</returns>
-		Function CreateFunctionObject(Context cx, Scriptable scope, object bytecode, object staticSecurityDomain);
+		Function CreateFunctionObject(CompilerEnvirons compilerEnv, ScriptNode tree, Context cx, Scriptable scope, object staticSecurityDomain, Action<object> debug);
 
+		/// <summary>
+		/// Compile the script or function from intermediate representation
+		/// tree into an executable form.
+		/// </summary>
+		/// <remarks>
+		/// Compile the script or function from intermediate representation
+		/// tree into an executable form.
+		/// </remarks>
+		/// <param name="compilerEnv">Compiler environment</param>
+		/// <param name="tree">parse tree</param>
+		/// <param name="staticSecurityDomain"></param>
+		/// <param name="debug"></param>
+		/// <param name="encodedSource">encoding of the source code for decompilation</param>
+		/// <param name="returnFunction">if true, compiling a function</param>
+		/// <returns>
+		/// an opaque object that can be passed to either
+		/// createFunctionObject or createScriptObject, depending on the
+		/// value of returnFunction
+		/// </returns>
 		/// <summary>Create a script object.</summary>
 		/// <remarks>Create a script object.</remarks>
 		/// <param name="bytecode">opaque object returned by compile</param>
 		/// <param name="staticSecurityDomain">security domain</param>
 		/// <returns>Script object that can be evaluated</returns>
-		Script CreateScriptObject(object bytecode, object staticSecurityDomain);
+		Script CreateScriptObject(CompilerEnvirons compilerEnv, ScriptNode tree, object staticSecurityDomain, Action<object> debug);
 
 		/// <summary>Capture stack information from the given exception.</summary>
 		/// <remarks>Capture stack information from the given exception.</remarks>

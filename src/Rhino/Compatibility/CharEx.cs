@@ -16,7 +16,6 @@ namespace Rhino
 				return true;
 			return false;
 		}
-
 		public static bool IsJavaIdentifierPart(char c)
 		{
 			if (IsJavaIdentifierStart(c))

@@ -18,7 +18,7 @@ using Sharpen;
 namespace Rhino.Tools.Jsc
 {
 	/// <author>Norris Boyd</author>
-	public class Program
+	public sealed class Program
 	{
 		/// <summary>Main entry point.</summary>
 		/// <remarks>
@@ -60,7 +60,7 @@ namespace Rhino.Tools.Jsc
 
 		/// <summary>Parse arguments.</summary>
 		/// <remarks>Parse arguments.</remarks>
-		public virtual string[] ProcessOptions(string[] args)
+		public string[] ProcessOptions(string[] args)
 		{
 			targetPackage = string.Empty;
 			// default to no package
@@ -84,20 +84,20 @@ namespace Rhino.Tools.Jsc
 					}
 					return result;
 				}
-				if (arg.Equals("-help") || arg.Equals("-h") || arg.Equals("--help"))
+				if (arg == "-help" || arg == "-h" || arg == "--help")
 				{
 					printHelp = true;
 					return null;
 				}
 				try
 				{
-					if (arg.Equals("-version") && ++i < args.Length)
+					if (arg == "-version" && ++i < args.Length)
 					{
-						int version = System.Convert.ToInt32(args[i]);
+						var version = (LanguageVersion) System.Convert.ToInt32(args[i]);
 						compilerEnv.SetLanguageVersion(version);
 						continue;
 					}
-					if ((arg.Equals("-opt") || arg.Equals("-O")) && ++i < args.Length)
+					if ((arg == "-opt" || arg == "-O") && ++i < args.Length)
 					{
 						int optLevel = System.Convert.ToInt32(args[i]);
 						compilerEnv.SetOptimizationLevel(optLevel);
@@ -109,27 +109,27 @@ namespace Rhino.Tools.Jsc
 					BadUsage(args[i]);
 					return null;
 				}
-				if (arg.Equals("-nosource"))
+				if (arg == "-nosource")
 				{
 					compilerEnv.SetGeneratingSource(false);
 					continue;
 				}
-				if (arg.Equals("-debug") || arg.Equals("-g"))
+				if (arg == "-debug" || arg == "-g")
 				{
 					compilerEnv.SetGenerateDebugInfo(true);
 					continue;
 				}
-				if (arg.Equals("-main-method-class") && ++i < args.Length)
+				if (arg == "-main-method-class" && ++i < args.Length)
 				{
 					compiler.SetMainMethodClass(args[i]);
 					continue;
 				}
-				if (arg.Equals("-encoding") && ++i < args.Length)
+				if (arg == "-encoding" && ++i < args.Length)
 				{
 					characterEncoding = args[i];
 					continue;
 				}
-				if (arg.Equals("-o") && ++i < args.Length)
+				if (arg == "-o" && ++i < args.Length)
 				{
 					string name = args[i];
 					int end = name.Length;
@@ -159,11 +159,11 @@ namespace Rhino.Tools.Jsc
 					targetName = name;
 					continue;
 				}
-				if (arg.Equals("-observe-instruction-count"))
+				if (arg == "-observe-instruction-count")
 				{
 					compilerEnv.SetGenerateObserverCount(true);
 				}
-				if (arg.Equals("-package") && ++i < args.Length)
+				if (arg == "-package" && ++i < args.Length)
 				{
 					string pkg = args[i];
 					int end = pkg.Length;
@@ -195,7 +195,7 @@ namespace Rhino.Tools.Jsc
 					targetPackage = pkg;
 					continue;
 				}
-				if (arg.Equals("-extends") && ++i < args.Length)
+				if (arg == "-extends" && ++i < args.Length)
 				{
 					string targetExtends = args[i];
 					Type superClass;
@@ -211,12 +211,12 @@ namespace Rhino.Tools.Jsc
 					compiler.SetTargetExtends(superClass);
 					continue;
 				}
-				if (arg.Equals("-implements") && ++i < args.Length)
+				if (arg == "-implements" && ++i < args.Length)
 				{
 					// TODO: allow for multiple comma-separated interfaces.
 					string targetImplements = args[i];
 					List<Type> list = new List<Type>();
-					foreach (var className in targetImplements.Split(","))
+					foreach (var className in targetImplements.Split(','))
 					{
 						try
 						{
@@ -232,7 +232,7 @@ namespace Rhino.Tools.Jsc
 					compiler.SetTargetImplements(implementsClasses);
 					continue;
 				}
-				if (arg.Equals("-d") && ++i < args.Length)
+				if (arg == "-d" && ++i < args.Length)
 				{
 					destinationDir = args[i];
 					continue;
@@ -254,7 +254,7 @@ namespace Rhino.Tools.Jsc
 
 		/// <summary>Compile JavaScript source.</summary>
 		/// <remarks>Compile JavaScript source.</remarks>
-		public virtual void ProcessSource(string[] filenames)
+		public void ProcessSource(string[] filenames)
 		{
 			for (int i = 0; i != filenames.Length; ++i)
 			{
@@ -281,7 +281,7 @@ namespace Rhino.Tools.Jsc
 				{
 					mainClassName = targetPackage + "." + mainClassName;
 				}
-				Tuple<string, byte[]>[] compiled = compiler.CompileToClassFiles(source, filename, 1, mainClassName);
+				Tuple<string, Type>[] compiled = compiler.CompileToClassFiles(source, filename, 1, mainClassName);
 				if (compiled == null || compiled.Length == 0)
 				{
 					return;
@@ -290,14 +290,14 @@ namespace Rhino.Tools.Jsc
 				foreach (var tuple in compiled)
 				{
 					string className = tuple.Item1;
-					byte[] bytes = tuple.Item2;
+					Type bytes = tuple.Item2;
 					FilePath outfile = GetOutputFile(targetTopDir, className);
 					try
 					{
 						FileOutputStream os = new FileOutputStream(outfile);
 						try
 						{
-							os.Write(bytes);
+							//os.Write(bytes);
 						}
 						finally
 						{
@@ -357,7 +357,7 @@ namespace Rhino.Tools.Jsc
 		/// illegal characters with underscores, and prepend the name with an
 		/// underscore if the file name does not begin with a JavaLetter.
 		/// </remarks>
-		internal virtual string GetClassName(string name)
+		internal string GetClassName(string name)
 		{
 			char[] s = new char[name.Length + 1];
 			char c;

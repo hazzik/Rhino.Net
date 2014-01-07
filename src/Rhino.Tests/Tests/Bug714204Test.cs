@@ -26,7 +26,7 @@ namespace Rhino.Tests
 		{
 			cx = Context.Enter();
 			scope = cx.InitStandardObjects();
-		    cx.SetLanguageVersion(LanguageVersion.VERSION_1_7);
+			cx.SetLanguageVersion(LanguageVersion.VERSION_1_7);
 		}
 
 		[NUnit.Framework.TearDown]

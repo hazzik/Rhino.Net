@@ -654,7 +654,7 @@ namespace Rhino
 			il.Emit(OpCodes.Ldarg_0); // this
 			for (int index = 0; index < baseParameterTypes.Length; index++)
 			{
-				il.EmitLdarg(index + 3);
+				il.EmitLoadArgument(index + 3);
 			}
 			il.Emit(OpCodes.Call, baseTypeConstructor);
 			
@@ -769,7 +769,7 @@ namespace Rhino
 			{
 				il.Emit(OpCodes.Dup); // duplicate array reference
 				il.EmitLoadConstant(i);
-				il.EmitLdarg(i + 1);
+				il.EmitLoadArgument(i + 1);
 				if (argumentTypes [i].IsValueType)
 				{
 					il.Emit(OpCodes.Box, argumentTypes [i]);
@@ -938,7 +938,7 @@ namespace Rhino
 			// push the rest of the parameters.
 			for (int index = 0; index < argTypes.Length; index++)
 			{
-				il.EmitLdarg(index + 1);
+				il.EmitLoadArgument(index + 1);
 			}
 			il.Emit(OpCodes.Call, method1);
 			il.Emit(OpCodes.Ret);

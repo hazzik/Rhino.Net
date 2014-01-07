@@ -5,8 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#if COMPILATION
 
+using System.Reflection;
+using System.Reflection.Emit;
+#if COMPILATION
 using System;
 using System.Collections.Generic;
 using Rhino.Ast;
@@ -133,7 +135,7 @@ namespace Rhino.Optimizer
 		/// array. The initial element of the array always holds
 		/// mainClassName and array[1] holds its byte code.
 		/// </returns>
-		public virtual Tuple<string, byte[]>[] CompileToClassFiles(string source, string sourceLocation, int lineno, string mainClassName)
+		public virtual Tuple<string, Type>[] CompileToClassFiles(string source, string sourceLocation, int lineno, string mainClassName)
 		{
 			Parser p = new Parser(compilerEnv);
 			AstRoot ast = p.Parse(source, sourceLocation, lineno);
@@ -148,7 +150,7 @@ namespace Rhino.Optimizer
 				: MakeAuxiliaryClassName(mainClassName, "1");
 			Codegen codegen = new Codegen();
 			codegen.SetMainMethodClass(mainMethodClassName);
-			byte[] scriptClassBytes = codegen.CompileToClassFile(compilerEnv, scriptClassName, tree, tree.GetEncodedSource(), false);
+			Type scriptClassBytes = codegen.CompileToClassFile(compilerEnv, scriptClassName, tree, tree.GetEncodedSource(), false);
 			if (isPrimary)
 			{
 				return new[] { Tuple.Create(scriptClassName, scriptClassBytes) };
@@ -168,7 +170,7 @@ namespace Rhino.Optimizer
 			{
 				superClass = ScriptRuntime.ObjectClass;
 			}
-			byte[] mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassName);
+			Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, codegen.mainClass);
 			return new[] { Tuple.Create(mainClassName, mainClassBytes), Tuple.Create(scriptClassName, scriptClassBytes) };
 		}
 

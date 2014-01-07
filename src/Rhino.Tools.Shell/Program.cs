@@ -644,7 +644,7 @@ goodUsage_break: ;
 			{
 				if (isClass)
 				{
-#if COMPILATION
+#if LOAD_COMPILED_SCRIPT
 					script = LoadCompiledScript(cx, path, (byte[])source, securityDomain);
 #endif
 				}
@@ -711,7 +711,7 @@ goodUsage_break: ;
 			return digest;
 		}
 
-#if COMPILATION
+#if LOAD_COMPILED_SCRIPT
 		/// <exception cref="System.IO.FileNotFoundException"></exception>
 		private static Script LoadCompiledScript(Context cx, string path, byte[] data, object securityDomain)
 		{

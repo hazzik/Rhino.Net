@@ -269,7 +269,7 @@ namespace Rhino
 							if (result && thisObj is ScriptableObject)
 							{
 								ScriptableObject so = (ScriptableObject)thisObj;
-                                PropertyAttributes attrs = so.GetAttributes(s);
+								PropertyAttributes attrs = so.GetAttributes(s);
 								result = ((attrs & PropertyAttributes.DONTENUM) == 0);
 							}
 						}

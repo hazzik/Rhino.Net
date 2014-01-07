@@ -52,7 +52,7 @@ namespace Rhino.Optimizer
 			throw new NotSupportedException();
 		}
 
-		public object Compile(CompilerEnvirons compilerEnv, ScriptNode tree, string encodedSource, bool returnFunction)
+		private Tuple<string, Type> Compile(CompilerEnvirons compilerEnv, ScriptNode tree, string encodedSource, bool returnFunction)
 		{
 			int serial;
 			lock (globalLock)
@@ -70,12 +70,16 @@ namespace Rhino.Optimizer
 			}
 			var mainClassName = "Rhino.Net.gen." + baseName + "_" + serial;
 			var mainClassBytes = CompileToClassFile(compilerEnv, mainClassName, tree, encodedSource, returnFunction);
-			return new object[] { mainClassName, mainClassBytes };
+			
+			return Tuple.Create(mainClassName, mainClassBytes);
 		}
 
-		public Script CreateScriptObject(object bytecode, object staticSecurityDomain)
+		public Script CreateScriptObject(CompilerEnvirons compilerEnv, ScriptNode tree, object staticSecurityDomain, Action<object> debug)
 		{
-			var cl = DefineClass(bytecode, staticSecurityDomain);
+			var bytecode = Compile(compilerEnv, tree, tree.GetEncodedSource(), false);
+			debug(bytecode);
+			//var cl = DefineClass(staticSecurityDomain, bytecode.Item1, bytecode.Item2);
+			var cl = bytecode.Item2;
 			Script script;
 			try
 			{
@@ -88,9 +92,13 @@ namespace Rhino.Optimizer
 			return script;
 		}
 
-		public Function CreateFunctionObject(Context cx, Scriptable scope, object bytecode, object staticSecurityDomain)
+		public Function CreateFunctionObject(CompilerEnvirons compilerEnv, ScriptNode tree, Context cx, Scriptable scope, object staticSecurityDomain, Action<object> debug)
 		{
-			var cl = DefineClass(bytecode, staticSecurityDomain);
+			var bytecode = Compile(compilerEnv, tree, tree.GetEncodedSource(), true);
+			debug(bytecode);
+
+			//var cl = DefineClass(staticSecurityDomain, bytecode.Item1, bytecode.Item2);
+			var cl = bytecode.Item2;
 			try
 			{
 				return (NativeFunction) Activator.CreateInstance(cl, scope, cx, 0);
@@ -101,11 +109,17 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		private Type DefineClass(object bytecode, object staticSecurityDomain)
+		class SecurityController
 		{
-			var nameBytesPair = (object[])bytecode;
-			var className = (string)nameBytesPair[0];
-			var classBytes = (byte[])nameBytesPair[1];
+			public static GeneratedClassLoader CreateLoader(ClassLoader rhinoLoader, object staticSecurityDomain)
+			{
+				throw new NotImplementedException();
+				//return new GeneratedClassLoader();
+			}
+		}
+
+		private Type DefineClass(object staticSecurityDomain, string className, byte[] classBytes)
+		{
 			// The generated classes in this case refer only to Rhino classes
 			// which must be accessible through this class loader
 			var rhinoLoader = GetType().GetClassLoader();
@@ -126,7 +140,7 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		public byte[] CompileToClassFile(CompilerEnvirons compilerEnv, string mainClassName, ScriptNode scriptOrFn, string encodedSource, bool returnFunction)
+		public Type CompileToClassFile(CompilerEnvirons compilerEnv, string mainClassName, ScriptNode scriptOrFn, string encodedSource, bool returnFunction)
 		{
 			this.compilerEnv = compilerEnv;
 			Transform(scriptOrFn);
@@ -136,7 +150,6 @@ namespace Rhino.Optimizer
 			}
 			InitScriptNodesData(scriptOrFn);
 			mainClass = module.DefineType(mainClassName);
-			mainClassSignature = ClassFileWriter.ClassNameToSignature(mainClassName);
 			try
 			{
 				return GenerateCode(encodedSource);
@@ -227,9 +240,16 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		private ModuleBuilder module;
+		public Codegen()
+		{
+			var name = "TempAssembly" + DateTime.UtcNow.Ticks;
+			dynamicAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(name), AssemblyBuilderAccess.RunAndSave);
+			module = dynamicAssembly.DefineDynamicModule(name + ".mod", name + ".dll", true);
+		}
 
-		private byte[] GenerateCode(string encodedSource)
+		private readonly ModuleBuilder module;
+
+		private Type GenerateCode(string encodedSource)
 		{
 			var hasScript = (scriptOrFnNodes[0].GetType() == Token.SCRIPT);
 			var hasFunctions = (scriptOrFnNodes.Length > 1 || !hasScript);
@@ -239,62 +259,78 @@ namespace Rhino.Optimizer
 				sourceFile = scriptOrFnNodes[0].GetSourceName();
 			}
 			var cfw = ClassFileWriter.CreateClassFileWriter(mainClass, SUPER_CLASS, sourceFile);
-			cfw.tb.DefineField(ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
-			if (hasFunctions)
-			{
-				GenerateFunctionConstructor(cfw);
-			}
-			if (hasScript)
-			{
-				cfw.tb.AddInterfaceImplementation(typeof(Script));
-				GenerateScriptCtor(cfw.tb, SUPER_CLASS.GetConstructor(Type.EmptyTypes));
-				GenerateMain(cfw.tb);
-				GenerateExecute(cfw.tb);
-			}
-			GenerateCallMethod(cfw);
+			mainClass.SetParent(SUPER_CLASS);
+			TypeBuilder tb = mainClass;
+			var idField = tb.DefineField(ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
 			GenerateResumeGenerator(cfw);
-			GenerateNativeFunctionOverrides(cfw.tb, encodedSource);
-			var count = scriptOrFnNodes.Length;
-			for (var i = 0; i < count; i++)
+			GenerateNativeFunctionOverrides(idField, tb, encodedSource);
+
+			var regExpInit = EmitRegExpInit(tb);
+			for (int i = 0, count = scriptOrFnNodes.Length; i < count; i++)
 			{
 				var n = scriptOrFnNodes[i];
-				var bodygen = new BodyCodegen
-				{
-					cfw = cfw,
-					codegen = this,
-					compilerEnv = compilerEnv,
-					scriptOrFn = n,
-					scriptOrFnIndex = i,
-					isGenerator = IsGenerator(n)
-				};
-				try
-				{
-					bodygen.GenerateBodyCode();
-				}
-				catch (ClassFileWriter.ClassFileFormatException e)
-				{
-					throw ReportClassFileFormatException(n, e.Message);
-				}
 				if (n.GetType() == Token.FUNCTION)
 				{
 					var ofn = OptFunctionNode.Get(n);
-					GenerateFunctionInit(cfw.tb, ofn);
+					functionInits [ofn] = GenerateFunctionInit(tb, regExpInit, ofn);
 					if (ofn.IsTargetOfDirectCall())
 					{
 						EmitDirectConstructor(cfw, ofn);
 					}
 				}
 			}
-			EmitRegExpInit(cfw.tb);
-			EmitConstantDudeInitializers(cfw.tb);
-			return cfw.ToByteArray();
+			ConstructorInfo constructor = null;
+			if (hasFunctions)
+			{
+				constructor = GenerateFunctionConstructor(cfw, idField);
+			}
+			for (int i = 0, count = scriptOrFnNodes.Length; i < count; i++)
+			{
+				var n = scriptOrFnNodes[i];
+				var bodygen = new BodyCodegen
+				{
+					tb = tb,
+					codegen = this,
+					compilerEnv = compilerEnv,
+					scriptOrFn = n,
+					scriptOrFnIndex = i,
+					isGenerator = IsGenerator(n),
+					constructor = constructor,
+					regExpInit = regExpInit,
+				};
+				try
+				{
+					var method = bodygen.GenerateBodyCode();
+					methods.Add(method.Name, method);
+				}
+				catch (ClassFileWriter.ClassFileFormatException e)
+				{
+					throw ReportClassFileFormatException(n, e.Message);
+				}
+			}
+			var callMethod = GenerateCallMethod(cfw, idField);
+			if (hasScript)
+			{
+				tb.AddInterfaceImplementation(typeof(Script));
+				var scriptConstructor = GenerateScriptCtor(tb, SUPER_CLASS.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null));
+				GenerateMain(tb, scriptConstructor);
+				GenerateExecute(tb, callMethod);
+			}
+			EmitConstantDudeInitializers(tb);
+			var type = tb.CreateType();
+			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
+			return type;
 		}
+
+		private Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>(); 
+
+		private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
 
 		private void EmitDirectConstructor(ClassFileWriter cfw, OptFunctionNode ofn)
 		{
 			Type[] parameterTypes = GetParameterTypes(ofn.fnode);
 
-			var method = cfw.StartMethod(GetDirectCtorName(ofn.fnode), MethodAttributes.Public | MethodAttributes.Static, typeof (object), parameterTypes);
+			var method = cfw.tb.DefineMethod(GetDirectCtorName(ofn.fnode), MethodAttributes.Public | MethodAttributes.Static, typeof (object), parameterTypes);
 			var il = method.GetILGenerator();
 
 			var firstLocal = il.DeclareLocal(typeof (Scriptable));
@@ -314,13 +350,13 @@ namespace Rhino.Optimizer
 			var argCount = ofn.fnode.GetParamCount();
 			for (var i = 0; i < argCount; i++)
 			{
-				il.EmitLdarg(4 + i*2);
-				il.EmitLdarg(5 + i*2);
+				il.EmitLoadArgument(4 + i*2);
+				il.EmitLoadArgument(5 + i*2);
 			}
-			il.EmitLdarg(4 + argCount*3);
+			il.EmitLoadArgument(4 + argCount*3);
 			il.Emit(OpCodes.Call, mainClass.GetMethod(GetBodyMethodName(ofn.fnode), parameterTypes));
 
-			var exitLabel = cfw.il.DefineLabel();
+			var exitLabel = il.DefineLabel();
 
 			il.Emit(OpCodes.Dup);
 			// make a copy of direct call result
@@ -331,7 +367,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 
 			il.MarkLabel(exitLabel);
-			il.EmitLdloc(firstLocal);
+			il.EmitLoadLocal(firstLocal);
 			il.Emit(OpCodes.Ret);
 		}
 
@@ -392,14 +428,14 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private void GenerateCallMethod(ClassFileWriter cfw)
+		private MethodBuilder GenerateCallMethod(ClassFileWriter cfw, FieldInfo ifField)
 		{
 			// Generate code for:
-			// if (!ScriptRuntime.hasTopCall(cx)) {
+			// if (ScriptRuntime.hasTopCall(cx)) {
 			//     return ScriptRuntime.doTopCall(this, cx, scope, thisObj, args);
 			// }
 
-			var method = cfw.tb.DefineMethod("Call", MethodAttributes.Public | MethodAttributes.Final, typeof (object), new[] { typeof (Context), typeof (Scriptable), typeof (Script), typeof (object[]) });
+			var method = cfw.tb.DefineMethod("Call", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (Scriptable), typeof (object[])});
 			var il = method.GetILGenerator();
 
 			il.Emit(OpCodes.Ldarg_1); // cx
@@ -427,30 +463,22 @@ namespace Rhino.Optimizer
 
 			var end = scriptOrFnNodes.Length;
 			var generateSwitch = (2 <= end);
-			var switchStart = 0;
-			var switchStackTop = 0;
+			Label[] switchTable = null;
 			if (generateSwitch)
 			{
 				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Ldfld, cfw.tb.GetField(ID_FIELD_NAME));
+				il.Emit(OpCodes.Ldfld, ifField);
 				// do switch from (1,  end - 1) mapping 0 to
 				// the default case
-				switchStart = cfw.AddTableSwitch(1, end - 1);
+				switchTable = il.DefineSwitchTable(end);
+				il.Emit(OpCodes.Switch, switchTable);
 			}
 			for (var i = 0; i < end; i++)
 			{
 				var n = scriptOrFnNodes[i];
 				if (generateSwitch)
 				{
-					if (i == 0)
-					{
-						cfw.MarkTableSwitchDefault(switchStart);
-						switchStackTop = cfw.GetStackTop();
-					}
-					else
-					{
-						cfw.MarkTableSwitchCase(switchStart, i - 1, switchStackTop);
-					}
+					il.MarkLabel(switchTable [i]);
 				}
 				if (n.GetType() == Token.FUNCTION)
 				{
@@ -468,34 +496,35 @@ namespace Rhino.Optimizer
 								il.EmitLoadConstant(p);
 								var undefArg = il.DefineLabel();
 								var beyond = il.DefineLabel();
-								cfw.Emit(ByteCode.IF_ICMPLE, undefArg);
+								il.Emit(ByteCode.IF_ICMPLE, undefArg);
 								// get array[p]
-								cfw.EmitLdloc(4);
+								il.EmitLoadArgument(4);
 								il.EmitLoadConstant(p);
-								cfw.Emit(ByteCode.AALOAD);
-								cfw.Emit(OpCodes.Br, beyond);
-								cfw.MarkLabel(undefArg);
+								il.Emit(OpCodes.Ldind_Ref);
+								il.Emit(OpCodes.Br, beyond);
+								il.MarkLabel(undefArg);
 								PushUndefined(il);
-								cfw.MarkLabel(beyond);
+								il.MarkLabel(beyond);
 								// Only one push
 								cfw.AdjustStackTop(-1);
 								il.EmitLoadConstant(0.0);
 								// restore invariant
-								cfw.EmitLdloc(4);
+								il.EmitLoadArgument(4);
 							}
 						}
 					}
 				}
-				il.Emit(OpCodes.Call, mainClass.GetMethod(GetBodyMethodName(n), GetParameterTypes(n)));
+				il.Emit(OpCodes.Call, methods [GetBodyMethodName(n)]/*; mainClass.GetMethod(GetBodyMethodName(n), GetParameterTypes(n))*/);
 				il.Emit(OpCodes.Ret);
 			}
+			return method;
 		}
 
-		private void GenerateMain(TypeBuilder tb)
+		private void GenerateMain(TypeBuilder tb, ConstructorInfo constructor)
 		{
 			var method = tb.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.Static, typeof (void), new[] {typeof (string[])});
 			var il = method.GetILGenerator();
-			il.Emit(OpCodes.Newobj, tb.GetConstructor(Type.EmptyTypes)); // new ScriptImpl()
+			il.Emit(OpCodes.Newobj, constructor); // new ScriptImpl()
 			il.Emit(OpCodes.Ldarg_0); // args
 
 			// Call mainMethodClass.Main(Script script, String[] args)
@@ -503,29 +532,30 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateExecute(TypeBuilder tb)
+		private static void GenerateExecute(TypeBuilder tb, MethodInfo callMethod)
 		{
-			var method = tb.DefineMethod("Exec", MethodAttributes.Public | MethodAttributes.Final, typeof (object), new[] {typeof (Context), typeof (Scriptable)});
+			var method = tb.DefineMethod("Exec", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot, typeof (object), new[] {typeof (Context), typeof (Scriptable)});
 			var il = method.GetILGenerator();
 			il.Emit(OpCodes.Ldarg_0);
 			il.Emit(OpCodes.Ldarg_1);
 			il.Emit(OpCodes.Ldarg_2);
 			il.Emit(OpCodes.Dup);
 			il.Emit(OpCodes.Ldnull);
-			il.Emit(OpCodes.Callvirt, tb.GetMethod("Call", new[] { typeof(Context), typeof(Scriptable), typeof(Scriptable), typeof(object[]) }));
+			il.Emit(OpCodes.Callvirt, callMethod);
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateScriptCtor(TypeBuilder tb, ConstructorInfo baseConstructor)
+		private static ConstructorBuilder GenerateScriptCtor(TypeBuilder tb, ConstructorInfo baseConstructor)
 		{
 			var constructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, Type.EmptyTypes);
 			var il = constructor.GetILGenerator();
 			il.Emit(OpCodes.Ldarg_0);
 			il.Emit(OpCodes.Call, baseConstructor);
 			il.Emit(OpCodes.Ret);
+			return constructor;
 		}
 
-		private void GenerateFunctionConstructor(ClassFileWriter cfw)
+		private ConstructorBuilder GenerateFunctionConstructor(ClassFileWriter cfw, FieldInfo idField)
 		{
 			var tb = cfw.tb;
 			var constructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] {typeof (Scriptable), typeof (Context), typeof (int)});
@@ -533,12 +563,12 @@ namespace Rhino.Optimizer
 			
 			// call base constructor
 			il.Emit(OpCodes.Ldarg_0); // this
-			il.Emit(OpCodes.Call, SUPER_CLASS.GetConstructor(Type.EmptyTypes));
+			il.Emit(OpCodes.Call, SUPER_CLASS.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null));
 
 			// set _id
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Ldarg_3); // id
-			il.Emit(OpCodes.Stfld, tb.GetField(ID_FIELD_NAME));
+			il.Emit(OpCodes.Stfld, idField);
 
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Ldarg_2); // context
@@ -552,38 +582,30 @@ namespace Rhino.Optimizer
 			}
 
 			var generateSwitch = (2 <= end - start);
-			var switchStart = 0;
+			Label[] switchTable = null;
 			var switchStackTop = 0;
 			if (generateSwitch)
 			{
-				cfw.EmitLdloc(3);
+				il.EmitLoadLocal(3);
 				// do switch from (start + 1,  end - 1) mapping start to
 				// the default case
-				switchStart = cfw.AddTableSwitch(start + 1, end - 1);
+				switchTable = il.DefineSwitchTable(end - start);
+				il.Emit(OpCodes.Switch, switchTable);
 			}
-			for (var i = start; i != end; ++i)
+			for (var i = start; i < end; i++)
 			{
 				if (generateSwitch)
 				{
-					if (i == start)
-					{
-						cfw.MarkTableSwitchDefault(switchStart);
-						switchStackTop = cfw.GetStackTop();
-					}
-					else
-					{
-						cfw.MarkTableSwitchCase(switchStart, i - 1 - start, switchStackTop);
-					}
+					il.MarkLabel(switchTable [i - start]);
 				}
 				var ofn = OptFunctionNode.Get(scriptOrFnNodes [i]);
-				cfw.il.Emit(OpCodes.Call, mainClass.GetMethod(GetFunctionInitMethodName(ofn), new[] { typeof(Context), typeof(Scriptable) }));
-				cfw.Emit(OpCodes.Ret);
+				il.Emit(OpCodes.Call, functionInits[ofn]);
+				il.Emit(OpCodes.Ret);
 			}
-			// 4 = this + scope + context + id
-			cfw.StopMethod(4);
+			return constructor;
 		}
 
-		private void GenerateFunctionInit(TypeBuilder type, OptFunctionNode ofn)
+		private MethodInfo GenerateFunctionInit(TypeBuilder type, MethodInfo regExpInit, OptFunctionNode ofn)
 		{
 			var method = type.DefineMethod(GetFunctionInitMethodName(ofn), MethodAttributes.Private | MethodAttributes.Final, typeof (void), new[] {typeof (Context), typeof (Scriptable)});
 			var il = method.GetILGenerator();
@@ -598,59 +620,58 @@ namespace Rhino.Optimizer
 			if (ofn.fnode.GetRegExpCount() != 0)
 			{
 				il.Emit(OpCodes.Ldarg_1); //cx
-				il.Emit(OpCodes.Call, mainClass.GetMethod(REGEXP_INIT_METHOD_NAME, new[] {typeof (Context)}));
+				il.Emit(OpCodes.Call, regExpInit);
 			}
 
 			il.Emit(OpCodes.Ret);
+			return method;
 		}
 
-		private void GenerateNativeFunctionOverrides(TypeBuilder type, string encodedSource)
+		private void GenerateNativeFunctionOverrides(FieldInfo idField, TypeBuilder type, string encodedSource)
 		{
-			GenerateGetFunctionName(type);
+			GenerateGetFunctionName(type, idField);
 			GenerateGetLanguageVersion(type);
-			GenerateGetParamCount(type);
-			GenerateGetParamAndVarCount(type);
-			GenerateGetParamOrVarName(type);
-			GenerateGetEncodedSource(type, encodedSource);
-			GenerateGetParamOrVarConst(type);
+			GenerateGetParamCount(type, idField);
+			GenerateGetParamAndVarCount(type, idField);
+			GenerateGetParamOrVarName(type, idField);
+			GenerateGetEncodedSource(type, idField, encodedSource);
+			GenerateGetParamOrVarConst(type, idField);
 		}
 
-		private void GenerateGetFunctionName(TypeBuilder type)
+		private void GenerateGetFunctionName(TypeBuilder type, FieldInfo idField)
 		{
 			var method = type.DefineMethod("GetFunctionName", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof (string), Type.EmptyTypes);
 			var il = method.GetILGenerator();
 
-			GenerateNativeFunctionBody(type,
-				il,
-				node =>
+			GenerateNativeFunctionBody(idField, il, node =>
+			{
+				// Impelemnet method-specific switch code
+				// Push function name
+				if (node.GetType() == Token.SCRIPT)
 				{
-					// Impelemnet method-specific switch code
-					// Push function name
-					if (node.GetType() == Token.SCRIPT)
-					{
-						il.EmitLoadConstant(string.Empty);
-					}
-					else
-					{
-						var name = ((FunctionNode) node).GetName();
-						il.EmitLoadConstant(name);
-					}
-					il.Emit(OpCodes.Ret);
-				});
+					il.EmitLoadConstant(string.Empty);
+				}
+				else
+				{
+					var name = ((FunctionNode) node).GetName();
+					il.EmitLoadConstant(name);
+				}
+				il.Emit(OpCodes.Ret);
+			});
 		}
 
 		private void GenerateGetLanguageVersion(TypeBuilder type)
 		{
 			// Override NativeFunction.getLanguageVersion() with
 			// public int getLanguageVersion() { return <version-constant>; }
-			var method = type.DefineMethod("GetLanguageVersion", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(int), Type.EmptyTypes);
+			var method = type.DefineMethod("GetLanguageVersion", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(LanguageVersion), Type.EmptyTypes);
 			var il = method.GetILGenerator();
 			var version = compilerEnv.GetLanguageVersion();
-			il.EmitLoadConstant(version);
+			il.EmitLoadConstant((int) version);
 			il.Emit(OpCodes.Ret);
 		}
 
-		private void GenerateGetEncodedSource(TypeBuilder type, string encodedSource)
+		private void GenerateGetEncodedSource(TypeBuilder type, FieldInfo idField, string encodedSource)
 		{
 			if (encodedSource == null)
 				return;
@@ -659,147 +680,139 @@ namespace Rhino.Optimizer
 			var il = method.GetILGenerator();
 			il.EmitLoadConstant(encodedSource);
 
-			GenerateNativeFunctionBody(type,
-				il,
-				node =>
-				{
-					// Push number encoded source start and end
-					// to prepare for encodedSource.Substring(start, length)
-					var start = node.GetEncodedSourceStart();
-					var end = node.GetEncodedSourceEnd();
-					var length = end - start;
+			GenerateNativeFunctionBody(idField, il, node =>
+			{
+				// Push number encoded source start and end
+				// to prepare for encodedSource.Substring(start, length)
+				var start = node.GetEncodedSourceStart();
+				var end = node.GetEncodedSourceEnd();
+				var length = end - start;
 
-					il.EmitLoadConstant(start);
-					il.EmitLoadConstant(length);
-					il.Emit(OpCodes.Callvirt, typeof (String).GetMethod("Substring", new[] { typeof (int), typeof (int) }));
-					il.Emit(OpCodes.Ret);
-				});
+				il.EmitLoadConstant(start);
+				il.EmitLoadConstant(length);
+				il.Emit(OpCodes.Callvirt, typeof (String).GetMethod("Substring", new[] { typeof (int), typeof (int) }));
+				il.Emit(OpCodes.Ret);
+			});
 		}
 
-		private void GenerateGetParamCount(TypeBuilder type)
+		private void GenerateGetParamCount(TypeBuilder type, FieldInfo idField)
 		{
 			var method = type.DefineMethod("GetParamCount", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(int), Type.EmptyTypes);
 			var il = method.GetILGenerator();
 
-			GenerateNativeFunctionBody(type,
-				il,
-				node =>
-				{
-					// Push number of defined parameters
-					var count = node.GetParamCount();
-					il.EmitLoadConstant(count);
-					il.Emit(OpCodes.Ret);
-				});
+			GenerateNativeFunctionBody(idField, il, node =>
+			{
+				// Push number of defined parameters
+				var count = node.GetParamCount();
+				il.EmitLoadConstant(count);
+				il.Emit(OpCodes.Ret);
+			});
 		}
 
-		private void GenerateGetParamAndVarCount(TypeBuilder type)
+		private void GenerateGetParamAndVarCount(TypeBuilder type, FieldInfo idField)
 		{
 			// Only this
 			var method = type.DefineMethod("GetParamAndVarCount", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(int), Type.EmptyTypes);
 			var il = method.GetILGenerator();
 
-			GenerateNativeFunctionBody(type,
-				il,
-				node =>
-				{
-					// Push number of defined parameters and declared variables
-					var k = node.GetParamAndVarCount();
-					il.EmitLoadConstant(k);
-					il.Emit(OpCodes.Ret);
-				});
+			GenerateNativeFunctionBody(idField, il, node =>
+			{
+				// Push number of defined parameters and declared variables
+				var k = node.GetParamAndVarCount();
+				il.EmitLoadConstant(k);
+				il.Emit(OpCodes.Ret);
+			});
 		}
 
-		private void GenerateGetParamOrVarName(TypeBuilder type)
+		private void GenerateGetParamOrVarName(TypeBuilder type, FieldInfo idField)
 		{
 			// this + paramOrVarIndex
 			var method = type.DefineMethod("GetParamOrVarName", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(string), new[] { typeof(int) });
 			var il = method.GetILGenerator();
 
-			GenerateNativeFunctionBody(type,
-				il,
-				node =>
+			GenerateNativeFunctionBody(idField, il, node =>
+			{
+				// Push name of parameter using another switch
+				// over paramAndVarCount
+				var count = node.GetParamAndVarCount();
+				if (count == 0)
 				{
-					// Push name of parameter using another switch
-					// over paramAndVarCount
-					var count = node.GetParamAndVarCount();
-					if (count == 0)
+					// The runtime should never call the method in this
+					// case but to make bytecode verifier happy return null
+					// as throwing execption takes more code
+					il.Emit(OpCodes.Ldnull);
+					il.Emit(OpCodes.Ret);
+				}
+				else if (count == 1)
+				{
+					// As above do not check for valid index but always
+					// return the name of the first param
+					var name = node.GetParamOrVarName(0);
+					il.EmitLoadConstant(name);
+					il.Emit(OpCodes.Ret);
+				}
+				else
+				{
+					// Do switch over getParamOrVarName
+					var table = il.DefineSwitchTable(count);
+					il.Emit(OpCodes.Ldarg_1);
+					il.Emit(OpCodes.Switch, table);
+					for (var j = 0; j < count; j++)
 					{
-						// The runtime should never call the method in this
-						// case but to make bytecode verifier happy return null
-						// as throwing execption takes more code
-						il.Emit(OpCodes.Ldnull);
-						il.Emit(OpCodes.Ret);
-					}
-					else if (count == 1)
-					{
-						// As above do not check for valid index but always
-						// return the name of the first param
-						var name = node.GetParamOrVarName(0);
+						var name = node.GetParamOrVarName(j);
+						il.MarkLabel(table[j]);
 						il.EmitLoadConstant(name);
 						il.Emit(OpCodes.Ret);
 					}
-					else
-					{
-						// Do switch over getParamOrVarName
-						var table = il.DefineSwitchTable(count);
-						il.Emit(OpCodes.Ldarg_1);
-						il.Emit(OpCodes.Switch, table);
-						for (var j = 0; j < count; j++)
-						{
-							var name = node.GetParamOrVarName(j);
-							il.MarkLabel(table[j]);
-							il.EmitLoadConstant(name);
-							il.Emit(OpCodes.Ret);
-						}
-					}
-				});
+				}
+			});
 		}
 
-		private void GenerateGetParamOrVarConst(TypeBuilder type)
+		private void GenerateGetParamOrVarConst(TypeBuilder type, FieldInfo idField)
 		{
 			var method = type.DefineMethod("GetParamOrVarConst", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof (bool), new[] { typeof (int) });
 			var il = method.GetILGenerator();
 
-			GenerateNativeFunctionBody(type,
-				il,
-				node =>
+			GenerateNativeFunctionBody(idField, il, node =>
+			{
+				// Push name of parameter using another switch
+				// over paramAndVarCount
+				int count = node.GetParamAndVarCount();
+				var constness = node.GetParamAndVarConst();
+				if (count == 0)
 				{
-					// Push name of parameter using another switch
-					// over paramAndVarCount
-					int count = node.GetParamAndVarCount();
-					var constness = node.GetParamAndVarConst();
-					if (count == 0)
+					// The runtime should never call the method in this
+					// case but to make bytecode verifier happy return null
+					// as throwing execption takes more code
+					il.Emit(OpCodes.Ldc_I4_0);
+					il.Emit(OpCodes.Ret);
+				}
+				else if (count == 1)
+				{
+					// As above do not check for valid index but always
+					// return the name of the first param
+					il.EmitLoadConstant(constness[0]);
+					il.Emit(OpCodes.Box, typeof(bool));
+					il.Emit(OpCodes.Ret);
+				}
+				else
+				{
+					// Do switch over getParamOrVarName
+					var table = il.DefineSwitchTable(count);
+					il.Emit(OpCodes.Ldarg_1);
+					il.Emit(OpCodes.Switch, table);
+					for (var j = 0; j < count; j++)
 					{
-						// The runtime should never call the method in this
-						// case but to make bytecode verifier happy return null
-						// as throwing execption takes more code
-						il.Emit(OpCodes.Ldc_I4_0);
+						il.MarkLabel(table[j]);
+						il.EmitLoadConstant(constness[j]);
+						il.Emit(OpCodes.Box, typeof(bool));
 						il.Emit(OpCodes.Ret);
 					}
-					else if (count == 1)
-					{
-						// As above do not check for valid index but always
-						// return the name of the first param
-						il.EmitLoadConstant(constness[0]);
-						il.Emit(OpCodes.Ret);
-					}
-					else
-					{
-						// Do switch over getParamOrVarName
-						var table = il.DefineSwitchTable(count);
-						il.Emit(OpCodes.Ldarg_1);
-						il.Emit(OpCodes.Switch, table);
-						for (var j = 0; j < count; j++)
-						{
-							il.MarkLabel(table[j]);
-							il.EmitLoadConstant(constness[j]);
-							il.Emit(OpCodes.Ret);
-						}
-					}
-				});
+				}
+			});
 		}
 
-		private void GenerateNativeFunctionBody(TypeBuilder type, ILGenerator il, Action<ScriptNode> emitter)
+		private void GenerateNativeFunctionBody(FieldInfo idField, ILGenerator il, Action<ScriptNode> emitter)
 		{
 			var count = scriptOrFnNodes.Length;
 			if (count == 1)
@@ -813,7 +826,7 @@ namespace Rhino.Optimizer
 
 				var switchTable = il.DefineSwitchTable(count);
 				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Ldfld, type.GetField(ID_FIELD_NAME));
+				il.Emit(OpCodes.Ldfld, idField);
 				il.Emit(OpCodes.Switch, switchTable.ToArray());
 
 				for (var i = 0; i < count; i++)
@@ -824,13 +837,13 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		private void EmitRegExpInit(TypeBuilder type)
+		private MethodBuilder EmitRegExpInit(TypeBuilder type)
 		{
 			// precompile all regexp literals
 			if (!scriptOrFnNodes.Any(t => t.GetRegExpCount() > 0))
-				return;
+				return null;
 
-			var method = type.DefineMethod(REGEXP_INIT_METHOD_NAME, MethodAttributes.Static | MethodAttributes.Private, typeof (void), new[] { typeof (Context) });
+			var method = type.DefineMethod("_reInit", MethodAttributes.Static | MethodAttributes.Private, typeof (void), new[] { typeof (Context) });
 			var il = method.GetILGenerator();
 			var regExpProxy = il.DeclareLocal(typeof (RegExpProxy));
 
@@ -871,6 +884,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ldc_I4_1);
 			il.Emit(OpCodes.Stfld, reInitDone);
 			il.Emit(OpCodes.Ret);
+			return method;
 		}
 
 		private void EmitConstantDudeInitializers(TypeBuilder type)
@@ -899,30 +913,27 @@ namespace Rhino.Optimizer
 					field = type.DefineField("_k" + i, typeof (Double), FieldAttributes.Static | FieldAttributes.Private);
 					il.EmitLoadConstant(number);
 				}
+				constantFields ["_k" + i] = field;
 				il.Emit(OpCodes.Stfld, field);
 			}
 			il.Emit(OpCodes.Ret);
 		}
 
-		internal void PushNumberAsObject(ClassFileWriter cfw, double num)
+		internal void PushNumberAsObject(ILGenerator il, ClassFileWriter cfw, double num)
 		{
+			il.EmitLoadConstant(num);
+			il.Emit(OpCodes.Box, typeof (double));
+			//TODO: FOR SOME REASONS THERE WAS FOLLOWING CRAZY CODE
+/*
 			if (num == 0.0)
 			{
-				if (1 / num > 0)
-				{
-					// +0.0
-					cfw.Add(OpCodes.Ldfld, typeof(OptRuntime), "zeroObj", typeof(Double));
-				}
-				else
-				{
-					cfw.il.EmitLoadConstant(num);
-				}
+				il.EmitLoadConstant(num);
 			}
 			else
 			{
 				if (num == 1.0)
 				{
-					cfw.Add(OpCodes.Ldfld, typeof(OptRuntime), "oneObj", typeof(Double));
+					il.EmitLoadConstant(1.0);
 					return;
 				}
 				else
@@ -945,7 +956,7 @@ namespace Rhino.Optimizer
 								// of static fields in a class or the size of the class
 								// initializer. Either way, we can't have any more than 2000
 								// statically init'd constants.
-								cfw.il.EmitLoadConstant(num);
+								il.EmitLoadConstant(num);
 							}
 							else
 							{
@@ -975,31 +986,20 @@ namespace Rhino.Optimizer
 									itsConstantListSize = N + 1;
 								}
 								var constantName = "_k" + index;
-								var constantType = GetStaticConstantWrapperType(num);
-								cfw.Add(OpCodes.Ldfld, mainClass, constantName, constantType);
+								il.Emit(OpCodes.Ldfld, constantFields [constantName]);
 							}
 						}
 					}
 				}
 			}
+*/
 		}
 
-		private static Type GetStaticConstantWrapperType(double num)
-		{
-			var inum = (int)num;
-			if (inum == num)
-			{
-				return typeof(int);
-			}
-			else
-			{
-				return typeof(Double);
-			}
-		}
+		private readonly Dictionary<string, FieldInfo> constantFields = new Dictionary<string, FieldInfo>();
 
 		internal static void PushUndefined(ILGenerator il)
 		{
-			il.Emit(OpCodes.Ldfld, typeof(Undefined).GetField("instance"));
+			il.Emit(OpCodes.Ldsfld, typeof(Undefined).GetField("instance"));
 		}
 
 		internal int GetIndex(ScriptNode n)
@@ -1074,7 +1074,8 @@ namespace Rhino.Optimizer
 
 		public void SetMainMethodClass(string className)
 		{
-			mainMethodClass = className;
+			throw new NotImplementedException();
+			//mainMethodClass = className;
 		}
 
 		internal static readonly Type DEFAULT_MAIN_METHOD_CLASS = typeof (OptRuntime);
@@ -1082,8 +1083,6 @@ namespace Rhino.Optimizer
 		private static readonly Type SUPER_CLASS = typeof (NativeFunction);
 
 		internal const string ID_FIELD_NAME = "_id";
-
-		internal const string REGEXP_INIT_METHOD_NAME = "_reInit";
 
 		private static readonly object globalLock = new object();
 
@@ -1101,11 +1100,10 @@ namespace Rhino.Optimizer
 
 		internal TypeBuilder mainClass;
 
-		internal string mainClassSignature;
-
 		private double[] itsConstantList;
 
 		private int itsConstantListSize;
+		private AssemblyBuilder dynamicAssembly;
 	}
 }
 

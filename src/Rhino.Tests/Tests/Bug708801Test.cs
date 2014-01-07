@@ -233,7 +233,7 @@ namespace Rhino.Tests
 			compilerEnv.InitFromContext(context);
 			ErrorReporter compilationErrorReporter = compilerEnv.GetErrorReporter();
 			Parser p = new Parser(compilerEnv, compilationErrorReporter);
-			AstRoot ast = p.Parse(source.ToString(), "<eval>", 1);
+			AstRoot ast = p.Parse(source, "<eval>", 1);
 			IRFactory irf = new IRFactory(compilerEnv);
 			ScriptNode tree = irf.TransformTree(ast);
 #if COMPILATION
