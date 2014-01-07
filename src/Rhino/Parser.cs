@@ -523,8 +523,10 @@ namespace Rhino
 
 		private void ExitLoop()
 		{
-			Loop loop = loopSet.Remove(loopSet.Count - 1);
-			loopAndSwitchSet.Remove(loopAndSwitchSet.Count - 1);
+			int index = loopSet.Count - 1;
+			Loop loop = loopSet[index];
+			loopSet.RemoveAt(index);
+			loopAndSwitchSet.RemoveAt(loopAndSwitchSet.Count - 1);
 			if (loop.GetParent() != null)
 			{
 				// see comment in enterLoop
@@ -544,7 +546,7 @@ namespace Rhino
 
 		private void ExitSwitch()
 		{
-			loopAndSwitchSet.Remove(loopAndSwitchSet.Count - 1);
+			loopAndSwitchSet.RemoveAt(loopAndSwitchSet.Count - 1);
 		}
 
 		/// <summary>Builds a parse tree from the given source string.</summary>
