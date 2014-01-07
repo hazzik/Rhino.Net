@@ -198,7 +198,7 @@ namespace Rhino
 			return MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			int id;
 			// #generated# Last update: 2010-01-06 05:48:21 ARST
@@ -250,7 +250,7 @@ L0_break: ;
 			{
 				return base.FindInstanceIdInfo(s);
 			}
-			int attr;
+			PropertyAttributes attr;
 			switch (id)
 			{
 				case Id_callee:
@@ -258,7 +258,7 @@ L0_break: ;
 				case Id_length:
 				case Id_constructor:
 				{
-					attr = DONTENUM;
+					attr = PropertyAttributes.DONTENUM;
 					break;
 				}
 
@@ -461,7 +461,7 @@ L0_break: ;
 				{
 					scope = this;
 				}
-				return BuildDataDescriptor(scope, value, EMPTY);
+				return BuildDataDescriptor(scope, value, PropertyAttributes.EMPTY);
 			}
 		}
 

@@ -51,14 +51,14 @@ namespace Rhino
 				{
 					string name = function.GetParamOrVarName(i);
 					object val = i < args.Length ? args[i] : Undefined.instance;
-					DefineProperty(name, val, PERMANENT);
+					DefineProperty(name, val, PropertyAttributes.PERMANENT);
 				}
 			}
 			// initialize "arguments" property but only if it was not overridden by
 			// the parameter with the same name
 			if (!base.Has("arguments", this))
 			{
-				DefineProperty("arguments", new Arguments(this), PERMANENT);
+				DefineProperty("arguments", new Arguments(this), PropertyAttributes.PERMANENT);
 			}
 			if (paramAndVarCount != 0)
 			{
@@ -69,11 +69,11 @@ namespace Rhino
 					{
 						if (function.GetParamOrVarConst(i))
 						{
-							DefineProperty(name, Undefined.instance, CONST);
+							DefineProperty(name, Undefined.instance, PropertyAttributes.CONST);
 						}
 						else
 						{
-							DefineProperty(name, Undefined.instance, PERMANENT);
+							DefineProperty(name, Undefined.instance, PropertyAttributes.PERMANENT);
 						}
 					}
 				}

@@ -33,7 +33,7 @@ namespace Rhino
 		{
 			Rhino.BaseFunction obj = new Rhino.BaseFunction();
 			// Function.prototype attributes: see ECMA 15.3.3.1
-			obj.prototypePropertyAttributes = DONTENUM | READONLY | PERMANENT;
+			obj.prototypePropertyAttributes = PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT;
 			obj.ExportAsJSClass(MAX_PROTOTYPE_ID, scope, @sealed);
 		}
 
@@ -108,7 +108,7 @@ namespace Rhino
 			return MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			int id;
 			// #generated# Last update: 2007-05-09 08:15:15 EDT
@@ -170,14 +170,14 @@ L0_break: ;
 			{
 				return base.FindInstanceIdInfo(s);
 			}
-			int attr;
+			PropertyAttributes attr;
 			switch (id)
 			{
 				case Id_length:
 				case Id_arity:
 				case Id_name:
 				{
-					attr = DONTENUM | READONLY | PERMANENT;
+					attr = PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT;
 					break;
 				}
 
@@ -186,7 +186,7 @@ L0_break: ;
 					// some functions such as built-ins don't have a prototype property
 					if (!HasPrototypeProperty())
 					{
-						return 0;
+						return null;
 					}
 					attr = prototypePropertyAttributes;
 					break;
@@ -194,7 +194,7 @@ L0_break: ;
 
 				case Id_arguments:
 				{
-					attr = DONTENUM | PERMANENT;
+					attr = PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT;
 					break;
 				}
 
@@ -276,7 +276,7 @@ L0_break: ;
 			{
 				case Id_prototype:
 				{
-					if ((prototypePropertyAttributes & READONLY) == 0)
+					if ((prototypePropertyAttributes & PropertyAttributes.READONLY) == 0)
 					{
 						prototypeProperty = (value != null) ? value : UniqueTag.NULL_VALUE;
 					}
@@ -484,12 +484,12 @@ L0_break: ;
 		/// </summary>
 		public virtual void SetImmunePrototypeProperty(object value)
 		{
-			if ((prototypePropertyAttributes & READONLY) != 0)
+			if ((prototypePropertyAttributes & PropertyAttributes.READONLY) != 0)
 			{
 				throw new InvalidOperationException();
 			}
 			prototypeProperty = (value != null) ? value : UniqueTag.NULL_VALUE;
-			prototypePropertyAttributes = DONTENUM | PERMANENT | READONLY;
+			prototypePropertyAttributes = PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY;
 		}
 
 		protected internal virtual Scriptable GetClassPrototype()
@@ -660,7 +660,7 @@ L0_break: ;
 					return prototypeProperty;
 				}
 				NativeObject obj = new NativeObject();
-				int attr = ScriptableObject.DONTENUM;
+				PropertyAttributes attr = PropertyAttributes.DONTENUM;
 				obj.DefineProperty("constructor", this, attr);
 				// put the prototype property into the object now, then in the
 				// wacky case of a user defining a function Object(), we don't
@@ -834,7 +834,7 @@ L0_break: ;
 
 		private object prototypeProperty;
 
-		private int prototypePropertyAttributes = PERMANENT | DONTENUM;
+		private PropertyAttributes prototypePropertyAttributes = PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM;
 		// #/string_id_map#
 		// For function object instances, attributes are
 		//  {configurable:false, enumerable:false};

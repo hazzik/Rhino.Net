@@ -56,7 +56,7 @@ namespace Rhino
 			this.@sealed = @sealed;
 			this.privileged = privileged;
 			this.state = STATE_BEFORE_INIT;
-			scope.AddLazilyInitializedValue(propertyName, 0, this, ScriptableObject.DONTENUM);
+			scope.AddLazilyInitializedValue(propertyName, 0, this, PropertyAttributes.DONTENUM);
 		}
 
 		internal void Init()

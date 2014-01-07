@@ -163,7 +163,7 @@ L0_break: ;
 			{
 				return base.FindInstanceIdInfo(s);
 			}
-			int attr;
+			PropertyAttributes attr;
 			switch (id)
 			{
 				case Id_ignoreComments:
@@ -172,7 +172,7 @@ L0_break: ;
 				case Id_prettyIndent:
 				case Id_prettyPrinting:
 				{
-					attr = PERMANENT | DONTENUM;
+					attr = PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM;
 					break;
 				}
 

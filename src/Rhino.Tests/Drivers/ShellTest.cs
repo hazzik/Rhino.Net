@@ -154,7 +154,7 @@ namespace Rhino.Drivers
 			TextWriter p = new StreamWriter(@out);
 			global.SetOut(p);
 			global.SetErr(p);
-			global.DefineFunctionProperties(new[] { "options" }, typeof(ShellTest), ScriptableObject.DONTENUM | ScriptableObject.PERMANENT | ScriptableObject.READONLY);
+			global.DefineFunctionProperties(new[] { "options" }, typeof(ShellTest), PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 			// test suite expects keywords to be disallowed as identifiers
 			shellContextFactory.SetAllowReservedKeywords(false);
 			TestState testState = new TestState();

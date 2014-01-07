@@ -47,7 +47,7 @@ namespace Rhino.Tests
 		{
 			MethodInfo readMethod = typeof(Foo).GetMethod("GetMyProp", Type.EmptyTypes);
 			Foo foo = new Foo("hello");
-			foo.DefineProperty("myProp", null, readMethod, null, ScriptableObject.EMPTY);
+			foo.DefineProperty("myProp", null, readMethod, null, PropertyAttributes.EMPTY);
 			string script = "foo.myProp = 123; foo.myProp";
 			ContextFactory contextFactory = new TestContextFactory(acceptWriteReadOnly);
 			contextFactory.Call(cx =>

@@ -163,7 +163,7 @@ namespace Rhino.RegExp
 			NativeRegExpCtor ctor = new NativeRegExpCtor();
 			// Bug #324006: ECMA-262 15.10.6.1 says "The initial value of
 			// RegExp.prototype.constructor is the builtin RegExp constructor."
-			proto.DefineProperty("constructor", ctor, ScriptableObject.DONTENUM);
+			proto.DefineProperty("constructor", ctor, PropertyAttributes.DONTENUM);
 			ScriptRuntime.SetFunctionProtoAndParent(ctor, scope);
 			ctor.SetImmunePrototypeProperty(proto);
 			if (@sealed)
@@ -171,7 +171,7 @@ namespace Rhino.RegExp
 				proto.SealObject();
 				ctor.SealObject();
 			}
-			DefineProperty(scope, "RegExp", ctor, ScriptableObject.DONTENUM);
+			DefineProperty(scope, "RegExp", ctor, PropertyAttributes.DONTENUM);
 		}
 
 		internal NativeRegExp(Scriptable scope, RECompiled regexpCompiled)
@@ -2975,7 +2975,7 @@ switchStatement_break: ;
 			return MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			int id;
 			// #generated# Last update: 2007-05-09 08:16:24 EDT
@@ -3040,12 +3040,12 @@ L0_break: ;
 			{
 				return base.FindInstanceIdInfo(s);
 			}
-			int attr;
+			PropertyAttributes attr;
 			switch (id)
 			{
 				case Id_lastIndex:
 				{
-					attr = PERMANENT | DONTENUM;
+					attr = PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM;
 					break;
 				}
 
@@ -3054,7 +3054,7 @@ L0_break: ;
 				case Id_ignoreCase:
 				case Id_multiline:
 				{
-					attr = PERMANENT | READONLY | DONTENUM;
+					attr = PropertyAttributes.PERMANENT | PropertyAttributes.READONLY | PropertyAttributes.DONTENUM;
 					break;
 				}
 

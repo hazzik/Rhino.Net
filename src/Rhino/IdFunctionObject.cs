@@ -84,7 +84,7 @@ namespace Rhino
 
 		public void AddAsProperty(Scriptable target)
 		{
-			ScriptableObject.DefineProperty(target, functionName, this, ScriptableObject.DONTENUM);
+			ScriptableObject.DefineProperty(target, functionName, this, PropertyAttributes.DONTENUM);
 		}
 
 		public virtual void ExportAsScopeProperty()

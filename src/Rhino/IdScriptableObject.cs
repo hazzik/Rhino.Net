@@ -49,13 +49,13 @@ namespace Rhino
 
 			private object[] valueArray;
 
-			private short[] attributeArray;
+			private PropertyAttributes[] attributeArray;
 
 			internal int constructorId;
 
 			private IdFunctionObject constructor;
 
-			private short constructorAttrs;
+			private PropertyAttributes constructorAttrs;
 
 			internal PrototypeValues(IdScriptableObject obj, int maxId)
 			{
@@ -78,7 +78,7 @@ namespace Rhino
 				return maxId;
 			}
 
-			internal void InitValue(int id, string name, object value, int attributes)
+			internal void InitValue(int id, string name, object value, PropertyAttributes attributes)
 			{
 				if (!(1 <= id && id <= maxId))
 				{
@@ -104,13 +104,13 @@ namespace Rhino
 						throw new ArgumentException("consructor should be initialized with IdFunctionObject");
 					}
 					constructor = (IdFunctionObject)value;
-					constructorAttrs = (short)attributes;
+					constructorAttrs = attributes;
 					return;
 				}
 				InitSlot(id, name, value, attributes);
 			}
 
-			private void InitSlot(int id, string name, object value, int attributes)
+			private void InitSlot(int id, string name, object value, PropertyAttributes attributes)
 			{
 				object[] array = valueArray;
 				if (array == null)
@@ -129,7 +129,7 @@ namespace Rhino
 					{
 						array[index] = value;
 						array[index + NAME_SLOT] = name;
-						attributeArray[id - 1] = (short)attributes;
+						attributeArray[id - 1] = attributes;
 					}
 					else
 					{
@@ -202,8 +202,8 @@ namespace Rhino
 					throw new ArgumentException();
 				}
 				EnsureId(id);
-				int attr = attributeArray[id - 1];
-				if ((attr & READONLY) == 0)
+				PropertyAttributes attr = attributeArray[id - 1];
+				if ((attr & PropertyAttributes.READONLY) == 0)
 				{
 					if (start == obj)
 					{
@@ -229,31 +229,31 @@ namespace Rhino
 			internal void Delete(int id)
 			{
 				EnsureId(id);
-				int attr = attributeArray[id - 1];
-				if ((attr & PERMANENT) == 0)
+				PropertyAttributes attr = attributeArray[id - 1];
+				if ((attr & PropertyAttributes.PERMANENT) == 0)
 				{
 					int valueSlot = (id - 1) * SLOT_SPAN;
 					lock (this)
 					{
 						valueArray[valueSlot] = ScriptableConstants.NOT_FOUND;
-						attributeArray[id - 1] = EMPTY;
+						attributeArray[id - 1] = PropertyAttributes.EMPTY;
 					}
 				}
 			}
 
-			internal int GetAttributes(int id)
+			internal PropertyAttributes GetAttributes(int id)
 			{
 				EnsureId(id);
 				return attributeArray[id - 1];
 			}
 
-			internal void SetAttributes(int id, int attributes)
+			internal void SetAttributes(int id, PropertyAttributes attributes)
 			{
 				ScriptableObject.CheckValidAttributes(attributes);
 				EnsureId(id);
 				lock (this)
 				{
-					attributeArray[id - 1] = (short)attributes;
+					attributeArray[id - 1] = attributes;
 				}
 			}
 
@@ -264,7 +264,7 @@ namespace Rhino
 				for (int id = 1; id <= maxId; ++id)
 				{
 					object value = EnsureId(id);
-					if (getAll || (attributeArray[id - 1] & DONTENUM) == 0)
+					if (getAll || (attributeArray[id - 1] & PropertyAttributes.DONTENUM) == 0)
 					{
 						if (value != ScriptableConstants.NOT_FOUND)
 						{
@@ -317,7 +317,7 @@ namespace Rhino
 						{
 							array = new object[maxId * SLOT_SPAN];
 							valueArray = array;
-							attributeArray = new short[maxId];
+							attributeArray = new PropertyAttributes[maxId];
 						}
 					}
 				}
@@ -365,15 +365,15 @@ namespace Rhino
 
 		public override bool Has(string name, Scriptable start)
 		{
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
-				int attr = ((int)(((uint)info) >> 16));
-				if ((attr & PERMANENT) != 0)
+				PropertyAttributes attr = info.Attributes;
+				if ((attr & PropertyAttributes.PERMANENT) != 0)
 				{
 					return true;
 				}
-				int id = (info & unchecked((int)(0xFFFF)));
+				int id = info.Id;
 				return ScriptableConstants.NOT_FOUND != GetInstanceIdValue(id);
 			}
 			if (prototypeValues != null)
@@ -396,10 +396,10 @@ namespace Rhino
 			{
 				return value;
 			}
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
-				int id = (info & unchecked((int)(0xFFFF)));
+				int id = info.Id;
 				value = GetInstanceIdValue(id);
 				if (value != ScriptableConstants.NOT_FOUND)
 				{
@@ -423,19 +423,19 @@ namespace Rhino
 
 		public override void Put(string name, Scriptable start, object value)
 		{
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
 				if (start == this && IsSealed())
 				{
 					throw Context.ReportRuntimeError1("msg.modify.sealed", name);
 				}
-				int attr = ((int)(((uint)info) >> 16));
-				if ((attr & READONLY) == 0)
+				PropertyAttributes attr = info.Attributes;
+				if ((attr & PropertyAttributes.READONLY) == 0)
 				{
 					if (start == this)
 					{
-						int id = (info & unchecked((int)(0xFFFF)));
+						int id = info.Id;
 						SetInstanceIdValue(id, value);
 					}
 					else
@@ -463,16 +463,16 @@ namespace Rhino
 
 		public override void Delete(string name)
 		{
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
 				// Let the super class to throw exceptions for sealed objects
 				if (!IsSealed())
 				{
-					int attr = ((int)(((uint)info) >> 16));
-					if ((attr & PERMANENT) == 0)
+					PropertyAttributes attr = info.Attributes;
+					if ((attr & PropertyAttributes.PERMANENT) == 0)
 					{
-						int id = (info & unchecked((int)(0xFFFF)));
+						int id = info.Id;
 						SetInstanceIdValue(id, ScriptableConstants.NOT_FOUND);
 					}
 					return;
@@ -493,12 +493,12 @@ namespace Rhino
 			base.Delete(name);
 		}
 
-		public override int GetAttributes(string name)
+		public override PropertyAttributes GetAttributes(string name)
 		{
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
-				int attr = ((int)(((uint)info) >> 16));
+				PropertyAttributes attr = info.Attributes;
 				return attr;
 			}
 			if (prototypeValues != null)
@@ -512,14 +512,14 @@ namespace Rhino
 			return base.GetAttributes(name);
 		}
 
-		public override void SetAttributes(string name, int attributes)
+		public override void SetAttributes(string name, PropertyAttributes attributes)
 		{
 			ScriptableObject.CheckValidAttributes(attributes);
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
-				int id = (info & unchecked((int)(0xFFFF)));
-				int currentAttributes = ((int)(((uint)info) >> 16));
+				int id = info.Id;
+				PropertyAttributes currentAttributes = info.Attributes;
 				if (attributes != currentAttributes)
 				{
 					SetInstanceIdAttributes(id, attributes);
@@ -553,18 +553,18 @@ namespace Rhino
 				for (int id = maxInstanceId; id != 0; --id)
 				{
 					string name = GetInstanceIdName(id);
-					int info = FindInstanceIdInfo(name);
-					if (info != 0)
+					InstanceIdInfo info = FindInstanceIdInfo(name);
+					if (info != null)
 					{
-						int attr = ((int)(((uint)info) >> 16));
-						if ((attr & PERMANENT) == 0)
+						PropertyAttributes attr = info.Attributes;
+						if ((attr & PropertyAttributes.PERMANENT) == 0)
 						{
 							if (ScriptableConstants.NOT_FOUND == GetInstanceIdValue(id))
 							{
 								continue;
 							}
 						}
-						if (getAll || (attr & DONTENUM) == 0)
+						if (getAll || (attr & PropertyAttributes.DONTENUM) == 0)
 						{
 							if (count == 0)
 							{
@@ -600,9 +600,9 @@ namespace Rhino
 			return 0;
 		}
 
-		protected internal static int InstanceIdInfo(int attributes, int id)
+		protected internal static InstanceIdInfo InstanceIdInfo(PropertyAttributes attributes, int id)
 		{
-			return (attributes << 16) | id;
+			return new InstanceIdInfo(id, attributes);
 		}
 
 		/// <summary>Map name to id of instance property.</summary>
@@ -612,9 +612,9 @@ namespace Rhino
 		/// <see cref="InstanceIdInfo(int, int)">InstanceIdInfo(int, int)</see>
 		/// .
 		/// </remarks>
-		protected internal virtual int FindInstanceIdInfo(string name)
+		protected internal virtual InstanceIdInfo FindInstanceIdInfo(string name)
 		{
-			return 0;
+			return null;
 		}
 
 		/// <summary>Map id back to property name it defines.</summary>
@@ -656,7 +656,7 @@ namespace Rhino
 		/// </remarks>
 		/// <param name="id">the instance property id</param>
 		/// <param name="attr">the new attribute bitset</param>
-		protected internal virtual void SetInstanceIdAttributes(int id, int attr)
+		protected internal virtual void SetInstanceIdAttributes(int id, PropertyAttributes attr)
 		{
 			throw ScriptRuntime.ConstructError("InternalError", "Changing attributes not supported for " + GetClassName() + " " + GetInstanceIdName(id) + " property");
 		}
@@ -719,7 +719,7 @@ namespace Rhino
 		{
 			Scriptable scope = ScriptableObject.GetTopLevelScope(this);
 			IdFunctionObject f = NewIdFunction(tag, id, name, arity, scope);
-			prototypeValues.InitValue(id, name, f, DONTENUM);
+			prototypeValues.InitValue(id, name, f, PropertyAttributes.DONTENUM);
 		}
 
 		public void InitPrototypeConstructor(IdFunctionObject f)
@@ -737,10 +737,10 @@ namespace Rhino
 			{
 				f.SealObject();
 			}
-			prototypeValues.InitValue(id, "constructor", f, DONTENUM);
+			prototypeValues.InitValue(id, "constructor", f, PropertyAttributes.DONTENUM);
 		}
 
-		public void InitPrototypeValue(int id, string name, object value, int attributes)
+		public void InitPrototypeValue(int id, string name, object value, PropertyAttributes attributes)
 		{
 			prototypeValues.InitValue(id, name, value, attributes);
 		}
@@ -815,10 +815,10 @@ namespace Rhino
 			if (key is string)
 			{
 				string name = (string)key;
-				int info = FindInstanceIdInfo(name);
-				if (info != 0)
+				InstanceIdInfo info = FindInstanceIdInfo(name);
+				if (info != null)
 				{
-					int id = (info & unchecked((int)(0xFFFF)));
+					int id = info.Id;
 					if (IsAccessorDescriptor(desc))
 					{
 						Delete(id);
@@ -829,9 +829,9 @@ namespace Rhino
 						CheckPropertyDefinition(desc);
 						ScriptableObject current = GetOwnPropertyDescriptor(cx, key);
 						CheckPropertyChange(name, current, desc);
-						int attr = ((int)(((uint)info) >> 16));
+						PropertyAttributes attr = info.Attributes;
 						object value = GetProperty(desc, "value");
-						if (value != ScriptableConstants.NOT_FOUND && (attr & READONLY) == 0)
+						if (value != ScriptableConstants.NOT_FOUND && (attr & PropertyAttributes.READONLY) == 0)
 						{
 							object currentValue = GetInstanceIdValue(id);
 							if (!SameValue(value, currentValue))
@@ -839,7 +839,7 @@ namespace Rhino
 								SetInstanceIdValue(id, value);
 							}
 						}
-						SetAttributes(name, ApplyDescriptorToAttributeBitset(attr, desc));
+						SetAttributes(name, (PropertyAttributes) ApplyDescriptorToAttributeBitset(attr, desc));
 						return;
 					}
 				}
@@ -858,9 +858,9 @@ namespace Rhino
 							CheckPropertyDefinition(desc);
 							ScriptableObject current = GetOwnPropertyDescriptor(cx, key);
 							CheckPropertyChange(name, current, desc);
-							int attr = prototypeValues.GetAttributes(id);
+							PropertyAttributes attr = prototypeValues.GetAttributes(id);
 							object value = GetProperty(desc, "value");
-							if (value != ScriptableConstants.NOT_FOUND && (attr & READONLY) == 0)
+							if (value != ScriptableConstants.NOT_FOUND && (attr & PropertyAttributes.READONLY) == 0)
 							{
 								object currentValue = prototypeValues.Get(id);
 								if (!SameValue(value, currentValue))
@@ -889,19 +889,19 @@ namespace Rhino
 
 		private ScriptableObject GetBuiltInDescriptor(string name)
 		{
-			object value = null;
-			int attr = EMPTY;
+			object value;
+			PropertyAttributes attr;
 			Scriptable scope = GetParentScope();
 			if (scope == null)
 			{
 				scope = this;
 			}
-			int info = FindInstanceIdInfo(name);
-			if (info != 0)
+			InstanceIdInfo info = FindInstanceIdInfo(name);
+			if (info != null)
 			{
-				int id = (info & unchecked((int)(0xFFFF)));
+				int id = info.Id;
 				value = GetInstanceIdValue(id);
-				attr = ((int)(((uint)info) >> 16));
+				attr = info.Attributes;
 				return BuildDataDescriptor(scope, value, attr);
 			}
 			if (prototypeValues != null)

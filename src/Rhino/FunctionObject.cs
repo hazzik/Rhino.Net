@@ -370,7 +370,7 @@ namespace Rhino
 		public virtual void AddAsConstructor(Scriptable scope, Scriptable prototype)
 		{
 			InitAsConstructor(scope, prototype);
-			DefineProperty(scope, prototype.GetClassName(), this, DONTENUM);
+			DefineProperty(scope, prototype.GetClassName(), this, PropertyAttributes.DONTENUM);
 		}
 
 		internal virtual void InitAsConstructor(Scriptable scope, Scriptable prototype)
@@ -378,7 +378,7 @@ namespace Rhino
 			ScriptRuntime.SetFunctionProtoAndParent(this, scope);
 			SetImmunePrototypeProperty(prototype);
 			prototype.SetParentScope(this);
-			DefineProperty(prototype, "constructor", this, DONTENUM | PERMANENT | READONLY);
+			DefineProperty(prototype, "constructor", this, PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 			SetParentScope(scope);
 		}
 

@@ -400,7 +400,7 @@ namespace Rhino.CommonJS.Module
 		private static void DefineReadOnlyProperty(ScriptableObject obj, string name, object value)
 		{
 			ScriptableObject.PutProperty(obj, name, value);
-			obj.SetAttributes(name, ScriptableObject.READONLY | ScriptableObject.PERMANENT);
+			obj.SetAttributes(name, PropertyAttributes.READONLY | PropertyAttributes.PERMANENT);
 		}
 
 		private ModuleScript GetModule(Context cx, string id, Uri uri, Uri @base)

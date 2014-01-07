@@ -56,7 +56,7 @@ namespace Rhino
 
 			internal object[] stack;
 
-			internal int[] stackAttributes;
+            internal PropertyAttributes[] stackAttributes;
 
 			internal double[] sDbl;
 
@@ -115,7 +115,7 @@ namespace Rhino
 				// clone stack but keep varSource to point to values
 				// from this frame to share variables.
 				copy.stack = (object[]) stack.Clone();
-				copy.stackAttributes = (int[]) stackAttributes.Clone();
+				copy.stackAttributes = (PropertyAttributes[]) stackAttributes.Clone();
 				copy.sDbl = (double[]) sDbl.Clone();
 				copy.frozen = false;
 				return copy;
@@ -1123,7 +1123,7 @@ namespace Rhino
 					double[] sDbl = frame.sDbl;
 					object[] vars = frame.varSource.stack;
 					double[] varDbls = frame.varSource.sDbl;
-					int[] varAttributes = frame.varSource.stackAttributes;
+					PropertyAttributes[] varAttributes = frame.varSource.stackAttributes;
 					sbyte[] iCode = frame.idata.itsICode;
 					string[] strings = frame.idata.itsStringTable;
 					// Use local for stackTop as well. Since execption handlers
@@ -2967,18 +2967,18 @@ object_compare_break: ;
 			return stackTop;
 		}
 
-		private static int DoSetConstVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, int[] varAttributes, int indexReg)
+        private static int DoSetConstVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, PropertyAttributes[] varAttributes, int indexReg)
 		{
 			if (!frame.useActivation)
 			{
-				if ((varAttributes[indexReg] & ScriptableObject.READONLY) == 0)
+				if ((varAttributes[indexReg] & PropertyAttributes.READONLY) == 0)
 				{
 					throw Context.ReportRuntimeError1("msg.var.redecl", frame.idata.argNames[indexReg]);
 				}
-				if ((varAttributes[indexReg] & ScriptableObject.UNINITIALIZED_CONST) != 0)
+				if ((varAttributes[indexReg] & PropertyAttributes.UNINITIALIZED_CONST) != 0)
 				{
 					vars[indexReg] = stack[stackTop];
-					varAttributes[indexReg] &= ~ScriptableObject.UNINITIALIZED_CONST;
+					varAttributes[indexReg] &= ~PropertyAttributes.UNINITIALIZED_CONST;
 					varDbls[indexReg] = sDbl[stackTop];
 				}
 			}
@@ -3003,11 +3003,11 @@ object_compare_break: ;
 			return stackTop;
 		}
 
-		private static int DoSetVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, int[] varAttributes, int indexReg)
+        private static int DoSetVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, PropertyAttributes[] varAttributes, int indexReg)
 		{
 			if (!frame.useActivation)
 			{
-				if ((varAttributes[indexReg] & ScriptableObject.READONLY) == 0)
+				if ((varAttributes[indexReg] & PropertyAttributes.READONLY) == 0)
 				{
 					vars[indexReg] = stack[stackTop];
 					varDbls[indexReg] = sDbl[stackTop];
@@ -3501,7 +3501,7 @@ object_compare_break: ;
 				Kit.CodeBug();
 			}
 			object[] stack;
-			int[] stackAttributes;
+            PropertyAttributes[] stackAttributes;
 			double[] sDbl;
 			bool stackReuse;
 			if (frame.stack != null && maxFrameArray <= frame.stack.Length)
@@ -3516,7 +3516,7 @@ object_compare_break: ;
 			{
 				stackReuse = false;
 				stack = new object[maxFrameArray];
-				stackAttributes = new int[maxFrameArray];
+                stackAttributes = new PropertyAttributes[maxFrameArray];
 				sDbl = new double[maxFrameArray];
 			}
 			int varCount = idata.GetParamAndVarCount();
@@ -3524,7 +3524,7 @@ object_compare_break: ;
 			{
 				if (idata.GetParamOrVarConst(i_1))
 				{
-					stackAttributes[i_1] = ScriptableObject.CONST;
+					stackAttributes[i_1] = PropertyAttributes.CONST;
 				}
 			}
 			int definedArgs = idata.argCount;
@@ -3747,7 +3747,7 @@ object_compare_break: ;
 				{
 					// Allow to GC unused stack space
 					x.stack[i] = null;
-					x.stackAttributes[i] = ScriptableObject.EMPTY;
+					x.stackAttributes[i] = PropertyAttributes.EMPTY;
 				}
 				if (x.savedCallOp == Token.CALL)
 				{

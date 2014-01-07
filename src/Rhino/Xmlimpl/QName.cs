@@ -157,7 +157,7 @@ namespace Rhino.XmlImpl
 			return base.GetMaxInstanceId() + MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			int id;
 			// #generated# Last update: 2007-08-20 08:21:41 EDT
@@ -188,13 +188,13 @@ L0_break: ;
 			{
 				return base.FindInstanceIdInfo(s);
 			}
-			int attr;
+			PropertyAttributes attr;
 			switch (id)
 			{
 				case Id_localName:
 				case Id_uri:
 				{
-					attr = PERMANENT | READONLY;
+					attr = PropertyAttributes.PERMANENT | PropertyAttributes.READONLY;
 					break;
 				}
 

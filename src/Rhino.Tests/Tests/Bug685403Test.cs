@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,7 +50,7 @@ namespace Rhino.Tests
 			source += "try { A(); continuation(); B() } finally { C() }";
 			source += "state";
 			string[] functions = new string[] { "continuation" };
-			scope.DefineFunctionProperties(functions, typeof(Bug685403Test), ScriptableObject.DONTENUM);
+			scope.DefineFunctionProperties(functions, typeof(Bug685403Test), PropertyAttributes.DONTENUM);
 			object state = null;
 			Script script = cx.CompileString(source, string.Empty, 1, null);
 			try

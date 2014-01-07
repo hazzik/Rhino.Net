@@ -129,7 +129,7 @@ namespace Rhino.Tools.Shell
 			object[] array = new object[args.Length];
 			System.Array.Copy(args, 0, array, 0, args.Length);
 			Scriptable argsObj = cx.NewArray(global, array);
-			global.DefineProperty("arguments", argsObj, ScriptableObject.DONTENUM);
+			global.DefineProperty("arguments", argsObj, PropertyAttributes.DONTENUM);
 			foreach (string file in fileList)
 			{
 				try

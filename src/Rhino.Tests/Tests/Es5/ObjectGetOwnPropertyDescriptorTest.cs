@@ -21,8 +21,8 @@ namespace Rhino.Tests.Es5
 		{
 			NativeObject descriptor;
 			NativeObject @object = new NativeObject();
-			@object.DefineProperty("a", "1", ScriptableObject.EMPTY);
-			@object.DefineProperty("b", "2", ScriptableObject.DONTENUM | ScriptableObject.READONLY | ScriptableObject.PERMANENT);
+			@object.DefineProperty("a", "1", PropertyAttributes.EMPTY);
+			@object.DefineProperty("b", "2", PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT);
 			descriptor = (NativeObject)Evaluator.Eval("Object.getOwnPropertyDescriptor(obj, 'a')", "obj", @object);
 			NUnit.Framework.Assert.AreEqual("1", descriptor.Get("value"));
 			NUnit.Framework.Assert.AreEqual(true, descriptor.Get("enumerable"));

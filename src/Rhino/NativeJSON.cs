@@ -42,7 +42,7 @@ namespace Rhino
 			{
 				obj.SealObject();
 			}
-			ScriptableObject.DefineProperty(scope, "JSON", obj, ScriptableObject.DONTENUM);
+			ScriptableObject.DefineProperty(scope, "JSON", obj, PropertyAttributes.DONTENUM);
 		}
 
 		private NativeJSON()

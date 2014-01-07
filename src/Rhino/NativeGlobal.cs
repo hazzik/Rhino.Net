@@ -129,9 +129,9 @@ namespace Rhino
 				}
 				f.ExportAsScopeProperty();
 			}
-			ScriptableObject.DefineProperty(scope, "NaN", ScriptRuntime.NaN, ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
-			ScriptableObject.DefineProperty(scope, "Infinity", ScriptRuntime.WrapNumber(double.PositiveInfinity), ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
-			ScriptableObject.DefineProperty(scope, "undefined", Undefined.instance, ScriptableObject.READONLY | ScriptableObject.DONTENUM | ScriptableObject.PERMANENT);
+			ScriptableObject.DefineProperty(scope, "NaN", ScriptRuntime.NaN, PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
+			ScriptableObject.DefineProperty(scope, "Infinity", ScriptRuntime.WrapNumber(double.PositiveInfinity), PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
+			ScriptableObject.DefineProperty(scope, "undefined", Undefined.instance, PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
 			string[] errorMethods = new string[] { "ConversionError", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "InternalError", "JavaException" };
 			for (int i = 0; i < errorMethods.Length; i++)
 			{
@@ -142,7 +142,7 @@ namespace Rhino
 				IdFunctionObject ctor = new IdFunctionObject(obj, FTAG, Id_new_CommonError, name, 1, scope);
 				ctor.MarkAsConstructor(errorProto);
 				errorProto.Put("constructor", errorProto, ctor);
-				errorProto.SetAttributes("constructor", ScriptableObject.DONTENUM);
+				errorProto.SetAttributes("constructor", PropertyAttributes.DONTENUM);
 				if (@sealed)
 				{
 					errorProto.SealObject();

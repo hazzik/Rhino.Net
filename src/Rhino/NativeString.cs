@@ -55,11 +55,11 @@ namespace Rhino
 			return MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			if (s.Equals("length"))
 			{
-				return InstanceIdInfo(DONTENUM | READONLY | PERMANENT, Id_length);
+				return InstanceIdInfo(PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT, Id_length);
 			}
 			return base.FindInstanceIdInfo(s);
 		}

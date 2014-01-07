@@ -19,7 +19,7 @@ using Sharpen;
 
 namespace Rhino
 {
-	/// <summary>This is the default implementation of the Scriptable interface.</summary>
+    /// <summary>This is the default implementation of the Scriptable interface.</summary>
 	/// <remarks>
 	/// This is the default implementation of the Scriptable interface. This
 	/// class provides convenient default behavior that makes it easier to
@@ -37,53 +37,7 @@ namespace Rhino
 	{
 		internal const long serialVersionUID = 2829861078851942586L;
 
-		/// <summary>The empty property attribute.</summary>
-		/// <remarks>
-		/// The empty property attribute.
-		/// Used by getAttributes() and setAttributes().
-		/// </remarks>
-		/// <seealso cref="GetAttributes(string)">GetAttributes(string)</seealso>
-		/// <seealso cref="SetAttributes(string, int)">SetAttributes(string, int)</seealso>
-		public const int EMPTY = unchecked((int)(0x00));
-
-		/// <summary>Property attribute indicating assignment to this property is ignored.</summary>
-		/// <remarks>Property attribute indicating assignment to this property is ignored.</remarks>
-		/// <seealso cref="Put(string, Scriptable, object)">Put(string, Scriptable, object)</seealso>
-		/// <seealso cref="GetAttributes(string)">GetAttributes(string)</seealso>
-		/// <seealso cref="SetAttributes(string, int)">SetAttributes(string, int)</seealso>
-		public const int READONLY = unchecked((int)(0x01));
-
-		/// <summary>Property attribute indicating property is not enumerated.</summary>
-		/// <remarks>
-		/// Property attribute indicating property is not enumerated.
-		/// Only enumerated properties will be returned by getIds().
-		/// </remarks>
-		/// <seealso cref="GetIds()">GetIds()</seealso>
-		/// <seealso cref="GetAttributes(string)">GetAttributes(string)</seealso>
-		/// <seealso cref="SetAttributes(string, int)">SetAttributes(string, int)</seealso>
-		public const int DONTENUM = unchecked((int)(0x02));
-
-		/// <summary>Property attribute indicating property cannot be deleted.</summary>
-		/// <remarks>Property attribute indicating property cannot be deleted.</remarks>
-		/// <seealso cref="Delete(string)">Delete(string)</seealso>
-		/// <seealso cref="GetAttributes(string)">GetAttributes(string)</seealso>
-		/// <seealso cref="SetAttributes(string, int)">SetAttributes(string, int)</seealso>
-		public const int PERMANENT = unchecked((int)(0x04));
-
-		/// <summary>
-		/// Property attribute indicating that this is a const property that has not
-		/// been assigned yet.
-		/// </summary>
-		/// <remarks>
-		/// Property attribute indicating that this is a const property that has not
-		/// been assigned yet.  The first 'const' assignment to the property will
-		/// clear this bit.
-		/// </remarks>
-		public const int UNINITIALIZED_CONST = unchecked((int)(0x08));
-
-		public const int CONST = PERMANENT | READONLY | UNINITIALIZED_CONST;
-
-		/// <summary>The prototype of this object.</summary>
+        /// <summary>The prototype of this object.</summary>
 		/// <remarks>The prototype of this object.</remarks>
 		private Scriptable prototypeObject;
 
@@ -127,7 +81,7 @@ namespace Rhino
 
 			internal int indexOrHash;
 
-			internal volatile short attributes;
+            internal volatile PropertyAttributes attributes;
 
 			[NonSerialized]
 			internal volatile bool wasDeleted;
@@ -140,7 +94,7 @@ namespace Rhino
 			[NonSerialized]
 			internal volatile Slot orderedNext;
 
-			internal Slot(string name, int indexOrHash, int attributes)
+            internal Slot(string name, int indexOrHash, PropertyAttributes attributes)
 			{
 				// API class
 				// If count >= 0, it gives number of keys or if count < 0,
@@ -152,7 +106,7 @@ namespace Rhino
 				// next in linked list
 				this.name = name;
 				this.indexOrHash = indexOrHash;
-				this.attributes = (short)attributes;
+				this.attributes = attributes;
 			}
 
 			/// <exception cref="System.IO.IOException"></exception>
@@ -168,7 +122,7 @@ namespace Rhino
 
 			internal virtual bool SetValue(object value, Scriptable owner, Scriptable start)
 			{
-				if ((attributes & READONLY) != 0)
+				if ((attributes & PropertyAttributes.READONLY) != 0)
 				{
 					return true;
 				}
@@ -188,17 +142,17 @@ namespace Rhino
 				return value;
 			}
 
-			internal virtual int GetAttributes()
+			internal virtual PropertyAttributes GetAttributes()
 			{
 				return attributes;
 			}
 
-			internal virtual void SetAttributes(int value)
+			internal virtual void SetAttributes(PropertyAttributes value)
 			{
 				lock (this)
 				{
 					CheckValidAttributes(value);
-					attributes = (short)value;
+					attributes = value;
 				}
 			}
 
@@ -215,14 +169,14 @@ namespace Rhino
 			}
 		}
 
-		protected internal static ScriptableObject BuildDataDescriptor(Scriptable scope, object value, int attributes)
+		protected internal static ScriptableObject BuildDataDescriptor(Scriptable scope, object value, PropertyAttributes attributes)
 		{
 			ScriptableObject desc = new NativeObject();
 			ScriptRuntime.SetBuiltinProtoAndParent(desc, scope, TopLevel.Builtins.Object);
-			desc.DefineProperty("value", value, EMPTY);
-			desc.DefineProperty("writable", (attributes & READONLY) == 0, EMPTY);
-			desc.DefineProperty("enumerable", (attributes & DONTENUM) == 0, EMPTY);
-			desc.DefineProperty("configurable", (attributes & PERMANENT) == 0, EMPTY);
+			desc.DefineProperty("value", value, PropertyAttributes.EMPTY);
+			desc.DefineProperty("writable", (attributes & PropertyAttributes.READONLY) == 0, PropertyAttributes.EMPTY);
+			desc.DefineProperty("enumerable", (attributes & PropertyAttributes.DONTENUM) == 0, PropertyAttributes.EMPTY);
+			desc.DefineProperty("configurable", (attributes & PropertyAttributes.PERMANENT) == 0, PropertyAttributes.EMPTY);
 			return desc;
 		}
 
@@ -235,24 +189,24 @@ namespace Rhino
 
 			internal object setter;
 
-			internal GetterSlot(string name, int indexOrHash, int attributes) : base(name, indexOrHash, attributes)
+			internal GetterSlot(string name, int indexOrHash, PropertyAttributes attributes) : base(name, indexOrHash, attributes)
 			{
 			}
 
 			internal override ScriptableObject GetPropertyDescriptor(Context cx, Scriptable scope)
 			{
-				int attr = GetAttributes();
+				PropertyAttributes attr = GetAttributes();
 				ScriptableObject desc = new NativeObject();
 				ScriptRuntime.SetBuiltinProtoAndParent(desc, scope, TopLevel.Builtins.Object);
-				desc.DefineProperty("enumerable", (attr & DONTENUM) == 0, EMPTY);
-				desc.DefineProperty("configurable", (attr & PERMANENT) == 0, EMPTY);
+				desc.DefineProperty("enumerable", (attr & PropertyAttributes.DONTENUM) == 0, PropertyAttributes.EMPTY);
+				desc.DefineProperty("configurable", (attr & PropertyAttributes.PERMANENT) == 0, PropertyAttributes.EMPTY);
 				if (getter != null)
 				{
-					desc.DefineProperty("get", getter, EMPTY);
+					desc.DefineProperty("get", getter, PropertyAttributes.EMPTY);
 				}
 				if (setter != null)
 				{
-					desc.DefineProperty("set", setter, EMPTY);
+					desc.DefineProperty("set", setter, PropertyAttributes.EMPTY);
 				}
 				return desc;
 			}
@@ -406,12 +360,12 @@ namespace Rhino
 				return slot.GetPropertyDescriptor(cx, scope);
 			}
 
-			internal override int GetAttributes()
+			internal override PropertyAttributes GetAttributes()
 			{
 				return slot.GetAttributes();
 			}
 
-			internal override void SetAttributes(int value)
+			internal override void SetAttributes(PropertyAttributes value)
 			{
 				slot.SetAttributes(value);
 			}
@@ -430,9 +384,9 @@ namespace Rhino
 			// just serialize the wrapped slot
 		}
 
-		internal static void CheckValidAttributes(int attributes)
+		internal static void CheckValidAttributes(PropertyAttributes attributes)
 		{
-			int mask = READONLY | DONTENUM | PERMANENT | UNINITIALIZED_CONST;
+			PropertyAttributes mask = PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.UNINITIALIZED_CONST;
 			if ((attributes & ~mask) != 0)
 			{
 				throw new ArgumentException(attributes.ToString());
@@ -614,7 +568,7 @@ namespace Rhino
 		/// <param name="value">value to set the property to</param>
 		public virtual void PutConst(string name, Scriptable start, object value)
 		{
-			if (PutConstImpl(name, 0, start, value, READONLY))
+			if (PutConstImpl(name, 0, start, value, PropertyAttributes.READONLY))
 			{
 				return;
 			}
@@ -634,7 +588,7 @@ namespace Rhino
 
 		public virtual void DefineConst(string name, Scriptable start)
 		{
-			if (PutConstImpl(name, 0, start, Undefined.instance, UNINITIALIZED_CONST))
+			if (PutConstImpl(name, 0, start, Undefined.instance, PropertyAttributes.UNINITIALIZED_CONST))
 			{
 				return;
 			}
@@ -662,92 +616,92 @@ namespace Rhino
 			{
 				return false;
 			}
-			return (slot.GetAttributes() & (PERMANENT | READONLY)) == (PERMANENT | READONLY);
+			return (slot.GetAttributes() & (PropertyAttributes.PERMANENT | PropertyAttributes.READONLY)) == (PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 		}
 
-		/// <summary>Get the attributes of a named property.</summary>
-		/// <remarks>
-		/// Get the attributes of a named property.
-		/// The property is specified by <code>name</code>
-		/// as defined for <code>has</code>.<p>
-		/// </remarks>
-		/// <param name="name">the identifier for the property</param>
-		/// <returns>the bitset of attributes</returns>
-		/// <exception>
-		/// EvaluatorException
-		/// if the named property is not found
-		/// </exception>
-		/// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
-		/// <seealso cref="READONLY">READONLY</seealso>
-		/// <seealso cref="DONTENUM">DONTENUM</seealso>
-		/// <seealso cref="PERMANENT">PERMANENT</seealso>
-		/// <seealso cref="EMPTY">EMPTY</seealso>
-		public virtual int GetAttributes(string name)
+        /// <summary>Get the attributes of a named property.</summary>
+        /// <remarks>
+        /// Get the attributes of a named property.
+        /// The property is specified by <code>name</code>
+        /// as defined for <code>has</code>.<p>
+        /// </remarks>
+        /// <param name="name">the identifier for the property</param>
+        /// <returns>the bitset of attributes</returns>
+        /// <exception>
+        /// EvaluatorException
+        /// if the named property is not found
+        /// </exception>
+        /// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
+        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+        public virtual PropertyAttributes GetAttributes(string name)
 		{
 			return FindAttributeSlot(name, 0, SLOT_QUERY).GetAttributes();
 		}
 
-		/// <summary>Get the attributes of an indexed property.</summary>
-		/// <remarks>Get the attributes of an indexed property.</remarks>
-		/// <param name="index">the numeric index for the property</param>
-		/// <exception>
-		/// EvaluatorException
-		/// if the named property is not found
-		/// is not found
-		/// </exception>
-		/// <returns>the bitset of attributes</returns>
-		/// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
-		/// <seealso cref="READONLY">READONLY</seealso>
-		/// <seealso cref="DONTENUM">DONTENUM</seealso>
-		/// <seealso cref="PERMANENT">PERMANENT</seealso>
-		/// <seealso cref="EMPTY">EMPTY</seealso>
-		public virtual int GetAttributes(int index)
+        /// <summary>Get the attributes of an indexed property.</summary>
+        /// <remarks>Get the attributes of an indexed property.</remarks>
+        /// <param name="index">the numeric index for the property</param>
+        /// <exception>
+        /// EvaluatorException
+        /// if the named property is not found
+        /// is not found
+        /// </exception>
+        /// <returns>the bitset of attributes</returns>
+        /// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
+        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+        public virtual PropertyAttributes GetAttributes(int index)
 		{
 			return FindAttributeSlot(null, index, SLOT_QUERY).GetAttributes();
 		}
 
-		/// <summary>Set the attributes of a named property.</summary>
-		/// <remarks>
-		/// Set the attributes of a named property.
-		/// The property is specified by <code>name</code>
-		/// as defined for <code>has</code>.<p>
-		/// The possible attributes are READONLY, DONTENUM,
-		/// and PERMANENT. Combinations of attributes
-		/// are expressed by the bitwise OR of attributes.
-		/// EMPTY is the state of no attributes set. Any unused
-		/// bits are reserved for future use.
-		/// </remarks>
-		/// <param name="name">the name of the property</param>
-		/// <param name="attributes">the bitset of attributes</param>
-		/// <exception>
-		/// EvaluatorException
-		/// if the named property is not found
-		/// </exception>
-		/// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
-		/// <seealso cref="READONLY">READONLY</seealso>
-		/// <seealso cref="DONTENUM">DONTENUM</seealso>
-		/// <seealso cref="PERMANENT">PERMANENT</seealso>
-		/// <seealso cref="EMPTY">EMPTY</seealso>
-		public virtual void SetAttributes(string name, int attributes)
+        /// <summary>Set the attributes of a named property.</summary>
+        /// <remarks>
+        /// Set the attributes of a named property.
+        /// The property is specified by <code>name</code>
+        /// as defined for <code>has</code>.<p>
+        /// The possible attributes are READONLY, DONTENUM,
+        /// and PERMANENT. Combinations of attributes
+        /// are expressed by the bitwise OR of attributes.
+        /// EMPTY is the state of no attributes set. Any unused
+        /// bits are reserved for future use.
+        /// </remarks>
+        /// <param name="name">the name of the property</param>
+        /// <param name="attributes">the bitset of attributes</param>
+        /// <exception>
+        /// EvaluatorException
+        /// if the named property is not found
+        /// </exception>
+        /// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
+        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+        public virtual void SetAttributes(string name, PropertyAttributes attributes)
 		{
 			CheckNotSealed(name, 0);
 			FindAttributeSlot(name, 0, SLOT_MODIFY).SetAttributes(attributes);
 		}
 
-		/// <summary>Set the attributes of an indexed property.</summary>
-		/// <remarks>Set the attributes of an indexed property.</remarks>
-		/// <param name="index">the numeric index for the property</param>
-		/// <param name="attributes">the bitset of attributes</param>
-		/// <exception>
-		/// EvaluatorException
-		/// if the named property is not found
-		/// </exception>
-		/// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
-		/// <seealso cref="READONLY">READONLY</seealso>
-		/// <seealso cref="DONTENUM">DONTENUM</seealso>
-		/// <seealso cref="PERMANENT">PERMANENT</seealso>
-		/// <seealso cref="EMPTY">EMPTY</seealso>
-		public virtual void SetAttributes(int index, int attributes)
+        /// <summary>Set the attributes of an indexed property.</summary>
+        /// <remarks>Set the attributes of an indexed property.</remarks>
+        /// <param name="index">the numeric index for the property</param>
+        /// <param name="attributes">the bitset of attributes</param>
+        /// <exception>
+        /// EvaluatorException
+        /// if the named property is not found
+        /// </exception>
+        /// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
+        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+        public virtual void SetAttributes(int index, PropertyAttributes attributes)
 		{
 			CheckNotSealed(null, index);
 			FindAttributeSlot(null, index, SLOT_MODIFY).SetAttributes(attributes);
@@ -786,8 +740,8 @@ namespace Rhino
 			}
 			if (!force)
 			{
-				int attributes = gslot.GetAttributes();
-				if ((attributes & READONLY) != 0)
+				PropertyAttributes attributes = gslot.GetAttributes();
+				if ((attributes & PropertyAttributes.READONLY) != 0)
 				{
 					throw Context.ReportRuntimeError1("msg.modify.readonly", name);
 				}
@@ -866,7 +820,7 @@ namespace Rhino
 			return false;
 		}
 
-		internal virtual void AddLazilyInitializedValue(string name, int index, LazilyLoadedCtor init, int attributes)
+		internal virtual void AddLazilyInitializedValue(string name, int index, LazilyLoadedCtor init, PropertyAttributes attributes)
 		{
 			if (name != null && index != 0)
 			{
@@ -1224,7 +1178,7 @@ namespace Rhino
 		/// </exception>
 		/// <seealso cref="Function">Function</seealso>
 		/// <seealso cref="FunctionObject">FunctionObject</seealso>
-		/// <seealso cref="READONLY">READONLY</seealso>
+		/// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
 		/// <seealso cref="DefineProperty(string, System.Type{T}, int)">DefineProperty(string, System.Type&lt;T&gt;, int)</seealso>
 		/// <exception cref="System.MemberAccessException"></exception>
 		/// <exception cref="Sharpen.InstantiationException"></exception>
@@ -1327,7 +1281,7 @@ namespace Rhino
 		/// </exception>
 		/// <seealso cref="Function">Function</seealso>
 		/// <seealso cref="FunctionObject">FunctionObject</seealso>
-		/// <seealso cref="READONLY">READONLY</seealso>
+		/// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
 		/// <seealso cref="DefineProperty(string, System.Type, int)">DefineProperty(string, System.Type&lt;T&gt;, int)</seealso>
 		/// <exception cref="System.MemberAccessException"></exception>
 		/// <exception cref="Sharpen.InstantiationException"></exception>
@@ -1492,7 +1446,7 @@ namespace Rhino
 				return null;
 			}
 			string name = ctor.GetClassPrototype().GetClassName();
-			DefineProperty(scope, name, ctor, DONTENUM);
+			DefineProperty(scope, name, ctor, PropertyAttributes.DONTENUM);
 			return name;
 		}
 
@@ -1721,7 +1675,7 @@ namespace Rhino
 						throw Context.ReportRuntimeError2("msg.extend.scriptable", proto.GetType().ToString(), name);
 					}
 					MethodInfo setter = FindSetterMethod(methods, name, setterPrefix);
-					int attr = PERMANENT | DONTENUM | (setter != null ? 0 : READONLY);
+					PropertyAttributes attr = PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM | (setter != null ? 0 : PropertyAttributes.READONLY);
 					((ScriptableObject)proto).DefineProperty(name, null, method_1, setter, attr);
 					continue;
 				}
@@ -1734,7 +1688,7 @@ namespace Rhino
 				{
 					throw Context.ReportRuntimeError1("msg.varargs.fun", ctorMember.Name);
 				}
-				DefineProperty(isStatic ? ctor : proto, name, f, DONTENUM);
+				DefineProperty(isStatic ? ctor : proto, name, f, PropertyAttributes.DONTENUM);
 				if (@sealed)
 				{
 					f.SealObject();
@@ -1860,16 +1814,16 @@ namespace Rhino
 			return null;
 		}
 
-		/// <summary>Define a JavaScript property.</summary>
-		/// <remarks>
-		/// Define a JavaScript property.
-		/// Creates the property with an initial value and sets its attributes.
-		/// </remarks>
-		/// <param name="propertyName">the name of the property to define.</param>
-		/// <param name="value">the initial value of the property</param>
-		/// <param name="attributes">the attributes of the JavaScript property</param>
-		/// <seealso cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</seealso>
-		public virtual void DefineProperty(string propertyName, object value, int attributes)
+        /// <summary>Define a JavaScript property.</summary>
+        /// <remarks>
+        /// Define a JavaScript property.
+        /// Creates the property with an initial value and sets its attributes.
+        /// </remarks>
+        /// <param name="propertyName">the name of the property to define.</param>
+        /// <param name="value">the initial value of the property</param>
+        /// <param name="attributes">the attributes of the JavaScript property</param>
+        /// <seealso cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</seealso>
+        public virtual void DefineProperty(string propertyName, object value, PropertyAttributes attributes)
 		{
 			CheckNotSealed(propertyName, 0);
 			Put(propertyName, this, value);
@@ -1883,7 +1837,7 @@ namespace Rhino
 		/// defineProperty there, otherwise calls put in destination
 		/// ignoring attributes
 		/// </remarks>
-		public static void DefineProperty(Scriptable destination, string propertyName, object value, int attributes)
+		public static void DefineProperty(Scriptable destination, string propertyName, object value, PropertyAttributes attributes)
 		{
 			if (!(destination is ScriptableObject))
 			{
@@ -1891,7 +1845,7 @@ namespace Rhino
 				return;
 			}
 			ScriptableObject so = (ScriptableObject)destination;
-			so.DefineProperty(propertyName, value, attributes);
+			so.DefineProperty(propertyName, value, (PropertyAttributes) attributes);
 		}
 
 		/// <summary>Utility method to add properties to arbitrary Scriptable object.</summary>
@@ -1910,7 +1864,7 @@ namespace Rhino
 			}
 			else
 			{
-				DefineProperty(destination, propertyName, Undefined.instance, CONST);
+				DefineProperty(destination, propertyName, Undefined.instance, PropertyAttributes.CONST);
 			}
 		}
 
@@ -1932,7 +1886,7 @@ namespace Rhino
 		/// <param name="clazz">the Java class to search for the getter and setter</param>
 		/// <param name="attributes">the attributes of the JavaScript property</param>
 		/// <seealso cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</seealso>
-		public virtual void DefineProperty(string propertyName, Type clazz, int attributes)
+        public virtual void DefineProperty(string propertyName, Type clazz, PropertyAttributes attributes)
 		{
 			int length = propertyName.Length;
 			if (length == 0)
@@ -1953,52 +1907,52 @@ namespace Rhino
 			MethodInfo setter = FunctionObject.FindSingleMethod(methods, setterName);
 			if (setter == null)
 			{
-				attributes |= READONLY;
+				attributes |= PropertyAttributes.READONLY;
 			}
 			DefineProperty(propertyName, null, getter, setter == null ? null : setter, attributes);
 		}
 
-		/// <summary>Define a JavaScript property.</summary>
-		/// <remarks>
-		/// Define a JavaScript property.
-		/// Use this method only if you wish to define getters and setters for
-		/// a given property in a ScriptableObject. To create a property without
-		/// special getter or setter side effects, use
-		/// <code>defineProperty(String,int)</code>.
-		/// If <code>setter</code> is null, the attribute READONLY is added to
-		/// the given attributes.<p>
-		/// Several forms of getters or setters are allowed. In all cases the
-		/// type of the value parameter can be any one of the following types:
-		/// Object, String, boolean, Scriptable, byte, short, int, long, float,
-		/// or double. The runtime will perform appropriate conversions based
-		/// upon the type of the parameter (see description in FunctionObject).
-		/// The first forms are nonstatic methods of the class referred to
-		/// by 'this':
-		/// <pre>
-		/// Object getFoo();
-		/// void setFoo(SomeType value);</pre>
-		/// Next are static methods that may be of any class; the object whose
-		/// property is being accessed is passed in as an extra argument:
-		/// <pre>
-		/// static Object getFoo(Scriptable obj);
-		/// static void setFoo(Scriptable obj, SomeType value);</pre>
-		/// Finally, it is possible to delegate to another object entirely using
-		/// the <code>delegateTo</code> parameter. In this case the methods are
-		/// nonstatic methods of the class delegated to, and the object whose
-		/// property is being accessed is passed in as an extra argument:
-		/// <pre>
-		/// Object getFoo(Scriptable obj);
-		/// void setFoo(Scriptable obj, SomeType value);</pre>
-		/// </remarks>
-		/// <param name="propertyName">the name of the property to define.</param>
-		/// <param name="delegateTo">
-		/// an object to call the getter and setter methods on,
-		/// or null, depending on the form used above.
-		/// </param>
-		/// <param name="getter">the method to invoke to get the value of the property</param>
-		/// <param name="setter">the method to invoke to set the value of the property</param>
-		/// <param name="attributes">the attributes of the JavaScript property</param>
-		public virtual void DefineProperty(string propertyName, object delegateTo, MethodInfo getter, MethodInfo setter, int attributes)
+        /// <summary>Define a JavaScript property.</summary>
+        /// <remarks>
+        /// Define a JavaScript property.
+        /// Use this method only if you wish to define getters and setters for
+        /// a given property in a ScriptableObject. To create a property without
+        /// special getter or setter side effects, use
+        /// <code>defineProperty(String,int)</code>.
+        /// If <code>setter</code> is null, the attribute READONLY is added to
+        /// the given attributes.<p>
+        /// Several forms of getters or setters are allowed. In all cases the
+        /// type of the value parameter can be any one of the following types:
+        /// Object, String, boolean, Scriptable, byte, short, int, long, float,
+        /// or double. The runtime will perform appropriate conversions based
+        /// upon the type of the parameter (see description in FunctionObject).
+        /// The first forms are nonstatic methods of the class referred to
+        /// by 'this':
+        /// <pre>
+        /// Object getFoo();
+        /// void setFoo(SomeType value);</pre>
+        /// Next are static methods that may be of any class; the object whose
+        /// property is being accessed is passed in as an extra argument:
+        /// <pre>
+        /// static Object getFoo(Scriptable obj);
+        /// static void setFoo(Scriptable obj, SomeType value);</pre>
+        /// Finally, it is possible to delegate to another object entirely using
+        /// the <code>delegateTo</code> parameter. In this case the methods are
+        /// nonstatic methods of the class delegated to, and the object whose
+        /// property is being accessed is passed in as an extra argument:
+        /// <pre>
+        /// Object getFoo(Scriptable obj);
+        /// void setFoo(Scriptable obj, SomeType value);</pre>
+        /// </remarks>
+        /// <param name="propertyName">the name of the property to define.</param>
+        /// <param name="delegateTo">
+        ///     an object to call the getter and setter methods on,
+        ///     or null, depending on the form used above.
+        /// </param>
+        /// <param name="getter">the method to invoke to get the value of the property</param>
+        /// <param name="setter">the method to invoke to set the value of the property</param>
+        /// <param name="attributes">the attributes of the JavaScript property</param>
+        public virtual void DefineProperty(string propertyName, object delegateTo, MethodInfo getter, MethodInfo setter, PropertyAttributes attributes)
 		{
 			MemberBox getterBox = null;
 			if (getter != null)
@@ -2169,12 +2123,12 @@ namespace Rhino
 				CheckPropertyChange(name, current, desc);
 			}
 			bool isAccessor = IsAccessorDescriptor(desc);
-			int attributes;
+			PropertyAttributes attributes;
 			if (slot == null)
 			{
 				// new slot
 				slot = GetSlot(cx, id, isAccessor ? SLOT_MODIFY_GETTER_SETTER : SLOT_MODIFY);
-				attributes = ApplyDescriptorToAttributeBitset(DONTENUM | READONLY | PERMANENT, desc);
+				attributes = ApplyDescriptorToAttributeBitset(PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT, desc);
 			}
 			else
 			{
@@ -2364,22 +2318,22 @@ namespace Rhino
 			return ScriptRuntime.ShallowEq(currentValue, newValue);
 		}
 
-		protected internal virtual int ApplyDescriptorToAttributeBitset(int attributes, ScriptableObject desc)
+		protected internal virtual PropertyAttributes ApplyDescriptorToAttributeBitset(PropertyAttributes attributes, ScriptableObject desc)
 		{
 			object enumerable = GetProperty(desc, "enumerable");
 			if (enumerable != ScriptableConstants.NOT_FOUND)
 			{
-				attributes = ScriptRuntime.ToBoolean(enumerable) ? attributes & ~DONTENUM : attributes | DONTENUM;
+				attributes = ScriptRuntime.ToBoolean(enumerable) ? attributes & ~PropertyAttributes.DONTENUM : attributes | PropertyAttributes.DONTENUM;
 			}
 			object writable = GetProperty(desc, "writable");
 			if (writable != ScriptableConstants.NOT_FOUND)
 			{
-				attributes = ScriptRuntime.ToBoolean(writable) ? attributes & ~READONLY : attributes | READONLY;
+				attributes = ScriptRuntime.ToBoolean(writable) ? attributes & ~PropertyAttributes.READONLY : attributes | PropertyAttributes.READONLY;
 			}
 			object configurable = GetProperty(desc, "configurable");
 			if (configurable != ScriptableConstants.NOT_FOUND)
 			{
-				attributes = ScriptRuntime.ToBoolean(configurable) ? attributes & ~PERMANENT : attributes | PERMANENT;
+				attributes = ScriptRuntime.ToBoolean(configurable) ? attributes & ~PropertyAttributes.PERMANENT : attributes | PropertyAttributes.PERMANENT;
 			}
 			return attributes;
 		}
@@ -2426,22 +2380,22 @@ namespace Rhino
 			return (ScriptableObject)arg;
 		}
 
-		/// <summary>
-		/// Search for names in a class, adding the resulting methods
-		/// as properties.
-		/// </summary>
-		/// <remarks>
-		/// Search for names in a class, adding the resulting methods
-		/// as properties.
-		/// <p> Uses reflection to find the methods of the given names. Then
-		/// FunctionObjects are constructed from the methods found, and
-		/// are added to this object as properties with the given names.
-		/// </remarks>
-		/// <param name="names">the names of the Methods to add as function properties</param>
-		/// <param name="clazz">the class to search for the Methods</param>
-		/// <param name="attributes">the attributes of the new properties</param>
-		/// <seealso cref="FunctionObject">FunctionObject</seealso>
-		public virtual void DefineFunctionProperties(string[] names, Type clazz, int attributes)
+        /// <summary>
+        /// Search for names in a class, adding the resulting methods
+        /// as properties.
+        /// </summary>
+        /// <remarks>
+        /// Search for names in a class, adding the resulting methods
+        /// as properties.
+        /// <p> Uses reflection to find the methods of the given names. Then
+        /// FunctionObjects are constructed from the methods found, and
+        /// are added to this object as properties with the given names.
+        /// </remarks>
+        /// <param name="names">the names of the Methods to add as function properties</param>
+        /// <param name="clazz">the class to search for the Methods</param>
+        /// <param name="attributes">the attributes of the new properties</param>
+        /// <seealso cref="FunctionObject">FunctionObject</seealso>
+        public virtual void DefineFunctionProperties(string[] names, Type clazz, PropertyAttributes attributes)
 		{
 			MethodInfo[] methods = FunctionObject.GetMethodList(clazz);
 			for (int i = 0; i < names.Length; i++)
@@ -2453,7 +2407,7 @@ namespace Rhino
 					throw Context.ReportRuntimeError2("msg.method.not.found", name, clazz.FullName);
 				}
 				FunctionObject f = new FunctionObject(name, m, this);
-				DefineProperty(name, f, attributes);
+				DefineProperty(name, (object) f, (PropertyAttributes) attributes);
 			}
 		}
 
@@ -3224,9 +3178,9 @@ namespace Rhino
 		/// false if this != start and no slot was found.  true if this == start
 		/// or this != start and a READONLY slot was found.
 		/// </returns>
-		private bool PutConstImpl(string name, int index, Scriptable start, object value, int constFlag)
+		private bool PutConstImpl(string name, int index, Scriptable start, object value, PropertyAttributes constFlag)
 		{
-			System.Diagnostics.Debug.Assert((constFlag != EMPTY));
+			System.Diagnostics.Debug.Assert((constFlag != PropertyAttributes.EMPTY));
 			Slot slot;
 			if (this != start)
 			{
@@ -3251,18 +3205,18 @@ namespace Rhino
 					CheckNotSealed(name, index);
 					// either const hoisted declaration or initialization
 					slot = UnwrapSlot(GetSlot(name, index, SLOT_MODIFY_CONST));
-					int attr = slot.GetAttributes();
-					if ((attr & READONLY) == 0)
+					PropertyAttributes attr = slot.GetAttributes();
+					if ((attr & PropertyAttributes.READONLY) == 0)
 					{
 						throw Context.ReportRuntimeError1("msg.var.redecl", name);
 					}
-					if ((attr & UNINITIALIZED_CONST) != 0)
+					if ((attr & PropertyAttributes.UNINITIALIZED_CONST) != 0)
 					{
 						slot.value = value;
 						// clear the bit on const initialization
-						if (constFlag != UNINITIALIZED_CONST)
+						if (constFlag != PropertyAttributes.UNINITIALIZED_CONST)
 						{
-							slot.SetAttributes(attr & ~UNINITIALIZED_CONST);
+							slot.SetAttributes(attr & ~PropertyAttributes.UNINITIALIZED_CONST);
 						}
 					}
 					return true;
@@ -3459,7 +3413,7 @@ namespace Rhino
 				Slot newSlot_1 = (accessType == SLOT_MODIFY_GETTER_SETTER ? new GetterSlot(name, indexOrHash, 0) : new Slot(name, indexOrHash, 0));
 				if (accessType == SLOT_MODIFY_CONST)
 				{
-					newSlot_1.SetAttributes(CONST);
+					newSlot_1.SetAttributes(PropertyAttributes.CONST);
 				}
 				++count;
 				// add new slot to linked list
@@ -3499,7 +3453,7 @@ namespace Rhino
 						prev = slot;
 						slot = slot.next;
 					}
-					if (slot != null && (slot.GetAttributes() & PERMANENT) == 0)
+					if (slot != null && (slot.GetAttributes() & PropertyAttributes.PERMANENT) == 0)
 					{
 						count--;
 						// remove slot from hash table
@@ -3621,7 +3575,7 @@ namespace Rhino
 			}
 			while (slot != null)
 			{
-				if (getAll || (slot.GetAttributes() & DONTENUM) == 0)
+				if (getAll || (slot.GetAttributes() & PropertyAttributes.DONTENUM) == 0)
 				{
 					if (c == 0)
 					{

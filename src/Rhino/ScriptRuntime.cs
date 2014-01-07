@@ -1409,7 +1409,7 @@ namespace Rhino
 			if (!scope.Has(DEFAULT_NS_TAG, scope))
 			{
 				// XXX: this is racy of cause
-				ScriptableObject.DefineProperty(scope, DEFAULT_NS_TAG, ns, ScriptableObject.PERMANENT | ScriptableObject.DONTENUM);
+				ScriptableObject.DefineProperty(scope, DEFAULT_NS_TAG, ns, PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM);
 			}
 			else
 			{
@@ -3737,7 +3737,7 @@ search_break: ;
 							if (!evalScript)
 							{
 								// Global var definitions are supposed to be DONTDELETE
-								ScriptableObject.DefineProperty(varScope, name, Undefined.instance, ScriptableObject.PERMANENT);
+								ScriptableObject.DefineProperty(varScope, name, Undefined.instance, PropertyAttributes.PERMANENT);
 							}
 							else
 							{
@@ -3820,13 +3820,13 @@ search_break: ;
 			}
 			NativeObject catchScopeObject = new NativeObject();
 			// See ECMA 12.4
-			catchScopeObject.DefineProperty(exceptionName, obj, ScriptableObject.PERMANENT);
+			catchScopeObject.DefineProperty(exceptionName, obj, PropertyAttributes.PERMANENT);
 			if (IsVisible(cx, t))
 			{
 				// Add special Rhino object __exception__ defined in the catch
 				// scope that can be used to retrieve the Java exception associated
 				// with the JavaScript exception (to get stack trace info, etc.)
-				catchScopeObject.DefineProperty("__exception__", Context.JavaToJS(t, scope), ScriptableObject.PERMANENT | ScriptableObject.DONTENUM);
+				catchScopeObject.DefineProperty("__exception__", Context.JavaToJS(t, scope), PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM);
 			}
 			if (cacheObj)
 			{
@@ -3912,12 +3912,12 @@ search_break: ;
 			if (javaException != null && IsVisible(cx, javaException))
 			{
 				object wrap = cx.GetWrapFactory().Wrap(cx, scope, javaException, null);
-				ScriptableObject.DefineProperty(errorObject, "javaException", wrap, ScriptableObject.PERMANENT | ScriptableObject.READONLY);
+				ScriptableObject.DefineProperty(errorObject, "javaException", wrap, PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 			}
 			if (IsVisible(cx, re))
 			{
 				object wrap = cx.GetWrapFactory().Wrap(cx, scope, re, null);
-				ScriptableObject.DefineProperty(errorObject, "rhinoException", wrap, ScriptableObject.PERMANENT | ScriptableObject.READONLY);
+				ScriptableObject.DefineProperty(errorObject, "rhinoException", wrap, PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 			}
 			return errorObject;
 		}
@@ -4005,7 +4005,7 @@ search_break: ;
 					{
 						// ECMA specifies that functions defined in global and
 						// function scope outside eval should have DONTDELETE set.
-						ScriptableObject.DefineProperty(scope, name, function, ScriptableObject.PERMANENT);
+						ScriptableObject.DefineProperty(scope, name, function, PropertyAttributes.PERMANENT);
 					}
 					else
 					{

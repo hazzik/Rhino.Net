@@ -35,7 +35,7 @@ namespace Rhino
 			{
 				obj.SealObject();
 			}
-			ScriptableObject.DefineProperty(scope, "Math", obj, ScriptableObject.DONTENUM);
+			ScriptableObject.DefineProperty(scope, "Math", obj, PropertyAttributes.DONTENUM);
 		}
 
 		private NativeMath()
@@ -262,7 +262,7 @@ namespace Rhino
 						throw new InvalidOperationException(id.ToString());
 					}
 				}
-				InitPrototypeValue(id, name, ScriptRuntime.WrapNumber(x), DONTENUM | READONLY | PERMANENT);
+				InitPrototypeValue(id, name, ScriptRuntime.WrapNumber(x), PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT);
 			}
 		}
 

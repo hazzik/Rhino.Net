@@ -111,7 +111,7 @@ namespace Rhino.Tests
 			// define object with custom method
 			MyObject myObject = new MyObject();
 			string[] functionNames = new string[] { "ReadPropFoo" };
-			myObject.DefineFunctionProperties(functionNames, typeof(MyObject), ScriptableObject.EMPTY);
+			myObject.DefineFunctionProperties(functionNames, typeof(MyObject), PropertyAttributes.EMPTY);
 			string scriptScope1 = "String.prototype.foo = 'from 1'; scope2.f()";
 			Utils.RunWithAllOptimizationLevels(cx =>
 			{

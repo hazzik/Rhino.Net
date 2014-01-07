@@ -188,7 +188,7 @@ namespace Rhino.Optimizer
 				object[] argsCopy = new object[args.Length];
 				System.Array.Copy(args, 0, argsCopy, 0, args.Length);
 				Scriptable argsObj = cx.NewArray(global, argsCopy);
-				global.DefineProperty("arguments", argsObj, ScriptableObject.DONTENUM);
+				global.DefineProperty("arguments", argsObj, PropertyAttributes.DONTENUM);
 				script.Exec(cx, global);
 				return null;
 			});

@@ -20,9 +20,9 @@ namespace Rhino.Tests.Es5
 		public virtual void ShouldReturnOnlyEnumerablePropertiesOfArg()
 		{
 			NativeObject @object = new NativeObject();
-			@object.DefineProperty("a", "1", ScriptableObject.EMPTY);
-			@object.DefineProperty("b", "2", ScriptableObject.EMPTY);
-			@object.DefineProperty("c", "3", ScriptableObject.DONTENUM);
+			@object.DefineProperty("a", "1", PropertyAttributes.EMPTY);
+			@object.DefineProperty("b", "2", PropertyAttributes.EMPTY);
+			@object.DefineProperty("c", "3", PropertyAttributes.DONTENUM);
 			object result = Evaluator.Eval("Object.keys(obj)", "obj", @object);
 			NativeArray keys = (NativeArray)result;
 			NUnit.Framework.Assert.AreEqual(2, keys.GetLength());

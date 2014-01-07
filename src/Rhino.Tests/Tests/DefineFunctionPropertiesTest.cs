@@ -38,7 +38,7 @@ namespace Rhino.Tests
 			{
 				global = cx.InitStandardObjects();
 				string[] names = new string[] { "f", "g" };
-				global.DefineFunctionProperties(names, typeof(DefineFunctionPropertiesTest), ScriptableObject.DONTENUM);
+				global.DefineFunctionProperties(names, typeof(DefineFunctionPropertiesTest), PropertyAttributes.DONTENUM);
 			}
 			finally
 			{

@@ -92,14 +92,14 @@ namespace Rhino.Tools.Shell
 			// that these functions are not part of ECMA.
 			InitStandardObjects(cx, sealedStdLib);
 			string[] names = new string[] { "defineClass", "deserialize", "doctest", "gc", "help", "load", "loadClass", "print", "quit", "readFile", "readUrl", "runCommand", "seal", "serialize", "spawn", "sync", "toInt32", "version" };
-			DefineFunctionProperties(names, typeof(Global), DONTENUM);
+			DefineFunctionProperties(names, typeof(Global), PropertyAttributes.DONTENUM);
 			// Set up "environment" in the global scope to provide access to the
 			// System environment variables.
 			Environment.DefineClass(this);
 			Environment environment = new Environment(this);
-			DefineProperty("environment", environment, DONTENUM);
+			DefineProperty("environment", environment, PropertyAttributes.DONTENUM);
 			history = (NativeArray)cx.NewArray(this, 0);
-			DefineProperty("history", history, DONTENUM);
+			DefineProperty("history", history, PropertyAttributes.DONTENUM);
 			initialized = true;
 		}
 

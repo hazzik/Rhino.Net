@@ -259,8 +259,8 @@ namespace Rhino
 							if (result && thisObj is ScriptableObject)
 							{
 								ScriptableObject so = (ScriptableObject)thisObj;
-								int attrs = so.GetAttributes(index);
-								result = ((attrs & DONTENUM) == 0);
+								PropertyAttributes attrs = so.GetAttributes(index);
+								result = ((attrs & PropertyAttributes.DONTENUM) == 0);
 							}
 						}
 						else
@@ -269,8 +269,8 @@ namespace Rhino
 							if (result && thisObj is ScriptableObject)
 							{
 								ScriptableObject so = (ScriptableObject)thisObj;
-								int attrs = so.GetAttributes(s);
-								result = ((attrs & DONTENUM) == 0);
+                                PropertyAttributes attrs = so.GetAttributes(s);
+								result = ((attrs & PropertyAttributes.DONTENUM) == 0);
 							}
 						}
 					}

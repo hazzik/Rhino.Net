@@ -145,8 +145,10 @@
     <Compile Include="Compatibility\BitArrayEx.cs" />
     <Compile Include="Compatibility\CharEx.cs" />
     <Compile Include="Compatibility\MethodBaseEx.cs" />
+    <Compile Include="InstanceIdInfo.cs" />
     <Compile Include="LanguageFeatures.cs" />
     <Compile Include="LanguageVersion.cs" />
+    <Compile Include="PropertyAttributes.cs" />
     <Compile Include="Utils\MemberInfoEx.cs" />
     <Compile Include="Compatibility\TypeEx.cs" />
     <Compile Include="Compatibility\ClassLoader.cs" />

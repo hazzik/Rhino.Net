@@ -42,7 +42,7 @@ namespace Rhino
 			{
 				obj.SealObject();
 			}
-			DefineProperty(scope, STOP_ITERATION, obj, DONTENUM);
+			DefineProperty(scope, STOP_ITERATION, obj, PropertyAttributes.DONTENUM);
 			// Use "associateValue" so that generators can continue to
 			// throw StopIteration even if the property of the global
 			// scope is replaced or deleted.

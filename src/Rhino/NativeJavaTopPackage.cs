@@ -100,10 +100,10 @@ namespace Rhino
 				getClass.SealObject();
 			}
 			getClass.ExportAsScopeProperty();
-			global.DefineProperty("Packages", top, ScriptableObject.DONTENUM);
+			global.DefineProperty("Packages", top, PropertyAttributes.DONTENUM);
 			for (int i_2 = 0; i_2 < topNames.Length; i_2++)
 			{
-				global.DefineProperty(topNames[i_2], topPackages[i_2], ScriptableObject.DONTENUM);
+				global.DefineProperty(topNames[i_2], topPackages[i_2], PropertyAttributes.DONTENUM);
 			}
 		}
 

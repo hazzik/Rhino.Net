@@ -128,7 +128,7 @@ namespace Rhino.RegExp
 			return base.GetMaxInstanceId() + MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			int id;
 			// #generated# Last update: 2001-05-24 16:09:31 GMT+02:00
@@ -353,7 +353,7 @@ L0_break: ;
 			{
 				return base.FindInstanceIdInfo(s);
 			}
-			int attr;
+			PropertyAttributes attr;
 			switch (id)
 			{
 				case Id_multiline:
@@ -361,13 +361,13 @@ L0_break: ;
 				case Id_input:
 				case Id_UNDERSCORE:
 				{
-					attr = PERMANENT;
+					attr = PropertyAttributes.PERMANENT;
 					break;
 				}
 
 				default:
 				{
-					attr = PERMANENT | READONLY;
+					attr = PropertyAttributes.PERMANENT | PropertyAttributes.READONLY;
 					break;
 				}
 			}

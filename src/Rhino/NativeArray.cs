@@ -75,7 +75,7 @@ namespace Rhino
 			return MAX_INSTANCE_ID;
 		}
 
-		protected internal override void SetInstanceIdAttributes(int id, int attr)
+		protected internal override void SetInstanceIdAttributes(int id, PropertyAttributes attr)
 		{
 			if (id == Id_length)
 			{
@@ -83,7 +83,7 @@ namespace Rhino
 			}
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			if (s.Equals("length"))
 			{
@@ -614,7 +614,7 @@ again_break: ;
 				}
 			}
 			base.Put(index, start, value);
-			if (start == this && (lengthAttr & READONLY) == 0)
+			if (start == this && (lengthAttr & PropertyAttributes.READONLY) == 0)
 			{
 				// only set the array length if given an array index (ECMA 15.4.0)
 				if (length <= index)
@@ -715,18 +715,18 @@ again_break: ;
 			}
 			ScriptableObject desc = new NativeObject();
 			ScriptRuntime.SetBuiltinProtoAndParent(desc, scope, TopLevel.Builtins.Object);
-			desc.DefineProperty("value", value, EMPTY);
-			desc.DefineProperty("writable", true, EMPTY);
-			desc.DefineProperty("enumerable", true, EMPTY);
-			desc.DefineProperty("configurable", true, EMPTY);
+			desc.DefineProperty("value", value, PropertyAttributes.EMPTY);
+			desc.DefineProperty("writable", true, PropertyAttributes.EMPTY);
+			desc.DefineProperty("enumerable", true, PropertyAttributes.EMPTY);
+			desc.DefineProperty("configurable", true, PropertyAttributes.EMPTY);
 			return desc;
 		}
 
-		public override int GetAttributes(int index)
+		public override PropertyAttributes GetAttributes(int index)
 		{
 			if (dense != null && index >= 0 && index < dense.Length && dense[index] != ScriptableConstants.NOT_FOUND)
 			{
-				return EMPTY;
+				return PropertyAttributes.EMPTY;
 			}
 			return base.GetAttributes(index);
 		}
@@ -834,7 +834,7 @@ again_break: ;
 
 		private void SetLength(object val)
 		{
-			if ((lengthAttr & READONLY) != 0)
+			if ((lengthAttr & PropertyAttributes.READONLY) != 0)
 			{
 				return;
 			}
@@ -2606,7 +2606,7 @@ L0_break: ;
 		private long length;
 
 		/// <summary>Attributes of the array's length property</summary>
-		private int lengthAttr = DONTENUM | PERMANENT;
+		private PropertyAttributes lengthAttr = PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT;
 
 		/// <summary>Fast storage for dense arrays.</summary>
 		/// <remarks>
