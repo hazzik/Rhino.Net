@@ -433,7 +433,7 @@ namespace Rhino
 				char c = buf[i];
 				if (c != '9')
 				{
-					Sharpen.Runtime.SetCharAt(buf, i, (char)(c + 1));
+					buf[i] = (char)(c + 1);
 					buf.Length = i + 1;
 					return false;
 				}
