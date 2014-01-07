@@ -21,7 +21,7 @@ using Sharpen;
 
 namespace Rhino
 {
-	/// <summary>This class represents the runtime context of an executing script.</summary>
+    /// <summary>This class represents the runtime context of an executing script.</summary>
 	/// <remarks>
 	/// This class represents the runtime context of an executing script.
 	/// Before executing a script, an instance of Context must be created
@@ -45,42 +45,7 @@ namespace Rhino
 	/// <author>Brendan Eich</author>
 	public class Context
 	{
-		/// <summary>The unknown version.</summary>
-		/// <remarks>The unknown version.</remarks>
-		public const int VERSION_UNKNOWN = -1;
-
-		/// <summary>The default version.</summary>
-		/// <remarks>The default version.</remarks>
-		public const int VERSION_DEFAULT = 0;
-
-		/// <summary>JavaScript 1.0</summary>
-		public const int VERSION_1_0 = 100;
-
-		/// <summary>JavaScript 1.1</summary>
-		public const int VERSION_1_1 = 110;
-
-		/// <summary>JavaScript 1.2</summary>
-		public const int VERSION_1_2 = 120;
-
-		/// <summary>JavaScript 1.3</summary>
-		public const int VERSION_1_3 = 130;
-
-		/// <summary>JavaScript 1.4</summary>
-		public const int VERSION_1_4 = 140;
-
-		/// <summary>JavaScript 1.5</summary>
-		public const int VERSION_1_5 = 150;
-
-		/// <summary>JavaScript 1.6</summary>
-		public const int VERSION_1_6 = 160;
-
-		/// <summary>JavaScript 1.7</summary>
-		public const int VERSION_1_7 = 170;
-
-		/// <summary>JavaScript 1.8</summary>
-		public const int VERSION_1_8 = 180;
-
-		/// <summary>Controls behaviour of <tt>Date.prototype.getYear()</tt>.</summary>
+	    /// <summary>Controls behaviour of <tt>Date.prototype.getYear()</tt>.</summary>
 		/// <remarks>
 		/// Controls behaviour of <tt>Date.prototype.getYear()</tt>.
 		/// If <tt>hasFeature(FEATURE_NON_ECMA_GET_YEAR)</tt> returns true,
@@ -137,7 +102,7 @@ namespace Rhino
 		/// <see cref="HasFeature(int)">HasFeature(int)</see>
 		/// returns true only if
 		/// the current JS version is set to
-		/// <see cref="VERSION_1_2">VERSION_1_2</see>
+		/// <see cref="LanguageVersionLanguageVersionERSION_1_2">VERSION_1_2</see>
 		/// .
 		/// </remarks>
 		public const int FEATURE_TO_STRING_AS_SOURCE = 4;
@@ -174,9 +139,9 @@ namespace Rhino
 		/// <see cref="HasFeature(int)">HasFeature(int)</see>
 		/// returns true if
 		/// the current JS version is set to
-		/// <see cref="VERSION_DEFAULT">VERSION_DEFAULT</see>
+		/// <see cref="LanguageVersionLanguageVersionERSION_DEFAULT">VERSION_DEFAULT</see>
 		/// or is at least
-		/// <see cref="VERSION_1_6">VERSION_1_6</see>
+		/// <see cref="LanguageVersionLanguageVersionERSION_1_6">VERSION_1_6</see>
 		/// .
 		/// </remarks>
 		/// <since>1.6 Release 1</since>
@@ -317,7 +282,7 @@ namespace Rhino
 				throw new ArgumentException("factory == null");
 			}
 			this.factory = factory;
-			version = VERSION_DEFAULT;
+			version = LanguageVersion.VERSION_DEFAULT;
 			optimizationLevel = codegenClass != null ? 0 : -1;
 			maximumInterpreterStackDepth = int.MaxValue;
 		}
@@ -577,21 +542,21 @@ namespace Rhino
 		/// in the overview documentation.
 		/// </remarks>
 		/// <returns>an integer that is one of VERSION_1_0, VERSION_1_1, etc.</returns>
-		public int GetLanguageVersion()
+		public LanguageVersion GetLanguageVersion()
 		{
 			return version;
 		}
 
-		/// <summary>Set the language version.</summary>
-		/// <remarks>
-		/// Set the language version.
-		/// <p>
-		/// Setting the language version will affect functions and scripts compiled
-		/// subsequently. See the overview documentation for version-specific
-		/// behavior.
-		/// </remarks>
-		/// <param name="version">the version as specified by VERSION_1_0, VERSION_1_1, etc.</param>
-		public virtual void SetLanguageVersion(int version)
+        /// <summary>Set the language version.</summary>
+        /// <remarks>
+        /// Set the language version.
+        /// <p>
+        /// Setting the language version will affect functions and scripts compiled
+        /// subsequently. See the overview documentation for version-specific
+        /// behavior.
+        /// </remarks>
+        /// <param name="version">the version as specified by VERSION_1_0, VERSION_1_1, etc.</param>
+        public virtual void SetLanguageVersion(LanguageVersion version)
 		{
 			if (@sealed)
 			{
@@ -606,20 +571,20 @@ namespace Rhino
 			this.version = version;
 		}
 
-		public static bool IsValidLanguageVersion(int version)
+		public static bool IsValidLanguageVersion(LanguageVersion version)
 		{
 			switch (version)
 			{
-				case VERSION_DEFAULT:
-				case VERSION_1_0:
-				case VERSION_1_1:
-				case VERSION_1_2:
-				case VERSION_1_3:
-				case VERSION_1_4:
-				case VERSION_1_5:
-				case VERSION_1_6:
-				case VERSION_1_7:
-				case VERSION_1_8:
+				case LanguageVersion.VERSION_DEFAULT:
+				case LanguageVersion.VERSION_1_0:
+				case LanguageVersion.VERSION_1_1:
+				case LanguageVersion.VERSION_1_2:
+				case LanguageVersion.VERSION_1_3:
+				case LanguageVersion.VERSION_1_4:
+				case LanguageVersion.VERSION_1_5:
+				case LanguageVersion.VERSION_1_6:
+				case LanguageVersion.VERSION_1_7:
+				case LanguageVersion.VERSION_1_8:
 				{
 					return true;
 				}
@@ -627,7 +592,7 @@ namespace Rhino
 			return false;
 		}
 
-		public static void CheckLanguageVersion(int version)
+		public static void CheckLanguageVersion(LanguageVersion version)
 		{
 			if (IsValidLanguageVersion(version))
 			{
@@ -2672,7 +2637,7 @@ namespace Rhino
 
 		internal bool IsVersionECMA1()
 		{
-			return version == VERSION_DEFAULT || version >= VERSION_1_3;
+			return version == LanguageVersion.VERSION_DEFAULT || version >= LanguageVersion.VERSION_1_3;
 		}
 
 #if ENCHANCED_SECURITY
@@ -2771,7 +2736,7 @@ namespace Rhino
 
 		internal object interpreterSecurityDomain;
 
-		internal int version;
+		internal LanguageVersion version;
 
 #if ENCHANCED_SECURITY
 		private SecurityController securityController;

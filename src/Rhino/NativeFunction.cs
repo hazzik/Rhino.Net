@@ -48,7 +48,7 @@ namespace Rhino
 		public override int GetLength()
 		{
 			int paramCount = GetParamCount();
-			if (GetLanguageVersion() != Context.VERSION_1_2)
+			if (GetLanguageVersion() != LanguageVersion.VERSION_1_2)
 			{
 				return paramCount;
 			}
@@ -91,7 +91,7 @@ namespace Rhino
 			throw new EvaluatorException("ResumeGenerator() not implemented");
 		}
 
-		protected internal abstract int GetLanguageVersion();
+		protected internal abstract LanguageVersion GetLanguageVersion();
 
 		/// <summary>Get number of declared parameters.</summary>
 		/// <remarks>Get number of declared parameters. It should be 0 for scripts.</remarks>

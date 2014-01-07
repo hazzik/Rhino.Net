@@ -38,8 +38,8 @@ namespace Rhino
 			calleeObj = f;
 			Scriptable topLevel = GetTopLevelScope(parent);
 			constructor = GetProperty(topLevel, "Object");
-			int version = f.GetLanguageVersion();
-			if (version <= Context.VERSION_1_3 && version != Context.VERSION_DEFAULT)
+			LanguageVersion version = f.GetLanguageVersion();
+			if (version <= LanguageVersion.VERSION_1_3 && version != LanguageVersion.VERSION_DEFAULT)
 			{
 				callerObj = null;
 			}

@@ -23,7 +23,7 @@ namespace Rhino
 
 		internal const int INITIAL_NUMBERTABLE_SIZE = 64;
 
-		internal InterpreterData(int languageVersion, string sourceFile, string encodedSource, bool isStrict)
+		internal InterpreterData(LanguageVersion languageVersion, string sourceFile, string encodedSource, bool isStrict)
 		{
 			this.languageVersion = languageVersion;
 			this.itsSourceFile = sourceFile;
@@ -89,7 +89,7 @@ namespace Rhino
 
 		internal int encodedSourceEnd;
 
-		internal int languageVersion;
+		internal LanguageVersion languageVersion;
 
 		internal bool isStrict;
 

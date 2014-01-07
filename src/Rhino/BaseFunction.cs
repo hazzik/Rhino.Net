@@ -701,7 +701,7 @@ L0_break: ;
 			int arglen = args.Length;
 			StringBuilder sourceBuf = new StringBuilder();
 			sourceBuf.Append("function ");
-			if (cx.GetLanguageVersion() != Context.VERSION_1_2)
+			if (cx.GetLanguageVersion() != LanguageVersion.VERSION_1_2)
 			{
 				sourceBuf.Append("anonymous");
 			}

@@ -19,7 +19,7 @@ namespace Rhino.Tools.Shell
 
 		private bool warningAsError;
 
-		private int languageVersion = Context.VERSION_1_7;
+		private LanguageVersion languageVersion = LanguageVersion.VERSION_1_7;
 
 		private int optimizationLevel;
 
@@ -84,7 +84,7 @@ namespace Rhino.Tools.Shell
 			this.warningAsError = flag;
 		}
 
-		public virtual void SetLanguageVersion(int version)
+		public virtual void SetLanguageVersion(LanguageVersion version)
 		{
 			Context.CheckLanguageVersion(version);
 			CheckNotSealed();

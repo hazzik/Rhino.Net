@@ -19,7 +19,7 @@ namespace Rhino
 		public CompilerEnvirons()
 		{
 			errorReporter = DefaultErrorReporter.instance;
-			languageVersion = Context.VERSION_DEFAULT;
+			languageVersion = LanguageVersion.VERSION_DEFAULT;
 			generateDebugInfo = true;
 			reservedKeywordAsIdentifier = true;
 			allowMemberExprAsFunctionName = false;
@@ -63,12 +63,12 @@ namespace Rhino
 			this.errorReporter = errorReporter;
 		}
 
-		public int GetLanguageVersion()
+		public LanguageVersion GetLanguageVersion()
 		{
 			return languageVersion;
 		}
 
-		public virtual void SetLanguageVersion(int languageVersion)
+		public virtual void SetLanguageVersion(LanguageVersion languageVersion)
 		{
 			Context.CheckLanguageVersion(languageVersion);
 			this.languageVersion = languageVersion;
@@ -297,7 +297,7 @@ namespace Rhino
 			env.SetRecordingComments(true);
 			env.SetStrictMode(true);
 			env.SetWarnTrailingComma(true);
-			env.SetLanguageVersion(170);
+            env.SetLanguageVersion(LanguageVersion.VERSION_1_7);
 			env.SetReservedKeywordAsIdentifier(true);
 			env.SetIdeMode(true);
 			env.SetErrorReporter(new ErrorCollector());
@@ -306,7 +306,7 @@ namespace Rhino
 
 		private ErrorReporter errorReporter;
 
-		private int languageVersion;
+		private LanguageVersion languageVersion;
 
 		private bool generateDebugInfo;
 

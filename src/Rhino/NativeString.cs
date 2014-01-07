@@ -809,7 +809,7 @@ again_break: ;
 				// swap if end < start
 				if (end < start)
 				{
-					if (cx.GetLanguageVersion() != Context.VERSION_1_2)
+					if (cx.GetLanguageVersion() != LanguageVersion.VERSION_1_2)
 					{
 						double temp = start;
 						start = end;

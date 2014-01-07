@@ -925,7 +925,7 @@ L0_break: ;
 						int result = StringToKeyword(str);
 						if (result != Token.EOF)
 						{
-							if ((result == Token.LET || result == Token.YIELD) && parser.compilerEnv.GetLanguageVersion() < Context.VERSION_1_7)
+							if ((result == Token.LET || result == Token.YIELD) && parser.compilerEnv.GetLanguageVersion() < LanguageVersion.VERSION_1_7)
 							{
 								// LET and YIELD are tokens only in 1.7 and later
 								@string = result == Token.LET ? "let" : "yield";

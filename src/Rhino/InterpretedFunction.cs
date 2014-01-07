@@ -146,7 +146,7 @@ namespace Rhino
 			return Interpreter.ResumeGenerator(cx, scope, operation, state, value);
 		}
 
-		protected internal override int GetLanguageVersion()
+		protected internal override LanguageVersion GetLanguageVersion()
 		{
 			return idata.languageVersion;
 		}

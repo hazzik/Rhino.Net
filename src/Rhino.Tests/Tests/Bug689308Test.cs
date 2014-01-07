@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,7 +23,7 @@ namespace Rhino.Tests
 		public virtual void SetUp()
 		{
 			cx = Context.Enter();
-			cx.SetLanguageVersion(Context.VERSION_1_8);
+			cx.SetLanguageVersion(LanguageVersion.VERSION_1_8);
 		}
 
 		[NUnit.Framework.TearDown]

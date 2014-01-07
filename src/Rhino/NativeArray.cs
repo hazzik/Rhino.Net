@@ -698,7 +698,7 @@ again_break: ;
 			if (hint == ScriptRuntime.NumberClass)
 			{
 				Context cx = Context.GetContext();
-				if (cx.GetLanguageVersion() == Context.VERSION_1_2)
+				if (cx.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 				{
 					return length;
 				}
@@ -778,7 +778,7 @@ again_break: ;
 			// Only use 1 arg as first element for version 1.2; for
 			// any other version (including 1.3) follow ECMA and use it as
 			// a length.
-			if (cx.GetLanguageVersion() == Context.VERSION_1_2)
+			if (cx.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 			{
 				return new NativeArray(args);
 			}
@@ -1039,7 +1039,7 @@ again_break: ;
 					cx.iterating.Put(thisObj, 0);
 					// stop recursion.
 					// make toSource print null and undefined values in recent versions
-					bool skipUndefinedAndNull = !toSource || cx.GetLanguageVersion() < Context.VERSION_1_5;
+					bool skipUndefinedAndNull = !toSource || cx.GetLanguageVersion() < LanguageVersion.VERSION_1_5;
 					for (i = 0; i < length; i++)
 					{
 						if (i > 0)
@@ -1380,7 +1380,7 @@ again_break: ;
 			}
 			length += args.Length;
 			object lengthObj = SetLengthProperty(cx, thisObj, length);
-			if (cx.GetLanguageVersion() == Context.VERSION_1_2)
+			if (cx.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 			{
 				// if JS1.2 && no arguments, return undefined.
 				return args.Length == 0 ? Undefined.instance : args[args.Length - 1];
@@ -1550,7 +1550,7 @@ again_break: ;
 			object result;
 			if (count != 0)
 			{
-				if (count == 1 && (cx.GetLanguageVersion() == Context.VERSION_1_2))
+				if (count == 1 && (cx.GetLanguageVersion() == LanguageVersion.VERSION_1_2))
 				{
 					result = GetElem(cx, thisObj, begin);
 				}
@@ -1583,7 +1583,7 @@ again_break: ;
 			else
 			{
 				// (count == 0)
-				if (cx.GetLanguageVersion() == Context.VERSION_1_2)
+				if (cx.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 				{
 					result = Undefined.instance;
 				}

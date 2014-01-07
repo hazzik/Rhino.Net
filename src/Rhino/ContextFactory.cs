@@ -273,13 +273,13 @@ namespace Rhino
 		/// </summary>
 		protected internal virtual bool HasFeature(Context cx, int featureIndex)
 		{
-			int version;
+			LanguageVersion version;
 			switch (featureIndex)
 			{
 				case Context.FEATURE_NON_ECMA_GET_YEAR:
 				{
 					version = cx.GetLanguageVersion();
-					return (version == Context.VERSION_1_0 || version == Context.VERSION_1_1 || version == Context.VERSION_1_2);
+					return (version == LanguageVersion.VERSION_1_0 || version == LanguageVersion.VERSION_1_1 || version == LanguageVersion.VERSION_1_2);
 				}
 
 				case Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME:
@@ -295,7 +295,7 @@ namespace Rhino
 				case Context.FEATURE_TO_STRING_AS_SOURCE:
 				{
 					version = cx.GetLanguageVersion();
-					return version == Context.VERSION_1_2;
+					return version == LanguageVersion.VERSION_1_2;
 				}
 
 				case Context.FEATURE_PARENT_PROTO_PROPERTIES:
@@ -306,7 +306,7 @@ namespace Rhino
 				case Context.FEATURE_E4X:
 				{
 					version = cx.GetLanguageVersion();
-					return (version == Context.VERSION_DEFAULT || version >= Context.VERSION_1_6);
+					return (version == LanguageVersion.VERSION_DEFAULT || version >= LanguageVersion.VERSION_1_6);
 				}
 
 				case Context.FEATURE_DYNAMIC_SCOPE:

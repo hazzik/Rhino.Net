@@ -260,10 +260,10 @@ namespace Rhino.Tools.Shell
 						usageError = arg;
 						goto goodUsage_break;
 					}
-					int version;
+					LanguageVersion version;
 					try
 					{
-						version = System.Convert.ToInt32(args[i]);
+					    version = (LanguageVersion) System.Convert.ToInt32(args [i]);
 					}
 					catch (FormatException)
 					{

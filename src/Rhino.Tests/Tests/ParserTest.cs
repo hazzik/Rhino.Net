@@ -1034,7 +1034,7 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestParseObjectLiteral3()
 		{
-			environment.SetLanguageVersion(Context.VERSION_1_8);
+			environment.SetLanguageVersion(LanguageVersion.VERSION_1_8);
 			environment.SetReservedKeywordAsIdentifier(true);
 			Parse("var {get} = {get:1};");
 			environment.SetReservedKeywordAsIdentifier(false);

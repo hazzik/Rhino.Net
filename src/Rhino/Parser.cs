@@ -728,7 +728,7 @@ namespace Rhino
 			bool isExpressionClosure = false;
 			if (!MatchToken(Token.LC))
 			{
-				if (compilerEnv.GetLanguageVersion() < Context.VERSION_1_8)
+				if (compilerEnv.GetLanguageVersion() < LanguageVersion.VERSION_1_8)
 				{
 					ReportError("msg.no.brace.body");
 				}
@@ -2671,7 +2671,7 @@ switchLoop_break: ;
 					{
 						ConsumeToken();
 						int parseToken = tt;
-						if (compilerEnv.GetLanguageVersion() == Context.VERSION_1_2)
+						if (compilerEnv.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 						{
 							// JavaScript 1.2 uses shallow equality for == and != .
 							if (tt == Token.EQ)
@@ -4138,7 +4138,7 @@ commaLoop_break: ;
 			// Support, e.g., |var {x, y} = o| as destructuring shorthand
 			// for |var {x: x, y: y} = o|, as implemented in spidermonkey JS 1.8.
 			int tt = PeekToken();
-			if ((tt == Token.COMMA || tt == Token.RC) && ptt == Token.NAME && compilerEnv.GetLanguageVersion() >= Context.VERSION_1_8)
+			if ((tt == Token.COMMA || tt == Token.RC) && ptt == Token.NAME && compilerEnv.GetLanguageVersion() >= LanguageVersion.VERSION_1_8)
 			{
 				if (!inDestructuringAssignment)
 				{
@@ -4261,7 +4261,7 @@ commaLoop_break: ;
 			{
 				if ("length".Equals(name))
 				{
-					if (token == Token.GETPROP && compilerEnv.GetLanguageVersion() == Context.VERSION_1_2)
+					if (token == Token.GETPROP && compilerEnv.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 					{
 						// Use of "length" in 1.2 requires an activation object.
 						activation = true;

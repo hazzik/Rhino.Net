@@ -4159,11 +4159,11 @@ search_break: ;
 
 		internal static void CheckDeprecated(Context cx, string name)
 		{
-			int version = cx.GetLanguageVersion();
-			if (version >= Context.VERSION_1_4 || version == Context.VERSION_DEFAULT)
+			LanguageVersion version = cx.GetLanguageVersion();
+			if (version >= LanguageVersion.VERSION_1_4 || version == LanguageVersion.VERSION_DEFAULT)
 			{
 				string msg = GetMessage1("msg.deprec.ctor", name);
-				if (version == Context.VERSION_DEFAULT)
+				if (version == LanguageVersion.VERSION_DEFAULT)
 				{
 					Context.ReportWarning(msg);
 				}

@@ -33,7 +33,7 @@ namespace Rhino.Tests
 		private void AssertSource(string source, string expectedOutput)
 		{
 			CompilerEnvirons env = new CompilerEnvirons();
-			env.SetLanguageVersion(Context.VERSION_1_7);
+			env.SetLanguageVersion(LanguageVersion.VERSION_1_7);
 			Parser parser = new Parser(env);
 			AstRoot root = parser.Parse(source, null, 0);
 			NUnit.Framework.Assert.AreEqual(expectedOutput, root.ToSource());

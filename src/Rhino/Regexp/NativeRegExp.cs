@@ -2921,7 +2921,7 @@ switchStatement_break: ;
 			res.lastMatch.index = index;
 			res.lastMatch.length = matchlen;
 			res.leftContext.str = str;
-			if (cx.GetLanguageVersion() == Context.VERSION_1_2)
+			if (cx.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
 			{
 				res.leftContext.index = start;
 				res.leftContext.length = gData.skipped;

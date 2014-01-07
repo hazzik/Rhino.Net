@@ -207,13 +207,14 @@ namespace Rhino.Tools.Shell
 		/// </remarks>
 		public static double Version(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
-			double result = cx.GetLanguageVersion();
+			LanguageVersion result = cx.GetLanguageVersion();
 			if (args.Length > 0)
 			{
-				double d = Context.ToNumber(args[0]);
-				cx.SetLanguageVersion((int)d);
+			    int d = (int) Context.ToNumber(args [0]);
+			    LanguageVersion version = (LanguageVersion) d;
+			    cx.SetLanguageVersion(version);
 			}
-			return result;
+		    return (int) result;
 		}
 
 		/// <summary>Load and execute a set of JavaScript source files.</summary>

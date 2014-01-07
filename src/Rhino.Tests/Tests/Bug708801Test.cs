@@ -26,7 +26,7 @@ namespace Rhino.Tests
 			protected override Context MakeContext()
 			{
 				Context cx = base.MakeContext();
-				cx.SetLanguageVersion(Context.VERSION_1_8);
+				cx.SetLanguageVersion(LanguageVersion.VERSION_1_8);
 				cx.SetOptimizationLevel(COMPILER_MODE);
 				return cx;
 			}

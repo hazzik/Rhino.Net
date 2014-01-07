@@ -193,7 +193,7 @@ namespace Rhino.RegExp
 			int i = ip[0];
 			int length = target.Length;
 			int result;
-			int version = cx.GetLanguageVersion();
+			LanguageVersion version = cx.GetLanguageVersion();
 			NativeRegExp re = (NativeRegExp)reObj;
 			while (true)
 			{
@@ -223,7 +223,7 @@ namespace Rhino.RegExp
 						{
 							if (i == length)
 							{
-								if (version == Context.VERSION_1_2)
+								if (version == LanguageVersion.VERSION_1_2)
 								{
 									matchlen[0] = 1;
 									result = i;
@@ -392,8 +392,8 @@ again_break: ;
 			{
 				Kit.CodeBug();
 			}
-			int version = cx.GetLanguageVersion();
-			if (version != Context.VERSION_DEFAULT && version <= Context.VERSION_1_4)
+			LanguageVersion version = cx.GetLanguageVersion();
+			if (version != LanguageVersion.VERSION_DEFAULT && version <= LanguageVersion.VERSION_1_4)
 			{
 				if (dp > 0 && da[dp - 1] == '\\')
 				{
@@ -409,7 +409,7 @@ again_break: ;
 			if (NativeRegExp.IsDigit(dc))
 			{
 				int cp;
-				if (version != Context.VERSION_DEFAULT && version <= Context.VERSION_1_4)
+				if (version != LanguageVersion.VERSION_DEFAULT && version <= LanguageVersion.VERSION_1_4)
 				{
 					if (dc == '0')
 					{
@@ -478,7 +478,7 @@ again_break: ;
 
 				case '`':
 				{
-					if (version == Context.VERSION_1_2)
+					if (version == LanguageVersion.VERSION_1_2)
 					{
 						res.leftContext.index = 0;
 						res.leftContext.length = res.lastMatch.index;
@@ -586,7 +586,7 @@ again_break: ;
 			int len = 0;
 			bool[] matched = new bool[] { false };
 			string[][] parens = new string[][] { null };
-			int version = cx.GetLanguageVersion();
+			LanguageVersion version = cx.GetLanguageVersion();
 			while ((match = Find_split(cx, scope, target, separator, version, reProxy, re, ip, matchlen, matched, parens)) >= 0)
 			{
 				if ((limited && len >= limit) || (match > target.Length))
@@ -620,7 +620,7 @@ again_break: ;
 					matched[0] = false;
 				}
 				ip[0] = match + matchlen[0];
-				if (version < Context.VERSION_1_3 && version != Context.VERSION_DEFAULT)
+				if (version < LanguageVersion.VERSION_1_3 && version != LanguageVersion.VERSION_DEFAULT)
 				{
 					if (!limited && ip[0] == target.Length)
 					{
@@ -631,11 +631,11 @@ again_break: ;
 			return result;
 		}
 
-		private static int Find_split(Context cx, Scriptable scope, string target, string separator, int version, RegExpProxy reProxy, Scriptable re, int[] ip, int[] matchlen, bool[] matched, string[][] parensp)
+		private static int Find_split(Context cx, Scriptable scope, string target, string separator, LanguageVersion version, RegExpProxy reProxy, Scriptable re, int[] ip, int[] matchlen, bool[] matched, string[][] parensp)
 		{
 			int i = ip[0];
 			int length = target.Length;
-			if (version == Context.VERSION_1_2 && re == null && separator.Length == 1 && separator[0] == ' ')
+			if (version == LanguageVersion.VERSION_1_2 && re == null && separator.Length == 1 && separator[0] == ' ')
 			{
 				if (i == 0)
 				{
@@ -669,13 +669,13 @@ again_break: ;
 			{
 				return reProxy.Find_split(cx, scope, target, separator, re, ip, matchlen, matched, parensp);
 			}
-			if (version != Context.VERSION_DEFAULT && version < Context.VERSION_1_3 && length == 0)
+			if (version != LanguageVersion.VERSION_DEFAULT && version < LanguageVersion.VERSION_1_3 && length == 0)
 			{
 				return -1;
 			}
 			if (separator.Length == 0)
 			{
-				if (version == Context.VERSION_1_2)
+				if (version == LanguageVersion.VERSION_1_2)
 				{
 					if (i == length)
 					{
