@@ -91,45 +91,18 @@ namespace Rhino.Tools.Idswitch
 		{
 			source_file = file_path;
 			body = new FileBody();
-			Stream @is;
-			if (file_path.Equals("-"))
+			using (Stream @is = file_path == "-" ? Console.OpenStandardInput() : File.OpenRead(file_path))
+			using (TextReader r = new StreamReader(@is, Encoding.ASCII))
 			{
-				@is = Console.OpenStandardInput();
-			}
-			else
-			{
-				@is = new FileInputStream(file_path);
-			}
-			try
-			{
-				TextReader r = new StreamReader(@is, Encoding.ASCII);
 				body.ReadData(r);
-			}
-			finally
-			{
-				@is.Close();
 			}
 			Process_file();
 			if (body.WasModified())
 			{
-				Stream os;
-				if (file_path.Equals("-"))
+				using (Stream os = file_path == "-" ? Console.OpenStandardOutput() : File.OpenWrite(file_path))
+				using (TextWriter w = new StreamWriter(os))
 				{
-					os = Console.OpenStandardOutput();
-				}
-				else
-				{
-					os = new FileOutputStream(file_path);
-				}
-				try
-				{
-					TextWriter w = new StreamWriter(os);
 					body.WriteData(w);
-					w.Flush();
-				}
-				finally
-				{
-					os.Close();
 				}
 			}
 		}

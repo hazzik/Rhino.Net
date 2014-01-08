@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Numerics;
 using System.Xml;
 using Sharpen;
@@ -55,7 +56,7 @@ namespace Rhino
 
 	public class StreamResult
 	{
-		public StreamResult(OutputStream outputStream)
+		public StreamResult(Stream outputStream)
 		{
 			throw new NotImplementedException();
 		}

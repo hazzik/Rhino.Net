@@ -55,7 +55,7 @@ namespace Rhino.Drivers
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private static void AddTestsFromStream(InputStream @in, ICollection<string> list)
+		private static void AddTestsFromStream(Stream @in, ICollection<string> list)
 		{
 			using (var reader = new StreamReader(@in))
 			{
