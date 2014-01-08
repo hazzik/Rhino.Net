@@ -509,7 +509,7 @@ check_break: ;
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static string ReadReader(StreamReader r)
+		public static string ReadReader(TextReader r)
 		{
 			char[] buffer = new char[512];
 			int cursor = 0;

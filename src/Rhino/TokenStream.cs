@@ -29,7 +29,7 @@ namespace Rhino
 
 		private const char BYTE_ORDER_MARK = '\uFEFF';
 
-		internal TokenStream(Parser parser, StreamReader sourceReader, string sourceString, int lineno)
+		internal TokenStream(Parser parser, TextReader sourceReader, string sourceString, int lineno)
 		{
 			this.parser = parser;
 			this.lineno = lineno;
@@ -2622,7 +2622,7 @@ retry_break: ;
 
 		private string sourceString;
 
-		private StreamReader sourceReader;
+		private TextReader sourceReader;
 
 		private char[] sourceBuffer;
 

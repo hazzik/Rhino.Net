@@ -594,10 +594,10 @@ namespace Rhino
 		/// <seealso cref="Parse(string, string, int)">Parse(string, string, int)</seealso>
 		/// <exception cref="System.IO.IOException">
 		/// if the
-		/// <see cref="System.IO.StreamReader">System.IO.StreamReader</see>
+		/// <see cref="System.IO.TextReader">System.IO.TextReader</see>
 		/// encounters an error
 		/// </exception>
-		public virtual AstRoot Parse(StreamReader sourceReader, string sourceURI, int lineno)
+		public virtual AstRoot Parse(TextReader sourceReader, string sourceURI, int lineno)
 		{
 			if (parseFinished)
 			{
@@ -4346,7 +4346,7 @@ commaLoop_break: ;
 		/// <see cref="CompilerEnvirons">CompilerEnvirons</see>
 		/// is not set to ide-mode,
 		/// and
-		/// <see cref="Parse(System.IO.StreamReader, string, int)">Parse(System.IO.StreamReader, string, int)</see>
+		/// <see cref="Parse(System.IO.TextReader, string, int)">Parse(System.IO.TextReader, string, int)</see>
 		/// was used.
 		/// </returns>
 		private int LineBeginningFor(int pos)
@@ -4407,7 +4407,7 @@ commaLoop_break: ;
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private string ReadFully(StreamReader reader)
+		private string ReadFully(TextReader reader)
 		{
 			BufferedReader @in = new BufferedReader(reader);
 			try

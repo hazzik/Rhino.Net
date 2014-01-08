@@ -1038,7 +1038,7 @@ namespace Rhino
 									}
 									else
 									{
-										if (typeHint == ScriptRuntime.NumberClass || typeHint == ScriptRuntime.ByteClass || typeHint == typeof(sbyte) || typeHint == ScriptRuntime.ShortClass || typeHint == typeof(short) || typeHint == ScriptRuntime.IntegerClass || typeHint == typeof(int) || typeHint == ScriptRuntime.FloatClass || typeHint == typeof(float) || typeHint == ScriptRuntime.DoubleClass || typeHint == typeof(double))
+										if (typeHint == ScriptRuntime.NumberClass || typeHint == ScriptRuntime.ByteClass || typeHint == typeof(byte) || typeHint == ScriptRuntime.ShortClass || typeHint == typeof(short) || typeHint == ScriptRuntime.IntegerClass || typeHint == typeof(int) || typeHint == ScriptRuntime.FloatClass || typeHint == typeof(float) || typeHint == ScriptRuntime.DoubleClass || typeHint == typeof(double))
 										{
 											hint = "number";
 										}

@@ -357,7 +357,7 @@ namespace Rhino.Tools.Debugger
 openStream_break: ;
 				try
 				{
-					source = Kit.ReadReader(new InputStreamReader(@is));
+					source = Kit.ReadReader(new StreamReader(@is));
 				}
 				finally
 				{

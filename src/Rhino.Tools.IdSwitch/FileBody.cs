@@ -55,7 +55,7 @@ namespace Rhino.Tools.Idswitch
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public virtual void ReadData(StreamReader r)
+		public virtual void ReadData(TextReader r)
 		{
 			int capacity = buffer.Length;
 			int offset = 0;

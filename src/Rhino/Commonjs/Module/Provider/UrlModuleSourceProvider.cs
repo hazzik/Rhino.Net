@@ -194,9 +194,9 @@ namespace Rhino.Commonjs.Module.Provider
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private static StreamReader GetReader(URLConnection urlConnection)
+		private static TextReader GetReader(URLConnection urlConnection)
 		{
-			return new InputStreamReader(urlConnection.GetInputStream(), GetCharacterEncoding(urlConnection));
+			return new StreamReader(urlConnection.GetInputStream(), GetCharacterEncoding(urlConnection));
 		}
 
 		private static string GetCharacterEncoding(URLConnection urlConnection)

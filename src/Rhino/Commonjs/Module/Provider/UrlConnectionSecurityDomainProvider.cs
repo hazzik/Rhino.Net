@@ -17,7 +17,7 @@ namespace Rhino.Commonjs.Module.Provider
 	/// <see cref="UrlModuleSourceProvider">UrlModuleSourceProvider</see>
 	/// to create Rhino security domain objects for
 	/// newly loaded scripts (see
-	/// <see cref="Rhino.Context.CompileReader(System.IO.StreamReader, string, int, object)">Rhino.Context.CompileReader(System.IO.StreamReader, string, int, object)</see>
+	/// <see cref="Rhino.Context.CompileReader(System.IO.TextReader, string, int, object)">Rhino.Context.CompileReader(System.IO.TextReader, string, int, object)</see>
 	/// ) based on the properties obtainable through their URL
 	/// connection.
 	/// </remarks>

@@ -233,7 +233,7 @@ namespace Rhino.Tests.Json
 		/// <exception cref="System.Exception"></exception>
 		public virtual void ShouldFailToParseIllegalUnicodeEscapeSeq3()
 		{
-			parser.ParseValue("\"\\u006ЩЎ\"");
+			parser.ParseValue("\"\\u006Ù¡\"");
 		}
 
 		/// <exception cref="System.Exception"></exception>

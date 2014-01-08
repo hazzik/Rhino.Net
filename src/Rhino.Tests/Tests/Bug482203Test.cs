@@ -24,7 +24,7 @@ namespace Rhino.Tests
 			try
 			{
 				cx.SetOptimizationLevel(-1);
-				Script script = cx.CompileReader(new InputStreamReader(typeof(Bug482203Test).GetResourceAsStream("Bug482203.js")), string.Empty, 1, null);
+				Script script = cx.CompileReader(new StreamReader(typeof(Bug482203Test).GetResourceAsStream("Bug482203.js")), string.Empty, 1, null);
 				Scriptable scope = cx.InitStandardObjects();
 				script.Exec(cx, scope);
 				int counter = 0;
@@ -55,7 +55,7 @@ namespace Rhino.Tests
 			try
 			{
 				cx.SetOptimizationLevel(-1);
-				Script script = cx.CompileReader(new InputStreamReader(typeof(Bug482203Test).GetResourceAsStream("Bug482203.js")), string.Empty, 1, null);
+				Script script = cx.CompileReader(new StreamReader(typeof(Bug482203Test).GetResourceAsStream("Bug482203.js")), string.Empty, 1, null);
 				Scriptable scope = cx.InitStandardObjects();
 				cx.ExecuteScriptWithContinuations(script, scope);
 				int counter = 0;

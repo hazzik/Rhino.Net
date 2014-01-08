@@ -13,7 +13,7 @@ using Sharpen;
 
 namespace Rhino.Tests
 {
-	/// <author>AndrГ© Bargull</author>
+	/// <author>AndrÃ© Bargull</author>
 	[NUnit.Framework.TestFixture]
 	public class Bug688018Test
 	{

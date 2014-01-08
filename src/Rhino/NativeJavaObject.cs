@@ -575,7 +575,7 @@ namespace Rhino
 								}
 								else
 								{
-									if (aType == typeof(sbyte))
+									if (aType == typeof(byte))
 									{
 										return 7;
 									}
@@ -1070,7 +1070,7 @@ namespace Rhino
 					return Sharpen.Extensions.ValueOf((short)ToInteger(value, ScriptRuntime.ShortClass, short.MinValue, short.MaxValue));
 				}
 			}
-			if (type == ScriptRuntime.ByteClass || type == typeof(sbyte))
+			if (type == ScriptRuntime.ByteClass || type == typeof(byte))
 			{
 				if (valueClass == ScriptRuntime.ByteClass)
 				{

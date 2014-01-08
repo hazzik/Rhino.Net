@@ -13,7 +13,7 @@ using Sharpen;
 
 namespace Rhino.Tests.Es5
 {
-	/// <author>AndrГ© Bargull</author>
+	/// <author>AndrÃ© Bargull</author>
 	[NUnit.Framework.TestFixture]
 	public class Test262RegExpTest
 	{

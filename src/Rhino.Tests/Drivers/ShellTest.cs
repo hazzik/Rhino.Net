@@ -378,7 +378,7 @@ namespace Rhino.Drivers
 			int expectedExitCode = 0;
 			p.Flush();
 			status.OutputWas(Sharpen.Runtime.GetStringForBytes(@out.ToByteArray()));
-			BufferedReader r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(@out.ToByteArray())));
+			BufferedReader r = new BufferedReader(new StreamReader(new ByteArrayInputStream(@out.ToByteArray())));
 			string failures = string.Empty;
 			for (; ; )
 			{

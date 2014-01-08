@@ -89,7 +89,7 @@ namespace Rhino.Commonjs.Module.Provider
 			{
 				return null;
 			}
-			StreamReader reader = moduleSource.GetReader();
+			TextReader reader = moduleSource.GetReader();
 			try
 			{
 				int idHash = moduleId.GetHashCode();

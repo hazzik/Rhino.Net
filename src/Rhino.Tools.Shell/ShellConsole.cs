@@ -18,7 +18,7 @@ using Sharpen;
 
 namespace Rhino.Tools.Shell
 {
-	/// <author>AndrГ© Bargull</author>
+	/// <author>AndrÃ© Bargull</author>
 	public abstract class ShellConsole
 	{
 		private static readonly Type[] NO_ARG = new Type[] {  };
@@ -339,7 +339,7 @@ namespace Rhino.Tools.Shell
 			{
 				this.@in = @in;
 				this.@out = new PrintWriter(ps);
-				this.reader = new BufferedReader(new InputStreamReader(@in, cs));
+				this.reader = new BufferedReader(new StreamReader(@in, cs));
 			}
 
 			public override InputStream GetIn()

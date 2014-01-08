@@ -829,7 +829,7 @@ namespace Rhino.Tools.Debugger
 			string text;
 			try
 			{
-				StreamReader r = new FileReader(fileName);
+				TextReader r = new FileReader(fileName);
 				try
 				{
 					text = Kit.ReadReader(r);

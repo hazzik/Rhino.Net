@@ -1216,9 +1216,9 @@ namespace Rhino.Tools.Shell
 					}
 					else
 					{
-						if (unwrapped is StreamReader)
+						if (unwrapped is TextReader)
 						{
-							s = ReadReader((StreamReader)unwrapped);
+							s = ReadReader((TextReader)unwrapped);
 						}
 						else
 						{
@@ -1307,14 +1307,14 @@ namespace Rhino.Tools.Shell
 					}
 					@is = new FileInputStream(f);
 				}
-				StreamReader r;
+				TextReader r;
 				if (charCoding == null)
 				{
-					r = new InputStreamReader(@is);
+					r = new StreamReader(@is);
 				}
 				else
 				{
-					r = new InputStreamReader(@is, charCoding);
+					r = new StreamReader(@is, charCoding);
 				}
 				return ReadReader(r, chunkLength);
 			}
@@ -1370,13 +1370,13 @@ namespace Rhino.Tools.Shell
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private static string ReadReader(StreamReader reader)
+		private static string ReadReader(TextReader reader)
 		{
 			return ReadReader(reader, 4096);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		private static string ReadReader(StreamReader reader, int initialBufferSize)
+		private static string ReadReader(TextReader reader, int initialBufferSize)
 		{
 			char[] buffer = new char[initialBufferSize];
 			int offset = 0;

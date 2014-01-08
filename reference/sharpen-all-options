@@ -27,7 +27,8 @@
 -typeMapping java.io.Closeable System.IDisposable
 -typeMapping java.io.File Sharpen.FilePath
 -typeMapping java.io.InterruptedIOException System.Threading.ThreadInterruptedException
--typeMapping java.io.Reader System.IO.StreamReader
+-typeMapping java.io.Reader System.IO.TextReader
+-typeMapping java.io.InputStreamReader System.IO.StreamReader
 -typeMapping java.lang.AssertionError System.Exception
 -typeMapping java.lang.Comparable System.IComparable
 -typeMapping java.lang.Comparable<> System.IComparable

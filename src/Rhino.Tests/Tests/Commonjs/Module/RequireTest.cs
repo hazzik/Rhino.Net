@@ -99,9 +99,9 @@ namespace Rhino.Tests.Commonjs.Module
 			}
 		}
 
-		private StreamReader GetReader(string name)
+		private TextReader GetReader(string name)
 		{
-			return new InputStreamReader(GetType().GetResourceAsStream(name));
+			return new StreamReader(GetType().GetResourceAsStream(name));
 		}
 
 		/// <exception cref="System.Exception"></exception>

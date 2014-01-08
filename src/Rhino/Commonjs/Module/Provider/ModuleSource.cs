@@ -45,7 +45,7 @@ namespace Rhino.Commonjs.Module.Provider
 	{
 		private const long serialVersionUID = 1L;
 
-		private readonly StreamReader reader;
+		private readonly TextReader reader;
 
 		private readonly object securityDomain;
 
@@ -67,7 +67,7 @@ namespace Rhino.Commonjs.Module.Provider
 		/// a validator that can be used for subsequent cache
 		/// validation of the source text.
 		/// </param>
-		public ModuleSource(StreamReader reader, object securityDomain, Uri uri, Uri @base, object validator)
+		public ModuleSource(TextReader reader, object securityDomain, Uri uri, Uri @base, object validator)
 		{
 			this.reader = reader;
 			this.securityDomain = securityDomain;
@@ -83,7 +83,7 @@ namespace Rhino.Commonjs.Module.Provider
 		/// possible to read the source twice.
 		/// </remarks>
 		/// <returns>the reader returning the source text of the module.</returns>
-		public virtual StreamReader GetReader()
+		public virtual TextReader GetReader()
 		{
 			return reader;
 		}

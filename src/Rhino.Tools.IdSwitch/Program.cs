@@ -100,7 +100,7 @@ namespace Rhino.Tools.Idswitch
 			}
 			try
 			{
-				StreamReader r = new InputStreamReader(@is, "ASCII");
+				TextReader r = new StreamReader(@is, "ASCII");
 				body.ReadData(r);
 			}
 			finally
