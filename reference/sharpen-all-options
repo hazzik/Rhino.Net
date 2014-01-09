@@ -85,15 +85,23 @@
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
 
 -typeMapping org.w3c.dom.Attr System.Xml.XmlAttribute
+-typeMapping org.w3c.dom.CdataSection System.Xml.XmlCDataSection
 -typeMapping org.w3c.dom.CharacterData System.Xml.XmlCharacterData
 -typeMapping org.w3c.dom.Comment System.Xml.XmlComment
 -typeMapping org.w3c.dom.Document System.Xml.XmlDocument
+-typeMapping org.w3c.dom.DocumentFragment System.Xml.XmlDocumentFragment
+-typeMapping org.w3c.dom.DocumentType System.Xml.XmlDocumentType
+-typeMapping org.w3c.dom.DOMImplementation System.Xml.XmlImplementation
 -typeMapping org.w3c.dom.Element System.Xml.XmlElement
+-typeMapping org.w3c.dom.Entity System.Xml.XmlEntity
+-typeMapping org.w3c.dom.EntityReference System.Xml.XmlEntityReference
+-typeMapping org.w3c.dom.NamedNodeMap System.Xml.XmlNamedNodeMap
 -typeMapping org.w3c.dom.Node System.Xml.XmlNode
 -typeMapping org.w3c.dom.NodeList System.Xml.XmlNodeList
--typeMapping org.w3c.dom.NamedNodeMap System.Xml.XmlNamedNodeMap
+-typeMapping org.w3c.dom.Notation System.Xml.XmlNotation
 -typeMapping org.w3c.dom.Text System.Xml.XmlText
 -typeMapping org.w3c.dom.ProcessingInstruction System.Xml.XmlProcessingInstruction
+-typeMapping org.w3c.dom.DOMException System.ArgumentException
 
 -methodMapping com.db4o.ObjectSet.hasNext Db4objects.Db4o.IObjectSet.HasNext 
 -methodMapping com.db4o.ObjectSet.next Db4objects.Db4o.IObjectSet.Next  
