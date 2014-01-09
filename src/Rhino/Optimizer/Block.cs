@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Rhino;
@@ -419,10 +420,10 @@ namespace Rhino.Optimizer
 		private void InitLiveOnEntrySets(OptFunctionNode fn, Node[] statementNodes)
 		{
 			int listLength = fn.GetVarCount();
-			itsUseBeforeDefSet = new BitSet(listLength);
-			itsNotDefSet = new BitSet(listLength);
-			itsLiveOnEntrySet = new BitSet(listLength);
-			itsLiveOnExitSet = new BitSet(listLength);
+			itsUseBeforeDefSet = new BitArray(listLength);
+			itsNotDefSet = new BitArray(listLength);
+			itsLiveOnEntrySet = new BitArray(listLength);
+			itsLiveOnExitSet = new BitArray(listLength);
 			for (int i = itsStartNodeIndex; i <= itsEndNodeIndex; i++)
 			{
 				Node n = statementNodes[i];
@@ -445,7 +446,7 @@ namespace Rhino.Optimizer
 			return UpdateEntrySet(itsLiveOnEntrySet, itsLiveOnExitSet, itsUseBeforeDefSet, itsNotDefSet);
 		}
 
-		private bool UpdateEntrySet(BitSet entrySet, BitSet exitSet, BitSet useBeforeDef, BitSet notDef)
+		private bool UpdateEntrySet(BitArray entrySet, BitArray exitSet, BitArray useBeforeDef, BitArray notDef)
 		{
 			int card = entrySet.Cardinality();
 			entrySet.Or(exitSet);
@@ -650,13 +651,13 @@ namespace Rhino.Optimizer
 
 		private int itsBlockID;
 
-		private BitSet itsLiveOnEntrySet;
+		private BitArray itsLiveOnEntrySet;
 
-		private BitSet itsLiveOnExitSet;
+		private BitArray itsLiveOnExitSet;
 
-		private BitSet itsUseBeforeDefSet;
+		private BitArray itsUseBeforeDefSet;
 
-		private BitSet itsNotDefSet;
+		private BitArray itsNotDefSet;
 
 		internal const bool DEBUG = false;
 

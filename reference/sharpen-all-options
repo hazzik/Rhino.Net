@@ -63,6 +63,7 @@
 -typeMapping java.nio.charset.Charset System.Text.Encoding
 -typeMapping java.util.ArrayList System.Collections.ArrayList 
 -typeMapping java.util.ArrayList<> System.Collections.Generic.List
+-typeMapping java.util.BitSet System.Collections.BitArray
 -typeMapping java.util.Collections Sharpen.Collections
 -typeMapping java.util.Comparator System.Collections.IEnumerator   
 -typeMapping java.util.Comparator<> System.Collections.Generic.IComparer
