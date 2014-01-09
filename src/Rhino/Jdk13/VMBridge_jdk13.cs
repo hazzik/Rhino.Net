@@ -57,11 +57,11 @@ namespace Rhino.Jdk13
 
 		protected internal override bool TryToMakeAccessible(object accessibleObject)
 		{
-			if (!(accessibleObject is AccessibleObject))
+			if (!(accessibleObject is MemberInfo))
 			{
 				return false;
 			}
-			AccessibleObject accessible = (AccessibleObject)accessibleObject;
+			MemberInfo accessible = (MemberInfo)accessibleObject;
 			if (accessible.IsAccessible())
 			{
 				return true;

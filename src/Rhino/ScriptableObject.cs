@@ -1631,9 +1631,9 @@ namespace Rhino
 			return ctor;
 		}
 
-		private static MemberInfo FindAnnotatedMember<_T0>(AccessibleObject[] members, Type<_T0> annotation) where _T0:Sharpen.Annotation.Annotation
+		private static MemberInfo FindAnnotatedMember<_T0>(MemberInfo[] members, Type<_T0> annotation) where _T0:Sharpen.Annotation.Annotation
 		{
-			foreach (AccessibleObject member in members)
+			foreach (MemberInfo member in members)
 			{
 				if (member.IsAnnotationPresent(annotation))
 				{

@@ -40,6 +40,7 @@
 -typeMapping java.lang.Package System.Reflection.Assembly
 -typeMapping java.lang.Process Sharpen.SystemProcess
 -typeMapping java.lang.ProcessBuilder System.Diagnostics.ProcessStartInfo
+-typeMapping java.lang.reflect.AccessibleObject System.Reflection.MemberInfo
 -typeMapping java.lang.reflect.Constructor System.Reflection.ConstructorInfo
 -typeMapping java.lang.reflect.Constructor<> System.Reflection.ConstructorInfo
 -typeMapping java.lang.reflect.Member System.Reflection.MemberInfo
