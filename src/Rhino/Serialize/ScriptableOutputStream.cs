@@ -44,7 +44,7 @@ namespace Rhino.Serialize
 		/// <param name="out">the OutputStream to write to.</param>
 		/// <param name="scope">the scope containing the object.</param>
 		/// <exception cref="System.IO.IOException"></exception>
-		public ScriptableOutputStream(OutputStream @out, Scriptable scope) : base(@out)
+		public ScriptableOutputStream(Stream @out, Scriptable scope) : base(@out)
 		{
 			// API class
 			this.scope = scope;

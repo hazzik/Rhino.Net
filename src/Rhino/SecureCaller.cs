@@ -164,7 +164,7 @@ namespace Rhino
 			Uri url = typeof(SecureCaller).GetResource("SecureCallerImpl.clazz");
 			try
 			{
-				InputStream @in = url.OpenStream();
+				Stream @in = url.OpenStream();
 				try
 				{
 					MemoryStream bout = new MemoryStream();

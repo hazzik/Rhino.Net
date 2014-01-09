@@ -532,7 +532,7 @@ check_break: ;
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static byte[] ReadStream(InputStream @is, int initialBufferCapacity)
+		public static byte[] ReadStream(Stream @is, int initialBufferCapacity)
 		{
 			if (initialBufferCapacity <= 0)
 			{

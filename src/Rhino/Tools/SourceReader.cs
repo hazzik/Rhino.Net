@@ -42,7 +42,7 @@ namespace Rhino.Tools
 		public static object ReadFileOrUrl(string path, bool convertToString, string defaultEncoding)
 		{
 			Uri url = ToUrl(path);
-			InputStream @is = null;
+			Stream @is = null;
 			int capacityHint = 0;
 			string encoding;
 			string contentType;

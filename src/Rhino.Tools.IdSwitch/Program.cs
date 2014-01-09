@@ -89,7 +89,7 @@ namespace Rhino.Tools.Idswitch
 		{
 			source_file = file_path;
 			body = new FileBody();
-			InputStream @is;
+			Stream @is;
 			if (file_path.Equals("-"))
 			{
 				@is = Runtime.@in;
@@ -110,7 +110,7 @@ namespace Rhino.Tools.Idswitch
 			Process_file();
 			if (body.WasModified())
 			{
-				OutputStream os;
+				Stream os;
 				if (file_path.Equals("-"))
 				{
 					os = System.Console.Out;

@@ -69,7 +69,7 @@ namespace Rhino.Drivers
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static void AddTestsFromStream(InputStream @in, IList<string> list)
+		public static void AddTestsFromStream(Stream @in, IList<string> list)
 		{
 			Properties props = new Properties();
 			props.Load(@in);
@@ -83,7 +83,7 @@ namespace Rhino.Drivers
 		public static string[] LoadTestsFromResource(string resource, string[] inherited)
 		{
 			IList<string> list = inherited == null ? new List<string>() : new List<string>(Arrays.AsList(inherited));
-			InputStream @in = typeof(StandardTests).GetResourceAsStream(resource);
+			Stream @in = typeof(StandardTests).GetResourceAsStream(resource);
 			if (@in != null)
 			{
 				AddTestsFromStream(@in, list);

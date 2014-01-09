@@ -37,7 +37,7 @@ namespace Rhino.Tools.Shell
 		}
 	}
 
-	internal class ConsoleWriter : OutputStream
+	internal class ConsoleWriter : Stream
 	{
 		private ConsoleTextArea textArea;
 
@@ -387,7 +387,7 @@ namespace Rhino.Tools.Shell
 			}
 		}
 
-		public virtual InputStream GetIn()
+		public virtual Stream GetIn()
 		{
 			return @in;
 		}

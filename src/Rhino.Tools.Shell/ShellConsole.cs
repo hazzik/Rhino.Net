@@ -35,9 +35,9 @@ namespace Rhino.Tools.Shell
 
 		/// <summary>
 		/// Returns the underlying
-		/// <see cref="System.IO.InputStream">System.IO.InputStream</see>
+		/// <see cref="System.IO.Stream">System.IO.Stream</see>
 		/// </summary>
-		public abstract InputStream GetIn();
+		public abstract Stream GetIn();
 
 		/// <summary>Reads a single line from the console</summary>
 		/// <exception cref="System.IO.IOException"></exception>
@@ -99,7 +99,7 @@ namespace Rhino.Tools.Shell
 		{
 			private readonly object reader;
 
-			private readonly InputStream @in;
+			private readonly Stream @in;
 
 			internal JLineShellConsoleV1(object reader, Encoding cs)
 			{
@@ -107,7 +107,7 @@ namespace Rhino.Tools.Shell
 				this.@in = new ShellConsole.ConsoleInputStream(this, cs);
 			}
 
-			public override InputStream GetIn()
+			public override Stream GetIn()
 			{
 				return @in;
 			}
@@ -158,7 +158,7 @@ namespace Rhino.Tools.Shell
 		{
 			private readonly object reader;
 
-			private readonly InputStream @in;
+			private readonly Stream @in;
 
 			internal JLineShellConsoleV2(object reader, Encoding cs)
 			{
@@ -166,7 +166,7 @@ namespace Rhino.Tools.Shell
 				this.@in = new ShellConsole.ConsoleInputStream(this, cs);
 			}
 
-			public override InputStream GetIn()
+			public override Stream GetIn()
 			{
 				return @in;
 			}
@@ -212,7 +212,7 @@ namespace Rhino.Tools.Shell
 		/// JLine's ConsoleReaderInputStream is no longer public, therefore we need
 		/// to use our own implementation
 		/// </summary>
-		private class ConsoleInputStream : InputStream
+		private class ConsoleInputStream : Stream
 		{
 			private static readonly byte[] EMPTY = new byte[] {  };
 
@@ -329,20 +329,20 @@ namespace Rhino.Tools.Shell
 
 		private class SimpleShellConsole : ShellConsole
 		{
-			private readonly InputStream @in;
+			private readonly Stream @in;
 
 			private readonly PrintWriter @out;
 
 			private readonly BufferedReader reader;
 
-			internal SimpleShellConsole(InputStream @in, TextWriter ps, Encoding cs)
+			internal SimpleShellConsole(Stream @in, TextWriter ps, Encoding cs)
 			{
 				this.@in = @in;
 				this.@out = new PrintWriter(ps);
 				this.reader = new BufferedReader(new StreamReader(@in, cs));
 			}
 
-			public override InputStream GetIn()
+			public override Stream GetIn()
 			{
 				return @in;
 			}
@@ -393,12 +393,12 @@ namespace Rhino.Tools.Shell
 		/// Returns a new
 		/// <see cref="ShellConsole">ShellConsole</see>
 		/// which uses the supplied
-		/// <see cref="System.IO.InputStream">System.IO.InputStream</see>
+		/// <see cref="System.IO.Stream">System.IO.Stream</see>
 		/// and
 		/// <see cref="System.IO.TextWriter">System.IO.TextWriter</see>
 		/// for its input/output
 		/// </summary>
-		public static ShellConsole GetConsole(InputStream @in, TextWriter ps, Encoding cs)
+		public static ShellConsole GetConsole(Stream @in, TextWriter ps, Encoding cs)
 		{
 			return new ShellConsole.SimpleShellConsole(@in, ps, cs);
 		}

@@ -1636,7 +1636,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Returns the input stream of the console text area.</summary>
 		/// <remarks>Returns the input stream of the console text area.</remarks>
-		public virtual InputStream GetIn()
+		public virtual Stream GetIn()
 		{
 			return consoleTextArea.GetIn();
 		}

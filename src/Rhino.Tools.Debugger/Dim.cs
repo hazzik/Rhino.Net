@@ -306,7 +306,7 @@ namespace Rhino.Tools.Debugger
 			}
 			try
 			{
-				InputStream @is;
+				Stream @is;
 				if (sourceUrl.IndexOf(':') < 0)
 				{
 					// Can be a file name

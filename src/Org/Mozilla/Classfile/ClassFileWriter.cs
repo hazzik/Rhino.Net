@@ -3201,7 +3201,7 @@ namespace Org.Mozilla.Classfile
 		/// <remarks>Write the class file to the OutputStream.</remarks>
 		/// <param name="oStream">the stream to write to</param>
 		/// <exception cref="System.IO.IOException">if writing to the stream produces an exception</exception>
-		public virtual void Write(OutputStream oStream)
+		public virtual void Write(Stream oStream)
 		{
 			byte[] array = ToByteArray();
 			oStream.Write(array);
@@ -5364,7 +5364,7 @@ stringLoop_break: ;
 			// Based on the version numbers we scrape, we can also determine what
 			// bytecode features we need. For example, Java 6 bytecode (classfile
 			// version 50) should have stack maps generated.
-			InputStream @is = null;
+			Stream @is = null;
 			int major = 48;
 			int minor = 0;
 			try

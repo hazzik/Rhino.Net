@@ -33,7 +33,7 @@ namespace Rhino.Serialize
 		/// <param name="in">the InputStream to read from.</param>
 		/// <param name="scope">the top-level scope to create the object in.</param>
 		/// <exception cref="System.IO.IOException"></exception>
-		public ScriptableInputStream(InputStream @in, Scriptable scope) : base(@in)
+		public ScriptableInputStream(Stream @in, Scriptable scope) : base(@in)
 		{
 			// API class
 			this.scope = scope;

@@ -791,12 +791,12 @@ goodUsage_break: ;
 			}
 		}
 
-		public static InputStream GetIn()
+		public static Stream GetIn()
 		{
 			return GetGlobal().GetIn();
 		}
 
-		public static void SetIn(InputStream @in)
+		public static void SetIn(Stream @in)
 		{
 			GetGlobal().SetIn(@in);
 		}

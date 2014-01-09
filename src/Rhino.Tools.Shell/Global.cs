@@ -37,7 +37,7 @@ namespace Rhino.Tools.Shell
 
 		private ShellConsole console;
 
-		private InputStream inStream;
+		private Stream inStream;
 
 		private TextWriter outStream;
 
@@ -736,9 +736,9 @@ namespace Rhino.Tools.Shell
 			{
 				throw ReportRuntimeError("msg.runCommand.bad.args");
 			}
-			InputStream @in = null;
-			OutputStream @out = null;
-			OutputStream err = null;
+			Stream @in = null;
+			Stream @out = null;
+			Stream err = null;
 			MemoryStream outBytes = null;
 			MemoryStream errBytes = null;
 			object outObj = null;
@@ -989,7 +989,7 @@ namespace Rhino.Tools.Shell
 			return console;
 		}
 
-		public virtual InputStream GetIn()
+		public virtual Stream GetIn()
 		{
 			if (inStream == null && !attemptedJLineLoad)
 			{
@@ -1001,7 +1001,7 @@ namespace Rhino.Tools.Shell
 			return inStream == null ? Runtime.@in : inStream;
 		}
 
-		public virtual void SetIn(InputStream @in)
+		public virtual void SetIn(Stream @in)
 		{
 			inStream = @in;
 		}
@@ -1050,7 +1050,7 @@ namespace Rhino.Tools.Shell
 		/// </remarks>
 		/// <returns>Exit value of process.</returns>
 		/// <exception cref="System.IO.IOException">If there was an error executing the process.</exception>
-		private static int RunProcess(string[] cmd, string[] environment, InputStream @in, OutputStream @out, OutputStream err)
+		private static int RunProcess(string[] cmd, string[] environment, Stream @in, Stream @out, Stream err)
 		{
 			SystemProcess p;
 			if (environment == null)
@@ -1126,7 +1126,7 @@ namespace Rhino.Tools.Shell
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		internal static void Pipe(bool fromProcess, InputStream from, OutputStream to)
+		internal static void Pipe(bool fromProcess, Stream from, Stream to)
 		{
 			try
 			{
@@ -1197,16 +1197,16 @@ namespace Rhino.Tools.Shell
 		// Ignore errors on close. On Windows JVM may throw invalid
 		// refrence exception if process terminates too fast.
 		/// <exception cref="System.IO.IOException"></exception>
-		private static InputStream ToInputStream(object value)
+		private static Stream ToInputStream(object value)
 		{
-			InputStream @is = null;
+			Stream @is = null;
 			string s = null;
 			if (value is Wrapper)
 			{
 				object unwrapped = ((Wrapper)value).Unwrap();
-				if (unwrapped is InputStream)
+				if (unwrapped is Stream)
 				{
-					@is = (InputStream)unwrapped;
+					@is = (Stream)unwrapped;
 				}
 				else
 				{
@@ -1241,15 +1241,15 @@ namespace Rhino.Tools.Shell
 			return @is;
 		}
 
-		private static OutputStream ToOutputStream(object value)
+		private static Stream ToOutputStream(object value)
 		{
-			OutputStream os = null;
+			Stream os = null;
 			if (value is Wrapper)
 			{
 				object unwrapped = ((Wrapper)value).Unwrap();
-				if (unwrapped is OutputStream)
+				if (unwrapped is Stream)
 				{
-					os = (OutputStream)unwrapped;
+					os = (Stream)unwrapped;
 				}
 			}
 			return os;
@@ -1259,7 +1259,7 @@ namespace Rhino.Tools.Shell
 		private static string ReadUrl(string filePath, string charCoding, bool urlIsFile)
 		{
 			int chunkLength;
-			InputStream @is = null;
+			Stream @is = null;
 			try
 			{
 				if (!urlIsFile)
@@ -1456,7 +1456,7 @@ namespace Rhino.Tools.Shell
 
 	internal class PipeThread : Sharpen.Thread
 	{
-		internal PipeThread(bool fromProcess, InputStream from, OutputStream to)
+		internal PipeThread(bool fromProcess, Stream from, Stream to)
 		{
 			SetDaemon(true);
 			this.fromProcess = fromProcess;
@@ -1478,8 +1478,8 @@ namespace Rhino.Tools.Shell
 
 		private bool fromProcess;
 
-		private InputStream from;
+		private Stream from;
 
-		private OutputStream to;
+		private Stream to;
 	}
 }

@@ -27,7 +27,7 @@ namespace Rhino.Tools.Shell
 	public class ShellLine
 	{
 		[Obsolete]
-		public static InputStream GetStream(Scriptable scope)
+		public static Stream GetStream(Scriptable scope)
 		{
 			ShellConsole console = ShellConsole.GetConsole(scope, Encoding.Default);
 			return (console != null ? console.GetIn() : null);

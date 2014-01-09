@@ -528,7 +528,7 @@ namespace Rhino.Drivers
 				this.trace = trace;
 			}
 
-			private XmlDocument Parse(InputStream @in)
+			private XmlDocument Parse(Stream @in)
 			{
 				try
 				{

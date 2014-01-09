@@ -143,11 +143,11 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>
 		/// Returns an
-		/// <see cref="System.IO.InputStream">System.IO.InputStream</see>
+		/// <see cref="System.IO.Stream">System.IO.Stream</see>
 		/// for stdin from the debugger's internal
 		/// Console window.
 		/// </summary>
-		public virtual InputStream GetIn()
+		public virtual Stream GetIn()
 		{
 			return debugGui.GetConsole().GetIn();
 		}
