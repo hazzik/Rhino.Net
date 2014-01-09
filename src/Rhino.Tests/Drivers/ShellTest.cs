@@ -49,9 +49,9 @@ namespace Rhino.Drivers
 
 		public static string GetStackTrace(Exception t)
 		{
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			MemoryStream bytes = new MemoryStream();
 			Sharpen.Runtime.PrintStackTrace(t, new TextWriter(bytes));
-			return Sharpen.Runtime.GetStringForBytes(bytes.ToByteArray());
+			return Sharpen.Runtime.GetStringForBytes(bytes.ToArray());
 		}
 
 		private static void RunFileIfExists(Context cx, Scriptable global, FilePath f)
@@ -350,7 +350,7 @@ namespace Rhino.Drivers
 		public static void Run(ShellContextFactory shellContextFactory, FilePath jsFile, ShellTest.Parameters parameters, ShellTest.Status status)
 		{
 			Global global = new Global();
-			ByteArrayOutputStream @out = new ByteArrayOutputStream();
+			MemoryStream @out = new MemoryStream();
 			TextWriter p = new TextWriter(@out);
 			global.SetOut(p);
 			global.SetErr(p);
@@ -377,8 +377,8 @@ namespace Rhino.Drivers
 			}
 			int expectedExitCode = 0;
 			p.Flush();
-			status.OutputWas(Sharpen.Runtime.GetStringForBytes(@out.ToByteArray()));
-			BufferedReader r = new BufferedReader(new StreamReader(new ByteArrayInputStream(@out.ToByteArray())));
+			status.OutputWas(Sharpen.Runtime.GetStringForBytes(@out.ToArray()));
+			BufferedReader r = new BufferedReader(new StreamReader(new MemoryStream(@out.ToArray())));
 			string failures = string.Empty;
 			for (; ; )
 			{

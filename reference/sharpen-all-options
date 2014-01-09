@@ -23,6 +23,8 @@
 -fullyQualify XmlNode
 
 -typeMapping com.db4o.ObjectSet Db4objects.Db4o.IObjectSet 
+-typeMapping java.io.ByteArrayInputStream System.IO.MemoryStream
+-typeMapping java.io.ByteArrayOutputStream System.IO.MemoryStream
 -typeMapping java.io.CharArrayWriter System.IO.StringWriter
 -typeMapping java.io.Closeable System.IDisposable
 -typeMapping java.io.File Sharpen.FilePath
@@ -96,6 +98,7 @@
 -methodMapping java.io.IOException.IOException(java.lang.Throwable) Sharpen.Extensions.CreateIOException
 -methodMapping java.io.PrintWriter.print Write
 -methodMapping java.io.PrintWriter.println WriteLine
+-methodMapping java.io.ByteArrayOutputStream.toByteArray ToArray
 -methodMapping java.lang.Appendable.append(java.lang.CharSequence,int,int) AppendRange
 -methodMapping java.lang.ArrayIndexOutOfBoundsException.ArrayIndexOutOfBoundsException(int) Sharpen.Extensions.CreateIndexOutOfRangeException
 -methodMapping java.lang.Boolean.parseBoolean System.Boolean.Parse

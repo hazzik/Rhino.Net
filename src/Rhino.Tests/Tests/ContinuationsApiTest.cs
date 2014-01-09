@@ -282,15 +282,15 @@ namespace Rhino.Tests
 			catch (ContinuationPending pending)
 			{
 				// serialize
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				MemoryStream baos = new MemoryStream();
 				ScriptableOutputStream sos = new ScriptableOutputStream(baos, globalScope);
 				sos.WriteObject(globalScope);
 				sos.WriteObject(pending.GetContinuation());
 				sos.Close();
 				baos.Close();
-				byte[] serializedData = baos.ToByteArray();
+				byte[] serializedData = baos.ToArray();
 				// deserialize
-				ByteArrayInputStream bais = new ByteArrayInputStream(serializedData);
+				MemoryStream bais = new MemoryStream(serializedData);
 				ScriptableInputStream sis = new ScriptableInputStream(bais, globalScope);
 				globalScope = (Scriptable)sis.ReadObject();
 				object continuation = sis.ReadObject();
@@ -339,13 +339,13 @@ namespace Rhino.Tests
 				catch (ContinuationPending pending)
 				{
 					// serialize
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					MemoryStream baos = new MemoryStream();
 					ObjectOutputStream sos = new ObjectOutputStream(baos);
 					sos.WriteObject(globalScope);
 					sos.WriteObject(pending.GetContinuation());
 					sos.Close();
 					baos.Close();
-					serializedData = baos.ToByteArray();
+					serializedData = baos.ToArray();
 				}
 				finally
 				{
@@ -358,7 +358,7 @@ namespace Rhino.Tests
 					Context cx = Context.Enter();
 					Scriptable globalScope;
 					// deserialize
-					ByteArrayInputStream bais = new ByteArrayInputStream(serializedData);
+					MemoryStream bais = new MemoryStream(serializedData);
 					ObjectInputStream sis = new ObjectInputStream(bais);
 					globalScope = (Scriptable)sis.ReadObject();
 					object continuation = sis.ReadObject();
@@ -406,15 +406,15 @@ namespace Rhino.Tests
 			catch (ContinuationPending pending)
 			{
 				// serialize
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				MemoryStream baos = new MemoryStream();
 				ScriptableOutputStream sos = new ScriptableOutputStream(baos, globalScope);
 				sos.WriteObject(globalScope);
 				sos.WriteObject(pending.GetContinuation());
 				sos.Close();
 				baos.Close();
-				byte[] serializedData = baos.ToByteArray();
+				byte[] serializedData = baos.ToArray();
 				// deserialize
-				ByteArrayInputStream bais = new ByteArrayInputStream(serializedData);
+				MemoryStream bais = new MemoryStream(serializedData);
 				ScriptableInputStream sis = new ScriptableInputStream(bais, globalScope);
 				globalScope = (Scriptable)sis.ReadObject();
 				object continuation = sis.ReadObject();
@@ -435,11 +435,11 @@ namespace Rhino.Tests
 		public virtual void TestConsStringSerialization()
 		{
 			ConsString r1 = new ConsString("foo", "bar");
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			MemoryStream baos = new MemoryStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
 			oos.WriteObject(r1);
 			oos.Flush();
-			ByteArrayInputStream bais = new ByteArrayInputStream(baos.ToByteArray());
+			MemoryStream bais = new MemoryStream(baos.ToArray());
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			CharSequence r2 = (CharSequence)ois.ReadObject();
 			NUnit.Framework.Assert.AreEqual("still the same at the other end", r1.ToString(), r2.ToString());

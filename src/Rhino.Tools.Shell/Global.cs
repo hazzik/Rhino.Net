@@ -472,8 +472,8 @@ namespace Rhino.Tools.Shell
 				}
 				TextWriter savedOut = this.GetOut();
 				TextWriter savedErr = this.GetErr();
-				ByteArrayOutputStream @out = new ByteArrayOutputStream();
-				ByteArrayOutputStream err = new ByteArrayOutputStream();
+				MemoryStream @out = new MemoryStream();
+				MemoryStream err = new MemoryStream();
 				this.SetOut(new TextWriter(@out));
 				this.SetErr(new TextWriter(err));
 				string resultString = string.Empty;
@@ -739,8 +739,8 @@ namespace Rhino.Tools.Shell
 			InputStream @in = null;
 			OutputStream @out = null;
 			OutputStream err = null;
-			ByteArrayOutputStream outBytes = null;
-			ByteArrayOutputStream errBytes = null;
+			MemoryStream outBytes = null;
+			MemoryStream errBytes = null;
 			object outObj = null;
 			object errObj = null;
 			string[] environment = null;
@@ -801,7 +801,7 @@ namespace Rhino.Tools.Shell
 					@out = ToOutputStream(outObj);
 					if (@out == null)
 					{
-						outBytes = new ByteArrayOutputStream();
+						outBytes = new MemoryStream();
 						@out = outBytes;
 					}
 				}
@@ -811,7 +811,7 @@ namespace Rhino.Tools.Shell
 					err = ToOutputStream(errObj);
 					if (err == null)
 					{
-						errBytes = new ByteArrayOutputStream();
+						errBytes = new MemoryStream();
 						err = errBytes;
 					}
 				}
@@ -1212,7 +1212,7 @@ namespace Rhino.Tools.Shell
 				{
 					if (unwrapped is byte[])
 					{
-						@is = new ByteArrayInputStream((byte[])unwrapped);
+						@is = new MemoryStream((byte[])unwrapped);
 					}
 					else
 					{
@@ -1236,7 +1236,7 @@ namespace Rhino.Tools.Shell
 				{
 					s = ScriptRuntime.ToString(value);
 				}
-				@is = new ByteArrayInputStream(Sharpen.Runtime.GetBytesForString(s));
+				@is = new MemoryStream(Sharpen.Runtime.GetBytesForString(s));
 			}
 			return @is;
 		}

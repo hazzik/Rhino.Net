@@ -167,13 +167,13 @@ namespace Rhino
 				InputStream @in = url.OpenStream();
 				try
 				{
-					ByteArrayOutputStream bout = new ByteArrayOutputStream();
+					MemoryStream bout = new MemoryStream();
 					for (; ; )
 					{
 						int r = @in.Read();
 						if (r == -1)
 						{
-							return bout.ToByteArray();
+							return bout.ToArray();
 						}
 						bout.Write(r);
 					}
