@@ -25,8 +25,6 @@ namespace Rhino
 	[System.Serializable]
 	public class BaseFunction : IdScriptableObject, Function
 	{
-		internal const long serialVersionUID = 5311394446546053859L;
-
 		private static readonly object FUNCTION_TAG = "Function";
 
 		internal static void Init(Scriptable scope, bool @sealed)

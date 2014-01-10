@@ -27,8 +27,6 @@ namespace Rhino.CommonJS.Module
 	[System.Serializable]
 	public class ModuleScript
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly Script script;
 
 		private readonly Uri uri;

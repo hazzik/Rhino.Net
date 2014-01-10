@@ -19,8 +19,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal sealed class QName : IdScriptableObject
 	{
-		internal const long serialVersionUID = 416745167693026750L;
-
 		private static readonly object QNAME_TAG = "QName";
 
 		private XMLLibImpl lib;

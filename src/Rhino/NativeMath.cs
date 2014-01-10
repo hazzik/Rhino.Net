@@ -21,8 +21,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class NativeMath : IdScriptableObject
 	{
-		internal const long serialVersionUID = -8838847185801131569L;
-
 		private static readonly object MATH_TAG = "Math";
 
 		internal static void Init(Scriptable scope, bool @sealed)

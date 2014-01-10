@@ -27,8 +27,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeGlobal : IdFunctionCall
 	{
-		internal const long serialVersionUID = 6080442165748707530L;
-
 		public static void Init(Context cx, Scriptable scope, bool @sealed)
 		{
 			NativeGlobal obj = new NativeGlobal();

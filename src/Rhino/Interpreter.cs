@@ -42,8 +42,6 @@ namespace Rhino
 		[System.Serializable]
 		private class CallFrame : ICloneable
 		{
-			internal const long serialVersionUID = -2843792508994958978L;
-
 			internal Interpreter.CallFrame parentFrame;
 
 			internal int frameIndex;
@@ -130,8 +128,6 @@ namespace Rhino
 		[System.Serializable]
 		private sealed class ContinuationJump
 		{
-			internal const long serialVersionUID = 7687739156004308247L;
-
 			internal Interpreter.CallFrame capturedFrame;
 
 			internal Interpreter.CallFrame branchFrame;

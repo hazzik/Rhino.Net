@@ -65,8 +65,6 @@ namespace Rhino.Tests
 		[Serializable]
 		internal class MySimpleScriptableObject : ScriptableObject
 		{
-			private const long serialVersionUID = 1L;
-
 			private string label_;
 
 			internal MySimpleScriptableObject(string label)

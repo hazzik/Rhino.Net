@@ -20,8 +20,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class NativeError : IdScriptableObject
 	{
-		internal const long serialVersionUID = -5338413581437645187L;
-
 		private static readonly object ERROR_TAG = "Error";
 
 		private RhinoException stackProvider;

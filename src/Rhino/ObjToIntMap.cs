@@ -23,8 +23,6 @@ namespace Rhino
 	[System.Serializable]
 	public class ObjToIntMap
 	{
-		internal const long serialVersionUID = -1542220580748809402L;
-
 		public class Iterator
 		{
 			internal Iterator(ObjToIntMap master)

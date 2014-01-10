@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class LazilyLoadedCtor
 	{
-		private const long serialVersionUID = 1L;
-
 		private const int STATE_BEFORE_INIT = 0;
 
 		private const int STATE_INITIALIZING = 1;

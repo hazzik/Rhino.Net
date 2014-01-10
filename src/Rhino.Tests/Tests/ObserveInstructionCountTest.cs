@@ -31,7 +31,6 @@ namespace Rhino.Tests
 		[System.Serializable]
 		internal class QuotaExceeded : Exception
 		{
-			private const long serialVersionUID = -8018441873635071899L;
 		}
 
 		[NUnit.Framework.SetUp]

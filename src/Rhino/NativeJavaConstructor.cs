@@ -30,8 +30,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeJavaConstructor : BaseFunction
 	{
-		internal const long serialVersionUID = -8149253217482668463L;
-
 		internal MemberBox ctor;
 
 		public NativeJavaConstructor(MemberBox ctor)

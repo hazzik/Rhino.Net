@@ -17,8 +17,6 @@ namespace Rhino
 	[System.Serializable]
 	public class ObjArray
 	{
-		internal const long serialVersionUID = 4174889037736658296L;
-
 		public ObjArray()
 		{
 		}

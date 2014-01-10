@@ -27,8 +27,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeJavaTopPackage : NativeJavaPackage, Function, IdFunctionCall
 	{
-		internal const long serialVersionUID = -1455787259477709999L;
-
 		private static readonly string[][] commonPackages = new string[][] { new string[] { "java", "lang", "reflect" }, new string[] { "java", "io" }, new string[] { "java", "math" }, new string[] { "java", "net" }, new string[] { "java", "util", "zip" }, new string[] { "java", "text", "resources" }, new string[] { "java", "applet" }, new string[] { "javax", "swing" } };
 
 		internal NativeJavaTopPackage(ClassLoader loader) : base(true, string.Empty, loader)

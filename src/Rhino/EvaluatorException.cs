@@ -16,8 +16,6 @@ namespace Rhino
 	[System.Serializable]
 	public class EvaluatorException : RhinoException
 	{
-		internal const long serialVersionUID = -8743165779676009808L;
-
 		public EvaluatorException(string detail) : base(detail)
 		{
 		}

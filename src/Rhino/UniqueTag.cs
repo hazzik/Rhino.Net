@@ -25,8 +25,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class UniqueTag
 	{
-		internal const long serialVersionUID = -4320556826714577259L;
-
 		private const int ID_NOT_FOUND = 1;
 
 		private const int ID_NULL_VALUE = 2;

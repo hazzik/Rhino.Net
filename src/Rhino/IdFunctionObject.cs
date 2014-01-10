@@ -16,8 +16,6 @@ namespace Rhino
 	[System.Serializable]
 	public class IdFunctionObject : BaseFunction
 	{
-		internal const long serialVersionUID = -5332312783643935019L;
-
 		public IdFunctionObject(IdFunctionCall idcall, object tag, int id, int arity)
 		{
 			// API class

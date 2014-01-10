@@ -29,8 +29,6 @@ namespace Rhino
 	[System.Serializable]
 	public class ContinuationPending : Exception
 	{
-		private const long serialVersionUID = 4956008116771118856L;
-
 		private NativeContinuation continuationState;
 
 		private object applicationState;

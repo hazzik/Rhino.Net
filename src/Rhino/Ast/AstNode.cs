@@ -139,8 +139,6 @@ namespace Rhino.Ast
 		[System.Serializable]
 		public class PositionComparator : IComparer<AstNode>
 		{
-			private const long serialVersionUID = 1L;
-
 			/// <summary>Sorts nodes by (relative) start position.</summary>
 			/// <remarks>
 			/// Sorts nodes by (relative) start position.  The start positions are

@@ -21,8 +21,6 @@ namespace Rhino
 	[System.Serializable]
 	public abstract class NativeFunction : BaseFunction
 	{
-		internal const long serialVersionUID = 8713897114082216401L;
-
 		public void InitScriptFunction(Context cx, Scriptable scope)
 		{
 			ScriptRuntime.SetFunctionProtoAndParent(this, scope);

@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class Arguments : IdScriptableObject
 	{
-		internal const long serialVersionUID = 4275508002492040609L;
-
 		private const string FTAG = "Arguments";
 
 		public Arguments(NativeCall activation)

@@ -107,7 +107,6 @@ namespace Rhino
 		[System.Serializable]
 		private class ParserException : Exception
 		{
-			internal const long serialVersionUID = 5882582646773765630L;
 			// we use basically every class
 			// TokenInformation flags : currentFlaggedToken stores them together
 			// with token type

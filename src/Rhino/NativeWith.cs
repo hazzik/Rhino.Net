@@ -25,8 +25,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeWith : Scriptable, IdFunctionCall
 	{
-		private const long serialVersionUID = 1L;
-
 		internal static void Init(Scriptable scope, bool @sealed)
 		{
 			Rhino.NativeWith obj = new Rhino.NativeWith();

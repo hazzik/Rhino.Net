@@ -990,8 +990,6 @@ namespace Rhino
 	[Serializable]
 	internal class FieldAndMethods : NativeJavaMethod
 	{
-		internal const long serialVersionUID = -9222428244284796755L;
-
 		internal FieldAndMethods(Scriptable scope, MemberBox[] methods, FieldInfo field) : base(methods)
 		{
 			this.field = field;

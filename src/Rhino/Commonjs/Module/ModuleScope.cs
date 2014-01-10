@@ -21,8 +21,6 @@ namespace Rhino.CommonJS.Module
 	[System.Serializable]
 	public class ModuleScope : TopLevel
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly Uri uri;
 
 		private readonly Uri @base;

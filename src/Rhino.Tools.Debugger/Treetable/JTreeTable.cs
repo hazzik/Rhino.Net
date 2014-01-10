@@ -6,12 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using Java.Awt;
-using Java.Awt.Event;
-using Javax.Swing;
-using Javax.Swing.Event;
-using Javax.Swing.Table;
-using Javax.Swing.Tree;
 using Rhino.Tools.Debugger.Treetable;
 using Sharpen;
 
@@ -33,8 +27,6 @@ namespace Rhino.Tools.Debugger.Treetable
 	[System.Serializable]
 	public class JTreeTable : JTable
 	{
-		private const long serialVersionUID = -2103973006456695515L;
-
 		/// <summary>A subclass of JTree.</summary>
 		/// <remarks>A subclass of JTree.</remarks>
 		protected internal JTreeTable.TreeTableCellRenderer tree;
@@ -111,8 +103,6 @@ namespace Rhino.Tools.Debugger.Treetable
 		[System.Serializable]
 		public class TreeTableCellRenderer : JTree, TableCellRenderer
 		{
-			private const long serialVersionUID = -193867880014600717L;
-
 			/// <summary>Last table/tree row asked to renderer.</summary>
 			/// <remarks>Last table/tree row asked to renderer.</remarks>
 			protected internal int visibleRow;
@@ -283,8 +273,6 @@ namespace Rhino.Tools.Debugger.Treetable
 		[System.Serializable]
 		public class ListToTreeSelectionModelWrapper : DefaultTreeSelectionModel
 		{
-			private const long serialVersionUID = 8168140829623071131L;
-
 			/// <summary>Set to true when we are updating the ListSelectionModel.</summary>
 			/// <remarks>Set to true when we are updating the ListSelectionModel.</remarks>
 			protected internal bool updatingListSelectionModel;

@@ -19,8 +19,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal class XMLList : XMLObjectImpl, Function
 	{
-		internal const long serialVersionUID = -4543618751670781135L;
-
 		private XmlNode.InternalList _annos;
 
 		private XMLObjectImpl targetObject = null;

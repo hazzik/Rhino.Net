@@ -18,8 +18,6 @@ namespace Rhino.XmlImpl
 	[Serializable]
 	internal class XMLName : Ref
 	{
-		internal const long serialVersionUID = 3832176310755686977L;
-
 		private static bool IsNCNameStartChar(int c)
 		{
 			if ((c & ~unchecked((int)(0x7F))) == 0)

@@ -43,8 +43,6 @@ namespace Rhino.CommonJS.Module.Provider
 	[System.Serializable]
 	public class ModuleSource
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly TextReader reader;
 
 		private readonly object securityDomain;

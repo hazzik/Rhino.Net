@@ -26,8 +26,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class NativeString : IdScriptableObject
 	{
-		internal const long serialVersionUID = 920268368584188687L;
-
 		private static readonly object STRING_TAG = "String";
 
 		internal static void Init(Scriptable scope, bool @sealed)

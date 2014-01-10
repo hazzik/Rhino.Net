@@ -33,8 +33,6 @@ namespace Rhino.CommonJS.Module.Provider
 	[System.Serializable]
 	public abstract class CachingModuleScriptProviderBase : ModuleScriptProvider
 	{
-		private const long serialVersionUID = 1L;
-
 		private static readonly int loadConcurrencyLevel = Environment.ProcessorCount * 8;
 
 		private static readonly int loadLockShift;

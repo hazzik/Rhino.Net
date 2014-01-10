@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	public class WrappedException : EvaluatorException
 	{
-		internal const long serialVersionUID = -1551979216966520648L;
-
 		/// <seealso cref="Context.ThrowAsScriptRuntimeEx(System.Exception)">Context.ThrowAsScriptRuntimeEx(System.Exception)</seealso>
 		public WrappedException(Exception exception) : base("Wrapped " + exception.ToString())
 		{

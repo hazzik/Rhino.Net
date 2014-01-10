@@ -30,8 +30,6 @@ namespace Rhino
 	[System.Serializable]
 	public class NativeJavaObject : Scriptable, Wrapper
 	{
-		internal const long serialVersionUID = -6948590651130498591L;
-
 		public NativeJavaObject()
 		{
 		}

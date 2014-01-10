@@ -27,8 +27,6 @@ namespace Rhino.RegExp
 	[System.Serializable]
 	internal class NativeRegExpCtor : BaseFunction
 	{
-		internal const long serialVersionUID = -5733330028285400526L;
-
 		internal NativeRegExpCtor()
 		{
 		}

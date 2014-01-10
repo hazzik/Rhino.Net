@@ -104,8 +104,6 @@ namespace Rhino.XmlImpl
 			return CreateImpl(other.dom.CloneNode(true));
 		}
 
-		private const long serialVersionUID = 1L;
-
 		private XmlNodeUserDataHandler events = new XmlNodeUserDataHandler();
 
 		private System.Xml.XmlNode dom;
@@ -406,8 +404,6 @@ namespace Rhino.XmlImpl
 		[Serializable]
 		internal class XmlNodeUserDataHandler : UserDataHandler
 		{
-			private const long serialVersionUID = 4666895518900769588L;
-
 			public virtual void Handle(short operation, string key, object data, System.Xml.XmlNode src, System.Xml.XmlNode dest)
 			{
 			}
@@ -751,9 +747,6 @@ namespace Rhino.XmlImpl
 		[Serializable]
 		internal class Namespace
 		{
-			/// <summary>Serial version id for Namespace with fields prefix and uri</summary>
-			private const long serialVersionUID = 4073904386884677090L;
-
 			internal static Namespace Create(string prefix, string uri)
 			{
 				if (prefix == null)
@@ -851,8 +844,6 @@ namespace Rhino.XmlImpl
 		[Serializable]
 		internal class QName
 		{
-			private const long serialVersionUID = -6587069811691451077L;
-
 			//    TODO    Where is this class used?  No longer using it in QName implementation
 			internal static QName Create(Namespace @namespace, string localName)
 			{
@@ -1041,8 +1032,6 @@ namespace Rhino.XmlImpl
 		[Serializable]
 		internal class InternalList
 		{
-			private const long serialVersionUID = -3633151157292048978L;
-
 			private IList<XmlNode> list;
 
 			internal InternalList()

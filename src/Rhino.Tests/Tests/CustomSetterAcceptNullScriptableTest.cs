@@ -27,8 +27,6 @@ namespace Rhino.Tests
 		[System.Serializable]
 		public class Foo : ScriptableObject
 		{
-			private const long serialVersionUID = -8771045033217033529L;
-
 			public override string GetClassName()
 			{
 				return "Foo";
@@ -42,8 +40,6 @@ namespace Rhino.Tests
 		[System.Serializable]
 		public class Foo2 : ScriptableObject
 		{
-			private const long serialVersionUID = -8880603824656138628L;
-
 			public override string GetClassName()
 			{
 				return "Foo2";

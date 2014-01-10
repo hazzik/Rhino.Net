@@ -15,8 +15,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class NativeContinuation : IdScriptableObject, Function
 	{
-		internal const long serialVersionUID = 1794167133757605367L;
-
 		private static readonly object FTAG = "Continuation";
 
 		private object implementation;

@@ -48,8 +48,6 @@ namespace Rhino.CommonJS.Module
 	[System.Serializable]
 	public class Require : BaseFunction
 	{
-		private const long serialVersionUID = 1L;
-
 		private readonly ModuleScriptProvider moduleScriptProvider;
 
 		private readonly Scriptable nativeScope;

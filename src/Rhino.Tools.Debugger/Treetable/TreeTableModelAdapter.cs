@@ -7,10 +7,6 @@
  */
 
 using System;
-using Javax.Swing;
-using Javax.Swing.Event;
-using Javax.Swing.Table;
-using Javax.Swing.Tree;
 using Rhino.Tools.Debugger.Treetable;
 using Sharpen;
 
@@ -32,8 +28,6 @@ namespace Rhino.Tools.Debugger.Treetable
 	[System.Serializable]
 	public class TreeTableModelAdapter : AbstractTableModel
 	{
-		private const long serialVersionUID = 48741114609209052L;
-
 		internal JTree tree;
 
 		internal TreeTableModel treeTableModel;

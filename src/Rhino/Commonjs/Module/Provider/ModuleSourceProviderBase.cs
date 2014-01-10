@@ -32,8 +32,6 @@ namespace Rhino.CommonJS.Module.Provider
 	[System.Serializable]
 	public abstract class ModuleSourceProviderBase : ModuleSourceProvider
 	{
-		private const long serialVersionUID = 1L;
-
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="Sharpen.URISyntaxException"></exception>
 		public virtual ModuleSource LoadSource(string moduleId, Scriptable paths, object validator)

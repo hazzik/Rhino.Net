@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	public class EcmaError : RhinoException
 	{
-		internal const long serialVersionUID = -6261226256957286699L;
-
 		private string errorName;
 
 		private string errorMessage;

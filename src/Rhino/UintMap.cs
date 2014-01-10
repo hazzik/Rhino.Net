@@ -23,8 +23,6 @@ namespace Rhino
 	[System.Serializable]
 	public class UintMap
 	{
-		internal const long serialVersionUID = 4242698212885848444L;
-
 		public UintMap() : this(4)
 		{
 		}

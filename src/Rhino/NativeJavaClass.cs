@@ -35,8 +35,6 @@ namespace Rhino
 	[Serializable]
 	public class NativeJavaClass : NativeJavaObject, Function
 	{
-		internal const long serialVersionUID = -6460763940409461664L;
-
 		internal const string javaClassPropertyName = "__javaObject__";
 
 		public NativeJavaClass()

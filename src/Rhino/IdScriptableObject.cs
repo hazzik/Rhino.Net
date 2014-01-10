@@ -37,8 +37,6 @@ namespace Rhino
 		[System.Serializable]
 		private sealed class PrototypeValues
 		{
-			internal const long serialVersionUID = 3038645279153854371L;
-
 			private const int NAME_SLOT = 1;
 
 			private const int SLOT_SPAN = 2;

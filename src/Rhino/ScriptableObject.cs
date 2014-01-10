@@ -19,7 +19,7 @@ using Sharpen;
 
 namespace Rhino
 {
-    /// <summary>This is the default implementation of the Scriptable interface.</summary>
+	/// <summary>This is the default implementation of the Scriptable interface.</summary>
 	/// <remarks>
 	/// This is the default implementation of the Scriptable interface. This
 	/// class provides convenient default behavior that makes it easier to
@@ -35,9 +35,7 @@ namespace Rhino
 	[Serializable]
 	public abstract class ScriptableObject : Scriptable, DebuggableObject, ConstProperties
 	{
-		internal const long serialVersionUID = 2829861078851942586L;
-
-        /// <summary>The prototype of this object.</summary>
+		/// <summary>The prototype of this object.</summary>
 		/// <remarks>The prototype of this object.</remarks>
 		private Scriptable prototypeObject;
 
@@ -75,13 +73,11 @@ namespace Rhino
 		[Serializable]
 		public class Slot
 		{
-			private const long serialVersionUID = -6090581677123995491L;
-
 			internal string name;
 
 			internal int indexOrHash;
 
-            internal volatile PropertyAttributes attributes;
+			internal volatile PropertyAttributes attributes;
 
 			[NonSerialized]
 			internal volatile bool wasDeleted;
@@ -94,7 +90,7 @@ namespace Rhino
 			[NonSerialized]
 			internal volatile Slot orderedNext;
 
-            internal Slot(string name, int indexOrHash, PropertyAttributes attributes)
+			internal Slot(string name, int indexOrHash, PropertyAttributes attributes)
 			{
 				// API class
 				// If count >= 0, it gives number of keys or if count < 0,
@@ -183,8 +179,6 @@ namespace Rhino
 		[Serializable]
 		private sealed class GetterSlot : Slot
 		{
-			internal const long serialVersionUID = -4900574849788797588L;
-
 			internal object getter;
 
 			internal object setter;
@@ -619,89 +613,89 @@ namespace Rhino
 			return (slot.GetAttributes() & (PropertyAttributes.PERMANENT | PropertyAttributes.READONLY)) == (PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 		}
 
-        /// <summary>Get the attributes of a named property.</summary>
-        /// <remarks>
-        /// Get the attributes of a named property.
-        /// The property is specified by <code>name</code>
-        /// as defined for <code>has</code>.<p>
-        /// </remarks>
-        /// <param name="name">the identifier for the property</param>
-        /// <returns>the bitset of attributes</returns>
-        /// <exception>
-        /// EvaluatorException
-        /// if the named property is not found
-        /// </exception>
-        /// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
-        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
-        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
-        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
-        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
-        public virtual PropertyAttributes GetAttributes(string name)
+		/// <summary>Get the attributes of a named property.</summary>
+		/// <remarks>
+		/// Get the attributes of a named property.
+		/// The property is specified by <code>name</code>
+		/// as defined for <code>has</code>.<p>
+		/// </remarks>
+		/// <param name="name">the identifier for the property</param>
+		/// <returns>the bitset of attributes</returns>
+		/// <exception>
+		/// EvaluatorException
+		/// if the named property is not found
+		/// </exception>
+		/// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
+		/// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+		/// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+		/// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+		/// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+		public virtual PropertyAttributes GetAttributes(string name)
 		{
 			return FindAttributeSlot(name, 0, SLOT_QUERY).GetAttributes();
 		}
 
-        /// <summary>Get the attributes of an indexed property.</summary>
-        /// <remarks>Get the attributes of an indexed property.</remarks>
-        /// <param name="index">the numeric index for the property</param>
-        /// <exception>
-        /// EvaluatorException
-        /// if the named property is not found
-        /// is not found
-        /// </exception>
-        /// <returns>the bitset of attributes</returns>
-        /// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
-        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
-        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
-        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
-        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
-        public virtual PropertyAttributes GetAttributes(int index)
+		/// <summary>Get the attributes of an indexed property.</summary>
+		/// <remarks>Get the attributes of an indexed property.</remarks>
+		/// <param name="index">the numeric index for the property</param>
+		/// <exception>
+		/// EvaluatorException
+		/// if the named property is not found
+		/// is not found
+		/// </exception>
+		/// <returns>the bitset of attributes</returns>
+		/// <seealso cref="Has(string, Scriptable)">Has(string, Scriptable)</seealso>
+		/// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+		/// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+		/// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+		/// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+		public virtual PropertyAttributes GetAttributes(int index)
 		{
 			return FindAttributeSlot(null, index, SLOT_QUERY).GetAttributes();
 		}
 
-        /// <summary>Set the attributes of a named property.</summary>
-        /// <remarks>
-        /// Set the attributes of a named property.
-        /// The property is specified by <code>name</code>
-        /// as defined for <code>has</code>.<p>
-        /// The possible attributes are READONLY, DONTENUM,
-        /// and PERMANENT. Combinations of attributes
-        /// are expressed by the bitwise OR of attributes.
-        /// EMPTY is the state of no attributes set. Any unused
-        /// bits are reserved for future use.
-        /// </remarks>
-        /// <param name="name">the name of the property</param>
-        /// <param name="attributes">the bitset of attributes</param>
-        /// <exception>
-        /// EvaluatorException
-        /// if the named property is not found
-        /// </exception>
-        /// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
-        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
-        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
-        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
-        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
-        public virtual void SetAttributes(string name, PropertyAttributes attributes)
+		/// <summary>Set the attributes of a named property.</summary>
+		/// <remarks>
+		/// Set the attributes of a named property.
+		/// The property is specified by <code>name</code>
+		/// as defined for <code>has</code>.<p>
+		/// The possible attributes are READONLY, DONTENUM,
+		/// and PERMANENT. Combinations of attributes
+		/// are expressed by the bitwise OR of attributes.
+		/// EMPTY is the state of no attributes set. Any unused
+		/// bits are reserved for future use.
+		/// </remarks>
+		/// <param name="name">the name of the property</param>
+		/// <param name="attributes">the bitset of attributes</param>
+		/// <exception>
+		/// EvaluatorException
+		/// if the named property is not found
+		/// </exception>
+		/// <seealso cref="Scriptable.Has(string,Scriptablee)">Scriptable.Has(string, Scriptable)</seealso>
+		/// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+		/// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+		/// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+		/// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+		public virtual void SetAttributes(string name, PropertyAttributes attributes)
 		{
 			CheckNotSealed(name, 0);
 			FindAttributeSlot(name, 0, SLOT_MODIFY).SetAttributes(attributes);
 		}
 
-        /// <summary>Set the attributes of an indexed property.</summary>
-        /// <remarks>Set the attributes of an indexed property.</remarks>
-        /// <param name="index">the numeric index for the property</param>
-        /// <param name="attributes">the bitset of attributes</param>
-        /// <exception>
-        /// EvaluatorException
-        /// if the named property is not found
-        /// </exception>
-        /// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
-        /// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
-        /// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
-        /// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
-        /// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
-        public virtual void SetAttributes(int index, PropertyAttributes attributes)
+		/// <summary>Set the attributes of an indexed property.</summary>
+		/// <remarks>Set the attributes of an indexed property.</remarks>
+		/// <param name="index">the numeric index for the property</param>
+		/// <param name="attributes">the bitset of attributes</param>
+		/// <exception>
+		/// EvaluatorException
+		/// if the named property is not found
+		/// </exception>
+		/// <seealso cref="Scriptable.Has(string, Scriptable)">Scriptable.Has(string, Scriptable)</seealso>
+		/// <seealso cref="PropertyAttributes.READONLY">READONLY</seealso>
+		/// <seealso cref="PropertyAttributes.DONTENUM">DONTENUM</seealso>
+		/// <seealso cref="PropertyAttributes.PERMANENT">PERMANENT</seealso>
+		/// <seealso cref="PropertyAttributes.EMPTY">EMPTY</seealso>
+		public virtual void SetAttributes(int index, PropertyAttributes attributes)
 		{
 			CheckNotSealed(null, index);
 			FindAttributeSlot(null, index, SLOT_MODIFY).SetAttributes(attributes);
@@ -1814,16 +1808,16 @@ namespace Rhino
 			return null;
 		}
 
-        /// <summary>Define a JavaScript property.</summary>
-        /// <remarks>
-        /// Define a JavaScript property.
-        /// Creates the property with an initial value and sets its attributes.
-        /// </remarks>
-        /// <param name="propertyName">the name of the property to define.</param>
-        /// <param name="value">the initial value of the property</param>
-        /// <param name="attributes">the attributes of the JavaScript property</param>
-        /// <seealso cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</seealso>
-        public virtual void DefineProperty(string propertyName, object value, PropertyAttributes attributes)
+		/// <summary>Define a JavaScript property.</summary>
+		/// <remarks>
+		/// Define a JavaScript property.
+		/// Creates the property with an initial value and sets its attributes.
+		/// </remarks>
+		/// <param name="propertyName">the name of the property to define.</param>
+		/// <param name="value">the initial value of the property</param>
+		/// <param name="attributes">the attributes of the JavaScript property</param>
+		/// <seealso cref="Scriptable.Put(string, Scriptable, object)">Scriptable.Put(string, Scriptable, object)</seealso>
+		public virtual void DefineProperty(string propertyName, object value, PropertyAttributes attributes)
 		{
 			CheckNotSealed(propertyName, 0);
 			Put(propertyName, this, value);
@@ -1886,7 +1880,7 @@ namespace Rhino
 		/// <param name="clazz">the Java class to search for the getter and setter</param>
 		/// <param name="attributes">the attributes of the JavaScript property</param>
 		/// <seealso cref="Scriptable.Put(string, SIScriptable object)">Scriptable.Put(string, Scriptable, object)</seealso>
-        public virtual void DefineProperty(string propertyName, Type clazz, PropertyAttributes attributes)
+		public virtual void DefineProperty(string propertyName, Type clazz, PropertyAttributes attributes)
 		{
 			int length = propertyName.Length;
 			if (length == 0)
@@ -1912,47 +1906,47 @@ namespace Rhino
 			DefineProperty(propertyName, null, getter, setter == null ? null : setter, attributes);
 		}
 
-        /// <summary>Define a JavaScript property.</summary>
-        /// <remarks>
-        /// Define a JavaScript property.
-        /// Use this method only if you wish to define getters and setters for
-        /// a given property in a ScriptableObject. To create a property without
-        /// special getter or setter side effects, use
-        /// <code>defineProperty(String,int)</code>.
-        /// If <code>setter</code> is null, the attribute READONLY is added to
-        /// the given attributes.<p>
-        /// Several forms of getters or setters are allowed. In all cases the
-        /// type of the value parameter can be any one of the following types:
-        /// Object, String, boolean, Scriptable, byte, short, int, long, float,
-        /// or double. The runtime will perform appropriate conversions based
-        /// upon the type of the parameter (see description in FunctionObject).
-        /// The first forms are nonstatic methods of the class referred to
-        /// by 'this':
-        /// <pre>
-        /// Object getFoo();
-        /// void setFoo(SomeType value);</pre>
-        /// Next are static methods that may be of any class; the object whose
-        /// property is being accessed is passed in as an extra argument:
-        /// <pre>
-        /// static Object getFoo(Scriptable obj);
-        /// static void setFoo(Scriptable obj, SomeType value);</pre>
-        /// Finally, it is possible to delegate to another object entirely using
-        /// the <code>delegateTo</code> parameter. In this case the methods are
-        /// nonstatic methods of the class delegated to, and the object whose
-        /// property is being accessed is passed in as an extra argument:
-        /// <pre>
-        /// Object getFoo(Scriptable obj);
-        /// void setFoo(Scriptable obj, SomeType value);</pre>
-        /// </remarks>
-        /// <param name="propertyName">the name of the property to define.</param>
-        /// <param name="delegateTo">
-        ///     an object to call the getter and setter methods on,
-        ///     or null, depending on the form used above.
-        /// </param>
-        /// <param name="getter">the method to invoke to get the value of the property</param>
-        /// <param name="setter">the method to invoke to set the value of the property</param>
-        /// <param name="attributes">the attributes of the JavaScript property</param>
-        public virtual void DefineProperty(string propertyName, object delegateTo, MethodInfo getter, MethodInfo setter, PropertyAttributes attributes)
+		/// <summary>Define a JavaScript property.</summary>
+		/// <remarks>
+		/// Define a JavaScript property.
+		/// Use this method only if you wish to define getters and setters for
+		/// a given property in a ScriptableObject. To create a property without
+		/// special getter or setter side effects, use
+		/// <code>defineProperty(String,int)</code>.
+		/// If <code>setter</code> is null, the attribute READONLY is added to
+		/// the given attributes.<p>
+		/// Several forms of getters or setters are allowed. In all cases the
+		/// type of the value parameter can be any one of the following types:
+		/// Object, String, boolean, Scriptable, byte, short, int, long, float,
+		/// or double. The runtime will perform appropriate conversions based
+		/// upon the type of the parameter (see description in FunctionObject).
+		/// The first forms are nonstatic methods of the class referred to
+		/// by 'this':
+		/// <pre>
+		/// Object getFoo();
+		/// void setFoo(SomeType value);</pre>
+		/// Next are static methods that may be of any class; the object whose
+		/// property is being accessed is passed in as an extra argument:
+		/// <pre>
+		/// static Object getFoo(Scriptable obj);
+		/// static void setFoo(Scriptable obj, SomeType value);</pre>
+		/// Finally, it is possible to delegate to another object entirely using
+		/// the <code>delegateTo</code> parameter. In this case the methods are
+		/// nonstatic methods of the class delegated to, and the object whose
+		/// property is being accessed is passed in as an extra argument:
+		/// <pre>
+		/// Object getFoo(Scriptable obj);
+		/// void setFoo(Scriptable obj, SomeType value);</pre>
+		/// </remarks>
+		/// <param name="propertyName">the name of the property to define.</param>
+		/// <param name="delegateTo">
+		///     an object to call the getter and setter methods on,
+		///     or null, depending on the form used above.
+		/// </param>
+		/// <param name="getter">the method to invoke to get the value of the property</param>
+		/// <param name="setter">the method to invoke to set the value of the property</param>
+		/// <param name="attributes">the attributes of the JavaScript property</param>
+		public virtual void DefineProperty(string propertyName, object delegateTo, MethodInfo getter, MethodInfo setter, PropertyAttributes attributes)
 		{
 			MemberBox getterBox = null;
 			if (getter != null)
@@ -2380,22 +2374,22 @@ namespace Rhino
 			return (ScriptableObject)arg;
 		}
 
-        /// <summary>
-        /// Search for names in a class, adding the resulting methods
-        /// as properties.
-        /// </summary>
-        /// <remarks>
-        /// Search for names in a class, adding the resulting methods
-        /// as properties.
-        /// <p> Uses reflection to find the methods of the given names. Then
-        /// FunctionObjects are constructed from the methods found, and
-        /// are added to this object as properties with the given names.
-        /// </remarks>
-        /// <param name="names">the names of the Methods to add as function properties</param>
-        /// <param name="clazz">the class to search for the Methods</param>
-        /// <param name="attributes">the attributes of the new properties</param>
-        /// <seealso cref="FunctionObject">FunctionObject</seealso>
-        public virtual void DefineFunctionProperties(string[] names, Type clazz, PropertyAttributes attributes)
+		/// <summary>
+		/// Search for names in a class, adding the resulting methods
+		/// as properties.
+		/// </summary>
+		/// <remarks>
+		/// Search for names in a class, adding the resulting methods
+		/// as properties.
+		/// <p> Uses reflection to find the methods of the given names. Then
+		/// FunctionObjects are constructed from the methods found, and
+		/// are added to this object as properties with the given names.
+		/// </remarks>
+		/// <param name="names">the names of the Methods to add as function properties</param>
+		/// <param name="clazz">the class to search for the Methods</param>
+		/// <param name="attributes">the attributes of the new properties</param>
+		/// <seealso cref="FunctionObject">FunctionObject</seealso>
+		public virtual void DefineFunctionProperties(string[] names, Type clazz, PropertyAttributes attributes)
 		{
 			MethodInfo[] methods = FunctionObject.GetMethodList(clazz);
 			for (int i = 0; i < names.Length; i++)

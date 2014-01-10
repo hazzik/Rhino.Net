@@ -21,8 +21,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class NativeBoolean : IdScriptableObject
 	{
-		internal const long serialVersionUID = -3716996899943880933L;
-
 		private static readonly object BOOLEAN_TAG = "Boolean";
 
 		internal static void Init(Scriptable scope, bool @sealed)

@@ -26,8 +26,6 @@ namespace Rhino
 	[System.Serializable]
 	public class ClassCache
 	{
-		private const long serialVersionUID = -8866246036237312215L;
-
 		private static readonly object AKEY = "ClassCache";
 
 		private volatile bool cachingIsEnabled = true;

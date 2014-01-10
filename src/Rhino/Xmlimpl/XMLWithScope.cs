@@ -17,8 +17,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal sealed class XMLWithScope : NativeWith
 	{
-		private const long serialVersionUID = -696429282095170887L;
-
 		private XMLLibImpl lib;
 
 		private int _currIndex;

@@ -31,8 +31,6 @@ namespace Rhino.CommonJS.Module
 	[System.Serializable]
 	public class RequireBuilder
 	{
-		private const long serialVersionUID = 1L;
-
 		private bool sandboxed = true;
 
 		private ModuleScriptProvider moduleScriptProvider;

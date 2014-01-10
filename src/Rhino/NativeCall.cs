@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class NativeCall : IdScriptableObject
 	{
-		internal const long serialVersionUID = -7471457301304454454L;
-
 		private static readonly object CALL_TAG = "Call";
 
 		internal static void Init(Scriptable scope, bool @sealed)

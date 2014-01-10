@@ -19,8 +19,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal class XML : XMLObjectImpl
 	{
-		internal const long serialVersionUID = -630969919086449092L;
-
 		private XmlNode node;
 
 		internal XML(XMLLibImpl lib, Scriptable scope, XMLObject prototype, XmlNode node) : base(lib, scope, prototype)

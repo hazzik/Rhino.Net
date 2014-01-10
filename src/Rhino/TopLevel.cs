@@ -49,8 +49,6 @@ namespace Rhino
 	[Serializable]
 	public class TopLevel : IdScriptableObject
 	{
-		internal const long serialVersionUID = -4648046356662472260L;
-
 		/// <summary>An enumeration of built-in ECMAScript objects.</summary>
 		/// <remarks>An enumeration of built-in ECMAScript objects.</remarks>
 		public enum Builtins

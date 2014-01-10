@@ -26,8 +26,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class NativeJSON : IdScriptableObject
 	{
-		internal const long serialVersionUID = -4567599697595654984L;
-
 		private static readonly object JSON_TAG = "JSON";
 
 		private const int MAX_STRINGIFY_GAP_LENGTH = 10;

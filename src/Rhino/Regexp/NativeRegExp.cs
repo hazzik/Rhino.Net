@@ -29,8 +29,6 @@ namespace Rhino.RegExp
 	[System.Serializable]
 	public class NativeRegExp : IdScriptableObject, Function
 	{
-		internal const long serialVersionUID = 4965263491464903264L;
-
 		private static readonly object REGEXP_TAG = new object();
 
 		public const int JSREG_GLOB = unchecked((int)(0x1));
@@ -3351,8 +3349,6 @@ L0_break: ;
 	[System.Serializable]
 	internal class RECompiled
 	{
-		internal const long serialVersionUID = -6144956577595844213L;
-
 		internal readonly char[] source;
 
 		internal int parenCount;
@@ -3556,8 +3552,6 @@ L0_break: ;
 	[System.Serializable]
 	internal sealed class RECharSet
 	{
-		internal const long serialVersionUID = 7931787979395898394L;
-
 		internal RECharSet(int length, int startIndex, int strlength, bool sense)
 		{
 			this.length = length;

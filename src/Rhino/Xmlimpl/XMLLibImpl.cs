@@ -18,8 +18,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	public sealed class XMLLibImpl : XMLLib
 	{
-		private const long serialVersionUID = 1L;
-
 		//
 		//    EXPERIMENTAL Java interface
 		//

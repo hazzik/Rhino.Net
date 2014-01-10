@@ -15,8 +15,6 @@ namespace Rhino
 	[System.Serializable]
 	public class Undefined
 	{
-		internal const long serialVersionUID = 9195680630202616767L;
-
 		public static readonly object instance = new Rhino.Undefined();
 
 		private Undefined()

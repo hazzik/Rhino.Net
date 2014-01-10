@@ -26,8 +26,6 @@ namespace Rhino
 	[System.Serializable]
 	internal class NativeScript : BaseFunction
 	{
-		internal const long serialVersionUID = -6795101161980121700L;
-
 		private static readonly object SCRIPT_TAG = "Script";
 
 		internal static void Init(Scriptable scope, bool @sealed)

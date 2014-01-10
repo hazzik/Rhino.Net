@@ -21,8 +21,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class NativeGenerator : IdScriptableObject
 	{
-		private const long serialVersionUID = 1645892441041347273L;
-
 		private static readonly object GENERATOR_TAG = "Generator";
 
 		internal static Rhino.NativeGenerator Init(ScriptableObject scope, bool @sealed)
@@ -362,7 +360,6 @@ L0_break: ;
 		[System.Serializable]
 		public class GeneratorClosedException : Exception
 		{
-			private const long serialVersionUID = 2561315658662379681L;
 			// #/string_id_map#
 		}
 	}

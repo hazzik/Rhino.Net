@@ -12,18 +12,9 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using Java.Awt;
-using Java.Awt.Event;
-using Javax.Swing;
-using Javax.Swing.Event;
-using Javax.Swing.Filechooser;
-using Javax.Swing.Table;
-using Javax.Swing.Text;
-using Javax.Swing.Tree;
 using Rhino;
 using Rhino.Tools.Debugger;
 using Rhino.Tools.Debugger.Treetable;
-using Rhino.Tools.Shell;
 using Sharpen;
 
 namespace Rhino.Tools.Debugger
@@ -33,10 +24,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	public class SwingGui : JFrame, GuiCallback
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -8217029773456711621L;
-
 		/// <summary>The debugger.</summary>
 		/// <remarks>The debugger.</remarks>
 		internal Dim dim;
@@ -1224,10 +1211,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class EvalTextArea : JTextArea, KeyListener, DocumentListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -3918033649601064194L;
-
 		/// <summary>The debugger GUI.</summary>
 		/// <remarks>The debugger GUI.</remarks>
 		private SwingGui debugGui;
@@ -1531,10 +1514,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class EvalWindow : JInternalFrame, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -2860585845212160176L;
-
 		/// <summary>The text area into which expressions can be typed.</summary>
 		/// <remarks>The text area into which expressions can be typed.</remarks>
 		private EvalTextArea evalTextArea;
@@ -1593,10 +1572,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class JSInternalConsole : JInternalFrame, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -5523468828771087292L;
-
 		/// <summary>Creates a new JSInternalConsole.</summary>
 		/// <remarks>Creates a new JSInternalConsole.</remarks>
 		public JSInternalConsole(string name) : base(name, true, false, true, true)
@@ -1690,10 +1665,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class FilePopupMenu : JPopupMenu
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 3589525009546013565L;
-
 		/// <summary>The popup x position.</summary>
 		/// <remarks>The popup x position.</remarks>
 		internal int x;
@@ -1730,10 +1701,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class FileTextArea : JTextArea, ActionListener, PopupMenuListener, KeyListener, MouseListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -25032065448563720L;
-
 		/// <summary>
 		/// The owning
 		/// <see cref="FileWindow">FileWindow</see>
@@ -1947,10 +1914,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class MoreWindows : JDialog, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 5177066296457377546L;
-
 		/// <summary>Last selected value.</summary>
 		/// <remarks>Last selected value.</remarks>
 		private string value;
@@ -2112,10 +2075,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class FindFunction : JDialog, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 559491015232880916L;
-
 		/// <summary>Last selected function.</summary>
 		/// <remarks>Last selected function.</remarks>
 		private string value;
@@ -2291,10 +2250,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class FileHeader : JPanel, MouseListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -2858905404778259127L;
-
 		/// <summary>The line that the mouse was pressed on.</summary>
 		/// <remarks>The line that the mouse was pressed on.</remarks>
 		private int pressLine = -1;
@@ -2469,10 +2424,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class FileWindow : JInternalFrame, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = -6212382604952082370L;
-
 		/// <summary>The debugger GUI.</summary>
 		/// <remarks>The debugger GUI.</remarks>
 		private SwingGui debugGui;
@@ -2713,10 +2664,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class MyTableModel : AbstractTableModel
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 2971618907207577000L;
-
 		/// <summary>The debugger GUI.</summary>
 		/// <remarks>The debugger GUI.</remarks>
 		private SwingGui debugGui;
@@ -2873,10 +2820,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class Evaluator : JTable
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 8133672432982594256L;
-
 		/// <summary>
 		/// The
 		/// <see cref="Javax.Swing.Table.TableModel">Javax.Swing.Table.TableModel</see>
@@ -3211,10 +3154,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class MyTreeTable : JTreeTable
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 3457265548184453049L;
-
 		/// <summary>Creates a new MyTreeTable.</summary>
 		/// <remarks>Creates a new MyTreeTable.</remarks>
 		public MyTreeTable(VariableModel model) : base(model)
@@ -3306,10 +3245,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class ContextWindow : JPanel, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 2306040975490228051L;
-
 		/// <summary>The debugger GUI.</summary>
 		/// <remarks>The debugger GUI.</remarks>
 		private SwingGui debugGui;
@@ -3763,10 +3698,6 @@ namespace Rhino.Tools.Debugger
 	[System.Serializable]
 	internal class Menubar : JMenuBar, ActionListener
 	{
-		/// <summary>Serializable magic number.</summary>
-		/// <remarks>Serializable magic number.</remarks>
-		private const long serialVersionUID = 3217170497245911461L;
-
 		/// <summary>Items that are enabled only when interrupted.</summary>
 		/// <remarks>Items that are enabled only when interrupted.</remarks>
 		private IList<JMenuItem> interruptOnlyItems = Sharpen.Collections.SynchronizedList(new List<JMenuItem>());

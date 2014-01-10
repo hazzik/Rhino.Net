@@ -16,8 +16,6 @@ namespace Rhino.Xml
 	[System.Serializable]
 	public abstract class XMLObject : IdScriptableObject
 	{
-		internal const long serialVersionUID = 8455156490438576500L;
-
 		public XMLObject()
 		{
 		}

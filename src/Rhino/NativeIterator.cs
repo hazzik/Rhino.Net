@@ -23,8 +23,6 @@ namespace Rhino
 	[Serializable]
 	public sealed class NativeIterator : IdScriptableObject
 	{
-		private const long serialVersionUID = -4136968203581667681L;
-
 		private static readonly object ITERATOR_TAG = "Iterator";
 
 		internal static void Init(ScriptableObject scope, bool @sealed)
@@ -82,8 +80,6 @@ namespace Rhino
 		[Serializable]
 		internal class StopIteration : NativeObject
 		{
-			private const long serialVersionUID = 2485151085722377663L;
-
 			public override string GetClassName()
 			{
 				return STOP_ITERATION;

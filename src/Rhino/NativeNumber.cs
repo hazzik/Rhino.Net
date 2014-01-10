@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class NativeNumber : IdScriptableObject
 	{
-		internal const long serialVersionUID = 3504516769741512101L;
-
 		private static readonly object NUMBER_TAG = "Number";
 
 		private const int MAX_PRECISION = 100;

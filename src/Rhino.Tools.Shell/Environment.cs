@@ -27,8 +27,6 @@ namespace Rhino.Tools.Shell
 	[System.Serializable]
 	public class Environment : ScriptableObject
 	{
-		internal const long serialVersionUID = -430727378460177065L;
-
 		private Rhino.Tools.Shell.Environment thePrototypeInstance = null;
 
 		public static void DefineClass(ScriptableObject scope)

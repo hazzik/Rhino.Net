@@ -15,8 +15,6 @@ namespace Rhino
 	[System.Serializable]
 	internal class SpecialRef : Ref
 	{
-		internal const long serialVersionUID = -7521596632456797847L;
-
 		private const int SPECIAL_NONE = 0;
 
 		private const int SPECIAL_PROTO = 1;

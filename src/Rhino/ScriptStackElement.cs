@@ -19,8 +19,6 @@ namespace Rhino
 	[System.Serializable]
 	public sealed class ScriptStackElement
 	{
-		internal const long serialVersionUID = -6416688260860477449L;
-
 		public readonly string fileName;
 
 		public readonly string functionName;

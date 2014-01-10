@@ -22,8 +22,6 @@ namespace Rhino
 	[System.Serializable]
 	public abstract class Ref
 	{
-		internal const long serialVersionUID = 4044540354730911424L;
-
 		public virtual bool Has(Context cx)
 		{
 			return true;

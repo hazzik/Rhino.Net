@@ -2225,8 +2225,6 @@ childScopesChecks_break: ;
 		[System.Serializable]
 		private class IdEnumeration
 		{
-			private const long serialVersionUID = 1L;
-
 			internal Scriptable obj;
 
 			internal object[] ids;

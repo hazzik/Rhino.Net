@@ -35,8 +35,6 @@ namespace Rhino.Tests
 		[System.Serializable]
 		public class MyClass
 		{
-			private const long serialVersionUID = 4189002778806232070L;
-
 			public virtual int F(int a)
 			{
 				Context cx = Context.Enter();

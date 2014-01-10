@@ -16,8 +16,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal class XMLCtor : IdFunctionObject
 	{
-		internal const long serialVersionUID = -8708195078359817341L;
-
 		private static readonly object XMLCTOR_TAG = "XMLCtor";
 
 		private XmlProcessor options;

@@ -15,8 +15,6 @@ namespace Rhino
 	[System.Serializable]
 	internal sealed class InterpreterData : DebuggableScript
 	{
-		internal const long serialVersionUID = 5067677351589230234L;
-
 		internal const int INITIAL_MAX_ICODE_LENGTH = 1024;
 
 		internal const int INITIAL_STRINGTABLE_SIZE = 64;

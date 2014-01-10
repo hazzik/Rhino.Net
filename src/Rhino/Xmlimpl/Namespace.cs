@@ -19,8 +19,6 @@ namespace Rhino.XmlImpl
 	[System.Serializable]
 	internal class Namespace : IdScriptableObject
 	{
-		internal const long serialVersionUID = -5765755238131301744L;
-
 		private static readonly object NAMESPACE_TAG = "Namespace";
 
 		private Namespace prototype;

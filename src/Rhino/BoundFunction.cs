@@ -20,8 +20,6 @@ namespace Rhino
 	[System.Serializable]
 	public class BoundFunction : BaseFunction
 	{
-		internal const long serialVersionUID = 2118137342826470729L;
-
 		private readonly Callable targetFunction;
 
 		private readonly Scriptable boundThis;
