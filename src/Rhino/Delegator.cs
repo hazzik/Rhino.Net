@@ -77,21 +77,13 @@ namespace Rhino
 			}
 		}
 
-		/// <summary>Retrieve the delegee.</summary>
-		/// <remarks>Retrieve the delegee.</remarks>
-		/// <returns>the delegee</returns>
-		public virtual Scriptable GetDelegee()
-		{
-			return obj;
-		}
-
-		/// <summary>Set the delegee.</summary>
-		/// <remarks>Set the delegee.</remarks>
-		/// <param name="obj">the delegee</param>
+		/// <summary>Get or set the delegee.</summary>
+		/// <value>the delegee</value>
 		/// <seealso cref="Scriptable">Scriptable</seealso>
-		public virtual void SetDelegee(Scriptable obj)
+		public virtual Scriptable Delegee
 		{
-			this.obj = obj;
+			set { obj = value; }
+			get { return obj; }
 		}
 
 		/// <seealso cref="Scriptable.GetClassName()">Scriptable.GetClassName()</seealso>
@@ -238,7 +230,7 @@ namespace Rhino
 				{
 					delegee = ScriptRuntime.ToObject(cx, scope, args[0]);
 				}
-				n.SetDelegee(delegee);
+				n.Delegee = delegee;
 				return n;
 			}
 			else

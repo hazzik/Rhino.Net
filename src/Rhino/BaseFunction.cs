@@ -467,7 +467,7 @@ L0_break: ;
 			object x = thisObj.GetDefaultValue(ScriptRuntime.FunctionClass);
 			if (x is Delegator)
 			{
-				x = ((Delegator)x).GetDelegee();
+				x = ((Delegator)x).Delegee;
 			}
 			if (x is Rhino.BaseFunction)
 			{
