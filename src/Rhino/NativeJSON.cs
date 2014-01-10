@@ -34,7 +34,7 @@ namespace Rhino
 		{
 			Rhino.NativeJSON obj = new Rhino.NativeJSON();
 			obj.ActivatePrototypeMap(MAX_ID);
-			obj.SetPrototype(GetObjectPrototype(scope));
+			obj.Prototype = GetObjectPrototype(scope);
 			obj.ParentScope = scope;
 			if (@sealed)
 			{
@@ -370,7 +370,7 @@ namespace Rhino
 			NativeJSON.StringifyState state = new NativeJSON.StringifyState(cx, scope, indent, gap, replacerFunction, propertyList, space);
 			ScriptableObject wrapper = new NativeObject();
 			wrapper.ParentScope = scope;
-			wrapper.SetPrototype(ScriptableObject.GetObjectPrototype(scope));
+			wrapper.Prototype = ScriptableObject.GetObjectPrototype(scope);
 			wrapper.DefineProperty(string.Empty, value, 0);
 			return Str(string.Empty, wrapper, state);
 		}

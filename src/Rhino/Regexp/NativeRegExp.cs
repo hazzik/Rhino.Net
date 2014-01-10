@@ -157,7 +157,7 @@ namespace Rhino.RegExp
 			proto.re = CompileRE(cx, string.Empty, null, false);
 			proto.ActivatePrototypeMap(MAX_PROTOTYPE_ID);
 			proto.ParentScope = scope;
-			proto.SetPrototype(GetObjectPrototype(scope));
+			proto.Prototype = GetObjectPrototype(scope);
 			NativeRegExpCtor ctor = new NativeRegExpCtor();
 			// Bug #324006: ECMA-262 15.10.6.1 says "The initial value of
 			// RegExp.prototype.constructor is the builtin RegExp constructor."

@@ -41,7 +41,7 @@ namespace Rhino.XmlImpl
 		internal void Initialize(XMLLibImpl lib, Scriptable scope, XMLObject prototype)
 		{
 			ParentScope = scope;
-			SetPrototype(prototype);
+			Prototype = prototype;
 			prototypeFlag = (prototype == null);
 			this.lib = lib;
 		}
@@ -109,14 +109,10 @@ namespace Rhino.XmlImpl
 			return lib.CreateNamespaces(declarations);
 		}
 
-		public sealed override Scriptable GetPrototype()
+		public override sealed Scriptable Prototype
 		{
-			return base.GetPrototype();
-		}
-
-		public sealed override void SetPrototype(Scriptable prototype)
-		{
-			base.SetPrototype(prototype);
+			set { base.Prototype = value; }
+			get { return base.Prototype; }
 		}
 
 		public sealed override Scriptable ParentScope
@@ -365,7 +361,7 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				Scriptable proto = GetPrototype();
+				Scriptable proto = Prototype;
 				if (proto is XMLObject)
 				{
 					return ((XMLObject)proto).GetFunctionProperty(cx, id);
@@ -382,7 +378,7 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				Scriptable proto = GetPrototype();
+				Scriptable proto = Prototype;
 				if (proto is XMLObject)
 				{
 					return ((XMLObject)proto).GetFunctionProperty(cx, name);

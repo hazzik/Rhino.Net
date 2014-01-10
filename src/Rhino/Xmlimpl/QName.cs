@@ -37,7 +37,7 @@ namespace Rhino.XmlImpl
 			rv.lib = lib;
 			rv.ParentScope = scope;
 			rv.prototype = prototype;
-			rv.SetPrototype(prototype);
+			rv.Prototype = prototype;
 			rv.delegate_ = delegate_;
 			return rv;
 		}

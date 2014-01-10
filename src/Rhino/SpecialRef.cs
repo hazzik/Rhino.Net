@@ -76,7 +76,7 @@ namespace Rhino
 
 				case SPECIAL_PROTO:
 				{
-					return target.GetPrototype();
+					return target.Prototype;
 				}
 
 				case SPECIAL_PARENT:
@@ -117,7 +117,7 @@ namespace Rhino
 							}
 							if (type == SPECIAL_PROTO)
 							{
-								search = search.GetPrototype();
+								search = search.Prototype;
 							}
 							else
 							{
@@ -128,7 +128,7 @@ namespace Rhino
 					}
 					if (type == SPECIAL_PROTO)
 					{
-						target.SetPrototype(obj);
+						target.Prototype = obj;
 					}
 					else
 					{

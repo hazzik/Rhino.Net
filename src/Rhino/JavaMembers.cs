@@ -310,7 +310,7 @@ namespace Rhino
 				if (methodOrCtor.IsCtor())
 				{
 					NativeJavaConstructor fun = new NativeJavaConstructor(methodOrCtor);
-					fun.SetPrototype(prototype);
+					fun.Prototype = prototype;
 					member = fun;
 					ht[name] = fun;
 				}
@@ -321,7 +321,7 @@ namespace Rhino
 					if (member is NativeJavaMethod && ((NativeJavaMethod)member).methods.Length > 1)
 					{
 						NativeJavaMethod fun = new NativeJavaMethod(methodOrCtor, name);
-						fun.SetPrototype(prototype);
+						fun.Prototype = prototype;
 						ht[name] = fun;
 						member = fun;
 					}
@@ -994,7 +994,7 @@ namespace Rhino
 		{
 			this.field = field;
 			ParentScope = scope;
-			SetPrototype(GetFunctionPrototype(scope));
+			Prototype = GetFunctionPrototype(scope);
 		}
 
 		public override object GetDefaultValue(Type hint)

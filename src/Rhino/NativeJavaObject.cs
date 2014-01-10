@@ -126,20 +126,19 @@ namespace Rhino
 		{
 		}
 
-		public virtual Scriptable GetPrototype()
-		{
-			if (prototype == null && javaObject is string)
-			{
-				return TopLevel.GetBuiltinPrototype(ScriptableObject.GetTopLevelScope(parent), TopLevel.Builtins.String);
-			}
-			return prototype;
-		}
-
 		/// <summary>Sets the prototype of the object.</summary>
 		/// <remarks>Sets the prototype of the object.</remarks>
-		public virtual void SetPrototype(Scriptable m)
+		public virtual Scriptable Prototype
 		{
-			prototype = m;
+			set { prototype = value; }
+			get
+			{
+				if (prototype == null && javaObject is string)
+				{
+					return TopLevel.GetBuiltinPrototype(ScriptableObject.GetTopLevelScope(parent), TopLevel.Builtins.String);
+				}
+				return prototype;
+			}
 		}
 
 		/// <summary>Returns the parent (enclosing) scope of the object.</summary>

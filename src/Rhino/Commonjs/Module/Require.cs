@@ -111,7 +111,7 @@ namespace Rhino.CommonJS.Module
 			this.sandboxed = sandboxed;
 			this.preExec = preExec;
 			this.postExec = postExec;
-			SetPrototype(ScriptableObject.GetFunctionPrototype(nativeScope));
+			Prototype = ScriptableObject.GetFunctionPrototype(nativeScope);
 			if (!sandboxed)
 			{
 				paths = cx.NewArray(nativeScope, 0);

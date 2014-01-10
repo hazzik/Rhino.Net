@@ -61,7 +61,7 @@ namespace Rhino.Tools.Shell
 			if (ctor != null && ctor is Scriptable)
 			{
 				Scriptable s = (Scriptable)ctor;
-				SetPrototype((Scriptable)s.Get("prototype", s));
+				Prototype = (Scriptable)s.Get("prototype", s);
 			}
 		}
 

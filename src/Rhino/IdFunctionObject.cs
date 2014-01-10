@@ -90,17 +90,20 @@ namespace Rhino
 			AddAsProperty(ParentScope);
 		}
 
-		public override Scriptable GetPrototype()
+		public override Scriptable Prototype
 		{
-			// Lazy initialization of prototype: for native functions this
-			// may not be called at all
-			Scriptable proto = base.GetPrototype();
-			if (proto == null)
+			get
 			{
-				proto = GetFunctionPrototype(ParentScope);
-				SetPrototype(proto);
+				// Lazy initialization of prototype: for native functions this
+				// may not be called at all
+				Scriptable proto = base.Prototype;
+				if (proto == null)
+				{
+					proto = GetFunctionPrototype(ParentScope);
+					Prototype = proto;
+				}
+				return proto;
 			}
-			return proto;
 		}
 
 		public override object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)

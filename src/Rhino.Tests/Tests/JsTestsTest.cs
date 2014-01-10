@@ -50,7 +50,7 @@ namespace Rhino.Tests
 		{
 			// create a lightweight top-level scope
 			Scriptable scope = cx.NewObject(shared);
-			scope.SetPrototype(shared);
+			scope.Prototype = shared;
 			Console.Out.Write(name + ": ");
 			object result;
 			try

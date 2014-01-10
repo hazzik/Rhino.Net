@@ -32,7 +32,7 @@ namespace Rhino
 			if (scope != null)
 			{
 				prototype.ParentScope = scope;
-				prototype.SetPrototype(GetObjectPrototype(scope));
+				prototype.Prototype = GetObjectPrototype(scope);
 			}
 			prototype.ActivatePrototypeMap(MAX_PROTOTYPE_ID);
 			if (@sealed)
@@ -66,7 +66,7 @@ namespace Rhino
 			Scriptable top = ScriptableObject.GetTopLevelScope(scope);
 			this.ParentScope = top;
 			Rhino.NativeGenerator prototype = (Rhino.NativeGenerator)ScriptableObject.GetTopScopeValue(top, GENERATOR_TAG);
-			this.SetPrototype(prototype);
+			this.Prototype = prototype;
 		}
 
 		public const int GENERATOR_SEND = 0;

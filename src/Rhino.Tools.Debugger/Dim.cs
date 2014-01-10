@@ -733,7 +733,7 @@ openStream_break: ;
 				{
 					if (name.Equals("__proto__"))
 					{
-						result = scriptable.GetPrototype();
+						result = scriptable.Prototype;
 					}
 					else
 					{
@@ -782,7 +782,7 @@ openStream_break: ;
 			{
 				ids = scriptable.GetIds();
 			}
-			Scriptable proto = scriptable.GetPrototype();
+			Scriptable proto = scriptable.Prototype;
 			Scriptable parent = scriptable.ParentScope;
 			int extra = 0;
 			if (proto != null)

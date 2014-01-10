@@ -66,7 +66,7 @@ namespace Rhino.Tests
 					// Run each script in its own scope, to keep global variables
 					// defined in each script separate
 					Scriptable threadScope = context.NewObject(globalScope);
-					threadScope.SetPrototype(globalScope);
+					threadScope.Prototype = globalScope;
 					threadScope.ParentScope = null;
 					testScript.Exec(context, threadScope);
 				}

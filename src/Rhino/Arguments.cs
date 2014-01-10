@@ -29,7 +29,7 @@ namespace Rhino
 			this.activation = activation;
 			Scriptable parent = activation.ParentScope;
 			ParentScope = parent;
-			SetPrototype(ScriptableObject.GetObjectPrototype(parent));
+			Prototype = ScriptableObject.GetObjectPrototype(parent);
 			args = activation.originalArgs;
 			lengthObj = args.Length;
 			NativeFunction f = activation.function;

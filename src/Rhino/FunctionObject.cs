@@ -532,7 +532,7 @@ namespace Rhino
 			{
 				throw Context.ThrowAsScriptRuntimeEx(ex);
 			}
-			result.SetPrototype(GetClassPrototype());
+			result.Prototype = GetClassPrototype();
 			result.ParentScope = ParentScope;
 			return result;
 		}

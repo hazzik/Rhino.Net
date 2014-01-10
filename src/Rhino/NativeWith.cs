@@ -29,7 +29,7 @@ namespace Rhino
 		{
 			Rhino.NativeWith obj = new Rhino.NativeWith();
 			obj.ParentScope = scope;
-			obj.SetPrototype(ScriptableObject.GetObjectPrototype(scope));
+			obj.Prototype = ScriptableObject.GetObjectPrototype(scope);
 			IdFunctionObject ctor = new IdFunctionObject(obj, FTAG, Id_constructor, "With", 0, scope);
 			ctor.MarkAsConstructor(obj);
 			if (@sealed)
@@ -110,14 +110,10 @@ namespace Rhino
 			prototype.Delete(index);
 		}
 
-		public virtual Scriptable GetPrototype()
+		public virtual Scriptable Prototype
 		{
-			return prototype;
-		}
-
-		public virtual void SetPrototype(Scriptable prototype)
-		{
-			this.prototype = prototype;
+			set { this.prototype = value; }
+			get { return prototype; }
 		}
 
 		public virtual Scriptable ParentScope
@@ -176,7 +172,7 @@ namespace Rhino
 			ScriptRuntime.CheckDeprecated(cx, "With");
 			scope = ScriptableObject.GetTopLevelScope(scope);
 			Rhino.NativeWith thisObj = new Rhino.NativeWith();
-			thisObj.SetPrototype(args.Length == 0 ? ScriptableObject.GetObjectPrototype(scope) : ScriptRuntime.ToObject(cx, scope, args[0]));
+			thisObj.Prototype = args.Length == 0 ? ScriptableObject.GetObjectPrototype(scope) : ScriptRuntime.ToObject(cx, scope, args[0]);
 			thisObj.ParentScope = scope;
 			return thisObj;
 		}

@@ -34,7 +34,7 @@ namespace Rhino.XmlImpl
 			Namespace rv = new Namespace();
 			rv.ParentScope = scope;
 			rv.prototype = prototype;
-			rv.SetPrototype(prototype);
+			rv.Prototype = prototype;
 			rv.ns = @namespace;
 			return rv;
 		}

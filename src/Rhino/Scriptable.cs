@@ -228,18 +228,12 @@ namespace Rhino
 		/// <seealso cref="ScriptableObject.DeleteProperty(Scriptable, int)">ScriptableObject.DeleteProperty(Scriptable, int)</seealso>
 		void Delete(int index);
 
-		/// <summary>Get the prototype of the object.</summary>
-		/// <remarks>Get the prototype of the object.</remarks>
-		/// <returns>the prototype</returns>
-		Scriptable GetPrototype();
-
-		/// <summary>Set the prototype of the object.</summary>
+		/// <summary>Set or set the prototype of the object.</summary>
 		/// <remarks>Set the prototype of the object.</remarks>
-		/// <param name="prototype">the prototype to set</param>
-		void SetPrototype(Scriptable prototype);
+		/// <value>the prototype to set</value>
+		Scriptable Prototype { set; get; }
 
-		/// <summary>Get the parent scope of the object.</summary>
-		/// <remarks>Get the parent scope of the object.</remarks>
+		/// <summary>Get or set the parent scope of the object.</summary>
 		/// <value>the parent scope</value>
 		Scriptable ParentScope { get; set; }
 

@@ -119,7 +119,7 @@ namespace Rhino
 				}
 				ScriptRuntime.CheckDeprecated(cx, "Call");
 				Rhino.NativeCall result = new Rhino.NativeCall();
-				result.SetPrototype(GetObjectPrototype(scope));
+				result.Prototype = GetObjectPrototype(scope);
 				return result;
 			}
 			throw new ArgumentException(id.ToString());

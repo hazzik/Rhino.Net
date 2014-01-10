@@ -32,7 +32,7 @@ namespace Rhino.XmlImpl
 
 		internal void InitAsDotQuery()
 		{
-			XMLObject prototype = (XMLObject)GetPrototype();
+			XMLObject prototype = (XMLObject)Prototype;
 			// XMLWithScope also handles the .(xxx) DotQuery for XML
 			// basically DotQuery is a for/in/with statement and in
 			// the following 3 statements we setup to signal it's
@@ -47,7 +47,7 @@ namespace Rhino.XmlImpl
 				XMLList xl = (XMLList)prototype;
 				if (xl.Length() > 0)
 				{
-					SetPrototype((Scriptable)(xl.Get(0, null)));
+					Prototype = (Scriptable)(xl.Get(0, null));
 				}
 			}
 			// Always return the outer-most type of XML lValue of
@@ -78,7 +78,7 @@ namespace Rhino.XmlImpl
 					// reset the expression to run with this object as
 					// the WITH selector.
 					_currIndex = idx;
-					SetPrototype((Scriptable)(orgXmlL.Get(idx, null)));
+					Prototype = (Scriptable)(orgXmlL.Get(idx, null));
 					// continue looping
 					return null;
 				}

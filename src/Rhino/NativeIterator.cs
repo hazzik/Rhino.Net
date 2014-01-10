@@ -34,7 +34,7 @@ namespace Rhino
 			NativeGenerator.Init(scope, @sealed);
 			// StopIteration
 			NativeObject obj = new StopIteration();
-			obj.SetPrototype(GetObjectPrototype(scope));
+			obj.Prototype = GetObjectPrototype(scope);
 			obj.ParentScope = scope;
 			if (@sealed)
 			{
@@ -200,7 +200,7 @@ namespace Rhino
 			object objectIterator = ScriptRuntime.EnumInit(obj, cx, keyOnly ? ScriptRuntime.ENUMERATE_KEYS_NO_ITERATOR : ScriptRuntime.ENUMERATE_ARRAY_NO_ITERATOR);
 			ScriptRuntime.SetEnumNumbers(objectIterator, true);
 			NativeIterator result = new NativeIterator(objectIterator);
-			result.SetPrototype(GetClassPrototype(scope, result.GetClassName()));
+			result.Prototype = GetClassPrototype(scope, result.GetClassName());
 			result.ParentScope = scope;
 			return result;
 		}

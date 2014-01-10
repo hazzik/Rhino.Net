@@ -159,11 +159,11 @@ namespace Rhino
 			Scriptable objectProto = ScriptableObject.GetObjectPrototype(scope);
 			// Function.prototype.__proto__ should be Object.prototype
 			Scriptable functionProto = ScriptableObject.GetClassPrototype(scope, "Function");
-			functionProto.SetPrototype(objectProto);
+			functionProto.Prototype = objectProto;
 			// Set the prototype of the object passed in if need be
-			if (scope.GetPrototype() == null)
+			if (scope.Prototype == null)
 			{
-				scope.SetPrototype(objectProto);
+				scope.Prototype = objectProto;
 			}
 			// must precede NativeGlobal since it's needed therein
 			NativeError.Init(scope, @sealed);
@@ -1970,7 +1970,7 @@ namespace Rhino
 			{
 				if (scope is NativeWith)
 				{
-					Scriptable withObj = scope.GetPrototype();
+					Scriptable withObj = scope.Prototype;
 					if (withObj is XMLObject)
 					{
 						XMLObject xmlObj = (XMLObject)withObj;
@@ -2090,7 +2090,7 @@ namespace Rhino
 				// Check for possibly nested "with" scopes first
 				while (scope is NativeWith)
 				{
-					Scriptable withObj = scope.GetPrototype();
+					Scriptable withObj = scope.Prototype;
 					if (withObj is XMLObject)
 					{
 						XMLObject xmlObject = (XMLObject)withObj;
@@ -2346,7 +2346,7 @@ childScopesChecks_break: ;
 				}
 				if (x.index == x.ids.Length)
 				{
-					x.obj = x.obj.GetPrototype();
+					x.obj = x.obj.Prototype;
 					EnumChangeObject(x);
 					continue;
 				}
@@ -2441,7 +2441,7 @@ childScopesChecks_break: ;
 				{
 					break;
 				}
-				x.obj = x.obj.GetPrototype();
+				x.obj = x.obj.Prototype;
 			}
 			if (x.obj != null && x.ids != null)
 			{
@@ -2992,7 +2992,7 @@ childScopesChecks_break: ;
 				target = scopeChain;
 				do
 				{
-					if (target is NativeWith && target.GetPrototype() is XMLObject)
+					if (target is NativeWith && target.Prototype is XMLObject)
 					{
 						break;
 					}
@@ -3001,7 +3001,7 @@ childScopesChecks_break: ;
 					{
 						goto search_break;
 					}
-					target = target.GetPrototype();
+					target = target.Prototype;
 				}
 				while (target != null);
 				scopeChain = scopeChain.ParentScope;
@@ -3028,7 +3028,7 @@ search_break: ;
 				{
 					goto search_break;
 				}
-				target = target.GetPrototype();
+				target = target.Prototype;
 			}
 			while (target != null);
 			start.Put(id, start, NaN);
@@ -3504,14 +3504,14 @@ search_break: ;
 		/// <returns>true iff rhs appears in lhs' proto chain</returns>
 		public static bool JsDelegatesTo(Scriptable lhs, Scriptable rhs)
 		{
-			Scriptable proto = lhs.GetPrototype();
+			Scriptable proto = lhs.Prototype;
 			while (proto != null)
 			{
 				if (proto.Equals(rhs))
 				{
 					return true;
 				}
-				proto = proto.GetPrototype();
+				proto = proto.Prototype;
 			}
 			return false;
 		}
@@ -3680,7 +3680,7 @@ search_break: ;
 			Scriptable proto = possibleDynamicScope;
 			for (; ; )
 			{
-				proto = proto.GetPrototype();
+				proto = proto.Prototype;
 				if (proto == staticTopScope)
 				{
 					return possibleDynamicScope;
@@ -3973,7 +3973,7 @@ search_break: ;
 		public static void SetFunctionProtoAndParent(BaseFunction fn, Scriptable scope)
 		{
 			fn.ParentScope = scope;
-			fn.SetPrototype(ScriptableObject.GetFunctionPrototype(scope));
+			fn.Prototype = ScriptableObject.GetFunctionPrototype(scope);
 		}
 
 		public static void SetObjectProtoAndParent(ScriptableObject @object, Scriptable scope)
@@ -3982,14 +3982,14 @@ search_break: ;
 			scope = ScriptableObject.GetTopLevelScope(scope);
 			@object.ParentScope = scope;
 			Scriptable proto = ScriptableObject.GetClassPrototype(scope, @object.GetClassName());
-			@object.SetPrototype(proto);
+			@object.Prototype = proto;
 		}
 
 		public static void SetBuiltinProtoAndParent(ScriptableObject @object, Scriptable scope, TopLevel.Builtins type)
 		{
 			scope = ScriptableObject.GetTopLevelScope(scope);
 			@object.ParentScope = scope;
-			@object.SetPrototype(TopLevel.GetBuiltinPrototype(scope, type));
+			@object.Prototype = TopLevel.GetBuiltinPrototype(scope, type);
 		}
 
 		public static void InitFunction(Context cx, Scriptable scope, NativeFunction function, int type, bool fromEvalCode)

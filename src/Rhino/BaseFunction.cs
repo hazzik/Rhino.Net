@@ -307,7 +307,7 @@ L0_break: ;
 			// Fix up bootstrapping problem: getPrototype of the IdFunctionObject
 			// can not return Function.prototype because Function object is not
 			// yet defined.
-			ctor.SetPrototype(this);
+			ctor.Prototype = this;
 			base.FillConstructorProperties(ctor);
 		}
 
@@ -528,12 +528,12 @@ L0_break: ;
 					throw new InvalidOperationException("Bad implementaion of call as constructor, name=" + GetFunctionName() + " in " + GetType().FullName);
 				}
 				result = (Scriptable)val;
-				if (result.GetPrototype() == null)
+				if (result.Prototype == null)
 				{
 					Scriptable proto = GetClassPrototype();
 					if (result != proto)
 					{
-						result.SetPrototype(proto);
+						result.Prototype = proto;
 					}
 				}
 				if (result.ParentScope == null)
@@ -568,7 +568,7 @@ L0_break: ;
 		public virtual Scriptable CreateObject(Context cx, Scriptable scope)
 		{
 			Scriptable newInstance = new NativeObject();
-			newInstance.SetPrototype(GetClassPrototype());
+			newInstance.Prototype = GetClassPrototype();
 			newInstance.ParentScope = ParentScope;
 			return newInstance;
 		}
@@ -668,7 +668,7 @@ L0_break: ;
 				if (proto != obj)
 				{
 					// not the one we just made, it must remain grounded
-					obj.SetPrototype(proto);
+					obj.Prototype = proto;
 				}
 				return obj;
 			}

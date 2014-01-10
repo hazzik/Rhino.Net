@@ -159,7 +159,7 @@ namespace Rhino
 							return p;
 						}
 					}
-					p = p.GetPrototype();
+					p = p.Prototype;
 				}
 				while (p != null);
 			}

@@ -678,7 +678,7 @@ namespace Rhino
 			if (scope != this && scope != null)
 			{
 				ParentScope = scope;
-				SetPrototype(GetObjectPrototype(scope));
+				Prototype = GetObjectPrototype(scope);
 			}
 			ActivatePrototypeMap(maxPrototypeId);
 			IdFunctionObject ctor = prototypeValues.CreatePrecachedConstructor();

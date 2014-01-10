@@ -120,7 +120,7 @@ namespace Rhino
 					{
 						WrapFactory wrapFactory = cx.GetWrapFactory();
 						newValue = wrapFactory.WrapJavaClass(cx, GetTopLevelScope(this), cl);
-						newValue.SetPrototype(GetPrototype());
+						newValue.Prototype = Prototype;
 					}
 				}
 				if (newValue == null)

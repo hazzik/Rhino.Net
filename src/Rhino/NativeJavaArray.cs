@@ -66,7 +66,7 @@ namespace Rhino
 				return length;
 			}
 			object result = base.Get(id, start);
-			if (result == ScriptableConstants.NOT_FOUND && !ScriptableObject.HasProperty(GetPrototype(), id))
+			if (result == ScriptableConstants.NOT_FOUND && !ScriptableObject.HasProperty(Prototype, id))
 			{
 				throw Context.ReportRuntimeError2("msg.java.member.not.found", array.GetType().FullName, id);
 			}
@@ -143,13 +143,16 @@ namespace Rhino
 			return cls.IsInstanceOfType(instance);
 		}
 
-		public override Scriptable GetPrototype()
+		public override Scriptable Prototype
 		{
-			if (prototype == null)
+			get
 			{
-				prototype = ScriptableObject.GetArrayPrototype(ParentScope);
+				if (prototype == null)
+				{
+					prototype = ScriptableObject.GetArrayPrototype(ParentScope);
+				}
+				return prototype;
 			}
-			return prototype;
 		}
 
 		internal Array array;

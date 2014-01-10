@@ -391,7 +391,7 @@ namespace Rhino.XmlImpl
 				// of XMLWithScope
 				if (scope is XMLWithScope)
 				{
-					xmlObj = (XMLObjectImpl)scope.GetPrototype();
+					xmlObj = (XMLObjectImpl)scope.Prototype;
 					if (xmlObj.HasXMLProperty(xmlName))
 					{
 						break;

@@ -130,7 +130,7 @@ namespace Rhino
 		{
 			Scriptable scope = ScriptableObject.GetTopLevelScope(obj);
 			NativeJavaObject res = new NativeJavaObject(scope, adapter, null, true);
-			res.SetPrototype(obj);
+			res.Prototype = obj;
 			return res;
 		}
 

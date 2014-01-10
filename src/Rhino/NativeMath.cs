@@ -27,7 +27,7 @@ namespace Rhino
 		{
 			Rhino.NativeMath obj = new Rhino.NativeMath();
 			obj.ActivatePrototypeMap(MAX_ID);
-			obj.SetPrototype(GetObjectPrototype(scope));
+			obj.Prototype = GetObjectPrototype(scope);
 			obj.ParentScope = scope;
 			if (@sealed)
 			{

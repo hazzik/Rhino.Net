@@ -828,18 +828,11 @@ namespace Rhino
 			gslot.value = init;
 		}
 
-		/// <summary>Returns the prototype of the object.</summary>
-		/// <remarks>Returns the prototype of the object.</remarks>
-		public virtual Scriptable GetPrototype()
+		/// <summary>Gets or sets the prototype of the object.</summary>
+		public virtual Scriptable Prototype
 		{
-			return prototypeObject;
-		}
-
-		/// <summary>Sets the prototype of the object.</summary>
-		/// <remarks>Sets the prototype of the object.</remarks>
-		public virtual void SetPrototype(Scriptable m)
-		{
-			prototypeObject = m;
+			set { prototypeObject = value; }
+			get { return prototypeObject; }
 		}
 
 		/// <summary>Gets or sets the parent (enclosing) scope of the object.</summary>
@@ -1509,7 +1502,7 @@ namespace Rhino
 			{
 				superProto = GetObjectPrototype(scope);
 			}
-			proto.SetPrototype(superProto);
+			proto.Prototype = superProto;
 			// Find out whether there are any methods that begin with
 			// "js". If so, then only methods that begin with special
 			// prefixes will be defined as JavaScript entities.
@@ -2582,7 +2575,7 @@ namespace Rhino
 				{
 					break;
 				}
-				obj = obj.GetPrototype();
+				obj = obj.Prototype;
 			}
 			while (obj != null);
 			return result;
@@ -2654,7 +2647,7 @@ namespace Rhino
 				{
 					break;
 				}
-				obj = obj.GetPrototype();
+				obj = obj.Prototype;
 			}
 			while (obj != null);
 			return result;
@@ -2918,7 +2911,7 @@ namespace Rhino
 			ObjToIntMap map = null;
 			for (; ; )
 			{
-				obj = obj.GetPrototype();
+				obj = obj.Prototype;
 				if (obj == null)
 				{
 					break;
@@ -3006,7 +2999,7 @@ namespace Rhino
 				{
 					break;
 				}
-				obj = obj.GetPrototype();
+				obj = obj.Prototype;
 			}
 			while (obj != null);
 			return obj;
@@ -3020,7 +3013,7 @@ namespace Rhino
 				{
 					break;
 				}
-				obj = obj.GetPrototype();
+				obj = obj.Prototype;
 			}
 			while (obj != null);
 			return obj;
@@ -3069,7 +3062,7 @@ namespace Rhino
 						return value;
 					}
 				}
-				scope = scope.GetPrototype();
+				scope = scope.Prototype;
 				if (scope == null)
 				{
 					return null;

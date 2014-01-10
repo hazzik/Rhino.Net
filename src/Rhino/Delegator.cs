@@ -148,16 +148,11 @@ namespace Rhino
 			obj.Delete(index);
 		}
 
-		/// <seealso cref="Scriptable.GetPrototype()">Scriptable.GetPrototype()</seealso>
-		public virtual Scriptable GetPrototype()
-		{
-			return obj.GetPrototype();
-		}
-
 		/// <seealso cref="Scriptable.SetPrototypeScriptablee)">Scriptable.SetPrototype(Scriptable)</seealso>
-		public virtual void SetPrototype(Scriptable prototype)
+		public virtual Scriptable Prototype
 		{
-			obj.SetPrototype(prototype);
+			set { obj.Prototype = value; }
+			get { return obj.Prototype; }
 		}
 
 		/// <seealso cref="Scriptable.GetParentScope()">Scriptable.GetParentScope()</seealso>

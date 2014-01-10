@@ -260,7 +260,7 @@ namespace Rhino
 							break;
 						}
 					}
-					o = o.GetPrototype();
+					o = o.Prototype;
 				}
 			}
 			object retval = meth.Invoke(javaObject, args);

@@ -95,7 +95,7 @@ namespace Rhino.Tests.CommonJS.Module
 		{
 			internal Print(Scriptable scope)
 			{
-				SetPrototype(GetFunctionPrototype(scope));
+				Prototype = GetFunctionPrototype(scope);
 			}
 
 			public object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)

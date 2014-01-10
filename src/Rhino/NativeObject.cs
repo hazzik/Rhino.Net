@@ -285,7 +285,7 @@ namespace Rhino
 						Scriptable v = (Scriptable)args[0];
 						do
 						{
-							v = v.GetPrototype();
+							v = v.Prototype;
 							if (v == thisObj)
 							{
 								result = true;
@@ -348,7 +348,7 @@ namespace Rhino
 						}
 						// If there is no getter or setter for the object itself,
 						// how about the prototype?
-						Scriptable v = so.GetPrototype();
+						Scriptable v = so.Prototype;
 						if (v == null)
 						{
 							break;
@@ -373,7 +373,7 @@ namespace Rhino
 				{
 					object arg = args.Length < 1 ? Undefined.instance : args[0];
 					Scriptable obj = EnsureScriptable(arg);
-					return obj.GetPrototype();
+					return obj.Prototype;
 				}
 
 				case ConstructorId_keys:
@@ -455,7 +455,7 @@ namespace Rhino
 					Scriptable obj = (arg == null) ? null : EnsureScriptable(arg);
 					ScriptableObject newObject = new NativeObject();
 					newObject.ParentScope = ParentScope;
-					newObject.SetPrototype(obj);
+					newObject.Prototype = obj;
 					if (args.Length > 1 && args[1] != Undefined.instance)
 					{
 						Scriptable props = Context.ToObject(args[1], ParentScope);

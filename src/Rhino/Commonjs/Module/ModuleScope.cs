@@ -29,7 +29,7 @@ namespace Rhino.CommonJS.Module
 		{
 			this.uri = uri;
 			this.@base = @base;
-			SetPrototype(prototype);
+			Prototype = prototype;
 			CacheBuiltins();
 		}
 
