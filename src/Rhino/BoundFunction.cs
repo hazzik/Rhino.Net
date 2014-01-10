@@ -35,7 +35,7 @@ namespace Rhino
 			this.boundArgs = boundArgs;
 			if (targetFunction is BaseFunction)
 			{
-				length = Math.Max(0, ((BaseFunction)targetFunction).GetLength() - boundArgs.Length);
+				length = Math.Max(0, ((BaseFunction)targetFunction).Length - boundArgs.Length);
 			}
 			else
 			{
@@ -77,9 +77,9 @@ namespace Rhino
 			throw ScriptRuntime.TypeError0("msg.not.ctor");
 		}
 
-		public override int GetLength()
+		public override int Length
 		{
-			return length;
+			get { return length; }
 		}
 
 		private object[] Concat(object[] first, object[] second)

@@ -258,9 +258,9 @@ namespace Rhino
 		/// <see cref="GetArity()">GetArity()</see>
 		/// .
 		/// </summary>
-		public override int GetLength()
+		public override int Length
 		{
-			return GetArity();
+			get { return GetArity(); }
 		}
 
 		public override string GetFunctionName()

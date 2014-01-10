@@ -242,7 +242,7 @@ L0_break: ;
 			{
 				case Id_length:
 				{
-					return ScriptRuntime.WrapInt(GetLength());
+					return ScriptRuntime.WrapInt(Length);
 				}
 
 				case Id_arity:
@@ -608,9 +608,9 @@ L0_break: ;
 			return 0;
 		}
 
-		public virtual int GetLength()
+		public virtual int Length
 		{
-			return 0;
+			get { return 0; }
 		}
 
 		public virtual string GetFunctionName()

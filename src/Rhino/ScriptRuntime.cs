@@ -57,9 +57,9 @@ namespace Rhino
 				throw Rhino.ScriptRuntime.TypeError0("msg.op.not.allowed");
 			}
 
-			public override int GetLength()
+			public override int Length
 			{
-				return 0;
+				get { return 0; }
 			}
 		}
 

@@ -428,9 +428,9 @@ namespace Rhino.CommonJS.Module
 			return 1;
 		}
 
-		public override int GetLength()
+		public override int Length
 		{
-			return 1;
+			get { return 1; }
 		}
 	}
 }

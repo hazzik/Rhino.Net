@@ -43,20 +43,23 @@ namespace Rhino
 			}
 		}
 
-		public override int GetLength()
+		public override int Length
 		{
-			int paramCount = GetParamCount();
-			if (GetLanguageVersion() != LanguageVersion.VERSION_1_2)
+			get
 			{
-				return paramCount;
+				int paramCount = GetParamCount();
+				if (GetLanguageVersion() != LanguageVersion.VERSION_1_2)
+				{
+					return paramCount;
+				}
+				Context cx = Context.GetContext();
+				NativeCall activation = ScriptRuntime.FindFunctionActivation(cx, this);
+				if (activation == null)
+				{
+					return paramCount;
+				}
+				return activation.originalArgs.Length;
 			}
-			Context cx = Context.GetContext();
-			NativeCall activation = ScriptRuntime.FindFunctionActivation(cx, this);
-			if (activation == null)
-			{
-				return paramCount;
-			}
-			return activation.originalArgs.Length;
 		}
 
 		public override int GetArity()

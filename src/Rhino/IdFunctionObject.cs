@@ -150,9 +150,9 @@ namespace Rhino
 			return arity;
 		}
 
-		public override int GetLength()
+		public override int Length
 		{
-			return GetArity();
+			get { return GetArity(); }
 		}
 
 		public override string GetFunctionName()

@@ -60,9 +60,9 @@ namespace Rhino
 			throw Context.ReportRuntimeError0("msg.script.is.not.constructor");
 		}
 
-		public override int GetLength()
+		public override int Length
 		{
-			return 0;
+			get { return 0; }
 		}
 
 		public override int GetArity()
