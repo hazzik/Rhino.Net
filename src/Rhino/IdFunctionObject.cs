@@ -140,19 +140,19 @@ namespace Rhino
 			}
 			sb.Append(GetFunctionName());
 			sb.Append(", arity=");
-			sb.Append(GetArity());
+			sb.Append(Arity);
 			sb.Append(justbody ? "]\n" : "] }\n");
 			return sb.ToString();
 		}
 
-		public override int GetArity()
+		public override int Arity
 		{
-			return arity;
+			get { return arity; }
 		}
 
 		public override int Length
 		{
-			get { return GetArity(); }
+			get { return Arity; }
 		}
 
 		public override string GetFunctionName()

@@ -65,9 +65,9 @@ namespace Rhino
 			get { return 0; }
 		}
 
-		public override int GetArity()
+		public override int Arity
 		{
-			return 0;
+			get { return 0; }
 		}
 
 		internal override string Decompile(int indent, int flags)

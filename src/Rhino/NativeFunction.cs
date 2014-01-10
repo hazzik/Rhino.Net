@@ -62,9 +62,9 @@ namespace Rhino
 			}
 		}
 
-		public override int GetArity()
+		public override int Arity
 		{
-			return GetParamCount();
+			get { return GetParamCount(); }
 		}
 
 		/// <summary>Get encoded source string.</summary>

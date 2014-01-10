@@ -247,7 +247,7 @@ L0_break: ;
 
 				case Id_arity:
 				{
-					return ScriptRuntime.WrapInt(GetArity());
+					return ScriptRuntime.WrapInt(Arity);
 				}
 
 				case Id_name:
@@ -594,7 +594,7 @@ L0_break: ;
 				sb.Append("() {\n\t");
 			}
 			sb.Append("[native code, arity=");
-			sb.Append(GetArity());
+			sb.Append(Arity);
 			sb.Append("]\n");
 			if (!justbody)
 			{
@@ -603,9 +603,9 @@ L0_break: ;
 			return sb.ToString();
 		}
 
-		public virtual int GetArity()
+		public virtual int Arity
 		{
-			return 0;
+			get { return 0; }
 		}
 
 		public virtual int Length

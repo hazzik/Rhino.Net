@@ -248,9 +248,9 @@ namespace Rhino
 		/// (number of parameters of the method, or 1 if the method is a "varargs"
 		/// form).
 		/// </remarks>
-		public override int GetArity()
+		public override int Arity
 		{
-			return parmsLength < 0 ? 1 : parmsLength;
+			get { return parmsLength < 0 ? 1 : parmsLength; }
 		}
 
 		/// <summary>
@@ -260,7 +260,7 @@ namespace Rhino
 		/// </summary>
 		public override int Length
 		{
-			get { return GetArity(); }
+			get { return Arity; }
 		}
 
 		public override string GetFunctionName()

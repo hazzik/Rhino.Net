@@ -423,9 +423,9 @@ namespace Rhino.CommonJS.Module
 			return "require";
 		}
 
-		public override int GetArity()
+		public override int Arity
 		{
-			return 1;
+			get { return 1; }
 		}
 
 		public override int Length
