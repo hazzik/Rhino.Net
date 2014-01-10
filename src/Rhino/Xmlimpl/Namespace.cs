@@ -32,7 +32,7 @@ namespace Rhino.XmlImpl
 		internal static Namespace Create(Scriptable scope, Namespace prototype, XmlNode.Namespace @namespace)
 		{
 			Namespace rv = new Namespace();
-			rv.SetParentScope(scope);
+			rv.ParentScope = scope;
 			rv.prototype = prototype;
 			rv.SetPrototype(prototype);
 			rv.ns = @namespace;
@@ -46,7 +46,7 @@ namespace Rhino.XmlImpl
 
 		public virtual void ExportAsJSClass(bool @sealed)
 		{
-			ExportAsJSClass(MAX_PROTOTYPE_ID, this.GetParentScope(), @sealed);
+			ExportAsJSClass(MAX_PROTOTYPE_ID, this.ParentScope, @sealed);
 		}
 
 		public virtual string Uri()
@@ -335,7 +335,7 @@ L0_break: ;
 		internal virtual Namespace NewNamespace(string uri)
 		{
 			Namespace prototype = (this.prototype == null) ? this : this.prototype;
-			return Create(this.GetParentScope(), prototype, XmlNode.Namespace.Create(uri));
+			return Create(this.ParentScope, prototype, XmlNode.Namespace.Create(uri));
 		}
 
 		internal virtual Namespace NewNamespace(string prefix, string uri)
@@ -345,7 +345,7 @@ L0_break: ;
 				return NewNamespace(uri);
 			}
 			Namespace prototype = (this.prototype == null) ? this : this.prototype;
-			return Create(this.GetParentScope(), prototype, XmlNode.Namespace.Create(prefix, uri));
+			return Create(this.ParentScope, prototype, XmlNode.Namespace.Create(prefix, uri));
 		}
 
 		internal virtual Namespace ConstructNamespace(object uriValue)

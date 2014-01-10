@@ -39,7 +39,7 @@ namespace Rhino
 			Scriptable proto = (Scriptable)(ctorObj.Get("prototype", ctorObj));
 			NativeError obj = new NativeError();
 			obj.SetPrototype(proto);
-			obj.SetParentScope(scope);
+			obj.ParentScope = scope;
 			int arglen = args.Length;
 			if (arglen >= 1)
 			{

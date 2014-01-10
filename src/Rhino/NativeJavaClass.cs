@@ -102,7 +102,7 @@ namespace Rhino
 			if (nestedClass != null)
 			{
 				Scriptable nestedValue = wrapFactory.WrapJavaClass(cx, scope, nestedClass);
-				nestedValue.SetParentScope(this);
+				nestedValue.ParentScope = this;
 				return nestedValue;
 			}
 			throw members.ReportMemberNotFound(name);

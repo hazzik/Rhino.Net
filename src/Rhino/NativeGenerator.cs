@@ -31,7 +31,7 @@ namespace Rhino
 			Rhino.NativeGenerator prototype = new Rhino.NativeGenerator();
 			if (scope != null)
 			{
-				prototype.SetParentScope(scope);
+				prototype.ParentScope = scope;
 				prototype.SetPrototype(GetObjectPrototype(scope));
 			}
 			prototype.ActivatePrototypeMap(MAX_PROTOTYPE_ID);
@@ -64,7 +64,7 @@ namespace Rhino
 			// "Generator" constructor in the top scope, we stash the
 			// prototype in the top scope's associated value.
 			Scriptable top = ScriptableObject.GetTopLevelScope(scope);
-			this.SetParentScope(top);
+			this.ParentScope = top;
 			Rhino.NativeGenerator prototype = (Rhino.NativeGenerator)ScriptableObject.GetTopScopeValue(top, GENERATOR_TAG);
 			this.SetPrototype(prototype);
 		}

@@ -27,8 +27,8 @@ namespace Rhino
 		public Arguments(NativeCall activation)
 		{
 			this.activation = activation;
-			Scriptable parent = activation.GetParentScope();
-			SetParentScope(parent);
+			Scriptable parent = activation.ParentScope;
+			ParentScope = parent;
 			SetPrototype(ScriptableObject.GetObjectPrototype(parent));
 			args = activation.originalArgs;
 			lengthObj = args.Length;
@@ -454,7 +454,7 @@ L0_break: ;
 			}
 			else
 			{
-				Scriptable scope = GetParentScope();
+				Scriptable scope = ParentScope;
 				if (scope == null)
 				{
 					scope = this;

@@ -401,7 +401,7 @@ namespace Rhino.XmlImpl
 						firstXml = xmlObj;
 					}
 				}
-				scope = scope.GetParentScope();
+				scope = scope.ParentScope;
 				if (scope == null)
 				{
 					xmlObj = firstXml;

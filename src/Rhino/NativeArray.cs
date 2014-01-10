@@ -708,7 +708,7 @@ again_break: ;
 
 		private ScriptableObject DefaultIndexPropertyDescriptor(object value)
 		{
-			Scriptable scope = GetParentScope();
+			Scriptable scope = ParentScope;
 			if (scope == null)
 			{
 				scope = this;

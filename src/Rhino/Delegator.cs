@@ -161,15 +161,10 @@ namespace Rhino
 		}
 
 		/// <seealso cref="Scriptable.GetParentScope()">Scriptable.GetParentScope()</seealso>
-		public virtual Scriptable GetParentScope()
+		public virtual Scriptable ParentScope
 		{
-			return obj.GetParentScope();
-		}
-
-		/// <seealso cref="Scriptable.SetParentScopeScriptablee)">Scriptable.SetParentScope(Scriptable)</seealso>
-		public virtual void SetParentScope(Scriptable parent)
-		{
-			obj.SetParentScope(parent);
+			get { return obj.ParentScope; }
+			set { obj.ParentScope = value; }
 		}
 
 		/// <seealso cref="Scriptable.GetIds()">Scriptable.GetIds()</seealso>

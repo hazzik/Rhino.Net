@@ -36,7 +36,7 @@ namespace Rhino.Tests
 					foreach (KeyValuePair<string, Scriptable> entry in bindings)
 					{
 						Scriptable @object = entry.Value;
-						@object.SetParentScope(scope);
+						@object.ParentScope = scope;
 						scope.Put(entry.Key, scope, @object);
 					}
 				}

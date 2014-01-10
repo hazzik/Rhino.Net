@@ -377,9 +377,9 @@ namespace Rhino
 		{
 			ScriptRuntime.SetFunctionProtoAndParent(this, scope);
 			SetImmunePrototypeProperty(prototype);
-			prototype.SetParentScope(this);
+			prototype.ParentScope = this;
 			DefineProperty(prototype, "constructor", this, PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
-			SetParentScope(scope);
+			ParentScope = scope;
 		}
 
 		/// <summary>
@@ -423,7 +423,7 @@ namespace Rhino
 						bool compatible = false;
 						if (thisObj == scope)
 						{
-							Scriptable parentScope = GetParentScope();
+							Scriptable parentScope = ParentScope;
 							if (scope != parentScope)
 							{
 								// Call with dynamic scope for standalone function,
@@ -533,7 +533,7 @@ namespace Rhino
 				throw Context.ThrowAsScriptRuntimeEx(ex);
 			}
 			result.SetPrototype(GetClassPrototype());
-			result.SetParentScope(GetParentScope());
+			result.ParentScope = ParentScope;
 			return result;
 		}
 

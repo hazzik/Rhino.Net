@@ -605,7 +605,7 @@ namespace Rhino.Tools.Shell
 		/// </remarks>
 		public static object Spawn(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
-			Scriptable scope = funObj.GetParentScope();
+			Scriptable scope = funObj.ParentScope;
 			if (args.Length != 0 && args[0] is Function)
 			{
 				object[] newArgs = null;
@@ -1005,7 +1005,7 @@ namespace Rhino.Tools.Shell
 
 		private static Global GetInstance(Function function)
 		{
-			Scriptable scope = function.GetParentScope();
+			Scriptable scope = function.ParentScope;
 			if (!(scope is Global))
 			{
 				throw ReportRuntimeError("msg.bad.shell.function.scope", scope.ToString());

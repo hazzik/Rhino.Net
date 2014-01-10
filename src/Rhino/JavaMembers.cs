@@ -993,7 +993,7 @@ namespace Rhino
 		internal FieldAndMethods(Scriptable scope, MemberBox[] methods, FieldInfo field) : base(methods)
 		{
 			this.field = field;
-			SetParentScope(scope);
+			ParentScope = scope;
 			SetPrototype(GetFunctionPrototype(scope));
 		}
 

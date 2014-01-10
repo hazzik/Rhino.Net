@@ -156,7 +156,7 @@ namespace Rhino.RegExp
 			NativeRegExp proto = new NativeRegExp();
 			proto.re = CompileRE(cx, string.Empty, null, false);
 			proto.ActivatePrototypeMap(MAX_PROTOTYPE_ID);
-			proto.SetParentScope(scope);
+			proto.ParentScope = scope;
 			proto.SetPrototype(GetObjectPrototype(scope));
 			NativeRegExpCtor ctor = new NativeRegExpCtor();
 			// Bug #324006: ECMA-262 15.10.6.1 says "The initial value of

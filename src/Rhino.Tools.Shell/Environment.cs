@@ -56,7 +56,7 @@ namespace Rhino.Tools.Shell
 
 		public Environment(ScriptableObject scope)
 		{
-			SetParentScope(scope);
+			ParentScope = scope;
 			object ctor = ScriptRuntime.GetTopLevelProp(scope, "Environment");
 			if (ctor != null && ctor is Scriptable)
 			{
@@ -83,7 +83,7 @@ namespace Rhino.Tools.Shell
 			string result = Runtime.GetProperty(name);
 			if (result != null)
 			{
-				return ScriptRuntime.ToObject(GetParentScope(), result);
+				return ScriptRuntime.ToObject(ParentScope, result);
 			}
 			else
 			{

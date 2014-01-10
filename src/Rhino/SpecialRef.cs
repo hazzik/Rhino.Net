@@ -81,7 +81,7 @@ namespace Rhino
 
 				case SPECIAL_PARENT:
 				{
-					return target.GetParentScope();
+					return target.ParentScope;
 				}
 
 				default:
@@ -121,7 +121,7 @@ namespace Rhino
 							}
 							else
 							{
-								search = search.GetParentScope();
+								search = search.ParentScope;
 							}
 						}
 						while (search != null);
@@ -132,7 +132,7 @@ namespace Rhino
 					}
 					else
 					{
-						target.SetParentScope(obj);
+						target.ParentScope = obj;
 					}
 					return obj;
 				}

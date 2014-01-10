@@ -147,7 +147,7 @@ namespace Rhino
 		{
 			if (prototype == null)
 			{
-				prototype = ScriptableObject.GetArrayPrototype(GetParentScope());
+				prototype = ScriptableObject.GetArrayPrototype(ParentScope);
 			}
 			return prototype;
 		}

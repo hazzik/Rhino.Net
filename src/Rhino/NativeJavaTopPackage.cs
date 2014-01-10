@@ -70,7 +70,7 @@ namespace Rhino
 //			ClassLoader loader = cx.GetApplicationClassLoader();
 			Rhino.NativeJavaTopPackage top = new Rhino.NativeJavaTopPackage(new ClassLoader());
 			top.SetPrototype(GetObjectPrototype(scope));
-			top.SetParentScope(scope);
+			top.ParentScope = scope;
 			for (int i = 0; i != commonPackages.Length; i++)
 			{
 				NativeJavaPackage parent = top;

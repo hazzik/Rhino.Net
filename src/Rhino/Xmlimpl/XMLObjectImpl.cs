@@ -40,7 +40,7 @@ namespace Rhino.XmlImpl
 
 		internal void Initialize(XMLLibImpl lib, Scriptable scope, XMLObject prototype)
 		{
-			SetParentScope(scope);
+			ParentScope = scope;
 			SetPrototype(prototype);
 			prototypeFlag = (prototype == null);
 			this.lib = lib;
@@ -119,14 +119,10 @@ namespace Rhino.XmlImpl
 			base.SetPrototype(prototype);
 		}
 
-		public sealed override Scriptable GetParentScope()
+		public sealed override Scriptable ParentScope
 		{
-			return base.GetParentScope();
-		}
-
-		public sealed override void SetParentScope(Scriptable parent)
-		{
-			base.SetParentScope(parent);
+			get { return base.ParentScope; }
+			set { base.ParentScope = value; }
 		}
 
 		public sealed override object GetDefaultValue(Type hint)
@@ -470,7 +466,7 @@ namespace Rhino.XmlImpl
 		internal void ExportAsJSClass(bool @sealed)
 		{
 			prototypeFlag = true;
-			ExportAsJSClass(MAX_PROTOTYPE_ID, GetParentScope(), @sealed);
+			ExportAsJSClass(MAX_PROTOTYPE_ID, ParentScope, @sealed);
 		}
 
 		private const int Id_constructor = 1;

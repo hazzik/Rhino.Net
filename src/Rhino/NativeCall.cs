@@ -37,7 +37,7 @@ namespace Rhino
 		internal NativeCall(NativeFunction function, Scriptable scope, object[] args)
 		{
 			this.function = function;
-			SetParentScope(scope);
+			ParentScope = scope;
 			// leave prototype null
 			this.originalArgs = (args == null) ? ScriptRuntime.emptyArgs : args;
 			// initialize values of arguments

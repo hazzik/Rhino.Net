@@ -536,12 +536,12 @@ L0_break: ;
 						result.SetPrototype(proto);
 					}
 				}
-				if (result.GetParentScope() == null)
+				if (result.ParentScope == null)
 				{
-					Scriptable parent = GetParentScope();
+					Scriptable parent = ParentScope;
 					if (result != parent)
 					{
-						result.SetParentScope(parent);
+						result.ParentScope = parent;
 					}
 				}
 			}
@@ -569,7 +569,7 @@ L0_break: ;
 		{
 			Scriptable newInstance = new NativeObject();
 			newInstance.SetPrototype(GetClassPrototype());
-			newInstance.SetParentScope(GetParentScope());
+			newInstance.ParentScope = ParentScope;
 			return newInstance;
 		}
 

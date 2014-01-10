@@ -739,7 +739,7 @@ openStream_break: ;
 					{
 						if (name.Equals("__parent__"))
 						{
-							result = scriptable.GetParentScope();
+							result = scriptable.ParentScope;
 						}
 						else
 						{
@@ -783,7 +783,7 @@ openStream_break: ;
 				ids = scriptable.GetIds();
 			}
 			Scriptable proto = scriptable.GetPrototype();
-			Scriptable parent = scriptable.GetParentScope();
+			Scriptable parent = scriptable.ParentScope;
 			int extra = 0;
 			if (proto != null)
 			{

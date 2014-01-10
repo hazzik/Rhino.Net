@@ -444,7 +444,7 @@ namespace Rhino
 					object arg = args.Length < 1 ? Undefined.instance : args[0];
 					ScriptableObject obj = EnsureScriptableObject(arg);
 					object propsObj = args.Length < 2 ? Undefined.instance : args[1];
-					Scriptable props = Context.ToObject(propsObj, GetParentScope());
+					Scriptable props = Context.ToObject(propsObj, ParentScope);
 					obj.DefineOwnProperties(cx, EnsureScriptableObject(props));
 					return obj;
 				}
@@ -454,11 +454,11 @@ namespace Rhino
 					object arg = args.Length < 1 ? Undefined.instance : args[0];
 					Scriptable obj = (arg == null) ? null : EnsureScriptable(arg);
 					ScriptableObject newObject = new NativeObject();
-					newObject.SetParentScope(GetParentScope());
+					newObject.ParentScope = ParentScope;
 					newObject.SetPrototype(obj);
 					if (args.Length > 1 && args[1] != Undefined.instance)
 					{
-						Scriptable props = Context.ToObject(args[1], GetParentScope());
+						Scriptable props = Context.ToObject(args[1], ParentScope);
 						newObject.DefineOwnProperties(cx, EnsureScriptableObject(props));
 					}
 					return newObject;

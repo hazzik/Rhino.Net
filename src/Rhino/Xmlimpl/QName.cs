@@ -35,7 +35,7 @@ namespace Rhino.XmlImpl
 		{
 			QName rv = new QName();
 			rv.lib = lib;
-			rv.SetParentScope(scope);
+			rv.ParentScope = scope;
 			rv.prototype = prototype;
 			rv.SetPrototype(prototype);
 			rv.delegate_ = delegate_;
@@ -48,7 +48,7 @@ namespace Rhino.XmlImpl
 		//    }
 		internal void ExportAsJSClass(bool @sealed)
 		{
-			ExportAsJSClass(MAX_PROTOTYPE_ID, GetParentScope(), @sealed);
+			ExportAsJSClass(MAX_PROTOTYPE_ID, ParentScope, @sealed);
 		}
 
 		public override string ToString()
@@ -390,7 +390,7 @@ L0_break: ;
 			{
 				q_localName = null;
 			}
-			return Create(lib, this.GetParentScope(), prototype, XmlNode.QName.Create(ns, q_localName));
+			return Create(lib, this.ParentScope, prototype, XmlNode.QName.Create(ns, q_localName));
 		}
 
 		//    See ECMA357 13.3.2

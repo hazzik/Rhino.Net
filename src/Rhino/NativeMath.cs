@@ -28,7 +28,7 @@ namespace Rhino
 			Rhino.NativeMath obj = new Rhino.NativeMath();
 			obj.ActivatePrototypeMap(MAX_ID);
 			obj.SetPrototype(GetObjectPrototype(scope));
-			obj.SetParentScope(scope);
+			obj.ParentScope = scope;
 			if (@sealed)
 			{
 				obj.SealObject();

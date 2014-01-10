@@ -1428,7 +1428,7 @@ namespace Rhino
 			object nsObject;
 			for (; ; )
 			{
-				Scriptable parent = scope.GetParentScope();
+				Scriptable parent = scope.ParentScope;
 				if (parent == null)
 				{
 					nsObject = ScriptableObject.GetProperty(scope, DEFAULT_NS_TAG);
@@ -1947,7 +1947,7 @@ namespace Rhino
 		/// <remarks>Looks up a name in the scope chain and returns its value.</remarks>
 		public static object Name(Context cx, Scriptable scope, string name)
 		{
-			Scriptable parent = scope.GetParentScope();
+			Scriptable parent = scope.ParentScope;
 			if (parent == null)
 			{
 				object result = TopScopeName(cx, scope, name);
@@ -2028,7 +2028,7 @@ namespace Rhino
 					}
 				}
 				scope = parentScope;
-				parentScope = parentScope.GetParentScope();
+				parentScope = parentScope.ParentScope;
 				if (parentScope == null)
 				{
 					result = TopScopeName(cx, scope, name);
@@ -2084,7 +2084,7 @@ namespace Rhino
 		public static Scriptable Bind(Context cx, Scriptable scope, string id)
 		{
 			Scriptable firstXMLObject = null;
-			Scriptable parent = scope.GetParentScope();
+			Scriptable parent = scope.ParentScope;
 			if (parent != null)
 			{
 				// Check for possibly nested "with" scopes first
@@ -2111,7 +2111,7 @@ namespace Rhino
 						}
 					}
 					scope = parent;
-					parent = parent.GetParentScope();
+					parent = parent.ParentScope;
 					if (parent == null)
 					{
 						goto childScopesChecks_break;
@@ -2124,7 +2124,7 @@ namespace Rhino
 						return scope;
 					}
 					scope = parent;
-					parent = parent.GetParentScope();
+					parent = parent.ParentScope;
 					if (parent == null)
 					{
 						goto childScopesChecks_break;
@@ -2296,7 +2296,7 @@ childScopesChecks_break: ;
 			x.iterator = null;
 			if (enumType != ENUMERATE_KEYS_NO_ITERATOR && enumType != ENUMERATE_VALUES_NO_ITERATOR && enumType != ENUMERATE_ARRAY_NO_ITERATOR)
 			{
-				x.iterator = ToIterator(cx, x.obj.GetParentScope(), x.obj, enumType == ScriptRuntime.ENUMERATE_KEYS);
+				x.iterator = ToIterator(cx, x.obj.ParentScope, x.obj, enumType == ScriptRuntime.ENUMERATE_KEYS);
 			}
 			if (x.iterator == null)
 			{
@@ -2326,7 +2326,7 @@ childScopesChecks_break: ;
 				Context cx = Context.GetContext();
 				try
 				{
-					x.currentId = f.Call(cx, x.iterator.GetParentScope(), x.iterator, emptyArgs);
+					x.currentId = f.Call(cx, x.iterator.ParentScope, x.iterator, emptyArgs);
 					return true;
 				}
 				catch (JavaScriptException e)
@@ -2474,7 +2474,7 @@ childScopesChecks_break: ;
 		/// </remarks>
 		public static Callable GetNameFunctionAndThis(string name, Context cx, Scriptable scope)
 		{
-			Scriptable parent = scope.GetParentScope();
+			Scriptable parent = scope.ParentScope;
 			if (parent == null)
 			{
 				object result = TopScopeName(cx, scope, name);
@@ -2615,7 +2615,7 @@ childScopesChecks_break: ;
 			Scriptable thisObj = null;
 			if (f is Scriptable)
 			{
-				thisObj = ((Scriptable)f).GetParentScope();
+				thisObj = ((Scriptable)f).ParentScope;
 			}
 			if (thisObj == null)
 			{
@@ -2625,7 +2625,7 @@ childScopesChecks_break: ;
 				}
 				thisObj = cx.topCallScope;
 			}
-			if (thisObj.GetParentScope() != null)
+			if (thisObj.ParentScope != null)
 			{
 				if (thisObj is NativeWith)
 				{
@@ -2693,7 +2693,7 @@ childScopesChecks_break: ;
 		{
 			if (callType == Node.SPECIALCALL_EVAL)
 			{
-				if (thisObj.GetParentScope() == null && NativeGlobal.IsEvalFunction(fun))
+				if (thisObj.ParentScope == null && NativeGlobal.IsEvalFunction(fun))
 				{
 					return EvalSpecial(cx, scope, callerThis, args, filename, lineNumber);
 				}
@@ -2985,7 +2985,7 @@ childScopesChecks_break: ;
 			object value;
 			do
 			{
-				if (cx.useDynamicScope && scopeChain.GetParentScope() == null)
+				if (cx.useDynamicScope && scopeChain.ParentScope == null)
 				{
 					scopeChain = CheckDynamicScope(cx.topCallScope, scopeChain);
 				}
@@ -3004,7 +3004,7 @@ childScopesChecks_break: ;
 					target = target.GetPrototype();
 				}
 				while (target != null);
-				scopeChain = scopeChain.GetParentScope();
+				scopeChain = scopeChain.ParentScope;
 			}
 			while (scopeChain != null);
 			throw NotFoundError(scopeChain, id);
@@ -3716,7 +3716,7 @@ search_break: ;
 				// object. See bug 38590.
 				while (varScope is NativeWith)
 				{
-					varScope = varScope.GetParentScope();
+					varScope = varScope.ParentScope;
 				}
 				for (int i = varCount; i-- != 0; )
 				{
@@ -3944,7 +3944,7 @@ search_break: ;
 		public static Scriptable LeaveWith(Scriptable scope)
 		{
 			NativeWith nw = (NativeWith)scope;
-			return nw.GetParentScope();
+			return nw.ParentScope;
 		}
 
 		public static Scriptable EnterDotQuery(object value, Scriptable scope)
@@ -3967,12 +3967,12 @@ search_break: ;
 		public static Scriptable LeaveDotQuery(Scriptable scope)
 		{
 			NativeWith nw = (NativeWith)scope;
-			return nw.GetParentScope();
+			return nw.ParentScope;
 		}
 
 		public static void SetFunctionProtoAndParent(BaseFunction fn, Scriptable scope)
 		{
-			fn.SetParentScope(scope);
+			fn.ParentScope = scope;
 			fn.SetPrototype(ScriptableObject.GetFunctionPrototype(scope));
 		}
 
@@ -3980,7 +3980,7 @@ search_break: ;
 		{
 			// Compared with function it always sets the scope to top scope
 			scope = ScriptableObject.GetTopLevelScope(scope);
-			@object.SetParentScope(scope);
+			@object.ParentScope = scope;
 			Scriptable proto = ScriptableObject.GetClassPrototype(scope, @object.GetClassName());
 			@object.SetPrototype(proto);
 		}
@@ -3988,7 +3988,7 @@ search_break: ;
 		public static void SetBuiltinProtoAndParent(ScriptableObject @object, Scriptable scope, TopLevel.Builtins type)
 		{
 			scope = ScriptableObject.GetTopLevelScope(scope);
-			@object.SetParentScope(scope);
+			@object.ParentScope = scope;
 			@object.SetPrototype(TopLevel.GetBuiltinPrototype(scope, type));
 		}
 
@@ -4023,7 +4023,7 @@ search_break: ;
 						// SpiderMonkey
 						while (scope is NativeWith)
 						{
-							scope = scope.GetParentScope();
+							scope = scope.ParentScope;
 						}
 						scope.Put(name, scope, function);
 					}

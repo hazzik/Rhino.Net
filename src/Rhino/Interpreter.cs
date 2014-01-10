@@ -3463,7 +3463,7 @@ object_compare_break: ;
 			Scriptable scope;
 			if (idata.itsFunctionType != 0)
 			{
-				scope = fnOrScript.GetParentScope();
+				scope = fnOrScript.ParentScope;
 				if (useActivation)
 				{
 					scope = ScriptRuntime.CreateFunctionActivation(fnOrScript, scope, args);
@@ -3609,7 +3609,7 @@ object_compare_break: ;
 						{
 							if (scope is NativeWith)
 							{
-								scope = scope.GetParentScope();
+								scope = scope.ParentScope;
 								if (scope == null || (frame.parentFrame != null && frame.parentFrame.scope == scope))
 								{
 									// If we get here, we didn't find a NativeCall in

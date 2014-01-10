@@ -144,16 +144,10 @@ namespace Rhino
 
 		/// <summary>Returns the parent (enclosing) scope of the object.</summary>
 		/// <remarks>Returns the parent (enclosing) scope of the object.</remarks>
-		public virtual Scriptable GetParentScope()
+		public virtual Scriptable ParentScope
 		{
-			return parent;
-		}
-
-		/// <summary>Sets the parent (enclosing) scope of the object.</summary>
-		/// <remarks>Sets the parent (enclosing) scope of the object.</remarks>
-		public virtual void SetParentScope(Scriptable m)
-		{
-			parent = m;
+			get { return parent; }
+			set { parent = value; }
 		}
 
 		public virtual object[] GetIds()
@@ -207,7 +201,7 @@ namespace Rhino
 				if (converterObject is Function)
 				{
 					Function f = (Function)converterObject;
-					value = f.Call(Context.GetContext(), f.GetParentScope(), this, ScriptRuntime.emptyArgs);
+					value = f.Call(Context.GetContext(), f.ParentScope, this, ScriptRuntime.emptyArgs);
 				}
 				else
 				{

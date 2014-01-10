@@ -867,7 +867,7 @@ namespace Rhino.XmlImpl
 					{
 						// TODO: Probably inefficient; taking clean non-optimized
 						// solution for now
-						XML x = new XML(GetLib(), GetParentScope(), (XMLObject)GetPrototype(), child);
+						XML x = new XML(GetLib(), ParentScope, (XMLObject)GetPrototype(), child);
 						rv.Append(x.ToString());
 					}
 				}

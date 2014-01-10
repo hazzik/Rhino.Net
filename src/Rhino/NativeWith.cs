@@ -28,7 +28,7 @@ namespace Rhino
 		internal static void Init(Scriptable scope, bool @sealed)
 		{
 			Rhino.NativeWith obj = new Rhino.NativeWith();
-			obj.SetParentScope(scope);
+			obj.ParentScope = scope;
 			obj.SetPrototype(ScriptableObject.GetObjectPrototype(scope));
 			IdFunctionObject ctor = new IdFunctionObject(obj, FTAG, Id_constructor, "With", 0, scope);
 			ctor.MarkAsConstructor(obj);
@@ -120,14 +120,10 @@ namespace Rhino
 			this.prototype = prototype;
 		}
 
-		public virtual Scriptable GetParentScope()
+		public virtual Scriptable ParentScope
 		{
-			return parent;
-		}
-
-		public virtual void SetParentScope(Scriptable parent)
-		{
-			this.parent = parent;
+			get { return parent; }
+			set { this.parent = value; }
 		}
 
 		public virtual object[] GetIds()
@@ -181,7 +177,7 @@ namespace Rhino
 			scope = ScriptableObject.GetTopLevelScope(scope);
 			Rhino.NativeWith thisObj = new Rhino.NativeWith();
 			thisObj.SetPrototype(args.Length == 0 ? ScriptableObject.GetObjectPrototype(scope) : ScriptRuntime.ToObject(cx, scope, args[0]));
-			thisObj.SetParentScope(scope);
+			thisObj.ParentScope = scope;
 			return thisObj;
 		}
 

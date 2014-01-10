@@ -253,7 +253,7 @@ namespace Rhino
 						if (setter is Function)
 						{
 							Function f = (Function)setter;
-							f.Call(cx, f.GetParentScope(), start, new object[] { value });
+							f.Call(cx, f.ParentScope, start, new object[] { value });
 						}
 					}
 					return true;
@@ -288,7 +288,7 @@ namespace Rhino
 						{
 							Function f = (Function)getter;
 							Context cx = Context.GetContext();
-							return f.Call(cx, f.GetParentScope(), start, ScriptRuntime.emptyArgs);
+							return f.Call(cx, f.ParentScope, start, ScriptRuntime.emptyArgs);
 						}
 					}
 				}
@@ -842,18 +842,11 @@ namespace Rhino
 			prototypeObject = m;
 		}
 
-		/// <summary>Returns the parent (enclosing) scope of the object.</summary>
-		/// <remarks>Returns the parent (enclosing) scope of the object.</remarks>
-		public virtual Scriptable GetParentScope()
+		/// <summary>Gets or sets the parent (enclosing) scope of the object.</summary>
+		public virtual Scriptable ParentScope
 		{
-			return parentScopeObject;
-		}
-
-		/// <summary>Sets the parent (enclosing) scope of the object.</summary>
-		/// <remarks>Sets the parent (enclosing) scope of the object.</remarks>
-		public virtual void SetParentScope(Scriptable m)
-		{
-			parentScopeObject = m;
+			get { return parentScopeObject; }
+			set { parentScopeObject = value; }
 		}
 
 		/// <summary>Returns an array of ids for the properties of the object.</summary>
@@ -989,7 +982,7 @@ namespace Rhino
 				{
 					cx = Context.GetContext();
 				}
-				v = fun.Call(cx, fun.GetParentScope(), @object, args);
+				v = fun.Call(cx, fun.ParentScope, @object, args);
 				if (v != null)
 				{
 					if (!(v is Scriptable))
@@ -2486,7 +2479,7 @@ namespace Rhino
 		{
 			for (; ; )
 			{
-				Scriptable parent = obj.GetParentScope();
+				Scriptable parent = obj.ParentScope;
 				if (parent == null)
 				{
 					return obj;
@@ -3692,7 +3685,7 @@ namespace Rhino
 			{
 				return null;
 			}
-			Scriptable scope = GetParentScope();
+			Scriptable scope = ParentScope;
 			return slot.GetPropertyDescriptor(cx, scope ?? this);
 		}
 

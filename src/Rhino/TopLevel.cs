@@ -113,7 +113,7 @@ namespace Rhino
 		public static Function GetBuiltinCtor(Context cx, Scriptable scope, Builtins type)
 		{
 			// must be called with top level scope
-			System.Diagnostics.Debug.Assert(scope.GetParentScope() == null);
+			System.Diagnostics.Debug.Assert(scope.ParentScope == null);
 			if (scope is TopLevel)
 			{
 				Function result = ((TopLevel)scope).GetBuiltinCtor(type);
@@ -142,7 +142,7 @@ namespace Rhino
 		public static Scriptable GetBuiltinPrototype(Scriptable scope, Builtins type)
 		{
 			// must be called with top level scope
-			System.Diagnostics.Debug.Assert(scope.GetParentScope() == null);
+			System.Diagnostics.Debug.Assert(scope.ParentScope == null);
 			if (scope is TopLevel)
 			{
 				Scriptable result = ((TopLevel)scope).GetBuiltinPrototype(type);

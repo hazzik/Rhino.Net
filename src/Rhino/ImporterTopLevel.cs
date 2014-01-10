@@ -166,7 +166,7 @@ namespace Rhino
 			// would keep them set to null. It also allow to use
 			// JavaImporter without new and still get properly
 			// initialized object.
-			result.SetParentScope(scope);
+			result.ParentScope = scope;
 			result.SetPrototype(this);
 			return result;
 		}

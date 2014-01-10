@@ -677,7 +677,7 @@ namespace Rhino
 			// Set scope and prototype unless this is top level scope itself
 			if (scope != this && scope != null)
 			{
-				SetParentScope(scope);
+				ParentScope = scope;
 				SetPrototype(GetObjectPrototype(scope));
 			}
 			ActivatePrototypeMap(maxPrototypeId);
@@ -889,7 +889,7 @@ namespace Rhino
 		{
 			object value;
 			PropertyAttributes attr;
-			Scriptable scope = GetParentScope();
+			Scriptable scope = ParentScope;
 			if (scope == null)
 			{
 				scope = this;

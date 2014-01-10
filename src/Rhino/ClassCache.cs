@@ -81,7 +81,7 @@ namespace Rhino
 		/// <seealso cref="Get(Scriptable)">Get(Scriptable)</seealso>
 		public virtual bool Associate(ScriptableObject topScope)
 		{
-			if (topScope.GetParentScope() != null)
+			if (topScope.ParentScope != null)
 			{
 				// Can only associate cache with top level scope
 				throw new ArgumentException();

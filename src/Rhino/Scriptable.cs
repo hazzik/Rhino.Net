@@ -240,13 +240,8 @@ namespace Rhino
 
 		/// <summary>Get the parent scope of the object.</summary>
 		/// <remarks>Get the parent scope of the object.</remarks>
-		/// <returns>the parent scope</returns>
-		Scriptable GetParentScope();
-
-		/// <summary>Set the parent scope of the object.</summary>
-		/// <remarks>Set the parent scope of the object.</remarks>
-		/// <param name="parent">the parent scope to set</param>
-		void SetParentScope(Scriptable parent);
+		/// <value>the parent scope</value>
+		Scriptable ParentScope { get; set; }
 
 		/// <summary>Get an array of property ids.</summary>
 		/// <remarks>

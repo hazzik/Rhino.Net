@@ -67,7 +67,7 @@ namespace Rhino.Tests
 					// defined in each script separate
 					Scriptable threadScope = context.NewObject(globalScope);
 					threadScope.SetPrototype(globalScope);
-					threadScope.SetParentScope(null);
+					threadScope.ParentScope = null;
 					testScript.Exec(context, threadScope);
 				}
 				catch (Exception ee)

@@ -129,7 +129,7 @@ namespace Rhino
 					{
 						Rhino.NativeJavaPackage pkg;
 						pkg = new Rhino.NativeJavaPackage(true, className, classLoader);
-						ScriptRuntime.SetObjectProtoAndParent(pkg, GetParentScope());
+						ScriptRuntime.SetObjectProtoAndParent(pkg, ParentScope);
 						newValue = pkg;
 					}
 					else

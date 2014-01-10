@@ -592,7 +592,7 @@ namespace Rhino
 			{
 				factory = ContextFactory.GetGlobal();
 			}
-			Scriptable scope = f.GetParentScope();
+			Scriptable scope = f.ParentScope;
 			if (argsToWrap == 0)
 			{
 				return Context.Call(factory, f, scope, thisObj, args);

@@ -35,7 +35,7 @@ namespace Rhino
 			// StopIteration
 			NativeObject obj = new StopIteration();
 			obj.SetPrototype(GetObjectPrototype(scope));
-			obj.SetParentScope(scope);
+			obj.ParentScope = scope;
 			if (@sealed)
 			{
 				obj.SealObject();
@@ -201,7 +201,7 @@ namespace Rhino
 			ScriptRuntime.SetEnumNumbers(objectIterator, true);
 			NativeIterator result = new NativeIterator(objectIterator);
 			result.SetPrototype(GetClassPrototype(scope, result.GetClassName()));
-			result.SetParentScope(scope);
+			result.ParentScope = scope;
 			return result;
 		}
 

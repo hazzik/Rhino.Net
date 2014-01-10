@@ -61,7 +61,7 @@ namespace Rhino
 				throw new ArgumentException();
 			}
 			this.functionName = name;
-			SetParentScope(scope);
+			ParentScope = scope;
 		}
 
 		public bool HasTag(object tag)
@@ -87,7 +87,7 @@ namespace Rhino
 
 		public virtual void ExportAsScopeProperty()
 		{
-			AddAsProperty(GetParentScope());
+			AddAsProperty(ParentScope);
 		}
 
 		public override Scriptable GetPrototype()
@@ -97,7 +97,7 @@ namespace Rhino
 			Scriptable proto = base.GetPrototype();
 			if (proto == null)
 			{
-				proto = GetFunctionPrototype(GetParentScope());
+				proto = GetFunctionPrototype(ParentScope);
 				SetPrototype(proto);
 			}
 			return proto;
