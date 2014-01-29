@@ -37,13 +37,7 @@ namespace Org.Mozilla.Classfile
 
 		public static OpCode LUSHR
 		{
-			get { return OpCodes.Nop; }
-		}
-
-
-		public static OpCode L2D
-		{
-			get { return OpCodes.Conv_R8; }
+			get { return OpCodes.Shr_Un; }
 		}
 
 

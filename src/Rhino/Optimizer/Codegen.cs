@@ -792,7 +792,6 @@ namespace Rhino.Optimizer
 					// As above do not check for valid index but always
 					// return the name of the first param
 					il.EmitLoadConstant(constness[0]);
-					il.Emit(OpCodes.Box, typeof(bool));
 					il.Emit(OpCodes.Ret);
 				}
 				else
@@ -805,7 +804,6 @@ namespace Rhino.Optimizer
 					{
 						il.MarkLabel(table[j]);
 						il.EmitLoadConstant(constness[j]);
-						il.Emit(OpCodes.Box, typeof(bool));
 						il.Emit(OpCodes.Ret);
 					}
 				}

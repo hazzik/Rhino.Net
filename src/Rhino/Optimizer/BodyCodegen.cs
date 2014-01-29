@@ -3301,7 +3301,7 @@ namespace Rhino.Optimizer
 				il.EmitLoadConstant(31);
 				il.Emit(OpCodes.And);
 				il.Emit(ByteCode.LUSHR);
-				il.Emit(ByteCode.L2D);
+				il.Emit(OpCodes.Conv_R8);
 				return;
 			}
 			if (childNumberFlag == -1)
