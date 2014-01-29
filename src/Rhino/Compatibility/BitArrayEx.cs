@@ -10,11 +10,6 @@ namespace Rhino
 			array.Set(index, true);
 		}
 
-		public static void Flip(this BitArray array, int fromIndex, int toindex)
-		{
-			throw new NotImplementedException();
-		}
-
 		public static int Cardinality(this BitArray array)
 		{
 			var result = 0;

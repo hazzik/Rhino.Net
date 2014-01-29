@@ -429,7 +429,7 @@ namespace Rhino.Optimizer
 				Node n = statementNodes[i];
 				LookForVariableAccess(fn, n);
 			}
-			itsNotDefSet.Flip(0, listLength);
+			itsNotDefSet.Not();
 		}
 
 		// truth in advertising
