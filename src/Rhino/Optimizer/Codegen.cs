@@ -583,10 +583,9 @@ namespace Rhino.Optimizer
 
 			var generateSwitch = (2 <= end - start);
 			Label[] switchTable = null;
-			var switchStackTop = 0;
 			if (generateSwitch)
 			{
-				il.EmitLoadLocal(3);
+				il.Emit(OpCodes.Ldarg_3); // id
 				// do switch from (start + 1,  end - 1) mapping start to
 				// the default case
 				switchTable = il.DefineSwitchTable(end - start);

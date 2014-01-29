@@ -597,13 +597,13 @@ namespace Rhino.Optimizer
 				{
 					var prevLocal = inLocalBlock;
 					inLocalBlock = true;
-					LocalBuilder local = GetNewWordLocal(il);
+					LocalBuilder local = il.DeclareLocal(typeof (object));
 					if (isGenerator)
 					{
 						il.Emit(OpCodes.Ldnull);
 						il.EmitStoreLocal(local);
 					}
-					node.PutProp(Node.LOCAL_PROP, local);
+					node.PutIntProp(Node.LOCAL_PROP, local.LocalIndex);
 					while (child != null)
 					{
 						GenerateStatement(il, child);
@@ -1069,6 +1069,7 @@ namespace Rhino.Optimizer
 					if (type == Token.ENUM_NEXT)
 					{
 						AddScriptRuntimeInvoke(il, "EnumNext", new[] { typeof (Object) });
+						il.Emit(OpCodes.Box, typeof (bool));
 					}
 					else
 					{
