@@ -684,7 +684,8 @@ namespace Rhino.Optimizer
 					{
 						AddInstructionCount(il);
 					}
-					cfw.EmitLdloc(GetLocalBlockRegister(node));
+					int local = GetLocalBlockRegister(node);
+					il.EmitLoadLocal(local);
 					il.Emit(OpCodes.Throw);
 					break;
 				}
@@ -770,7 +771,7 @@ namespace Rhino.Optimizer
 					il.EmitLoadConstant(enumType);
 					AddScriptRuntimeInvoke(il, "EnumInit", new[] { typeof (Object), typeof (Context), typeof (int) });
 					var local = GetLocalBlockRegister(node);
-					cfw.EmitStloc(local);
+					il.EmitStoreLocal(local);
 					break;
 				}
 
@@ -992,7 +993,7 @@ namespace Rhino.Optimizer
 					}
 					else
 					{
-						codegen.PushNumberAsObject(il, cfw, num);
+						Codegen.PushNumberAsObject(il, cfw, num);
 					}
 					break;
 				}
@@ -1041,7 +1042,7 @@ namespace Rhino.Optimizer
 					// Create a new wrapper around precompiled regexp
 					il.Emit(OpCodes.Ldarg_1);
 					il.Emit(OpCodes.Ldarg_2);
-					il.Emit(OpCodes.Ldfld, codegen.mainClass.GetField(codegen.GetCompiledRegExpName(scriptOrFn, node.GetExistingIntProp(Node.REGEXP_PROP))));
+					il.Emit(OpCodes.Ldsfld, codegen.GetField(codegen.GetCompiledRegExpName(scriptOrFn, node.GetExistingIntProp(Node.REGEXP_PROP))));
 					AddScriptRuntimeInvoke(il, "WrapRegExp", typeof (Context), typeof (Scriptable), typeof (Object));
 					break;
 				}
@@ -1064,7 +1065,7 @@ namespace Rhino.Optimizer
 				case Token.ENUM_ID:
 				{
 					var local = GetLocalBlockRegister(node);
-					cfw.EmitLdloc(local);
+					il.EmitLoadLocal(local);
 					if (type == Token.ENUM_NEXT)
 					{
 						AddScriptRuntimeInvoke(il, "EnumNext", new[] { typeof (Object) });
@@ -1440,7 +1441,6 @@ namespace Rhino.Optimizer
 					GenerateExpression(il, child, node);
 					il.Emit(OpCodes.Ldarg_1);
 					il.EmitLoadConstant(isName);
-					il.Emit(OpCodes.Box, typeof(bool));
 					AddScriptRuntimeInvoke(il, "Delete", new[] { typeof(Object), typeof(Object), typeof(Context), typeof(bool) });
 					break;
 				}
@@ -1462,7 +1462,8 @@ namespace Rhino.Optimizer
 
 				case Token.LOCAL_LOAD:
 				{
-					cfw.EmitLdloc(GetLocalBlockRegister(node));
+					int local = GetLocalBlockRegister(node);
+					il.EmitLoadLocal(local);
 					break;
 				}
 
@@ -3273,7 +3274,7 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-					il.Emit(OpCodes.Unbox_Any, typeof(double));
+					il.Emit(OpCodes.Unbox_Any, typeof (double));
 				}
 				il.Emit(opCode);
 				if (!childOfArithmetic)

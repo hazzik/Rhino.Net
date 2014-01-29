@@ -261,7 +261,7 @@ namespace Rhino.Optimizer
 			var cfw = ClassFileWriter.CreateClassFileWriter(mainClass, SUPER_CLASS, sourceFile);
 			mainClass.SetParent(SUPER_CLASS);
 			TypeBuilder tb = mainClass;
-			var idField = tb.DefineField(ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
+			var idField = DefineField(tb, ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
 			GenerateResumeGenerator(cfw);
 			GenerateNativeFunctionOverrides(idField, tb, encodedSource);
 
@@ -547,7 +547,7 @@ namespace Rhino.Optimizer
 
 		private static ConstructorBuilder GenerateScriptCtor(TypeBuilder tb, ConstructorInfo baseConstructor)
 		{
-			var constructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, Type.EmptyTypes);
+			var constructor = tb.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, Type.EmptyTypes);
 			var il = constructor.GetILGenerator();
 			il.Emit(OpCodes.Ldarg_0);
 			il.Emit(OpCodes.Call, baseConstructor);
@@ -558,7 +558,7 @@ namespace Rhino.Optimizer
 		private ConstructorBuilder GenerateFunctionConstructor(ClassFileWriter cfw, FieldInfo idField)
 		{
 			var tb = cfw.tb;
-			var constructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] {typeof (Scriptable), typeof (Context), typeof (int)});
+			var constructor = tb.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (Scriptable), typeof (Context), typeof (int) });
 			var il = constructor.GetILGenerator();
 			
 			// call base constructor
@@ -845,9 +845,9 @@ namespace Rhino.Optimizer
 			var il = method.GetILGenerator();
 			var regExpProxy = il.DeclareLocal(typeof (RegExpProxy));
 
-			var reInitDone = type.DefineField("_reInitDone", typeof (bool), new[] { typeof (IsVolatile) }, Type.EmptyTypes, FieldAttributes.Static | FieldAttributes.Private);
+			var reInitDone = DefineField(type, "_reInitDone", typeof (bool), new[] { typeof (IsVolatile) }, Type.EmptyTypes, FieldAttributes.Static | FieldAttributes.Private);
 
-			il.Emit(OpCodes.Ldfld, reInitDone);
+			il.Emit(OpCodes.Ldsfld, reInitDone);
 
 			var doInit = il.DefineLabel();
 			il.Emit(OpCodes.Brfalse, doInit);
@@ -869,21 +869,37 @@ namespace Rhino.Optimizer
 					var reString = scriptOrFnNode.GetRegExpString(j);
 					var reFlags = scriptOrFnNode.GetRegExpFlags(j);
 
-					var reField = type.DefineField(GetCompiledRegExpName(scriptOrFnNode, j), typeof (object), FieldAttributes.Static | FieldAttributes.Private);
+					var reField = DefineField(type, GetCompiledRegExpName(scriptOrFnNode, j), typeof (object), FieldAttributes.Static | FieldAttributes.Private);
 
 					il.Emit(OpCodes.Ldloc, regExpProxy); // proxy
 					il.Emit(OpCodes.Ldarg_0); // context
 					il.Emit(OpCodes.Ldstr, reString);
 					il.Emit(OpCodes.Ldstr, reFlags);
 					il.Emit(OpCodes.Callvirt, typeof (RegExpProxy).GetMethod("CompileRegExp", new[] { typeof (Context), typeof (string), typeof (string) }));
-					il.Emit(OpCodes.Stfld, reField);
+					il.Emit(OpCodes.Stsfld, reField);
 				}
 			}
 			il.Emit(OpCodes.Ldc_I4_1);
-			il.Emit(OpCodes.Stfld, reInitDone);
+			il.Emit(OpCodes.Stsfld, reInitDone);
 			il.Emit(OpCodes.Ret);
 			return method;
 		}
+
+		private FieldBuilder DefineField(TypeBuilder type, string name, Type fieldType, Type[] requiredCustomModifiers, Type[] optionalCustomModifiers, FieldAttributes fieldAttributes)
+		{
+			var field = type.DefineField(name, fieldType, requiredCustomModifiers, optionalCustomModifiers, fieldAttributes);
+			fields.Add(name, field);
+			return field;
+		}
+
+		private FieldBuilder DefineField(TypeBuilder type, string name, Type fieldType, FieldAttributes fieldAttributes)
+		{
+			var reField = type.DefineField(name, fieldType, fieldAttributes);
+			fields.Add(name, reField);
+			return reField;
+		}
+
+		private readonly Dictionary<string, FieldInfo> fields = new Dictionary<string, FieldInfo>();
 
 		private void EmitConstantDudeInitializers(TypeBuilder type)
 		{
@@ -903,21 +919,21 @@ namespace Rhino.Optimizer
 				FieldBuilder field;
 				if (integer == number)
 				{
-					field = type.DefineField("_k" + i, typeof (int), FieldAttributes.Static | FieldAttributes.Private);
+					field = DefineField(type, "_k" + i, typeof (int), FieldAttributes.Static | FieldAttributes.Private);
 					il.EmitLoadConstant(integer);
 				}
 				else
 				{
-					field = type.DefineField("_k" + i, typeof (Double), FieldAttributes.Static | FieldAttributes.Private);
+					field = DefineField(type, "_k" + i, typeof (Double), FieldAttributes.Static | FieldAttributes.Private);
 					il.EmitLoadConstant(number);
 				}
 				constantFields ["_k" + i] = field;
-				il.Emit(OpCodes.Stfld, field);
+				il.Emit(OpCodes.Stsfld, field);
 			}
 			il.Emit(OpCodes.Ret);
 		}
 
-		internal void PushNumberAsObject(ILGenerator il, ClassFileWriter cfw, double num)
+		internal static void PushNumberAsObject(ILGenerator il, ClassFileWriter cfw, double num)
 		{
 			il.EmitLoadConstant(num);
 			il.Emit(OpCodes.Box, typeof (double));
@@ -1102,6 +1118,11 @@ namespace Rhino.Optimizer
 
 		private int itsConstantListSize;
 		private AssemblyBuilder dynamicAssembly;
+
+		public FieldInfo GetField(string name)
+		{
+			return fields[name];
+		}
 	}
 }
 

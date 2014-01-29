@@ -647,7 +647,7 @@ namespace Rhino
 			parameterTypes[1] = typeof (ContextFactory);
 			Array.Copy(baseParameterTypes, 0, parameterTypes, 2, baseParameterTypes.Length);
 
-			var constructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, parameterTypes);
+			var constructor = tb.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, parameterTypes);
 			var il = constructor.GetILGenerator();
 			
 			// Invoke base class constructor
@@ -687,8 +687,8 @@ namespace Rhino
 			 *      this.delegee = delegee;
 			 *      this.self = self;
 			 *  }
-			 */ 
-			var constructor = type.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] {typeof (ContextFactory), typeof (Scriptable), typeof (Scriptable)});
+			 */
+			var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof(ContextFactory), typeof(Scriptable), typeof(Scriptable) });
 			var il = constructor.GetILGenerator();
 			
 			// Invoke base class constructor
@@ -722,7 +722,7 @@ namespace Rhino
 			 *      this.self = JavaAdapter.CreateAdapterWrapper(scriptable, this);
 			 *  }
 			 */
-			var constructor = type.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, Type.EmptyTypes);
+			var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, Type.EmptyTypes);
 			var il = constructor.GetILGenerator();
 
 			// Invoke base class constructor

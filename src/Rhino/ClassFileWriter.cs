@@ -79,26 +79,10 @@ namespace Org.Mozilla.Classfile
 
 		public readonly TypeBuilder tb;
 
-		public void Add(OpCode theOpCode, Type type, string fieldName, Type fieldType)
-		{
-			//TODO: declare FIELD?
-			il.Emit(theOpCode, type.GetField(fieldName));
-		}
-
-		public void EmitLoadConstant(bool k)
-		{
-			il.EmitLoadConstant(k);
-		}
-
 		/// <summary>Store integer from stack top into the given local.</summary>
 		/// <remarks>Store integer from stack top into the given local.</remarks>
 		/// <param name="local">number of local register</param>
 		public void EmitStloc(int local)
-		{
-			il.EmitStoreLocal(local);
-		}
-	
-		public void EmitStloc(LocalBuilder local)
 		{
 			il.EmitStoreLocal(local);
 		}
@@ -130,11 +114,6 @@ namespace Org.Mozilla.Classfile
 		}
 
 		public void MarkTableSwitchCase(int switchStart, int caseIndex)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void MarkTableSwitchCase(int switchStart, int caseIndex, int stackTop)
 		{
 			throw new NotImplementedException();
 		}
