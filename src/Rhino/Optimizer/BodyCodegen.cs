@@ -378,6 +378,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Ldarg_2);
 				AddScriptRuntimeInvoke(il, "EnterActivationFunction", new[] { typeof (Context), typeof (Scriptable) });
+				il.BeginExceptionBlock();
 			}
 			else
 			{
@@ -526,22 +527,13 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
+					var local = il.DeclareLocal(typeof (object));
+					il.EmitStoreLocal(local);
+					il.BeginFinallyBlock();
 					GenerateActivationExit(il);
+					il.EndExceptionBlock();	
+					il.EmitLoadLocal(local);
 					il.Emit(OpCodes.Ret);
-					// Generate catch block to catch all and rethrow to call exit code
-					// under exception propagation as well.
-					var finallyHandler = il.DefineLabel();
-					cfw.MarkHandler(finallyHandler);
-					var exceptionObject = il.DeclareLocal(typeof (Exception));
-					il.EmitStoreLocal(exceptionObject);
-					// Duplicate GenerateActivationExit() in the catch block since it
-					// takes less space then full-featured ByteCode.JSR/ByteCode.RET
-					GenerateActivationExit(il);
-					il.EmitLoadLocal(exceptionObject);
-					// rethrow
-					il.Emit(OpCodes.Throw);
-					// mark the handler
-					cfw.AddExceptionHandler(enterAreaStartLabel.Value, epilogueLabel, finallyHandler, null);
 				}
 			}
 		}
