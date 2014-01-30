@@ -205,8 +205,6 @@ namespace Org.Mozilla.Classfile
 		private int itsFixupTableTop;
 
 		private ObjArray itsVarDescriptors;
-
-		private char[] tmpCharBuffer = new char[64];
 	}
 
 	internal sealed class ExceptionTableEntry

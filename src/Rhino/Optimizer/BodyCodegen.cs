@@ -515,8 +515,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Ldarg_2);
 				AddOptRuntimeInvoke(il, "ThrowStopIteration", new[] {typeof (object)});
 				Codegen.PushUndefined(il);
-				OpCode theOpCode = OpCodes.Ret;
-				il.Emit(theOpCode);
+				il.Emit(OpCodes.Ret);
 			}
 			else
 			{
@@ -2038,24 +2037,20 @@ namespace Rhino.Optimizer
 			// stack: ... cx functionObj thisObj
 			child = child.GetNext();
 			GenerateCallArgArray(il, node, child, false);
+			il.Emit(OpCodes.Ldarg_2);
+			il.Emit(OpCodes.Ldarg_3);
+			// call type
+			il.EmitLoadConstant(specialType);
 			if (type == Token.NEW)
 			{
-				// call type
-				il.Emit(OpCodes.Ldarg_2);
-				il.Emit(OpCodes.Ldarg_3);
-				il.EmitLoadConstant(specialType);
 				AddOptRuntimeInvoke(il, "NewObjectSpecial", typeof (Context), typeof (Object), typeof (Object[]), typeof (Scriptable), typeof (Scriptable), typeof (int));
 			}
 			else
 			{
-				// call type
 				// filename, linenumber
-				il.Emit(OpCodes.Ldarg_2);
-				il.Emit(OpCodes.Ldarg_3);
-				il.EmitLoadConstant(specialType);
 				il.EmitLoadConstant(scriptOrFn.GetSourceName() ?? string.Empty);
 				il.EmitLoadConstant(itsLineNumber);
-				AddOptRuntimeInvoke(il, "CallSpecial", typeof (Context), typeof (Callable), typeof (Scriptable), typeof (Object[]), typeof (Scriptable), typeof (Scriptable), typeof (int));
+				AddOptRuntimeInvoke(il, "CallSpecial", typeof (Context), typeof (Callable), typeof (Scriptable), typeof (Object[]), typeof (Scriptable), typeof (Scriptable), typeof (int), typeof (string), typeof (int));
 			}
 		}
 
@@ -3105,8 +3100,6 @@ namespace Rhino.Optimizer
 					var varIndex = fnCurrent.GetVarIndex(child);
 					var reg = varRegisters[varIndex];
 					var varIsDirectCallParameter = VarIsDirectCallParameter(varIndex);
-					var dsub = OpCodes.Sub;
-					var dadd = OpCodes.Add;
 					if (node.GetIntProp(Node.ISNUMBER_PROP, -1) != -1)
 					{
 						if (varIsDirectCallParameter)
@@ -3124,11 +3117,11 @@ namespace Rhino.Optimizer
 						il.EmitLoadConstant(1.0);
 						if ((incrDecrMask & Node.DECR_FLAG) == 0)
 						{
-							il.Emit(dadd);
+							il.Emit(OpCodes.Add);
 						}
 						else
 						{
-							il.Emit(dsub);
+							il.Emit(OpCodes.Sub);
 						}
 						if (!post)
 						{
@@ -3162,11 +3155,11 @@ namespace Rhino.Optimizer
 						il.EmitLoadConstant(1.0);
 						if ((incrDecrMask & Node.DECR_FLAG) == 0)
 						{
-							il.Emit(dadd);
+							il.Emit(OpCodes.Add);
 						}
 						else
 						{
-							il.Emit(dsub);
+							il.Emit(OpCodes.Sub);
 						}
 						if (!post)
 						{
@@ -3526,7 +3519,12 @@ namespace Rhino.Optimizer
 				}
 				if (type == Token.GE || type == Token.GT)
 				{
-					il.Emit(ByteCode.SWAP);
+					var local1 = il.DeclareLocal(typeof (object));
+					var local2 = il.DeclareLocal(typeof (object));
+					il.EmitStoreLocal(local1);
+					il.EmitStoreLocal(local2);
+					il.EmitLoadLocal(local1);
+					il.EmitLoadLocal(local2);
 				}
 				var routine = ((type == Token.LT) || (type == Token.GT)) ? "Cmp_LT" : "Cmp_LE";
 				AddScriptRuntimeInvoke(il, routine, typeof (Object), typeof (Object));

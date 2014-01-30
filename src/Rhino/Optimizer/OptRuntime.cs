@@ -117,7 +117,7 @@ namespace Rhino.Optimizer
 			ScriptRuntime.InitFunction(cx, scope, fn, functionType, false);
 		}
 
-		public static object CallSpecial(Context cx, Callable fun, Scriptable thisObj, object[] args, Scriptable scope, Scriptable callerThis, int callType, string fileName, int lineNumber)
+		public new static object CallSpecial(Context cx, Callable fun, Scriptable thisObj, object[] args, Scriptable scope, Scriptable callerThis, int callType, string fileName, int lineNumber)
 		{
 			return ScriptRuntime.CallSpecial(cx, fun, thisObj, args, scope, callerThis, callType, fileName, lineNumber);
 		}
