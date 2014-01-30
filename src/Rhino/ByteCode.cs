@@ -30,64 +30,45 @@ namespace Org.Mozilla.Classfile
 			get { return OpCodes.Nop; }
 		}
 
-		public static OpCode DNEG
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode LUSHR
-		{
-			get { return OpCodes.Shr_Un; }
-		}
-
-
 		public static OpCode DCMPL
 		{
 			get { return OpCodes.Nop; }
 		}
-
 
 		public static OpCode DCMPG
 		{
 			get { return OpCodes.Nop; }
 		}
 
-
 		public static OpCode IFLT
 		{
 			get { return OpCodes.Nop; }
 		}
-
 
 		public static OpCode IFGE
 		{
 			get { return OpCodes.Nop; }
 		}
 
-
 		public static OpCode IFGT
 		{
 			get { return OpCodes.Nop; }
 		}
-
 
 		public static OpCode IFLE
 		{
 			get { return OpCodes.Nop; }
 		}
 
-
 		public static OpCode IF_ICMPLE
 		{
 			get { return OpCodes.Nop; }
 		}
 
-
 		public static OpCode IF_ACMPEQ
 		{
 			get { return OpCodes.Nop; }
 		}
-
 
 		public static OpCode IF_ACMPNE
 		{

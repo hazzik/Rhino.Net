@@ -1261,11 +1261,12 @@ namespace Rhino.Optimizer
 				case Token.NEG:
 				{
 					GenerateExpression(il, child, node);
-					AddObjectToNumber(il);
+					AddObjectToNumberUnBoxed(il);
 					if (type == Token.NEG)
 					{
-						il.Emit(ByteCode.DNEG);
+						il.Emit(OpCodes.Neg);
 					}
+					il.Emit(OpCodes.Box, typeof(double));
 					break;
 				}
 
@@ -3302,8 +3303,9 @@ namespace Rhino.Optimizer
 				// LUSHR takes 6 bits.
 				il.EmitLoadConstant(31);
 				il.Emit(OpCodes.And);
-				il.Emit(ByteCode.LUSHR);
+				il.Emit(OpCodes.Shr_Un);
 				il.Emit(OpCodes.Conv_R8);
+				il.Emit(OpCodes.Box, typeof (double));
 				return;
 			}
 			if (childNumberFlag == -1)
