@@ -9,6 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Reflection.Emit;
 using Rhino.Ast;
 using Rhino.Optimizer;
 using Sharpen;
@@ -353,7 +355,7 @@ namespace Rhino.Tools.Jsc
 			{
 				superClass = ScriptRuntime.ObjectClass;
 			}
-			Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassBytes);
+            Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassBytes, codegen.ModuleBuilder);
 			return new[] { Tuple.Create(mainClassName, mainClassBytes), Tuple.Create(scriptClassName, scriptClassBytes) };
 		}
 
@@ -404,7 +406,7 @@ namespace Rhino.Tools.Jsc
 		/// </remarks>
 		internal static string FileNameToClassName(string name)
 		{
-			char[] s = new char[name.Length + 1];
+			char[] s = new char[name.Length];
 			char c;
 			int j = 0;
 			if (!CharEx.IsJavaIdentifierStart(name[0]))

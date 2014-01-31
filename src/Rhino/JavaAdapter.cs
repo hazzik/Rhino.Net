@@ -372,11 +372,17 @@ namespace Rhino
 
 		public static Type CreateAdapterCode(ObjToIntMap functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName)
 		{
+			var module = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("TempAssembly" + DateTime.Now.Millisecond), AssemblyBuilderAccess.Run)
+				.DefineDynamicModule("TempModule" + DateTime.Now.Millisecond);
+
+			return CreateAdapterCode(functionNames, name, baseType, interfaces, scriptClassName, module);
+		}
+
+		public static Type CreateAdapterCode(ObjToIntMap functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName, ModuleBuilder module)
+		{
 			interfaces = interfaces ?? Type.EmptyTypes;
 
-			var type = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("TempAssembly" + DateTime.Now.Millisecond), AssemblyBuilderAccess.Run)
-				.DefineDynamicModule("TempModule" + DateTime.Now.Millisecond)
-				.DefineType(name, TypeAttributes.Public, baseType);
+			var type = module.DefineType(name, TypeAttributes.Public, baseType);
 
 			var factory = type.DefineField("factory", typeof (ContextFactory), FieldAttributes.Public | FieldAttributes.InitOnly);
 			var delegee = type.DefineField("delegee", typeof(Scriptable), FieldAttributes.Public | FieldAttributes.InitOnly);
@@ -402,11 +408,11 @@ namespace Rhino
 
 			if (scriptClassName != null)
 			{
-				GenerateEmptyCtor(type, type, baseType, scriptClassName);
+				GenerateEmptyCtor(type, baseType, scriptClassName, delegee, self);
 			}
 			ObjToIntMap generatedOverrides = new ObjToIntMap();
 			ObjToIntMap generatedMethods = new ObjToIntMap();
-			
+
 			// generate methods to satisfy all specified interfaces.
 			foreach (Type @interface in interfaces)
 			{
@@ -679,7 +685,7 @@ namespace Rhino
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateSerialCtor(TypeBuilder type, Type baseType, FieldInfo factory, FieldInfo delegee, FieldInfo self)
+		private static void GenerateSerialCtor(TypeBuilder tb, Type baseType, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
 			/*  public XXX (ContextFactory factory, Scriptable delegee, Scriptable self) : base ()
 			 *  {
@@ -688,9 +694,9 @@ namespace Rhino
 			 *      this.self = self;
 			 *  }
 			 */
-			var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof(ContextFactory), typeof(Scriptable), typeof(Scriptable) });
+			var constructor = tb.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (ContextFactory), typeof (Scriptable), typeof (Scriptable) });
 			var il = constructor.GetILGenerator();
-			
+
 			// Invoke base class constructor
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Call, baseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null));
@@ -699,10 +705,10 @@ namespace Rhino
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Ldarg_1); // first arg: ContextFactory instance
 			il.Emit(OpCodes.Stfld, factory);
-			
+
 			// Save parameter in instance variable "delegee"
 			il.Emit(OpCodes.Ldarg_0); // this
-			il.Emit(OpCodes.Ldloc_2); // second arg: Scriptable instance
+			il.Emit(OpCodes.Ldarg_2); // second arg: Scriptable instance
 			il.Emit(OpCodes.Stfld, delegee);
 
 			// save self
@@ -713,7 +719,7 @@ namespace Rhino
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateEmptyCtor(TypeBuilder type, Type adapterType, Type baseType, Type scriptType)
+		private static void GenerateEmptyCtor(TypeBuilder type, Type baseType, Type scriptType, FieldInfo delegee, FieldInfo self)
 		{
 			/*  public XXX () : base() 
 			 *  {
@@ -727,11 +733,11 @@ namespace Rhino
 
 			// Invoke base class constructor
 			il.Emit(OpCodes.Ldarg_0); // this
-			il.Emit(OpCodes.Call, baseType.GetConstructor(Type.EmptyTypes));
+			il.Emit(OpCodes.Call, baseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null));
 
 			// Load script class
-			il.Emit(OpCodes.Call, scriptType.GetConstructor(Type.EmptyTypes));
-			
+			il.Emit(OpCodes.Newobj, scriptType.GetConstructor(Type.EmptyTypes));
+
 			// Run script and save resulting scope
 			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("RunScript", new[] { typeof (Script) }));
 			var scriptable = il.DeclareLocal(typeof (Scriptable));
@@ -740,15 +746,15 @@ namespace Rhino
 			// Save the Scriptable in instance variable "delegee"
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Ldloc, scriptable); // Scriptable
-			il.Emit(OpCodes.Stfld, adapterType.GetField("delegee"));
+			il.Emit(OpCodes.Stfld, delegee);
 
 			il.Emit(OpCodes.Ldarg_0); // this for the following Stfld for self
-			
+
 			// create a wrapper object to be used as "this" in method calls
 			il.Emit(OpCodes.Ldloc, scriptable); // the Scriptable
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Call, typeof (JavaAdapter).GetMethod("CreateAdapterWrapper", new[] { typeof (Scriptable), typeof (Object) }));
-			il.Emit(OpCodes.Stfld, adapterType.GetField("self"));
+			il.Emit(OpCodes.Stfld, self);
 
 			il.Emit(OpCodes.Ret);
 		}

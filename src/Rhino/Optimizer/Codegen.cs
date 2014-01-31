@@ -249,6 +249,11 @@ namespace Rhino.Optimizer
 
 		private readonly ModuleBuilder module;
 
+		public ModuleBuilder ModuleBuilder
+		{
+			get { return module; }
+		}
+
 		private Type GenerateCode(string encodedSource)
 		{
 			var hasScript = (scriptOrFnNodes[0].GetType() == Token.SCRIPT);
