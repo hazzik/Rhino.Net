@@ -9,10 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Rhino;
+using Rhino.Ast;
 using Rhino.Optimizer;
-using Rhino.Tools;
-using Rhino.Tools.Jsc;
 using Sharpen;
 
 namespace Rhino.Tools.Jsc
@@ -36,10 +34,10 @@ namespace Rhino.Tools.Jsc
 			{
 				if (main.printHelp)
 				{
-					System.Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.usage", typeof(Program).FullName));
-					System.Environment.Exit(0);
+					Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.usage", typeof(Program).FullName));
+					Environment.Exit(0);
 				}
-				System.Environment.Exit(1);
+				Environment.Exit(1);
 			}
 			if (!main.reporter.HasReportedError())
 			{
@@ -55,7 +53,8 @@ namespace Rhino.Tools.Jsc
 			reporter = new ToolErrorReporter(true);
 			compilerEnv = new CompilerEnvirons();
 			compilerEnv.SetErrorReporter(reporter);
-			compiler = new ClassCompiler(compilerEnv);
+			mainMethodClass = Codegen.DEFAULT_MAIN_METHOD_CLASS.FullName;
+			targetImplements = new Type[0];
 		}
 
 		/// <summary>Parse arguments.</summary>
@@ -93,13 +92,13 @@ namespace Rhino.Tools.Jsc
 				{
 					if (arg == "-version" && ++i < args.Length)
 					{
-						var version = (LanguageVersion) System.Convert.ToInt32(args[i]);
+						var version = (LanguageVersion) Convert.ToInt32(args[i]);
 						compilerEnv.SetLanguageVersion(version);
 						continue;
 					}
 					if ((arg == "-opt" || arg == "-O") && ++i < args.Length)
 					{
-						int optLevel = System.Convert.ToInt32(args[i]);
+						int optLevel = Convert.ToInt32(args[i]);
 						compilerEnv.SetOptimizationLevel(optLevel);
 						continue;
 					}
@@ -121,7 +120,7 @@ namespace Rhino.Tools.Jsc
 				}
 				if (arg == "-main-method-class" && ++i < args.Length)
 				{
-					compiler.SetMainMethodClass(args[i]);
+					mainMethodClass = args[i];
 					continue;
 				}
 				if (arg == "-encoding" && ++i < args.Length)
@@ -201,14 +200,14 @@ namespace Rhino.Tools.Jsc
 					Type superClass;
 					try
 					{
-						superClass = Sharpen.Runtime.GetType(targetExtends);
+						superClass = Runtime.GetType(targetExtends);
 					}
 					catch (TypeLoadException e)
 					{
+						// TODO: better error
 						throw new Exception(e.ToString());
 					}
-					// TODO: better error
-					compiler.SetTargetExtends(superClass);
+					this.targetExtends = superClass;
 					continue;
 				}
 				if (arg == "-implements" && ++i < args.Length)
@@ -220,7 +219,7 @@ namespace Rhino.Tools.Jsc
 					{
 						try
 						{
-							list.Add (Sharpen.Runtime.GetType(className));
+							list.Add (Runtime.GetType(className));
 						}
 						catch (TypeLoadException e)
 						{
@@ -228,8 +227,7 @@ namespace Rhino.Tools.Jsc
 						}
 					}
 					// TODO: better error
-					Type[] implementsClasses = list.ToArray();
-					compiler.SetTargetImplements(implementsClasses);
+					this.targetImplements = list.ToArray();
 					continue;
 				}
 				if (arg == "-d" && ++i < args.Length)
@@ -241,7 +239,7 @@ namespace Rhino.Tools.Jsc
 				return null;
 			}
 			// no file name
-			P(ToolErrorReporter.GetMessage("msg.no.file"));
+			Console.Out.WriteLine(ToolErrorReporter.GetMessage("msg.no.file"));
 			return null;
 		}
 
@@ -249,16 +247,16 @@ namespace Rhino.Tools.Jsc
 		/// <remarks>Print a usage message.</remarks>
 		private static void BadUsage(string s)
 		{
-			System.Console.Error.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.bad.usage", typeof(Program).FullName, s));
+			Console.Error.WriteLine(ToolErrorReporter.GetMessage("msg.jsc.bad.usage", typeof(Program).FullName, s));
 		}
 
 		/// <summary>Compile JavaScript source.</summary>
-		/// <remarks>Compile JavaScript source.</remarks>
-		public void ProcessSource(string[] filenames)
+		public void ProcessSource(IEnumerable<string> filenames)
 		{
-			for (int i = 0; i != filenames.Length; ++i)
+			Codegen codegen = new Codegen();
+			codegen.SetMainMethodClass(mainMethodClass);
+			foreach (string filename in filenames)
 			{
-				string filename = filenames[i];
 				if (!filename.EndsWith(".js"))
 				{
 					AddError("msg.extension.not.js", filename);
@@ -275,18 +273,19 @@ namespace Rhino.Tools.Jsc
 				{
 					string name = f.Name;
 					string nojs = name.Substring(0, name.Length - 3);
-					mainClassName = GetClassName(nojs);
+					mainClassName = FileNameToClassName(nojs);
 				}
 				if (targetPackage.Length != 0)
 				{
 					mainClassName = targetPackage + "." + mainClassName;
 				}
-				Tuple<string, Type>[] compiled = compiler.CompileToClassFiles(source, filename, 1, mainClassName);
+				Tuple<string, Type>[] compiled = CompileToClassFiles(codegen, source, filename, mainClassName, compilerEnv);
 				if (compiled == null || compiled.Length == 0)
 				{
 					return;
 				}
 				DirectoryInfo targetTopDir = destinationDir != null ? new DirectoryInfo(destinationDir) : f.Directory;
+/*
 				foreach (var tuple in compiled)
 				{
 					string className = tuple.Item1;
@@ -309,7 +308,53 @@ namespace Rhino.Tools.Jsc
 						AddFormatedError(ioe.ToString());
 					}
 				}
+*/
 			}
+			try
+			{
+				codegen.Save();
+			}
+			catch (Exception e)
+			{
+				AddFormatedError(e.ToString());
+			}
+		}
+
+		private Tuple<string, Type>[] CompileToClassFiles(Codegen codegen, string source, string filename, string mainClassName, CompilerEnvirons compilerEnvirons)
+		{
+			Parser p = new Parser(compilerEnvirons);
+			AstRoot ast = p.Parse(source, filename, 1);
+			IRFactory irf = new IRFactory(compilerEnvirons);
+			ScriptNode tree = irf.TransformTree(ast);
+			// release reference to original parse tree & parser
+			Type superClass = targetExtends;
+			Type[] interfaces = targetImplements;
+			bool isPrimary = (interfaces == null && superClass == null);
+			string scriptClassName = isPrimary
+				? mainClassName
+				: mainClassName + "1";
+			Type scriptClassBytes = codegen.CompileToClassFile(compilerEnvirons, scriptClassName, tree, tree.GetEncodedSource(), false);
+			if (isPrimary)
+			{
+				return new[] { Tuple.Create(scriptClassName, scriptClassBytes) };
+			}
+			int functionCount = tree.GetFunctionCount();
+			ObjToIntMap functionNames = new ObjToIntMap(functionCount);
+			for (int i = 0; i < functionCount; i++)
+			{
+				FunctionNode ofn = tree.GetFunctionNode(i);
+				string name = ofn.GetName();
+				if (!string.IsNullOrEmpty(name))
+				{
+					functionNames.Put(name, ofn.GetParamCount());
+				}
+			}
+			if (superClass == null)
+			{
+				superClass = ScriptRuntime.ObjectClass;
+			}
+			Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassBytes);
+			return new[] { Tuple.Create(mainClassName, mainClassBytes), Tuple.Create(scriptClassName, scriptClassBytes) };
 		}
 
 		private string ReadSource(FileSystemInfo f)
@@ -336,7 +381,7 @@ namespace Rhino.Tools.Jsc
 
 		private static FilePath GetOutputFile(DirectoryInfo parentDir, string className)
 		{
-			string path = className.Replace('.', FilePath.separatorChar);
+		    string path = className.Replace('.', Path.DirectorySeparatorChar);
 			path = String.Concat(path, ".class");
 			FilePath f = new FilePath(parentDir + "/" + path);
 			string dirPath = f.GetParent();
@@ -357,7 +402,7 @@ namespace Rhino.Tools.Jsc
 		/// illegal characters with underscores, and prepend the name with an
 		/// underscore if the file name does not begin with a JavaLetter.
 		/// </remarks>
-		internal string GetClassName(string name)
+		internal static string FileNameToClassName(string name)
 		{
 			char[] s = new char[name.Length + 1];
 			char c;
@@ -381,11 +426,6 @@ namespace Rhino.Tools.Jsc
 			return (new string(s)).Trim();
 		}
 
-		private static void P(string s)
-		{
-			System.Console.Out.WriteLine(s);
-		}
-
 		private void AddError(string messageId, string arg)
 		{
 			string msg;
@@ -407,11 +447,9 @@ namespace Rhino.Tools.Jsc
 
 		private bool printHelp;
 
-		private ToolErrorReporter reporter;
+		private readonly ToolErrorReporter reporter;
 
-		private CompilerEnvirons compilerEnv;
-
-		private ClassCompiler compiler;
+		private readonly CompilerEnvirons compilerEnv;
 
 		private string targetName;
 
@@ -420,6 +458,9 @@ namespace Rhino.Tools.Jsc
 		private string destinationDir;
 
 		private string characterEncoding;
+		private string mainMethodClass;
+		private Type targetExtends;
+		private Type[] targetImplements;
 #endif
 	}
 }

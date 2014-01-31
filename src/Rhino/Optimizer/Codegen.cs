@@ -317,8 +317,13 @@ namespace Rhino.Optimizer
 			}
 			EmitConstantDudeInitializers(mainClass);
 			var type = mainClass.CreateType();
-			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
+			//Save();
 			return type;
+		}
+
+		public void Save()
+		{
+			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
 		}
 
 		private Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>(); 
@@ -1085,11 +1090,10 @@ namespace Rhino.Optimizer
 
 		public void SetMainMethodClass(string className)
 		{
-			throw new NotImplementedException();
-			//mainMethodClass = className;
+			mainMethodClass = Runtime.GetType(className);
 		}
 
-		internal static readonly Type DEFAULT_MAIN_METHOD_CLASS = typeof (OptRuntime);
+		public static readonly Type DEFAULT_MAIN_METHOD_CLASS = typeof (OptRuntime);
 
 		private static readonly Type SUPER_CLASS = typeof (NativeFunction);
 
