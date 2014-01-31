@@ -1004,7 +1004,7 @@ namespace Rhino
 			IList<ObjectProperty> elems = node.GetElements();
 			Node @object = new Node(Token.OBJECTLIT);
 			object[] properties;
-			if (elems.IsEmpty())
+			if (elems.Count == 0)
 			{
 				properties = ScriptRuntime.emptyArgs;
 			}

@@ -174,7 +174,7 @@ namespace Rhino.Tools.Idswitch
 									if (tag_id == -SWITCH_TAG)
 									{
 										cur_state = 0;
-										if (generated_begin >= 0 && !all_pairs.IsEmpty())
+										if (generated_begin >= 0 && all_pairs.Count > 0)
 										{
 											Generate_java_code();
 											string code = P.ToString();

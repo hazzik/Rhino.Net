@@ -129,7 +129,7 @@ namespace Rhino.Ast
 				childScopes.Clear();
 				childScopes = null;
 			}
-			if (symbolTable != null && !symbolTable.IsEmpty())
+			if (symbolTable != null && symbolTable.Count > 0)
 			{
 				JoinScopes(this, newScope);
 			}

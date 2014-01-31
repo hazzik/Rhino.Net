@@ -4398,7 +4398,7 @@ commaLoop_break: ;
 			if (compilerEnv.GetWarnTrailingComma())
 			{
 				// back up from comma to beginning of line or array/objlit
-				if (!elems.IsEmpty())
+				if (elems.Count > 0)
 				{
 					object foo = elems[0];
 					pos = ((AstNode) foo).GetPosition();

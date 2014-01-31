@@ -494,7 +494,7 @@ namespace Rhino
 				}
 			}
 			string finalValue;
-			if (partial.IsEmpty())
+			if (partial.Count == 0)
 			{
 				finalValue = "{}";
 			}
@@ -548,7 +548,7 @@ namespace Rhino
 				}
 			}
 			string finalValue;
-			if (partial.IsEmpty())
+			if (partial.Count == 0)
 			{
 				finalValue = "[]";
 			}
