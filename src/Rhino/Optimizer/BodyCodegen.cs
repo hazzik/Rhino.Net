@@ -37,35 +37,6 @@ namespace Rhino.Optimizer
 				// return a generator object
 				GenerateGenerator();
 			}
-			if (literals != null)
-			{
-				// literals list may grow while we're looping
-				for (var i = 0; i < literals.Count; i++)
-				{
-					var node = literals[i];
-					var type = node.GetType();
-					switch (type)
-					{
-						case Token.OBJECTLIT:
-						{
-							GenerateObjectLiteralFactory(node, i + 1);
-							break;
-						}
-
-						case Token.ARRAYLIT:
-						{
-							GenerateArrayLiteralFactory(node, i + 1);
-							break;
-						}
-
-						default:
-						{
-							Kit.CodeBug(Token.TypeToName(type));
-							break;
-						}
-					}
-				}
-			}
 			return method;
 		}
 
@@ -1831,7 +1802,7 @@ namespace Rhino.Optimizer
 			ret.jsrPoints.Add(retLabel);
 		}
 
-		private void GenerateArrayLiteralFactory(Node node, int count)
+		private MethodBuilder GenerateArrayLiteralFactory(Node node, int count)
 		{
 			var methodName = codegen.GetBodyMethodName(scriptOrFn) + "_literal" + count;
 			InitBodyGeneration();
@@ -1841,9 +1812,10 @@ namespace Rhino.Optimizer
 			var il = method.GetILGenerator();
 			VisitArrayLiteral(il, node, node.GetFirstChild(), true);
 			il.Emit(OpCodes.Ret);
+			return method;
 		}
 
-		private void GenerateObjectLiteralFactory(Node node, int count)
+		private MethodBuilder GenerateObjectLiteralFactory(Node node, int count)
 		{
 			var methodName = codegen.GetBodyMethodName(scriptOrFn) + "_literal" + count;
 			InitBodyGeneration();
@@ -1853,6 +1825,7 @@ namespace Rhino.Optimizer
 			var il = method.GetILGenerator();
 			VisitObjectLiteral(il, node, node.GetFirstChild(), true);
 			il.Emit(OpCodes.Ret);
+			return method;
 		}
 
 		private void VisitArrayLiteral(ILGenerator il, Node node, Node child, bool topLevel)
@@ -1865,18 +1838,16 @@ namespace Rhino.Optimizer
 			// If code budget is tight swap out literals into separate method
 			if (!topLevel && (count > 10 || il.ILOffset > 30000) && !hasVarsInRegs && !isGenerator && !inLocalBlock)
 			{
-				if (literals == null)
-				{
-					literals = new List<Node>();
-				}
-				literals.Add(node);
-				var methodName = codegen.GetBodyMethodName(scriptOrFn) + "_literal" + literals.Count;
+				literalsCount++;
+				var bodyCodegen = Clone();
+				var method = bodyCodegen.GenerateArrayLiteralFactory(node, literalsCount);
+				literalsCount = bodyCodegen.literalsCount;
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Ldarg_2);
 				il.Emit(OpCodes.Ldarg_3);
 				il.EmitLoadArgument(argsArgument);
-				il.Emit(OpCodes.Callvirt, tb.GetMethod(methodName, new[] { typeof(Context), typeof(Scriptable), typeof(Scriptable), typeof(Object[]) }));
+				il.Emit(OpCodes.Callvirt, method);
 				return;
 			}
 			// load array to store array literal objects
@@ -1914,18 +1885,16 @@ namespace Rhino.Optimizer
 			// If code budget is tight swap out literals into separate method
 			if (!topLevel && (count > 10 || il.ILOffset > 30000) && !hasVarsInRegs && !isGenerator && !inLocalBlock)
 			{
-				if (literals == null)
-				{
-					literals = new List<Node>();
-				}
-				literals.Add(node);
-				var methodName = codegen.GetBodyMethodName(scriptOrFn) + "_literal" + literals.Count;
+				literalsCount++;
+				var bodyCodegen = Clone();
+				var method = bodyCodegen.GenerateObjectLiteralFactory(node, literalsCount);
+				literalsCount = bodyCodegen.literalsCount;
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Ldarg_2);
 				il.Emit(OpCodes.Ldarg_3);
 				il.EmitLoadArgument(argsArgument);
-				il.Emit(OpCodes.Callvirt, tb.GetMethod(methodName, new[] { typeof (Context), typeof (Scriptable), typeof (Scriptable), typeof (Object[]) }));
+				il.Emit(OpCodes.Callvirt, method);
 				return;
 			}
 			// load array with property ids
@@ -2013,6 +1982,22 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ldarg_1);
 			il.Emit(OpCodes.Ldarg_2);
 			AddScriptRuntimeInvoke(il, "NewObjectLiteral", new[] { typeof (Object[]), typeof (Object[]), typeof (int[]), typeof (Context), typeof (Scriptable) });
+		}
+
+		private BodyCodegen Clone()
+		{
+			return new BodyCodegen
+			{
+				tb = tb,
+				codegen = codegen,
+				compilerEnv = compilerEnv,
+				scriptOrFn = scriptOrFn,
+				scriptOrFnIndex = scriptOrFnIndex,
+				isGenerator = isGenerator,
+				constructor = constructor,
+				regExpInit = regExpInit,
+				literalsCount = literalsCount,
+			};
 		}
 
 		private void VisitSpecialCall(ILGenerator il, Node node, int type, int specialType, Node child)
@@ -4172,7 +4157,7 @@ namespace Rhino.Optimizer
 
 		private IDictionary<Node, FinallyReturnPoint> finallys;
 
-		private IList<Node> literals;
+		private int literalsCount;
 		public TypeBuilder tb;
 		public ConstructorInfo constructor;
 		public MethodInfo regExpInit;

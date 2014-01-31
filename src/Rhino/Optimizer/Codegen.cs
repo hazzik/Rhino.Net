@@ -6,7 +6,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -416,7 +415,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Ldfld, idField);
 
-			Label[] switchTable = il.DefineSwitchTable(scriptOrFnNodes.Length - 1);
+			Label[] switchTable = il.DefineSwitchTable(scriptOrFnNodes.Length);
 			var endlabel = il.DefineLabel();
 			for (var i = 0; i < scriptOrFnNodes.Length; i++)
 			{
@@ -566,7 +565,7 @@ namespace Rhino.Optimizer
 
 		private ConstructorBuilder GenerateFunctionConstructor(TypeBuilder type, FieldInfo idField)
 		{
-		    var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (Scriptable), typeof (Context), typeof (int) });
+			var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (Scriptable), typeof (Context), typeof (int) });
 			var il = constructor.GetILGenerator();
 			
 			// call base constructor
@@ -1118,7 +1117,7 @@ namespace Rhino.Optimizer
 
 		private Type mainMethodClass = DEFAULT_MAIN_METHOD_CLASS;
 
-	    private TypeBuilder mainClass;
+		private TypeBuilder mainClass;
 
 		private double[] itsConstantList;
 
