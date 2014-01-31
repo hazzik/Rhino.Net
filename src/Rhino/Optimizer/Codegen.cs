@@ -148,7 +148,7 @@ namespace Rhino.Optimizer
 				scriptOrFn = scriptOrFn.GetFunctionNode(0);
 			}
 			InitScriptNodesData(scriptOrFn);
-			mainClass = module.DefineType(mainClassName, TypeAttributes.Public, SUPER_CLASS);
+			mainClass = new CachingTypeBuilder(module.DefineType(mainClassName, TypeAttributes.Public, SUPER_CLASS));
 			try
 			{
 				return GenerateCode(encodedSource);
@@ -264,8 +264,7 @@ namespace Rhino.Optimizer
 			}
 			//TODO: set source file info.
 
-			var idField = DefineField(mainClass, ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
-			GenerateResumeGenerator(mainClass, idField);
+			var idField = mainClass.DefineField(ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
 			GenerateNativeFunctionOverrides(mainClass, idField, encodedSource);
 
 			var regExpInit = EmitRegExpInit(mainClass);
@@ -293,15 +292,14 @@ namespace Rhino.Optimizer
 				var bodygen = BodyCodegen.CreateBodyCodegen(this, n, i, constructor, regExpInit, mainClass, compilerEnv, IsGenerator(n));
 				try
 				{
-					var method = bodygen.GenerateBodyCode();
-
-					methods.Add(method.Name, method);
+					bodygen.GenerateBodyCode();
 				}
 				catch (ClassFileWriter.ClassFileFormatException e)
 				{
 					throw ReportClassFileFormatException(n, e.Message);
 				}
 			}
+			GenerateResumeGenerator(mainClass, idField);
 			var callMethod = GenerateCallMethod(mainClass, idField);
 			if (hasScript)
 			{
@@ -321,11 +319,9 @@ namespace Rhino.Optimizer
 			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
 		}
 
-		private Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>(); 
+		private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>();
 
-		private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
-
-		private void EmitDirectConstructor(TypeBuilder type, OptFunctionNode ofn)
+		private void EmitDirectConstructor(CachingTypeBuilder type, OptFunctionNode ofn)
 		{
 			Type[] parameterTypes = GetParameterTypes(ofn.fnode);
 
@@ -387,7 +383,7 @@ namespace Rhino.Optimizer
 		// method corresponding to the generator body. As a matter of convention
 		// the generator body is given the name of the generator activation function
 		// appended by "_gen".
-		private void GenerateResumeGenerator(TypeBuilder type, FieldInfo idField)
+		private void GenerateResumeGenerator(CachingTypeBuilder type, FieldInfo idField)
 		{
 			// if there are no generators defined, we don't implement a
 			// resumeGenerator(). The base class provides a default implementation.
@@ -427,7 +423,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private MethodBuilder GenerateCallMethod(TypeBuilder tb, FieldInfo ifField)
+		private MethodBuilder GenerateCallMethod(CachingTypeBuilder tb, FieldInfo ifField)
 		{
 			// Generate code for:
 			// if (ScriptRuntime.hasTopCall(cx)) {
@@ -513,13 +509,13 @@ namespace Rhino.Optimizer
 						}
 					}
 				}
-				il.Emit(OpCodes.Call, methods [GetBodyMethodName(n)]/*; mainClass.GetMethod(GetBodyMethodName(n), GetParameterTypes(n))*/);
+				il.Emit(OpCodes.Call, mainClass.GetMethod(GetBodyMethodName(n), GetParameterTypes(n)));
 				il.Emit(OpCodes.Ret);
 			}
 			return method;
 		}
 
-		private void GenerateMain(TypeBuilder tb, ConstructorInfo constructor)
+		private void GenerateMain(CachingTypeBuilder tb, ConstructorInfo constructor)
 		{
 			var method = tb.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.Static, typeof (void), new[] {typeof (string[])});
 			var il = method.GetILGenerator();
@@ -531,7 +527,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateExecute(TypeBuilder tb, MethodInfo callMethod)
+		private static void GenerateExecute(CachingTypeBuilder tb, MethodInfo callMethod)
 		{
 			var method = tb.DefineMethod("Exec", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot, typeof (object), new[] {typeof (Context), typeof (Scriptable)});
 			var il = method.GetILGenerator();
@@ -544,7 +540,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static ConstructorBuilder GenerateScriptCtor(TypeBuilder tb, ConstructorInfo baseConstructor)
+		private static ConstructorBuilder GenerateScriptCtor(CachingTypeBuilder tb, ConstructorInfo baseConstructor)
 		{
 			var constructor = tb.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, Type.EmptyTypes);
 			var il = constructor.GetILGenerator();
@@ -554,7 +550,7 @@ namespace Rhino.Optimizer
 			return constructor;
 		}
 
-		private ConstructorBuilder GenerateFunctionConstructor(TypeBuilder type, FieldInfo idField)
+		private ConstructorBuilder GenerateFunctionConstructor(CachingTypeBuilder type, FieldInfo idField)
 		{
 			var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (Scriptable), typeof (Context), typeof (int) });
 			var il = constructor.GetILGenerator();
@@ -602,7 +598,7 @@ namespace Rhino.Optimizer
 			return constructor;
 		}
 
-		private MethodInfo GenerateFunctionInit(TypeBuilder type, MethodInfo regExpInit, OptFunctionNode ofn)
+		private MethodInfo GenerateFunctionInit(CachingTypeBuilder type, MethodInfo regExpInit, OptFunctionNode ofn)
 		{
 			var method = type.DefineMethod(GetFunctionInitMethodName(ofn), MethodAttributes.Private | MethodAttributes.Final, typeof (void), new[] {typeof (Context), typeof (Scriptable)});
 			var il = method.GetILGenerator();
@@ -624,7 +620,7 @@ namespace Rhino.Optimizer
 			return method;
 		}
 
-		private void GenerateNativeFunctionOverrides(TypeBuilder type, FieldInfo idField, string encodedSource)
+		private void GenerateNativeFunctionOverrides(CachingTypeBuilder type, FieldInfo idField, string encodedSource)
 		{
 			GenerateGetFunctionName(type, idField);
 			GenerateGetLanguageVersion(type);
@@ -635,7 +631,7 @@ namespace Rhino.Optimizer
 			GenerateGetParamOrVarConst(type, idField);
 		}
 
-		private void GenerateGetFunctionName(TypeBuilder type, FieldInfo idField)
+		private void GenerateGetFunctionName(CachingTypeBuilder type, FieldInfo idField)
 		{
 			var method = type.DefineMethod("GetFunctionName", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof (string), Type.EmptyTypes);
 			var il = method.GetILGenerator();
@@ -657,7 +653,7 @@ namespace Rhino.Optimizer
 			});
 		}
 
-		private void GenerateGetLanguageVersion(TypeBuilder type)
+		private void GenerateGetLanguageVersion(CachingTypeBuilder type)
 		{
 			// Override NativeFunction.getLanguageVersion() with
 			// public int getLanguageVersion() { return <version-constant>; }
@@ -668,7 +664,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private void GenerateGetEncodedSource(TypeBuilder type, FieldInfo idField, string encodedSource)
+		private void GenerateGetEncodedSource(CachingTypeBuilder type, FieldInfo idField, string encodedSource)
 		{
 			if (encodedSource == null)
 				return;
@@ -692,7 +688,7 @@ namespace Rhino.Optimizer
 			});
 		}
 
-		private void GenerateGetParamCount(TypeBuilder type, FieldInfo idField)
+		private void GenerateGetParamCount(CachingTypeBuilder type, FieldInfo idField)
 		{
 			var method = type.DefineMethod("GetParamCount", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(int), Type.EmptyTypes);
 			var il = method.GetILGenerator();
@@ -706,7 +702,7 @@ namespace Rhino.Optimizer
 			});
 		}
 
-		private void GenerateGetParamAndVarCount(TypeBuilder type, FieldInfo idField)
+		private void GenerateGetParamAndVarCount(CachingTypeBuilder type, FieldInfo idField)
 		{
 			// Only this
 			var method = type.DefineMethod("GetParamAndVarCount", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(int), Type.EmptyTypes);
@@ -721,7 +717,7 @@ namespace Rhino.Optimizer
 			});
 		}
 
-		private void GenerateGetParamOrVarName(TypeBuilder type, FieldInfo idField)
+		private void GenerateGetParamOrVarName(CachingTypeBuilder type, FieldInfo idField)
 		{
 			// this + paramOrVarIndex
 			var method = type.DefineMethod("GetParamOrVarName", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(string), new[] { typeof(int) });
@@ -765,7 +761,7 @@ namespace Rhino.Optimizer
 			});
 		}
 
-		private void GenerateGetParamOrVarConst(TypeBuilder type, FieldInfo idField)
+		private void GenerateGetParamOrVarConst(CachingTypeBuilder type, FieldInfo idField)
 		{
 			var method = type.DefineMethod("GetParamOrVarConst", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof (bool), new[] { typeof (int) });
 			var il = method.GetILGenerator();
@@ -832,7 +828,7 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		private MethodBuilder EmitRegExpInit(TypeBuilder type)
+		private MethodBuilder EmitRegExpInit(CachingTypeBuilder type)
 		{
 			// precompile all regexp literals
 			if (!scriptOrFnNodes.Any(t => t.GetRegExpCount() > 0))
@@ -842,7 +838,7 @@ namespace Rhino.Optimizer
 			var il = method.GetILGenerator();
 			var regExpProxy = il.DeclareLocal(typeof (RegExpProxy));
 
-			var reInitDone = DefineField(type, "_reInitDone", typeof (bool), new[] { typeof (IsVolatile) }, Type.EmptyTypes, FieldAttributes.Static | FieldAttributes.Private);
+			var reInitDone = type.DefineField("_reInitDone", typeof (bool), new[] { typeof (IsVolatile) }, Type.EmptyTypes, FieldAttributes.Static | FieldAttributes.Private);
 
 			il.Emit(OpCodes.Ldsfld, reInitDone);
 
@@ -866,7 +862,7 @@ namespace Rhino.Optimizer
 					var reString = scriptOrFnNode.GetRegExpString(j);
 					var reFlags = scriptOrFnNode.GetRegExpFlags(j);
 
-					var reField = DefineField(type, GetCompiledRegExpName(scriptOrFnNode, j), typeof (object), FieldAttributes.Static | FieldAttributes.Private);
+					var reField = type.DefineField(GetCompiledRegExpName(scriptOrFnNode, j), typeof (object), FieldAttributes.Static | FieldAttributes.Private);
 
 					il.Emit(OpCodes.Ldloc, regExpProxy); // proxy
 					il.Emit(OpCodes.Ldarg_0); // context
@@ -882,23 +878,7 @@ namespace Rhino.Optimizer
 			return method;
 		}
 
-		private FieldBuilder DefineField(TypeBuilder type, string name, Type fieldType, Type[] requiredCustomModifiers, Type[] optionalCustomModifiers, FieldAttributes fieldAttributes)
-		{
-			var field = type.DefineField(name, fieldType, requiredCustomModifiers, optionalCustomModifiers, fieldAttributes);
-			fields.Add(name, field);
-			return field;
-		}
-
-		private FieldBuilder DefineField(TypeBuilder type, string name, Type fieldType, FieldAttributes fieldAttributes)
-		{
-			var reField = type.DefineField(name, fieldType, fieldAttributes);
-			fields.Add(name, reField);
-			return reField;
-		}
-
-		private readonly Dictionary<string, FieldInfo> fields = new Dictionary<string, FieldInfo>();
-
-		private void EmitConstantDudeInitializers(TypeBuilder type)
+		private void EmitConstantDudeInitializers(CachingTypeBuilder type)
 		{
 			var n = itsConstantListSize;
 			if (n == 0)
@@ -916,12 +896,12 @@ namespace Rhino.Optimizer
 				FieldBuilder field;
 				if (integer == number)
 				{
-					field = DefineField(type, "_k" + i, typeof (int), FieldAttributes.Static | FieldAttributes.Private);
+					field = type.DefineField("_k" + i, typeof (int), FieldAttributes.Static | FieldAttributes.Private);
 					il.EmitLoadConstant(integer);
 				}
 				else
 				{
-					field = DefineField(type, "_k" + i, typeof (Double), FieldAttributes.Static | FieldAttributes.Private);
+					field = type.DefineField("_k" + i, typeof (Double), FieldAttributes.Static | FieldAttributes.Private);
 					il.EmitLoadConstant(number);
 				}
 				constantFields ["_k" + i] = field;
@@ -1108,7 +1088,7 @@ namespace Rhino.Optimizer
 
 		private Type mainMethodClass = DEFAULT_MAIN_METHOD_CLASS;
 
-		private TypeBuilder mainClass;
+		private CachingTypeBuilder mainClass;
 
 		private double[] itsConstantList;
 
@@ -1117,7 +1097,7 @@ namespace Rhino.Optimizer
 
 		public FieldInfo GetField(string name)
 		{
-			return fields[name];
+			return mainClass.GetField(name);
 		}
 	}
 }

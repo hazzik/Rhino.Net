@@ -52,7 +52,7 @@ namespace Rhino.Optimizer
 				// Unless we're in a direct call use the enclosing scope
 				// of the function as our variable object.
 				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Callvirt, typeof (Scriptable).GetMethod("GetParentScope", Type.EmptyTypes));
+				il.Emit(OpCodes.Callvirt, typeof (Scriptable).GetMethod("get_ParentScope", Type.EmptyTypes));
 				il.Emit(OpCodes.Starg_S, (byte) 2);
 			}
 			// generators are forced to have an activation record
@@ -206,7 +206,8 @@ namespace Rhino.Optimizer
 					// get resumption point
 					GenerateGetGeneratorResumptionPoint(il);
 					// generate dispatch table
-					generatorSwitch = cfw.AddTableSwitch(0, targets.Count + GENERATOR_START);
+					generatorSwitch = il.DefineSwitchTable(targets.Count + GENERATOR_START + 1);
+					il.Emit(OpCodes.Switch);
 					GenerateCheckForThrowOrClose(il, null, false, GENERATOR_START);
 				}
 			}
@@ -433,7 +434,7 @@ namespace Rhino.Optimizer
 						var live = liveLocals.Get(node);
 						if (live != null)
 						{
-							cfw.MarkTableSwitchCase(generatorSwitch, GetNextGeneratorState(node));
+							il.MarkLabel(generatorSwitch [GetNextGeneratorState(node)]);
 							GenerateGetGeneratorLocalsState(il);
 							for (var j = 0; j < live.Length; j++)
 							{
@@ -477,7 +478,7 @@ namespace Rhino.Optimizer
 			{
 				if (((FunctionNode)scriptOrFn).GetResumptionPoints() != null)
 				{
-					cfw.MarkTableSwitchDefault(generatorSwitch);
+					il.Emit(OpCodes.Br, generatorSwitch[0]);
 				}
 				// change state for re-entry
 				GenerateSetGeneratorResumptionPoint(il, GENERATOR_TERMINATE);
@@ -1002,7 +1003,7 @@ namespace Rhino.Optimizer
 					// Create a new wrapper around precompiled regexp
 					il.Emit(OpCodes.Ldarg_1);
 					il.Emit(OpCodes.Ldarg_2);
-					il.Emit(OpCodes.Ldsfld, codegen.GetField(codegen.GetCompiledRegExpName(scriptOrFn, node.GetExistingIntProp(Node.REGEXP_PROP))));
+					il.Emit(OpCodes.Ldsfld, tb.GetField(codegen.GetCompiledRegExpName(scriptOrFn, node.GetExistingIntProp(Node.REGEXP_PROP))));
 					AddScriptRuntimeInvoke(il, "WrapRegExp", typeof (Context), typeof (Scriptable), typeof (Object));
 					break;
 				}
@@ -1563,9 +1564,9 @@ namespace Rhino.Optimizer
 		private void GenerateYieldPoint(ILGenerator il, Node node, bool exprContext)
 		{
 			// save stack state
-			int top = cfw.GetStackTop();
+			int top = /*cfw.GetStackTop()*/0;
 			maxStack = maxStack > top ? maxStack : top;
-			if (cfw.GetStackTop() != 0)
+			if (/*cfw.GetStackTop()*/0 != 0)
 			{
 				GenerateGetGeneratorStackState(il);
 				for (var i = 0; i < top; i++)
@@ -1637,7 +1638,7 @@ namespace Rhino.Optimizer
 			if (!hasLocals)
 			{
 				// jump here directly if there are no locals
-				cfw.MarkTableSwitchCase(generatorSwitch, nextState);
+				il.MarkLabel(generatorSwitch[nextState]);
 			}
 			// see if we need to dispatch for .close() or .throw()
 			il.EmitLoadLocal(operationLocal);
@@ -4141,7 +4142,7 @@ namespace Rhino.Optimizer
 
 		public bool isGenerator;
 
-		private int generatorSwitch;
+		private Label[] generatorSwitch;
 
 		private int maxLocals;
 
@@ -4149,7 +4150,7 @@ namespace Rhino.Optimizer
 
 		private IDictionary<Node, FinallyReturnPoint> finallys;
 
-		public TypeBuilder tb;
+		public CachingTypeBuilder tb;
 		public ConstructorInfo constructor;
 		public MethodInfo regExpInit;
 		public IdentityGenerator identityGenerator;
@@ -4250,7 +4251,7 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		public static BodyCodegen CreateBodyCodegen(Codegen codegen, ScriptNode n, int i, ConstructorInfo constructor, MethodInfo regExpInit, TypeBuilder tb, CompilerEnvirons compilerEnv, bool isGenerator)
+		public static BodyCodegen CreateBodyCodegen(Codegen codegen, ScriptNode n, int i, ConstructorInfo constructor, MethodInfo regExpInit, CachingTypeBuilder tb, CompilerEnvirons compilerEnv, bool isGenerator)
 		{
 			var bodygen = new BodyCodegen
 			{

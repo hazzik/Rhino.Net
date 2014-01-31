@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using Rhino.Annotations;
+using Rhino.Optimizer;
 using Sharpen;
 
 namespace Rhino
@@ -382,7 +383,7 @@ namespace Rhino
 		{
 			interfaces = interfaces ?? Type.EmptyTypes;
 
-			var type = module.DefineType(name, TypeAttributes.Public, baseType);
+			CachingTypeBuilder type = new CachingTypeBuilder(module.DefineType(name, TypeAttributes.Public, baseType));
 
 			var factory = type.DefineField("factory", typeof (ContextFactory), FieldAttributes.Public | FieldAttributes.InitOnly);
 			var delegee = type.DefineField("delegee", typeof(Scriptable), FieldAttributes.Public | FieldAttributes.InitOnly);
@@ -642,7 +643,7 @@ namespace Rhino
 			});
 		}
 
-		private static void GenerateCtor(TypeBuilder tb, ConstructorInfo baseTypeConstructor, FieldInfo factory, FieldInfo delegee, FieldInfo self)
+		private static void GenerateCtor(CachingTypeBuilder tb, ConstructorInfo baseTypeConstructor, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
 			Type[] baseParameterTypes = baseTypeConstructor.GetParameterTypes();
 			// Note that we swapped arguments in app-facing constructors to avoid
@@ -685,7 +686,7 @@ namespace Rhino
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateSerialCtor(TypeBuilder tb, Type baseType, FieldInfo factory, FieldInfo delegee, FieldInfo self)
+		private static void GenerateSerialCtor(CachingTypeBuilder tb, Type baseType, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
 			/*  public XXX (ContextFactory factory, Scriptable delegee, Scriptable self) : base ()
 			 *  {
@@ -719,7 +720,7 @@ namespace Rhino
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateEmptyCtor(TypeBuilder type, Type baseType, Type scriptType, FieldInfo delegee, FieldInfo self)
+		private static void GenerateEmptyCtor(CachingTypeBuilder type, Type baseType, Type scriptType, FieldInfo delegee, FieldInfo self)
 		{
 			/*  public XXX () : base() 
 			 *  {
@@ -867,7 +868,7 @@ namespace Rhino
 			il.Emit(OpCodes.Ret);
 		}
 
-		private static void GenerateMethod(TypeBuilder type, string methodName, Type[] parameterTypes, Type returnType, bool convertResult, FieldInfo factory, FieldInfo delegee, FieldInfo self)
+		private static void GenerateMethod(CachingTypeBuilder type, string methodName, Type[] parameterTypes, Type returnType, bool convertResult, FieldInfo factory, FieldInfo delegee, FieldInfo self)
 		{
 			/*  public TRet Method(T1, ...) 
 			 *  {
@@ -935,7 +936,7 @@ namespace Rhino
 		/// from JavaScript that is equivalent to calling "super.methodName()"
 		/// from Java. Eventually, this may be supported directly in JavaScript.
 		/// </remarks>
-		private static void GenerateSuper(TypeBuilder type, string methodName, Type[] argTypes, MethodInfo baseMethod)
+		private static void GenerateSuper(CachingTypeBuilder type, string methodName, Type[] argTypes, MethodInfo baseMethod)
 		{
 			var method1 = type.DefineMethod("super$" + methodName, MethodAttributes.Public, baseMethod.ReturnType, argTypes);
 			var il = method1.GetILGenerator();
