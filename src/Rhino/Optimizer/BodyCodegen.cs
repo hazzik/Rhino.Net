@@ -1605,7 +1605,7 @@ namespace Rhino.Optimizer
 					il.Emit(ByteCode.SWAP);
 					il.EmitLoadConstant(i);
 					il.Emit(ByteCode.SWAP);
-					il.Emit(OpCodes.Stelem, typeof(object));
+					il.Emit(OpCodes.Stelem_Ref);
 				}
 				// pop the array object
 				il.Emit(OpCodes.Pop);
@@ -1886,7 +1886,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Dup);
 				il.EmitLoadConstant(i);
 				GenerateExpression(il, child, node);
-				il.Emit(OpCodes.Stelem, typeof(object));
+				il.Emit(OpCodes.Stelem_Ref);
 				child = child.GetNext();
 			}
 			var skipIndexes = (int[])node.GetProp(Node.SKIP_INDEXES_PROP);
@@ -1943,8 +1943,9 @@ namespace Rhino.Optimizer
 				else
 				{
 					il.EmitLoadConstant((int) id);
+					il.Emit(OpCodes.Box, typeof (int));
 				}
-				il.Emit(OpCodes.Stelem, typeof(object));
+				il.Emit(OpCodes.Stelem_Ref);
 			}
 			// load array with property values
 			AddNewObjectArray(il, count);
@@ -1962,7 +1963,7 @@ namespace Rhino.Optimizer
 				{
 					GenerateExpression(il, child2, node);
 				}
-				il.Emit(OpCodes.Stelem, typeof(object));
+				il.Emit(OpCodes.Stelem_Ref);
 				child2 = child2.GetNext();
 			}
 			// check if object literal actually has any getters or setters
@@ -2317,7 +2318,7 @@ namespace Rhino.Optimizer
 					il.EmitLoadConstant(i);
 					il.EmitLoadLocal(tempLocal);
 				}
-				il.Emit(OpCodes.Stelem, typeof(object));
+				il.Emit(OpCodes.Stelem_Ref);
 				argChild = argChild.GetNext();
 			}
 		}
@@ -2951,7 +2952,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Dup);
 				il.EmitLoadConstant(i);
 				il.EmitLoadLocal(ls[i]);
-				il.Emit(OpCodes.Stelem, typeof(object));
+				il.Emit(OpCodes.Stelem_Ref);
 			}
 			// pop the array off the stack
 			il.Emit(OpCodes.Pop);
