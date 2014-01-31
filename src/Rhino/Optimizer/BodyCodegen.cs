@@ -603,7 +603,7 @@ namespace Rhino.Optimizer
 				case Token.CATCH_SCOPE:
 				{
 					// nothing stays on the stack on entry into a catch scope
-					cfw.SetStackTop(0);
+					//cfw.SetStackTop(0);
 					var local = GetLocalBlockRegister(node);
 					var scopeIndex = node.GetExistingIntProp(Node.CATCH_SCOPE_PROP);
 					var name = child.GetString();
@@ -618,13 +618,13 @@ namespace Rhino.Optimizer
 					else
 					{
 						// Load previous catch scope object
-						cfw.EmitLdloc(local);
+						il.EmitLoadLocal(local);
 					}
 					il.EmitLoadConstant(name);
 					il.Emit(OpCodes.Ldarg_1);
 					il.Emit(OpCodes.Ldarg_2);
 					AddScriptRuntimeInvoke(il, "NewCatchScope", new[] { typeof (Exception), typeof (Scriptable), typeof (String), typeof (Context), typeof (Scriptable) });
-					cfw.EmitStloc(local);
+					il.EmitStoreLocal(local);
 					break;
 				}
 
@@ -2381,9 +2381,11 @@ namespace Rhino.Optimizer
 			var savedVariableObject = il.DeclareLocal(typeof (object));
 			il.Emit(OpCodes.Ldarg_2);
 			il.Emit(OpCodes.Stloc, savedVariableObject);
+
+			il.BeginExceptionBlock();
 			var startLabel = il.DefineLabel();
-			il.MarkLabel(startLabel);
-			//itsStackTop = stackTop;
+			//il.MarkLabel(startLabel);
+
 			var catchTarget = node.target;
 			var finallyTarget = node.GetFinally();
 			var handlerLabels = new Label[EXCEPTION_MAX];
@@ -2404,7 +2406,7 @@ namespace Rhino.Optimizer
 				handlerLabels[FINALLY_EXCEPTION] = il.DefineLabel();
 			}
 
-			exceptionManager.SetHandlers(handlerLabels, startLabel);
+			//exceptionManager.SetHandlers(handlerLabels, startLabel);
 			// create a table for the equivalent of JSR returns
 			if (isGenerator && finallyTarget != null)
 			{
@@ -2433,7 +2435,7 @@ namespace Rhino.Optimizer
 			}
 			// control flow skips the handlers
 			var realEnd = il.DefineLabel();
-			il.Emit(OpCodes.Br, realEnd);
+			il.Emit(OpCodes.Leave, realEnd);
 			var exceptionLocal = GetLocalBlockRegister(node);
 			// javascript handler; unwrap exception and GOTO to javascript
 			// catch area.
@@ -2460,15 +2462,18 @@ namespace Rhino.Optimizer
 			{
 				var finallyHandler = il.DefineLabel();
 				var finallyEnd = il.DefineLabel();
-				cfw.MarkHandler(finallyHandler);
+				
+				//cfw.MarkHandler(finallyHandler);
+				il.MarkLabel(finallyHandler);
 				if (!isGenerator)
 				{
-					il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
+					il.BeginFinallyBlock(); 
+					//il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
 				}
-				cfw.EmitStloc(exceptionLocal);
+				//il.EmitStoreLocal(exceptionLocal);
 				// reset the variable object local
-				cfw.EmitLdloc(savedVariableObject);
-				il.Emit(OpCodes.Starg_S, 2);
+				il.EmitLoadLocal(savedVariableObject);
+				il.Emit(OpCodes.Starg_S, (byte) 2);
 				// get the label to JSR to
 				var finallyLabel = GetTargetLabel(il, finallyTarget);
 				if (isGenerator)
@@ -2477,15 +2482,15 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-					InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
+					//InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
 				}
 				// rethrow
-				cfw.EmitLdloc(exceptionLocal);
+				/*il.EmitLoadLocal(exceptionLocal);
 				if (isGenerator)
 				{
 					il.Emit(OpCodes.Castclass, typeof(Exception));
 				}
-				il.Emit(OpCodes.Throw);
+				il.Emit(OpCodes.Throw);*/
 				il.MarkLabel(finallyEnd);
 				// mark the handler
 				if (isGenerator)
@@ -2494,11 +2499,12 @@ namespace Rhino.Optimizer
 				}
 			}
 			// catch any
-			il.MarkLabel(realEnd);
 			if (!isGenerator)
-			{
-				exceptionManager.PopExceptionInfo();
+			{   
+				il.EndExceptionBlock();
+				//exceptionManager.PopExceptionInfo();
 			}
+			il.MarkLabel(realEnd);
 		}
 
 		private const int JAVASCRIPT_EXCEPTION = 0;
@@ -2518,17 +2524,18 @@ namespace Rhino.Optimizer
 		// an explicit Throwable string.
 		private void GenerateCatchBlock(ILGenerator il, int exceptionType, LocalBuilder savedVariableObject, Label? catchLabel, int exceptionLocal, Label? handler)
 		{
-			if (handler == null)
-			{
-				handler = il.DefineLabel();
-			}
-			cfw.MarkHandler(handler.Value);
+			il.BeginCatchBlock(ExceptionTypeToName(exceptionType));
+//			if (handler == null)
+//			{
+//				handler = il.DefineLabel();
+//			}
+			//cfw.MarkHandler(handler.Value);
 			// MS JVM gets cranky if the exception object is left on the stack
-			cfw.EmitStloc(exceptionLocal);
+			il.EmitStoreLocal(exceptionLocal);
 			// reset the variable object local
-			cfw.EmitLdloc(savedVariableObject);
+			il.EmitLoadLocal(savedVariableObject);
 			il.Emit(OpCodes.Starg_S, 2);
-			ExceptionTypeToName(exceptionType);
+			//ExceptionTypeToName(exceptionType);
 			il.Emit(OpCodes.Br, catchLabel.Value);
 		}
 
