@@ -159,6 +159,7 @@
     <Compile Include="InstanceIdInfo.cs" />
     <Compile Include="LanguageFeatures.cs" />
     <Compile Include="LanguageVersion.cs" />
+    <Compile Include="Optimizer\IdentityGenerator.cs" />
     <Compile Include="PropertyAttributes.cs" />
     <Compile Include="Utils\MemberInfoEx.cs" />
     <Compile Include="Compatibility\TypeEx.cs" />

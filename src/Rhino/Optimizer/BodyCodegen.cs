@@ -1838,10 +1838,8 @@ namespace Rhino.Optimizer
 			// If code budget is tight swap out literals into separate method
 			if (!topLevel && (count > 10 || il.ILOffset > 30000) && !hasVarsInRegs && !isGenerator && !inLocalBlock)
 			{
-				literalsCount++;
 				var bodyCodegen = Clone();
-				var method = bodyCodegen.GenerateArrayLiteralFactory(node, literalsCount);
-				literalsCount = bodyCodegen.literalsCount;
+				var method = bodyCodegen.GenerateArrayLiteralFactory(node, identityGenerator.GetNextId());
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Ldarg_2);
@@ -1885,10 +1883,8 @@ namespace Rhino.Optimizer
 			// If code budget is tight swap out literals into separate method
 			if (!topLevel && (count > 10 || il.ILOffset > 30000) && !hasVarsInRegs && !isGenerator && !inLocalBlock)
 			{
-				literalsCount++;
 				var bodyCodegen = Clone();
-				var method = bodyCodegen.GenerateObjectLiteralFactory(node, literalsCount);
-				literalsCount = bodyCodegen.literalsCount;
+				var method = bodyCodegen.GenerateObjectLiteralFactory(node, identityGenerator.GetNextId());
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Ldarg_2);
@@ -1996,7 +1992,7 @@ namespace Rhino.Optimizer
 				isGenerator = isGenerator,
 				constructor = constructor,
 				regExpInit = regExpInit,
-				literalsCount = literalsCount,
+				identityGenerator = identityGenerator,
 			};
 		}
 
@@ -4157,10 +4153,10 @@ namespace Rhino.Optimizer
 
 		private IDictionary<Node, FinallyReturnPoint> finallys;
 
-		private int literalsCount;
 		public TypeBuilder tb;
 		public ConstructorInfo constructor;
 		public MethodInfo regExpInit;
+		public IdentityGenerator identityGenerator;
 
 		internal class FinallyReturnPoint
 		{

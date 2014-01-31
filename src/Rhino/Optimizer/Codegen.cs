@@ -300,6 +300,7 @@ namespace Rhino.Optimizer
 					isGenerator = IsGenerator(n),
 					constructor = constructor,
 					regExpInit = regExpInit,
+					identityGenerator = new IdentityGenerator(),
 				};
 				try
 				{
