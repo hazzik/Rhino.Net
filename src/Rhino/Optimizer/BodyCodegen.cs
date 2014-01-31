@@ -35,7 +35,7 @@ namespace Rhino.Optimizer
 			{
 				// generate the user visible method which when invoked will
 				// return a generator object
-				GenerateGenerator();
+				Clone().GenerateGenerator();
 			}
 			return method;
 		}
