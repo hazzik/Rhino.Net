@@ -233,7 +233,6 @@
     <Compile Include="ObjToIntMap.cs" />
     <Compile Include="Optimizer\Block.cs" />
     <Compile Include="Optimizer\BodyCodegen.cs" />
-    <Compile Include="Optimizer\ClassCompiler.cs" />
     <Compile Include="Optimizer\Codegen.cs" />
     <Compile Include="Optimizer\OptFunctionNode.cs" />
     <Compile Include="Optimizer\Optimizer.cs" />

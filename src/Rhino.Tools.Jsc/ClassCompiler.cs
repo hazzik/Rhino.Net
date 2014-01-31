@@ -6,14 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using System.Reflection;
-using System.Reflection.Emit;
 #if COMPILATION
+using Rhino.Optimizer;
 using System;
-using System.Collections.Generic;
 using Rhino.Ast;
 
-namespace Rhino.Optimizer
+namespace Rhino.Tools.Jsc
 {
 	/// <summary>Generates class files from script sources.</summary>
 	/// <remarks>
