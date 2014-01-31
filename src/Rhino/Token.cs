@@ -886,7 +886,8 @@ namespace Rhino
 		/// </remarks>
 		public static string Name(int token)
 		{
-			return token.ToString();
+			if (!printNames)
+				return token.ToString();
 			return TypeToName(token);
 		}
 

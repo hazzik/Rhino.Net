@@ -355,7 +355,7 @@ namespace Rhino.Tools.Jsc
 			{
 				superClass = ScriptRuntime.ObjectClass;
 			}
-            Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassBytes, codegen.ModuleBuilder);
+			Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassBytes, codegen.ModuleBuilder);
 			return new[] { Tuple.Create(mainClassName, mainClassBytes), Tuple.Create(scriptClassName, scriptClassBytes) };
 		}
 
@@ -383,7 +383,7 @@ namespace Rhino.Tools.Jsc
 
 		private static FilePath GetOutputFile(DirectoryInfo parentDir, string className)
 		{
-		    string path = className.Replace('.', Path.DirectorySeparatorChar);
+			string path = className.Replace('.', Path.DirectorySeparatorChar);
 			path = String.Concat(path, ".class");
 			FilePath f = new FilePath(parentDir + "/" + path);
 			string dirPath = f.GetParent();

@@ -53,14 +53,14 @@ namespace Rhino.Optimizer
 				// of the function as our variable object.
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Callvirt, typeof (Scriptable).GetMethod("get_ParentScope", Type.EmptyTypes));
-				il.Emit(OpCodes.Starg_S, (byte) 2);
+				il.EmitStoreArgument(2);
 			}
 			// generators are forced to have an activation record
 			il.Emit(OpCodes.Ldarg_0);
 			il.Emit(OpCodes.Ldarg_2);
 			il.EmitLoadArgument(argsArgument);
 			AddScriptRuntimeInvoke(il, "CreateFunctionActivation", typeof (NativeFunction), typeof (Scriptable), typeof (Object[]));
-			il.Emit(OpCodes.Starg_S, (byte) 2);
+			il.EmitStoreArgument(2);
 		   
 			// create a function object
 			// Call function constructor
@@ -173,7 +173,7 @@ namespace Rhino.Optimizer
 				// Use the enclosing scope of the function as our variable object.
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Callvirt, typeof (Scriptable).GetMethod("get_ParentScope", Type.EmptyTypes));
-				il.Emit(OpCodes.Starg_S, (byte) 2);
+				il.EmitStoreArgument(2);
 			}
 			// reserve 'args[]'
 			argsArgument = firstFreeLocal++;
@@ -195,7 +195,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Dup);
 				il.EmitStoreLocal(generatorStateLocal);
 				il.Emit(OpCodes.Ldfld, OptRuntime.GeneratorState.CLASS_NAME.GetField(OptRuntime.GeneratorState.thisObj_NAME));
-				il.Emit(OpCodes.Starg_S, 3);
+				il.EmitStoreArgument(3);
 				if (epilogueLabel == null)
 				{
 					epilogueLabel = il.DefineLabel();
@@ -344,7 +344,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Ldarg_2);
 				il.EmitLoadArgument(argsArgument);
 				AddScriptRuntimeInvoke(il, "CreateFunctionActivation", new[] { typeof (NativeFunction), typeof (Scriptable), typeof (Object[]) });
-				il.Emit(OpCodes.Starg_S, 2);
+				il.EmitStoreArgument(2);
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Ldarg_2);
 				AddScriptRuntimeInvoke(il, "EnterActivationFunction", new[] { typeof (Context), typeof (Scriptable) });
@@ -672,7 +672,7 @@ namespace Rhino.Optimizer
 								{
 									throw Codegen.BadTree();
 								}
-								cfw.EmitLdloc(popvLocal);
+								il.EmitLoadLocal(popvLocal);
 							}
 						}
 					}
@@ -708,7 +708,7 @@ namespace Rhino.Optimizer
 					il.Emit(OpCodes.Ldarg_1);
 					il.Emit(OpCodes.Ldarg_2);
 					AddScriptRuntimeInvoke(il, "EnterWith", new[] { typeof (Object), typeof (Context), typeof (Scriptable) });
-					il.Emit(OpCodes.Starg_S, 2);
+					il.EmitStoreArgument(2);
 					IncReferenceWordLocal(2);
 					break;
 				}
@@ -717,7 +717,7 @@ namespace Rhino.Optimizer
 				{
 					il.Emit(OpCodes.Ldarg_2);
 					AddScriptRuntimeInvoke(il, "LeaveWith", new[] { typeof (Scriptable) });
-					il.Emit(OpCodes.Starg_S, 2);
+					il.EmitStoreArgument(2);
 					DecReferenceWordLocal(2);
 					break;
 				}
@@ -1786,7 +1786,7 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-					AddGoto(il, OpCodes.Br, target);
+					AddGoto(il, OpCodes.Leave, target);
 				}
 			}
 		}
@@ -2420,6 +2420,7 @@ namespace Rhino.Optimizer
 				// add the finally node as well to the hash table
 				finallys[finallyTarget.GetNext()] = ret;
 			}
+			var exceptionLocal = GetLocalBlockRegister(node);
 			while (child != null)
 			{
 				if (child == catchTarget)
@@ -2429,16 +2430,32 @@ namespace Rhino.Optimizer
 					exceptionManager.RemoveHandler(EVALUATOR_EXCEPTION, catchLabel);
 					exceptionManager.RemoveHandler(ECMAERROR_EXCEPTION, catchLabel);
 					exceptionManager.RemoveHandler(THROWABLE_EXCEPTION, catchLabel);
+					//il.BeginCatchBlock(typeof (RhinoException));
+					//il.MarkLabel(catchLabel);
+					Label? handler = handlerLabels [ECMAERROR_EXCEPTION];
+					il.BeginCatchBlock(typeof (RhinoException));
+//			if (handler == null)
+//			{
+//				handler = il.DefineLabel();
+//			}
+					//cfw.MarkHandler(handler.Value);
+					// MS JVM gets cranky if the exception object is left on the stack
+					il.EmitStoreLocal(exceptionLocal);
+					// reset the variable object local
+					il.EmitLoadLocal(savedVariableObject);
+					il.EmitStoreArgument(2);
+					//ExceptionTypeToName(exceptionType);
+					il.Emit(OpCodes.Br, ((Label?) catchLabel).Value);
 				}
 				GenerateStatement(il, child);
 				child = child.GetNext();
 			}
 			// control flow skips the handlers
 			var realEnd = il.DefineLabel();
-			il.Emit(OpCodes.Leave, realEnd);
-			var exceptionLocal = GetLocalBlockRegister(node);
+			//il.Emit(OpCodes.Leave, realEnd);
 			// javascript handler; unwrap exception and GOTO to javascript
 			// catch area.
+/*
 			if (catchTarget != null)
 			{
 				// get the label to goto
@@ -2456,6 +2473,7 @@ namespace Rhino.Optimizer
 					GenerateCatchBlock(il, THROWABLE_EXCEPTION, savedVariableObject, catchLabel, exceptionLocal, handlerLabels[THROWABLE_EXCEPTION]);
 				}
 			}
+*/
 			// finally handler; catch all exceptions, store to a local; JSR to
 			// the finally, then re-throw.
 			if (finallyTarget != null)
@@ -2473,7 +2491,7 @@ namespace Rhino.Optimizer
 				//il.EmitStoreLocal(exceptionLocal);
 				// reset the variable object local
 				il.EmitLoadLocal(savedVariableObject);
-				il.Emit(OpCodes.Starg_S, (byte) 2);
+				il.EmitStoreArgument(2);
 				// get the label to JSR to
 				var finallyLabel = GetTargetLabel(il, finallyTarget);
 				if (isGenerator)
@@ -2504,7 +2522,7 @@ namespace Rhino.Optimizer
 				il.EndExceptionBlock();
 				//exceptionManager.PopExceptionInfo();
 			}
-			il.MarkLabel(realEnd);
+			//il.MarkLabel(realEnd);
 		}
 
 		private const int JAVASCRIPT_EXCEPTION = 0;
@@ -2534,7 +2552,7 @@ namespace Rhino.Optimizer
 			il.EmitStoreLocal(exceptionLocal);
 			// reset the variable object local
 			il.EmitLoadLocal(savedVariableObject);
-			il.Emit(OpCodes.Starg_S, 2);
+			il.EmitStoreArgument(2);
 			//ExceptionTypeToName(exceptionType);
 			il.Emit(OpCodes.Br, catchLabel.Value);
 		}
@@ -3054,7 +3072,7 @@ namespace Rhino.Optimizer
 		/// other blocks that don't have any ops - this allows
 		/// for monitoring/killing of while(true) loops and such.
 		/// </remarks>
-		private void AddInstructionCount(ILGenerator il, int count)
+		private static void AddInstructionCount(ILGenerator il, int count)
 		{
 			il.Emit(OpCodes.Ldarg_1);
 			il.EmitLoadConstant(count);
@@ -3930,7 +3948,7 @@ namespace Rhino.Optimizer
 			GenerateExpression(il, child, node);
 			il.Emit(OpCodes.Ldarg_2);
 			AddScriptRuntimeInvoke(il, "EnterDotQuery", typeof (Object), typeof (Scriptable));
-			il.Emit(OpCodes.Starg_S, 2);
+			il.EmitStoreArgument(2);
 			// add push null/pop with label in between to simplify code for loop
 			// continue when it is necessary to pop the null result from
 			// updateDotQuery
@@ -3948,7 +3966,7 @@ namespace Rhino.Optimizer
 			// stack: ... non_null_result_of_updateDotQuery
 			il.Emit(OpCodes.Ldarg_2);
 			AddScriptRuntimeInvoke(il, "LeaveDotQuery", typeof (Scriptable));
-			il.Emit(OpCodes.Starg_S, 2);
+			il.EmitStoreArgument(2);
 		}
 
 		private static void AddObjectToBoolean(ILGenerator il)

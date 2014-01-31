@@ -38,7 +38,7 @@ namespace Rhino.Ast
 
 		private IList<RegExpLiteral> regexps;
 
-        private IList<FunctionNode> EMPTY_LIST = new FunctionNode[0];
+		private IList<FunctionNode> EMPTY_LIST = new FunctionNode[0];
 
 		private IList<Symbol> symbols = new List<Symbol>(4);
 
