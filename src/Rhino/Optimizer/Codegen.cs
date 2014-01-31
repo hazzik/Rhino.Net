@@ -290,21 +290,11 @@ namespace Rhino.Optimizer
 			for (int i = 0, count = scriptOrFnNodes.Length; i < count; i++)
 			{
 				var n = scriptOrFnNodes[i];
-				var bodygen = new BodyCodegen
-				{
-					tb = mainClass,
-					codegen = this,
-					compilerEnv = compilerEnv,
-					scriptOrFn = n,
-					scriptOrFnIndex = i,
-					isGenerator = IsGenerator(n),
-					constructor = constructor,
-					regExpInit = regExpInit,
-					identityGenerator = new IdentityGenerator(),
-				};
+				var bodygen = BodyCodegen.CreateBodyCodegen(this, n, i, constructor, regExpInit, mainClass, compilerEnv, IsGenerator(n));
 				try
 				{
 					var method = bodygen.GenerateBodyCode();
+
 					methods.Add(method.Name, method);
 				}
 				catch (ClassFileWriter.ClassFileFormatException e)
