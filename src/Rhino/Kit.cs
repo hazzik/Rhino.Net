@@ -548,7 +548,7 @@ check_break: ;
 			for (; ; )
 			{
 				int n = @is.Read(buffer, cursor, buffer.Length - cursor);
-				if (n < 0)
+				if (n <= 0)
 				{
 					break;
 				}
