@@ -149,7 +149,7 @@ namespace Rhino.Optimizer
 				scriptOrFn = scriptOrFn.GetFunctionNode(0);
 			}
 			InitScriptNodesData(scriptOrFn);
-			mainClass = module.DefineType(mainClassName);
+			mainClass = module.DefineType(mainClassName, TypeAttributes.Public, SUPER_CLASS);
 			try
 			{
 				return GenerateCode(encodedSource);
@@ -258,38 +258,37 @@ namespace Rhino.Optimizer
 			{
 				sourceFile = scriptOrFnNodes[0].GetSourceName();
 			}
-			var cfw = ClassFileWriter.CreateClassFileWriter(mainClass, SUPER_CLASS, sourceFile);
-			mainClass.SetParent(SUPER_CLASS);
-			TypeBuilder tb = mainClass;
-			var idField = DefineField(tb, ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
-			GenerateResumeGenerator(cfw);
-			GenerateNativeFunctionOverrides(idField, tb, encodedSource);
+			//TODO: set source file info.
 
-			var regExpInit = EmitRegExpInit(tb);
+			var idField = DefineField(mainClass, ID_FIELD_NAME, typeof (int), FieldAttributes.Private);
+			GenerateResumeGenerator(mainClass, idField);
+			GenerateNativeFunctionOverrides(mainClass, idField, encodedSource);
+
+			var regExpInit = EmitRegExpInit(mainClass);
 			for (int i = 0, count = scriptOrFnNodes.Length; i < count; i++)
 			{
 				var n = scriptOrFnNodes[i];
 				if (n.GetType() == Token.FUNCTION)
 				{
 					var ofn = OptFunctionNode.Get(n);
-					functionInits [ofn] = GenerateFunctionInit(tb, regExpInit, ofn);
+					functionInits [ofn] = GenerateFunctionInit(mainClass, regExpInit, ofn);
 					if (ofn.IsTargetOfDirectCall())
 					{
-						EmitDirectConstructor(cfw, ofn);
+						EmitDirectConstructor(mainClass, ofn);
 					}
 				}
 			}
 			ConstructorInfo constructor = null;
 			if (hasFunctions)
 			{
-				constructor = GenerateFunctionConstructor(cfw, idField);
+				constructor = GenerateFunctionConstructor(mainClass, idField);
 			}
 			for (int i = 0, count = scriptOrFnNodes.Length; i < count; i++)
 			{
 				var n = scriptOrFnNodes[i];
 				var bodygen = new BodyCodegen
 				{
-					tb = tb,
+					tb = mainClass,
 					codegen = this,
 					compilerEnv = compilerEnv,
 					scriptOrFn = n,
@@ -308,16 +307,16 @@ namespace Rhino.Optimizer
 					throw ReportClassFileFormatException(n, e.Message);
 				}
 			}
-			var callMethod = GenerateCallMethod(cfw, idField);
+			var callMethod = GenerateCallMethod(mainClass, idField);
 			if (hasScript)
 			{
-				tb.AddInterfaceImplementation(typeof(Script));
-				var scriptConstructor = GenerateScriptCtor(tb, SUPER_CLASS.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null));
-				GenerateMain(tb, scriptConstructor);
-				GenerateExecute(tb, callMethod);
+				mainClass.AddInterfaceImplementation(typeof(Script));
+				var scriptConstructor = GenerateScriptCtor(mainClass, SUPER_CLASS.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null));
+				GenerateMain(mainClass, scriptConstructor);
+				GenerateExecute(mainClass, callMethod);
 			}
-			EmitConstantDudeInitializers(tb);
-			var type = tb.CreateType();
+			EmitConstantDudeInitializers(mainClass);
+			var type = mainClass.CreateType();
 			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
 			return type;
 		}
@@ -326,11 +325,11 @@ namespace Rhino.Optimizer
 
 		private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
 
-		private void EmitDirectConstructor(ClassFileWriter cfw, OptFunctionNode ofn)
+		private void EmitDirectConstructor(TypeBuilder type, OptFunctionNode ofn)
 		{
 			Type[] parameterTypes = GetParameterTypes(ofn.fnode);
 
-			var method = cfw.tb.DefineMethod(GetDirectCtorName(ofn.fnode), MethodAttributes.Public | MethodAttributes.Static, typeof (object), parameterTypes);
+			var method = type.DefineMethod(GetDirectCtorName(ofn.fnode), MethodAttributes.Public | MethodAttributes.Static, typeof (object), parameterTypes);
 			var il = method.GetILGenerator();
 
 			var firstLocal = il.DeclareLocal(typeof (Scriptable));
@@ -388,14 +387,14 @@ namespace Rhino.Optimizer
 		// method corresponding to the generator body. As a matter of convention
 		// the generator body is given the name of the generator activation function
 		// appended by "_gen".
-		private void GenerateResumeGenerator(ClassFileWriter cfw)
+		private void GenerateResumeGenerator(TypeBuilder type, FieldInfo idField)
 		{
 			// if there are no generators defined, we don't implement a
 			// resumeGenerator(). The base class provides a default implementation.
 			if (!scriptOrFnNodes.Any(IsGenerator))
 				return;
 
-			var method = cfw.tb.DefineMethod("ResumeGenerator", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (int), typeof (object), typeof (object)});
+			var method = type.DefineMethod("ResumeGenerator", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (int), typeof (object), typeof (object)});
 			var il = method.GetILGenerator();
 			// load arguments for dispatch to the corresponding *_gen method
 			il.Emit(OpCodes.Ldarg_0); // this
@@ -405,7 +404,7 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ldarg_S, (byte) 5); // value
 			il.Emit(OpCodes.Ldarg_3); // operation
 			il.Emit(OpCodes.Ldarg_0); // this
-			il.Emit(OpCodes.Ldfld, cfw.tb.GetField(ID_FIELD_NAME));
+			il.Emit(OpCodes.Ldfld, idField);
 
 			Label[] switchTable = il.DefineSwitchTable(scriptOrFnNodes.Length - 1);
 			var endlabel = il.DefineLabel();
@@ -428,14 +427,14 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Ret);
 		}
 
-		private MethodBuilder GenerateCallMethod(ClassFileWriter cfw, FieldInfo ifField)
+		private MethodBuilder GenerateCallMethod(TypeBuilder tb, FieldInfo ifField)
 		{
 			// Generate code for:
 			// if (ScriptRuntime.hasTopCall(cx)) {
 			//     return ScriptRuntime.doTopCall(this, cx, scope, thisObj, args);
 			// }
 
-			var method = cfw.tb.DefineMethod("Call", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (Scriptable), typeof (object[])});
+			var method = tb.DefineMethod("Call", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (Scriptable), typeof (object[])});
 			var il = method.GetILGenerator();
 
 			il.Emit(OpCodes.Ldarg_1); // cx
@@ -506,7 +505,7 @@ namespace Rhino.Optimizer
 								PushUndefined(il);
 								il.MarkLabel(beyond);
 								// Only one push
-								cfw.AdjustStackTop(-1);
+								//cfw.AdjustStackTop(-1);
 								il.EmitLoadConstant(0.0);
 								// restore invariant
 								il.EmitLoadArgument(4);
@@ -555,10 +554,9 @@ namespace Rhino.Optimizer
 			return constructor;
 		}
 
-		private ConstructorBuilder GenerateFunctionConstructor(ClassFileWriter cfw, FieldInfo idField)
+		private ConstructorBuilder GenerateFunctionConstructor(TypeBuilder type, FieldInfo idField)
 		{
-			var tb = cfw.tb;
-			var constructor = tb.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (Scriptable), typeof (Context), typeof (int) });
+		    var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig, CallingConventions.Standard, new[] { typeof (Scriptable), typeof (Context), typeof (int) });
 			var il = constructor.GetILGenerator();
 			
 			// call base constructor
@@ -626,7 +624,7 @@ namespace Rhino.Optimizer
 			return method;
 		}
 
-		private void GenerateNativeFunctionOverrides(FieldInfo idField, TypeBuilder type, string encodedSource)
+		private void GenerateNativeFunctionOverrides(TypeBuilder type, FieldInfo idField, string encodedSource)
 		{
 			GenerateGetFunctionName(type, idField);
 			GenerateGetLanguageVersion(type);
@@ -1111,7 +1109,7 @@ namespace Rhino.Optimizer
 
 		private Type mainMethodClass = DEFAULT_MAIN_METHOD_CLASS;
 
-		internal TypeBuilder mainClass;
+	    private TypeBuilder mainClass;
 
 		private double[] itsConstantList;
 

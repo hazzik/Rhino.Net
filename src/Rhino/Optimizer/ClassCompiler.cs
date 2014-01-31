@@ -170,7 +170,7 @@ namespace Rhino.Optimizer
 			{
 				superClass = ScriptRuntime.ObjectClass;
 			}
-			Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, codegen.mainClass);
+			Type mainClassBytes = JavaAdapter.CreateAdapterCode(functionNames, mainClassName, superClass, interfaces, scriptClassBytes);
 			return new[] { Tuple.Create(mainClassName, mainClassBytes), Tuple.Create(scriptClassName, scriptClassBytes) };
 		}
 

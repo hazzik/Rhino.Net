@@ -26,11 +26,6 @@ namespace Org.Mozilla.Classfile
 	/// <author>Roger Lawrence</author>
 	public sealed class ClassFileWriter
 	{
-		public static ClassFileWriter CreateClassFileWriter(TypeBuilder type, Type baseType, string source)
-		{
-			return new ClassFileWriter(type, baseType, source);
-		}
-
 		public ILGenerator il;
 
 		/// <summary>
@@ -50,34 +45,6 @@ namespace Org.Mozilla.Classfile
 			{
 			}
 		}
-
-		/// <summary>Construct a ClassFileWriter for a class.</summary>
-		/// <remarks>Construct a ClassFileWriter for a class.</remarks>
-		/// <param name="className">
-		/// the name of the class to write, including
-		/// full package qualification.
-		/// </param>
-		/// <param name="superClassName">
-		/// the name of the superclass of the class
-		/// to write, including full package qualification.
-		/// </param>
-		/// <param name="sourceFileName">
-		/// the name of the source file to use for
-		/// producing debug information, or null if debug information
-		/// is not desired
-		/// </param>
-		private ClassFileWriter(TypeBuilder className, Type superClassName, string sourceFileName)
-		{
-			tb = className;
-			if (sourceFileName != null)
-			{
-			}
-			// All "new" implementations are supposed to output ACC_SUPER as a
-			// class flag. This is specified in the first JVM spec, so it should
-			// be old enough that it's okay to always set it.
-		}
-
-		public readonly TypeBuilder tb;
 
 		/// <summary>Store integer from stack top into the given local.</summary>
 		/// <remarks>Store integer from stack top into the given local.</remarks>
@@ -137,20 +104,6 @@ namespace Org.Mozilla.Classfile
 		public void SetStackTop(short n)
 		{
 			itsStackTop = n;
-		}
-
-		public void AdjustStackTop(int delta)
-		{
-			var newStack = itsStackTop + delta;
-			if (newStack < 0 || short.MaxValue < newStack)
-			{
-				BadStack(newStack);
-			}
-			itsStackTop = (short)newStack;
-			if (newStack > itsMaxStack)
-			{
-				itsMaxStack = (short)newStack;
-			}
 		}
 
 		public void AddExceptionHandler(Label startLabel, Label? endLabel, Label handlerLabel, Type exceptionType)
