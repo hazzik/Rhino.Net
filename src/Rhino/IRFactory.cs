@@ -2742,7 +2742,7 @@ namespace Rhino
 				case Token.NUMBER:
 				{
 					double num = node.GetDouble();
-					if (num == num && num != 0.0)
+					if (!Double.IsNaN(num) && num != 0.0)
 					{
 						return ALWAYS_TRUE_BOOLEAN;
 					}

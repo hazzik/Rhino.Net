@@ -193,7 +193,7 @@ namespace Rhino
 						else
 						{
 							double d = ScriptRuntime.ToNumber(args[0]);
-							result = (d == d && d != double.PositiveInfinity && d != double.NegativeInfinity);
+							result = (!Double.IsNaN(d) && d != double.PositiveInfinity && d != double.NegativeInfinity);
 						}
 						return ScriptRuntime.WrapBoolean(result);
 					}
@@ -209,7 +209,7 @@ namespace Rhino
 						else
 						{
 							double d = ScriptRuntime.ToNumber(args[0]);
-							result = (d != d);
+							result = Double.IsNaN(d);
 						}
 						return ScriptRuntime.WrapBoolean(result);
 					}
@@ -498,7 +498,7 @@ namespace Rhino
 			{
 				// the 'mask' argument.  Non-ECMA.
 				double d = ScriptRuntime.ToNumber(args[1]);
-				if (d != d || ((mask = (int)d) != d) || 0 != (mask & ~(URL_XALPHAS | URL_XPALPHAS | URL_PATH)))
+				if (Double.IsNaN(d) || ((mask = (int)d) != d) || 0 != (mask & ~(URL_XALPHAS | URL_XPALPHAS | URL_PATH)))
 				{
 					throw Context.ReportRuntimeError0("msg.bad.esc.mask");
 				}

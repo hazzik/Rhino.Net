@@ -118,7 +118,7 @@ namespace Rhino
 				copy.frozen = false;
 				return copy;
 			}
-		}
+			}
 
 		[System.Serializable]
 		private sealed class ContinuationJump
@@ -228,7 +228,7 @@ namespace Rhino
 			if (bytecode != itsData)
 			{
 				Kit.CodeBug();
-			}
+		}
 			return InterpretedFunction.CreateScript(itsData, staticSecurityDomain);
 		}
 
@@ -2667,9 +2667,9 @@ StateLoop_break: ;
 				}
 				else
 				{
-					// Must be instance of Error or code bug
-					throw (Exception)throwable;
-				}
+				// Must be instance of Error or code bug
+				throw (Exception) throwable;
+			}
 			}
 			return (interpreterResult != DBL_MRK) ? interpreterResult : ScriptRuntime.WrapNumber(interpreterResultDbl);
 		}
@@ -3809,38 +3809,38 @@ object_compare_break: ;
 				}
 				else
 				{
-					if (x == UniqueTag.DOUBLE_MARK)
+				if (x == UniqueTag.DOUBLE_MARK)
+				{
+					double d = frame.sDbl[i];
+					return !Double.IsNaN(d) && d != 0.0;
+				}
+				else
+				{
+					if (x == null || x == Undefined.instance)
 					{
-						double d = frame.sDbl[i];
-						return d == d && d != 0.0;
+						return false;
 					}
 					else
 					{
-						if (x == null || x == Undefined.instance)
+						if (x.IsNumber())
 						{
-							return false;
+							double d = System.Convert.ToDouble(x);
+							return (!Double.IsNaN(d) && d != 0.0);
 						}
 						else
 						{
-							if (x.IsNumber())
-							{
-								double d = System.Convert.ToDouble(x);
-								return (d == d && d != 0.0);
-							}
-							else
-							{
 								if (x is bool)
 								{
 									return ((bool)x);
 								}
 								else
 								{
-									return ScriptRuntime.ToBoolean(x);
-								}
-							}
+							return ScriptRuntime.ToBoolean(x);
 						}
 					}
 				}
+			}
+		}
 			}
 		}
 

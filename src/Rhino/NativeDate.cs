@@ -473,8 +473,8 @@ namespace Rhino
 					object tv = ScriptRuntime.ToPrimitive(o, ScriptRuntime.NumberClass);
 					if (tv.IsNumber())
 					{
-						double d = System.Convert.ToDouble(tv);
-						if (d != d || System.Double.IsInfinity(d))
+						double d = Convert.ToDouble(tv);
+						if (Double.IsNaN(d) || Double.IsInfinity(d))
 						{
 							return null;
 						}
@@ -509,7 +509,7 @@ namespace Rhino
 				case Id_toTimeString:
 				case Id_toDateString:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						return Date_format(t, id);
 					}
@@ -520,7 +520,7 @@ namespace Rhino
 				case Id_toLocaleTimeString:
 				case Id_toLocaleDateString:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						return ToLocale_helper(t, id);
 					}
@@ -529,7 +529,7 @@ namespace Rhino
 
 				case Id_toUTCString:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						return Js_toUTCString(t);
 					}
@@ -551,7 +551,7 @@ namespace Rhino
 				case Id_getFullYear:
 				case Id_getUTCFullYear:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id != Id_getUTCFullYear)
 						{
@@ -579,7 +579,7 @@ namespace Rhino
 				case Id_getMonth:
 				case Id_getUTCMonth:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getMonth)
 						{
@@ -593,7 +593,7 @@ namespace Rhino
 				case Id_getDate:
 				case Id_getUTCDate:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getDate)
 						{
@@ -607,7 +607,7 @@ namespace Rhino
 				case Id_getDay:
 				case Id_getUTCDay:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getDay)
 						{
@@ -621,7 +621,7 @@ namespace Rhino
 				case Id_getHours:
 				case Id_getUTCHours:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getHours)
 						{
@@ -635,7 +635,7 @@ namespace Rhino
 				case Id_getMinutes:
 				case Id_getUTCMinutes:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getMinutes)
 						{
@@ -649,7 +649,7 @@ namespace Rhino
 				case Id_getSeconds:
 				case Id_getUTCSeconds:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getSeconds)
 						{
@@ -663,7 +663,7 @@ namespace Rhino
 				case Id_getMilliseconds:
 				case Id_getUTCMilliseconds:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						if (id == Id_getMilliseconds)
 						{
@@ -676,7 +676,7 @@ namespace Rhino
 
 				case Id_getTimezoneOffset:
 				{
-					if (t == t)
+					if (!Double.IsNaN(t))
 					{
 						t = (t - LocalTime(t)) / msPerMinute;
 					}
@@ -719,13 +719,13 @@ namespace Rhino
 				case Id_setYear:
 				{
 					double year = ScriptRuntime.ToNumber(args, 0);
-					if (year != year || System.Double.IsInfinity(year))
+					if (Double.IsNaN(year) || Double.IsInfinity(year))
 					{
 						t = ScriptRuntime.NaN;
 					}
 					else
 					{
-						if (t != t)
+						if (Double.IsNaN(t))
 						{
 							t = 0;
 						}
@@ -760,7 +760,7 @@ namespace Rhino
 
 		private string ToISOString()
 		{
-			if (date == date)
+			if (!Double.IsNaN(date))
 			{
 				lock (isoFormat)
 				{
@@ -1301,7 +1301,7 @@ namespace Rhino
 
 		private static double TimeClip(double d)
 		{
-			if (d != d || d == double.PositiveInfinity || d == double.NegativeInfinity || Math.Abs(d) > HalfTimeDomain)
+			if (Double.IsNaN(d) || d == double.PositiveInfinity || d == double.NegativeInfinity || Math.Abs(d) > HalfTimeDomain)
 			{
 				return ScriptRuntime.NaN;
 			}
@@ -1338,7 +1338,7 @@ namespace Rhino
 				if (loop < args.Length)
 				{
 					d = ScriptRuntime.ToNumber(args[loop]);
-					if (d != d || System.Double.IsInfinity(d))
+					if (Double.IsNaN(d) || Double.IsInfinity(d))
 					{
 						return ScriptRuntime.NaN;
 					}
@@ -1896,7 +1896,7 @@ namespace Rhino
 					if (localeDateTimeFormatter == null)
 					{
 						localeDateTimeFormatter = DateFormat.GetDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
-					}
+				}
 					formatter = localeDateTimeFormatter;
 					break;
 				}
@@ -1906,7 +1906,7 @@ namespace Rhino
 					if (localeTimeFormatter == null)
 					{
 						localeTimeFormatter = DateFormat.GetTimeInstance(DateFormat.LONG);
-					}
+				}
 					formatter = localeTimeFormatter;
 					break;
 				}
@@ -1916,7 +1916,7 @@ namespace Rhino
 					if (localeDateFormatter == null)
 					{
 						localeDateFormatter = DateFormat.GetDateInstance(DateFormat.LONG);
-					}
+				}
 					formatter = localeDateFormatter;
 					break;
 				}
@@ -1930,7 +1930,7 @@ namespace Rhino
 			lock (formatter)
 			{
 				return formatter.Format(Sharpen.Extensions.CreateDate((long)t));
-			}
+		}
 		}
 
 		private static string Js_toUTCString(double date)
@@ -2098,9 +2098,7 @@ namespace Rhino
 			double sec;
 			double msec;
 			double lorutime;
-			double time;
-			double result;
-			if (date != date)
+			if (Double.IsNaN(date))
 			{
 				return date;
 			}
@@ -2112,7 +2110,7 @@ namespace Rhino
 			{
 				conv[i] = ScriptRuntime.ToNumber(args[i]);
 				// limit checks that happen in MakeTime in ECMA.
-				if (conv[i] != conv[i] || System.Double.IsInfinity(conv[i]))
+				if (Double.IsNaN(conv[i]) || Double.IsInfinity(conv[i]))
 				{
 					return ScriptRuntime.NaN;
 				}
@@ -2160,8 +2158,8 @@ namespace Rhino
 			{
 				msec = MsFromTime(lorutime);
 			}
-			time = MakeTime(hour, min, sec, msec);
-			result = MakeDate(Day(lorutime), time);
+			double time = MakeTime(hour, min, sec, msec);
+			double result = MakeDate(Day(lorutime), time);
 			if (local)
 			{
 				result = InternalUTC(result);
@@ -2237,13 +2235,13 @@ namespace Rhino
 			{
 				conv[i] = ScriptRuntime.ToNumber(args[i]);
 				// limit checks that happen in MakeDate in ECMA.
-				if (conv[i] != conv[i] || System.Double.IsInfinity(conv[i]))
+				if (Double.IsNaN(conv[i]) || Double.IsInfinity(conv[i]))
 				{
 					return ScriptRuntime.NaN;
 				}
 				conv[i] = ScriptRuntime.ToInteger(conv[i]);
 			}
-			if (date != date)
+			if (Double.IsNaN(date))
 			{
 				if (args.Length < 3)
 				{

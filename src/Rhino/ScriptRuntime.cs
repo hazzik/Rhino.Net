@@ -339,7 +339,7 @@ namespace Rhino
 				if (val.IsNumber())
 				{
 					double d = System.Convert.ToDouble(val);
-					return (d == d && d != 0.0);
+					return (!Double.IsNaN(d) && d != 0.0);
 				}
 				if (val is Scriptable)
 				{
@@ -975,7 +975,7 @@ namespace Rhino
 
 		public static string NumberToString(double d, int @base)
 		{
-			if (d != d)
+			if (Double.IsNaN(d))
 			{
 				return "NaN";
 			}
@@ -1282,7 +1282,7 @@ namespace Rhino
 		public static double ToInteger(double d)
 		{
 			// if it's NaN
-			if (d != d)
+			if (Double.IsNaN(d))
 			{
 				return +0.0;
 			}
@@ -1330,7 +1330,7 @@ namespace Rhino
 				// This covers -0.0 as well
 				return id;
 			}
-			if (d != d || d == double.PositiveInfinity || d == double.NegativeInfinity)
+			if (Double.IsNaN(d) || d == double.PositiveInfinity || d == double.NegativeInfinity)
 			{
 				return 0;
 			}
@@ -1355,7 +1355,7 @@ namespace Rhino
 				// This covers -0.0 as well
 				return l & unchecked((long)(0xffffffffL));
 			}
-			if (d != d || d == double.PositiveInfinity || d == double.NegativeInfinity)
+			if (Double.IsNaN(d) || d == double.PositiveInfinity || d == double.NegativeInfinity)
 			{
 				return 0;
 			}
@@ -1381,7 +1381,7 @@ namespace Rhino
 			{
 				return (char)i;
 			}
-			if (d != d || d == double.PositiveInfinity || d == double.NegativeInfinity)
+			if (Double.IsNaN(d) || d == double.PositiveInfinity || d == double.NegativeInfinity)
 			{
 				return 0;
 			}
@@ -3429,7 +3429,7 @@ search_break: ;
 				}
 				// NaN check
 				double d = System.Convert.ToDouble(x);
-				return d == d;
+				return !Double.IsNaN(d);
 			}
 			if (x == null || x == Undefined.instance)
 			{

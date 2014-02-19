@@ -765,7 +765,7 @@ again_break: ;
 		{
 			string search = ScriptRuntime.ToString(args, 0);
 			double end = ScriptRuntime.ToNumber(args, 1);
-			if (end != end || end > target.Length)
+			if (Double.IsNaN(end) || end > target.Length)
 			{
 				end = target.Length;
 			}

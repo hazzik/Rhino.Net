@@ -437,7 +437,7 @@ namespace Rhino
 			if (value.IsNumber())
 			{
 				double d = System.Convert.ToDouble(value);
-				if (d == d && d != double.PositiveInfinity && d != double.NegativeInfinity)
+				if (!Double.IsNaN(d) && d != double.PositiveInfinity && d != double.NegativeInfinity)
 				{
 					return ScriptRuntime.ToString(value);
 				}

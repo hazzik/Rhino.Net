@@ -542,7 +542,7 @@ again_break: ;
 
 		private static long ToArrayIndex(double d)
 		{
-			if (d == d)
+			if (!Double.IsNaN(d))
 			{
 				long index = ScriptRuntime.ToUint32(d);
 				if (index == d && index != 4294967295L)

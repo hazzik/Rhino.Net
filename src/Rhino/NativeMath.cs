@@ -293,7 +293,7 @@ namespace Rhino
 				case Id_asin:
 				{
 					x = ScriptRuntime.ToNumber(args, 0);
-					if (x == x && -1.0 <= x && x <= 1.0)
+					if (!Double.IsNaN(x) && -1.0 <= x && x <= 1.0)
 					{
 						x = (methodId == Id_acos) ? Math.Acos(x) : Math.Asin(x);
 					}
@@ -361,7 +361,7 @@ namespace Rhino
 					for (int i = 0; i != args.Length; ++i)
 					{
 						double d = ScriptRuntime.ToNumber(args[i]);
-						if (d != d)
+						if (Double.IsNaN(d))
 						{
 							x = d;
 							// NaN
@@ -396,7 +396,7 @@ namespace Rhino
 				case Id_round:
 				{
 					x = ScriptRuntime.ToNumber(args, 0);
-					if (x == x && x != double.PositiveInfinity && x != double.NegativeInfinity)
+					if (!Double.IsNaN(x) && x != double.PositiveInfinity && x != double.NegativeInfinity)
 					{
 						// Round only finite x
 						long l = Math.Round(x);
@@ -456,7 +456,7 @@ namespace Rhino
 		private double Js_pow(double x, double y)
 		{
 			double result;
-			if (y != y)
+			if (Double.IsNaN(y))
 			{
 				// y is NaN, result is always NaN
 				result = y;
@@ -494,7 +494,7 @@ namespace Rhino
 					else
 					{
 						result = Math.Pow(x, y);
-						if (result != result)
+						if (Double.IsNaN(result))
 						{
 							// Check for broken Java implementations that gives NaN
 							// when they should return something else
