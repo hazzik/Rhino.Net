@@ -463,29 +463,6 @@ check_break: ;
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static string ReadReader(TextReader r)
-		{
-			char[] buffer = new char[512];
-			int cursor = 0;
-			for (; ; )
-			{
-				int n = r.Read(buffer, cursor, buffer.Length - cursor);
-				if (n < 0)
-				{
-					break;
-				}
-				cursor += n;
-				if (cursor == buffer.Length)
-				{
-					char[] tmp = new char[buffer.Length * 2];
-					Array.Copy(buffer, 0, tmp, 0, cursor);
-					buffer = tmp;
-				}
-			}
-			return new string(buffer, 0, cursor);
-		}
-
-		/// <exception cref="System.IO.IOException"></exception>
 		public static byte[] ReadStream(Stream @is, int initialBufferCapacity)
 		{
 			if (initialBufferCapacity <= 0)

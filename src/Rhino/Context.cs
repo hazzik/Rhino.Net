@@ -2246,7 +2246,7 @@ namespace Rhino
 			{
 				if (sourceReader != null)
 				{
-					sourceString = Kit.ReadReader(sourceReader);
+					sourceString = sourceReader.ReadToEnd();
 					sourceReader = null;
 				}
 			}
