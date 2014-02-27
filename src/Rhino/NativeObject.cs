@@ -320,9 +320,10 @@ namespace Rhino
 					Callable getterOrSetter = (Callable)args[1];
 					bool isSetter = (id == Id___defineSetter__);
 					so.SetGetterOrSetter(name, index, getterOrSetter, isSetter);
-					if (so is NativeArray)
+					var nativeArray = so as NativeArray;
+					if (nativeArray != null)
 					{
-						((NativeArray)so).SetDenseOnly(false);
+						nativeArray.SetDenseOnly(false);
 					}
 					return Undefined.instance;
 				}
@@ -353,9 +354,10 @@ namespace Rhino
 						{
 							break;
 						}
-						if (v is ScriptableObject)
+						var o = v as ScriptableObject;
+						if (o != null)
 						{
-							so = (ScriptableObject)v;
+							so = o;
 						}
 						else
 						{

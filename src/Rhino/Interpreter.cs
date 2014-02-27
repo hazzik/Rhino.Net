@@ -50,7 +50,7 @@ namespace Rhino
 
 			internal object[] stack;
 
-            internal PropertyAttributes[] stackAttributes;
+			internal PropertyAttributes[] stackAttributes;
 
 			internal double[] sDbl;
 
@@ -1694,11 +1694,11 @@ namespace Rhino
 								{
 									calleeScope = ScriptableObject.GetTopLevelScope(frame.scope);
 								}
-								if (fun is InterpretedFunction)
+								var interpretedFunction = fun as InterpretedFunction;
+								if (interpretedFunction != null)
 								{
-									InterpretedFunction ifun = (InterpretedFunction)fun;
-									#if ENCHANCED_SECURITY
-									if (frame.fnOrScript.securityDomain == ifun.securityDomain)
+#if ENCHANCED_SECURITY
+									if (frame.fnOrScript.securityDomain == interpretedFunction.securityDomain)
 									#endif
 									{
 										Interpreter.CallFrame callParentFrame = frame;
@@ -1725,7 +1725,7 @@ namespace Rhino
 											// it is being done here.
 											ExitFrame(cx, frame, null);
 										}
-										InitFrame(cx, calleeScope, funThisObj, stack, sDbl, stackTop + 2, indexReg, ifun, callParentFrame, calleeFrame);
+										InitFrame(cx, calleeScope, funThisObj, stack, sDbl, stackTop + 2, indexReg, interpretedFunction, callParentFrame, calleeFrame);
 										if (op != Icode_TAIL_CALL)
 										{
 											frame.savedStackTop = stackTop;
@@ -1735,11 +1735,11 @@ namespace Rhino
 										goto StateLoop_continue;
 									}
 								}
-								if (fun is NativeContinuation)
+								var nativeContinuation = fun as NativeContinuation;
+								if (nativeContinuation != null)
 								{
 									// Jump to the captured continuation
-									Interpreter.ContinuationJump cjump;
-									cjump = new Interpreter.ContinuationJump((NativeContinuation)fun, frame);
+									ContinuationJump cjump = new Interpreter.ContinuationJump(nativeContinuation, frame);
 									// continuation result is the first argument if any
 									// of continuation call
 									if (indexReg == 0)
@@ -1755,27 +1755,27 @@ namespace Rhino
 									throwable = cjump;
 									goto withoutExceptions_break;
 								}
-								if (fun is IdFunctionObject)
+								var idFunctionObject = fun as IdFunctionObject;
+								if (idFunctionObject != null)
 								{
-									IdFunctionObject ifun = (IdFunctionObject)fun;
-									if (NativeContinuation.IsContinuationConstructor(ifun))
+									if (NativeContinuation.IsContinuationConstructor(idFunctionObject))
 									{
 										frame.stack[stackTop] = CaptureContinuation(cx, frame.parentFrame, false);
 										goto Loop_continue;
 									}
 									// Bug 405654 -- make best effort to keep Function.apply and
 									// Function.call within this interpreter loop invocation
-									if (BaseFunction.IsApplyOrCall(ifun))
+									if (BaseFunction.IsApplyOrCall(idFunctionObject))
 									{
 										Callable applyCallable = ScriptRuntime.GetCallable(funThisObj);
-										if (applyCallable is InterpretedFunction)
+										var iApplyCallable = applyCallable as InterpretedFunction;
+										if (iApplyCallable != null)
 										{
-											InterpretedFunction iApplyCallable = (InterpretedFunction)applyCallable;
 #if ENCHANCED_SECURITY
 											if (frame.fnOrScript.securityDomain == iApplyCallable.securityDomain)
 #endif
 											{
-												frame = InitFrameForApplyOrCall(cx, frame, indexReg, stack, sDbl, stackTop, op, calleeScope, ifun, iApplyCallable);
+												frame = InitFrameForApplyOrCall(cx, frame, indexReg, stack, sDbl, stackTop, op, calleeScope, idFunctionObject, iApplyCallable);
 												goto StateLoop_continue;
 											}
 										}
@@ -1783,15 +1783,15 @@ namespace Rhino
 								}
 								// Bug 447697 -- make best effort to keep __noSuchMethod__ within this
 								// interpreter loop invocation
-								if (fun is ScriptRuntime.NoSuchMethodShim)
+								var noSuchMethodShim = fun as ScriptRuntime.NoSuchMethodShim;
+								if (noSuchMethodShim != null)
 								{
 									// get the shim and the actual method
-									ScriptRuntime.NoSuchMethodShim noSuchMethodShim = (ScriptRuntime.NoSuchMethodShim)fun;
 									Callable noSuchMethodMethod = noSuchMethodShim.noSuchMethodMethod;
 									// if the method is in fact an InterpretedFunction
-									if (noSuchMethodMethod is InterpretedFunction)
+									var ifun = noSuchMethodMethod as InterpretedFunction;
+									if (ifun != null)
 									{
-										InterpretedFunction ifun = (InterpretedFunction)noSuchMethodMethod;
 #if ENCHANCED_SECURITY
 										if (frame.fnOrScript.securityDomain == ifun.securityDomain)
 #endif
@@ -1818,16 +1818,16 @@ namespace Rhino
 								// indexReg: number of arguments
 								stackTop -= indexReg;
 								object lhs = stack[stackTop];
-								if (lhs is InterpretedFunction)
+								var interpretedFunction = lhs as InterpretedFunction;
+								if (interpretedFunction != null)
 								{
-									InterpretedFunction f = (InterpretedFunction)lhs;
 #if ENCHANCED_SECURITY
-									if (frame.fnOrScript.securityDomain == f.securityDomain)
+									if (frame.fnOrScript.securityDomain == interpretedFunction.securityDomain)
 #endif
 									{
-										Scriptable newInstance = f.CreateObject(cx, frame.scope);
+										Scriptable newInstance = interpretedFunction.CreateObject(cx, frame.scope);
 										Interpreter.CallFrame calleeFrame = new Interpreter.CallFrame();
-										InitFrame(cx, frame.scope, newInstance, stack, sDbl, stackTop + 1, indexReg, f, frame, calleeFrame);
+										InitFrame(cx, frame.scope, newInstance, stack, sDbl, stackTop + 1, indexReg, interpretedFunction, frame, calleeFrame);
 										stack[stackTop] = newInstance;
 										frame.savedStackTop = stackTop;
 										frame.savedCallOp = op;
@@ -1844,10 +1844,10 @@ namespace Rhino
 									throw ScriptRuntime.NotFunctionError(lhs);
 								}
 								Function fun = (Function)lhs;
-								if (fun is IdFunctionObject)
+								var idFunctionObject = fun as IdFunctionObject;
+								if (idFunctionObject != null)
 								{
-									IdFunctionObject ifun = (IdFunctionObject)fun;
-									if (NativeContinuation.IsContinuationConstructor(ifun))
+									if (NativeContinuation.IsContinuationConstructor(idFunctionObject))
 									{
 										frame.stack[stackTop] = CaptureContinuation(cx, frame.parentFrame, false);
 										goto Loop_continue;
@@ -2539,11 +2539,12 @@ withoutExceptions_break: ;
 										}
 										else
 										{
-											if (throwable is Interpreter.ContinuationJump)
+											var continuationJump = throwable as ContinuationJump;
+											if (continuationJump != null)
 											{
 												// It must be ContinuationJump
 												exState = EX_FINALLY_STATE;
-												cjump_1 = (Interpreter.ContinuationJump)throwable;
+												cjump_1 = continuationJump;
 											}
 											else
 											{
@@ -2950,7 +2951,7 @@ object_compare_break: ;
 			return stackTop;
 		}
 
-        private static int DoSetConstVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, PropertyAttributes[] varAttributes, int indexReg)
+		private static int DoSetConstVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, PropertyAttributes[] varAttributes, int indexReg)
 		{
 			if (!frame.useActivation)
 			{
@@ -2973,9 +2974,9 @@ object_compare_break: ;
 					val = ScriptRuntime.WrapNumber(sDbl[stackTop]);
 				}
 				string stringReg = frame.idata.argNames[indexReg];
-				if (frame.scope is ConstProperties)
+				var cp = frame.scope as ConstProperties;
+				if (cp != null)
 				{
-					ConstProperties cp = (ConstProperties)frame.scope;
 					cp.PutConst(stringReg, frame.scope, val);
 				}
 				else
@@ -2986,7 +2987,7 @@ object_compare_break: ;
 			return stackTop;
 		}
 
-        private static int DoSetVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, PropertyAttributes[] varAttributes, int indexReg)
+		private static int DoSetVar(Interpreter.CallFrame frame, object[] stack, double[] sDbl, int stackTop, object[] vars, double[] varDbls, PropertyAttributes[] varAttributes, int indexReg)
 		{
 			if (!frame.useActivation)
 			{
@@ -3484,7 +3485,7 @@ object_compare_break: ;
 				Kit.CodeBug();
 			}
 			object[] stack;
-            PropertyAttributes[] stackAttributes;
+			PropertyAttributes[] stackAttributes;
 			double[] sDbl;
 			bool stackReuse;
 			if (frame.stack != null && maxFrameArray <= frame.stack.Length)
@@ -3499,7 +3500,7 @@ object_compare_break: ;
 			{
 				stackReuse = false;
 				stack = new object[maxFrameArray];
-                stackAttributes = new PropertyAttributes[maxFrameArray];
+				stackAttributes = new PropertyAttributes[maxFrameArray];
 				sDbl = new double[maxFrameArray];
 			}
 			int varCount = idata.GetParamAndVarCount();
@@ -3892,9 +3893,9 @@ object_compare_break: ;
 			}
 			else
 			{
-				if (lhs is string)
+				var lstr = lhs as string;
+				if (lstr != null)
 				{
-					string lstr = (string)lhs;
 					string rstr = ScriptRuntime.ToCharSequence(d);
 					if (leftRightOrder)
 					{

@@ -116,9 +116,10 @@ namespace Rhino
 					{
 						reviver = args[1];
 					}
-					if (reviver is Callable)
+					var callable = reviver as Callable;
+					if (callable != null)
 					{
-						return Parse(cx, scope, jtext, (Callable)reviver);
+						return Parse(cx, scope, jtext, callable);
 					}
 					else
 					{
@@ -199,39 +200,40 @@ namespace Rhino
 			{
 				property = holder.Get(((string)name), holder);
 			}
-			if (property is Scriptable)
+			var val = property as Scriptable;
+			if (val != null)
 			{
-				Scriptable val = ((Scriptable)property);
-				if (val is NativeArray)
+				var nativeArray = val as NativeArray;
+				if (nativeArray != null)
 				{
-					long len = ((NativeArray)val).GetLength();
+					long len = nativeArray.GetLength();
 					for (long i = 0; i < len; i++)
 					{
 						// indices greater than MAX_INT are represented as strings
 						if (i > int.MaxValue)
 						{
 							string id = System.Convert.ToString(i);
-							object newElement = Walk(cx, scope, reviver, val, id);
+							object newElement = Walk(cx, scope, reviver, nativeArray, id);
 							if (newElement == Undefined.instance)
 							{
 								val.Delete(id);
 							}
 							else
 							{
-								val.Put(id, val, newElement);
+								val.Put(id, nativeArray, newElement);
 							}
 						}
 						else
 						{
 							int idx = (int)i;
-							object newElement = Walk(cx, scope, reviver, val, idx);
+							object newElement = Walk(cx, scope, reviver, nativeArray, idx);
 							if (newElement == Undefined.instance)
 							{
 								val.Delete(idx);
 							}
 							else
 							{
-								val.Put(idx, val, newElement);
+								val.Put(idx, nativeArray, newElement);
 							}
 						}
 					}
@@ -311,16 +313,18 @@ namespace Rhino
 			string gap = string.Empty;
 			IList<object> propertyList = null;
 			Callable replacerFunction = null;
-			if (replacer is Callable)
+			var callable = replacer as Callable;
+			if (callable != null)
 			{
-				replacerFunction = (Callable)replacer;
+				replacerFunction = callable;
 			}
 			else
 			{
-				if (replacer is NativeArray)
+				var nativeArray = replacer as NativeArray;
+				if (nativeArray != null)
 				{
 					propertyList = new List<object>();
-					NativeArray replacerArray = (NativeArray)replacer;
+					NativeArray replacerArray = nativeArray;
 					foreach (int i in replacerArray.GetIndexIds())
 					{
 						object v = replacerArray.Get(i, replacerArray);
@@ -358,9 +362,10 @@ namespace Rhino
 			}
 			else
 			{
-				if (space is string)
+				var strSpace = space as string;
+				if (strSpace != null)
 				{
-					gap = (string)space;
+					gap = strSpace;
 					if (gap.Length > MAX_STRINGIFY_GAP_LENGTH)
 					{
 						gap = gap.Substring(0, MAX_STRINGIFY_GAP_LENGTH);
@@ -378,9 +383,10 @@ namespace Rhino
 		private static object Str(object key, Scriptable holder, NativeJSON.StringifyState state)
 		{
 			object value = null;
-			if (key is string)
+			var strKey = key as string;
+			if (strKey != null)
 			{
-				value = GetProperty(holder, (string)key);
+				value = GetProperty(holder, strKey);
 			}
 			else
 			{
@@ -446,9 +452,10 @@ namespace Rhino
 			}
 			if (value is Scriptable && !(value is Callable))
 			{
-				if (value is NativeArray)
+				var nativeArray = value as NativeArray;
+				if (nativeArray != null)
 				{
-					return Ja((NativeArray)value, state);
+					return Ja(nativeArray, state);
 				}
 				return Jo((Scriptable)value, state);
 			}

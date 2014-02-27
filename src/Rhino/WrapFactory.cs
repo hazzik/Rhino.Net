@@ -97,9 +97,10 @@ namespace Rhino
 		/// <returns>the wrapped value.</returns>
 		public virtual Scriptable WrapNewObject(Context cx, Scriptable scope, object obj)
 		{
-			if (obj is Scriptable)
+			var scriptable = obj as Scriptable;
+			if (scriptable != null)
 			{
-				return (Scriptable)obj;
+				return scriptable;
 			}
 			Type cls = obj.GetType();
 			if (cls.IsArray)

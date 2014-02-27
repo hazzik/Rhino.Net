@@ -159,9 +159,9 @@ namespace Rhino
 
 		internal static bool IsWithFunction(object functionObj)
 		{
-			if (functionObj is IdFunctionObject)
+			var f = functionObj as IdFunctionObject;
+			if (f != null)
 			{
-				IdFunctionObject f = (IdFunctionObject)functionObj;
 				return f.HasTag(FTAG) && f.MethodId() == Id_constructor;
 			}
 			return false;

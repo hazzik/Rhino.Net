@@ -145,15 +145,17 @@ namespace Rhino
 			for (int i = 0; i != args.Length; ++i)
 			{
 				object arg = args[i];
-				if (arg is NativeJavaClass)
+				var cl = arg as NativeJavaClass;
+				if (cl != null)
 				{
-					result.ImportClass((NativeJavaClass)arg);
+					result.ImportClass(cl);
 				}
 				else
 				{
-					if (arg is NativeJavaPackage)
+					var pkg = arg as NativeJavaPackage;
+					if (pkg != null)
 					{
-						result.ImportPackage((NativeJavaPackage)arg);
+						result.ImportPackage(pkg);
 					}
 					else
 					{

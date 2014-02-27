@@ -137,9 +137,10 @@ namespace Rhino
 		{
 			this.compilerEnv = compilerEnv;
 			this.errorReporter = errorReporter;
-			if (errorReporter is IdeErrorReporter)
+			var ideReporter = errorReporter as IdeErrorReporter;
+			if (ideReporter != null)
 			{
-				errorCollector = (IdeErrorReporter)errorReporter;
+				errorCollector = ideReporter;
 			}
 		}
 
@@ -825,12 +826,13 @@ bodyLoop_break: ;
 
 		private string GetDirective(AstNode n)
 		{
-			if (n is ExpressionStatement)
+			var expressionStatement = n as ExpressionStatement;
+			if (expressionStatement != null)
 			{
-				AstNode e = ((ExpressionStatement)n).GetExpression();
-				if (e is StringLiteral)
+				var stringLiteral = expressionStatement.GetExpression() as StringLiteral;
+				if (stringLiteral != null)
 				{
-					return ((StringLiteral)e).GetValue();
+					return stringLiteral.GetValue();
 				}
 			}
 			return null;
@@ -1599,10 +1601,11 @@ switchLoop_break: ;
 				if (isForIn)
 				{
 					ForInLoop fis = new ForInLoop(forPos);
-					if (init is VariableDeclaration)
+					var variableDeclaration = init as VariableDeclaration;
+					if (variableDeclaration != null)
 					{
 						// check that there was only one variable given
-						if (((VariableDeclaration)init).GetVariables().Count > 1)
+						if (variableDeclaration.GetVariables().Count > 1)
 						{
 							ReportError("msg.mult.index");
 						}
@@ -4600,24 +4603,27 @@ commaLoop_break: ;
 					lineno = ts.lineno;
 				}
 				AstNode id = prop.GetLeft();
-				Node rightElem = null;
-				if (id is Name)
+				Node rightElem;
+				var nameId = id as Name;
+				if (nameId != null)
 				{
-					Node s = Node.NewString(((Name)id).GetIdentifier());
+					Node s = Node.NewString(nameId.GetIdentifier());
 					rightElem = new Node(Token.GETPROP, CreateName(tempName), s);
 				}
 				else
 				{
-					if (id is StringLiteral)
+					var stringLiteralId = id as StringLiteral;
+					if (stringLiteralId != null)
 					{
-						Node s = Node.NewString(((StringLiteral)id).GetValue());
+						Node s = Node.NewString(stringLiteralId.GetValue());
 						rightElem = new Node(Token.GETPROP, CreateName(tempName), s);
 					}
 					else
 					{
-						if (id is NumberLiteral)
+						var numberLiteralId = id as NumberLiteral;
+						if (numberLiteralId != null)
 						{
-							Node s = CreateNumber((int)((NumberLiteral)id).GetNumber());
+							Node s = CreateNumber((int)numberLiteralId.GetNumber());
 							rightElem = new Node(Token.GETELEM, CreateName(tempName), s);
 						}
 						else
@@ -4733,17 +4739,19 @@ commaLoop_break: ;
 					// We could alternately have PropertyGet and ElementGet
 					// override getFirstChild/getLastChild and return the appropriate
 					// field, but that seems just as ugly as this casting.
-					if (left is PropertyGet)
+					var leftPropertyGet = left as PropertyGet;
+					if (leftPropertyGet != null)
 					{
-						obj = ((PropertyGet)left).GetTarget();
-						id = ((PropertyGet)left).GetProperty();
+						obj = leftPropertyGet.GetTarget();
+						id = leftPropertyGet.GetProperty();
 					}
 					else
 					{
-						if (left is ElementGet)
+						var leftElementGet = left as ElementGet;
+						if (leftElementGet != null)
 						{
-							obj = ((ElementGet)left).GetTarget();
-							id = ((ElementGet)left).GetElement();
+							obj = leftElementGet.GetTarget();
+							id = leftElementGet.GetElement();
 						}
 						else
 						{
@@ -4801,15 +4809,17 @@ commaLoop_break: ;
 
 		internal virtual void MarkDestructuring(AstNode node)
 		{
-			if (node is DestructuringForm)
+			var destructuringForm = node as DestructuringForm;
+			if (destructuringForm != null)
 			{
-				((DestructuringForm)node).SetIsDestructuring(true);
+				destructuringForm.SetIsDestructuring(true);
 			}
 			else
 			{
-				if (node is ParenthesizedExpression)
+				var parenthesizedExpression = node as ParenthesizedExpression;
+				if (parenthesizedExpression != null)
 				{
-					MarkDestructuring(((ParenthesizedExpression)node).GetExpression());
+					MarkDestructuring(parenthesizedExpression.GetExpression());
 				}
 			}
 		}

@@ -21,7 +21,7 @@ using Sharpen;
 
 namespace Rhino
 {
-    /// <summary>This class represents the runtime context of an executing script.</summary>
+	/// <summary>This class represents the runtime context of an executing script.</summary>
 	/// <remarks>
 	/// This class represents the runtime context of an executing script.
 	/// Before executing a script, an instance of Context must be created
@@ -45,7 +45,7 @@ namespace Rhino
 	/// <author>Brendan Eich</author>
 	public class Context
 	{
-        public const string languageVersionProperty = "language version";
+		public const string languageVersionProperty = "language version";
 
 		public const string errorReporterProperty = "error reporter";
 
@@ -338,16 +338,16 @@ namespace Rhino
 			return version;
 		}
 
-        /// <summary>Set the language version.</summary>
-        /// <remarks>
-        /// Set the language version.
-        /// <p>
-        /// Setting the language version will affect functions and scripts compiled
-        /// subsequently. See the overview documentation for version-specific
-        /// behavior.
-        /// </remarks>
-        /// <param name="version">the version as specified by VERSION_1_0, VERSION_1_1, etc.</param>
-        public virtual void SetLanguageVersion(LanguageVersion version)
+		/// <summary>Set the language version.</summary>
+		/// <remarks>
+		/// Set the language version.
+		/// <p>
+		/// Setting the language version will affect functions and scripts compiled
+		/// subsequently. See the overview documentation for version-specific
+		/// behavior.
+		/// </remarks>
+		/// <param name="version">the version as specified by VERSION_1_0, VERSION_1_1, etc.</param>
+		public virtual void SetLanguageVersion(LanguageVersion version)
 		{
 			if (@sealed)
 			{
@@ -548,9 +548,9 @@ namespace Rhino
 				{
 					break;
 				}
-				if (l is PropertyChangeListener)
+				var pcl = l as PropertyChangeListener;
+				if (pcl != null)
 				{
-					PropertyChangeListener pcl = (PropertyChangeListener)l;
 					pcl.PropertyChange(new PropertyChangeEvent(this, property, oldValue, newValue));
 				}
 			}
@@ -1155,9 +1155,10 @@ namespace Rhino
 		/// <returns>a string representing the function source</returns>
 		public string DecompileFunction(Function fun, int indent)
 		{
-			if (fun is BaseFunction)
+			var baseFunction = fun as BaseFunction;
+			if (baseFunction != null)
 			{
-				return ((BaseFunction)fun).Decompile(indent, 0);
+				return baseFunction.Decompile(indent, 0);
 			}
 			else
 			{
@@ -1179,9 +1180,9 @@ namespace Rhino
 		/// <returns>a string representing the function body source.</returns>
 		public string DecompileFunctionBody(Function fun, int indent)
 		{
-			if (fun is BaseFunction)
+			var bf = fun as BaseFunction;
+			if (bf != null)
 			{
-				BaseFunction bf = (BaseFunction)fun;
 				return bf.Decompile(indent, Decompiler.ONLY_BODY_FLAG);
 			}
 			// ALERT: not sure what the right response here is.
@@ -1954,42 +1955,43 @@ namespace Rhino
 		/// </remarks>
 		public static DebuggableScript GetDebuggableView(Script script)
 		{
-			if (script is NativeFunction)
+			var nativeFunction = script as NativeFunction;
+			if (nativeFunction != null)
 			{
-				return ((NativeFunction)script).GetDebuggableView();
+				return nativeFunction.GetDebuggableView();
 			}
 			return null;
 		}
 
-        /// <summary>Controls certain aspects of script semantics.</summary>
-        /// <remarks>
-        /// Controls certain aspects of script semantics.
-        /// Should be overwritten to alter default behavior.
-        /// <p>
-        /// The default implementation calls
-        /// <see cref="ContextFactory.HasFeature">ContextFactory.HasFeature(Context, int)</see>
-        /// that allows to customize Context behavior without introducing
-        /// Context subclasses.
-        /// <see cref="ContextFactory">ContextFactory</see>
-        /// documentation gives
-        /// an example of hasFeature implementation.
-        /// </remarks>
-        /// <param name="featureIndex">feature index to check</param>
-        /// <returns>true if the <code>featureIndex</code> feature is turned on</returns>
-        /// <seealso cref="LanguageFeatures.NonEcmaGetYear">NON_ECMA_GET_YEAR</seealso>
-        /// <seealso cref="LanguageFeatures.MemberExprAsFunctionName">FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME</seealso>
-        /// <seealso cref="LanguageFeatures.ReservedKeywordAsIdentifier">FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER</seealso>
-        /// <seealso cref="LanguageFeatures.ToStringAsSource">FEATURE_TO_STRING_AS_SOURCE</seealso>
-        /// <seealso cref="LanguageFeatures.ParentProtoProperties">FEATURE_PARENT_PROTO_PROPERTIES</seealso>
-        /// <seealso cref="LanguageFeatures.E4X">FEATURE_E4X</seealso>
-        /// <seealso cref="LanguageFeatures.DynamicScope">DynamicScope</seealso>
-        /// <seealso cref="LanguageFeatures.StrictVars">StrictVars</seealso>
-        /// <seealso cref="LanguageFeatures.StrictEval">StrictEval</seealso>
-        /// <seealso cref="LanguageFeatures.LocationInformationInError">LocationInformationInError</seealso>
-        /// <seealso cref="LanguageFeatures.StrictMode">StrictMode</seealso>
-        /// <seealso cref="LanguageFeatures.WarningAsError">WarningAsError</seealso>
-        /// <seealso cref="LanguageFeatures.EnhancedJavaAccess">EnhancedJavaAccess</seealso>
-        public virtual bool HasFeature(LanguageFeatures featureIndex)
+		/// <summary>Controls certain aspects of script semantics.</summary>
+		/// <remarks>
+		/// Controls certain aspects of script semantics.
+		/// Should be overwritten to alter default behavior.
+		/// <p>
+		/// The default implementation calls
+		/// <see cref="ContextFactory.HasFeature">ContextFactory.HasFeature(Context, int)</see>
+		/// that allows to customize Context behavior without introducing
+		/// Context subclasses.
+		/// <see cref="ContextFactory">ContextFactory</see>
+		/// documentation gives
+		/// an example of hasFeature implementation.
+		/// </remarks>
+		/// <param name="featureIndex">feature index to check</param>
+		/// <returns>true if the <code>featureIndex</code> feature is turned on</returns>
+		/// <seealso cref="LanguageFeatures.NonEcmaGetYear">NON_ECMA_GET_YEAR</seealso>
+		/// <seealso cref="LanguageFeatures.MemberExprAsFunctionName">FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME</seealso>
+		/// <seealso cref="LanguageFeatures.ReservedKeywordAsIdentifier">FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER</seealso>
+		/// <seealso cref="LanguageFeatures.ToStringAsSource">FEATURE_TO_STRING_AS_SOURCE</seealso>
+		/// <seealso cref="LanguageFeatures.ParentProtoProperties">FEATURE_PARENT_PROTO_PROPERTIES</seealso>
+		/// <seealso cref="LanguageFeatures.E4X">FEATURE_E4X</seealso>
+		/// <seealso cref="LanguageFeatures.DynamicScope">DynamicScope</seealso>
+		/// <seealso cref="LanguageFeatures.StrictVars">StrictVars</seealso>
+		/// <seealso cref="LanguageFeatures.StrictEval">StrictEval</seealso>
+		/// <seealso cref="LanguageFeatures.LocationInformationInError">LocationInformationInError</seealso>
+		/// <seealso cref="LanguageFeatures.StrictMode">StrictMode</seealso>
+		/// <seealso cref="LanguageFeatures.WarningAsError">WarningAsError</seealso>
+		/// <seealso cref="LanguageFeatures.EnhancedJavaAccess">EnhancedJavaAccess</seealso>
+		public virtual bool HasFeature(LanguageFeatures featureIndex)
 		{
 			ContextFactory f = GetFactory();
 			return f.HasFeature(this, featureIndex);

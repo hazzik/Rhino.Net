@@ -117,9 +117,10 @@ namespace Rhino
 
 				case Token.FOR:
 				{
-					if (node is ForInLoop)
+					var forInLoop = node as ForInLoop;
+					if (forInLoop != null)
 					{
-						return TransformForInLoop((ForInLoop)node);
+						return TransformForInLoop(forInLoop);
 					}
 					else
 					{
@@ -239,49 +240,60 @@ namespace Rhino
 
 				default:
 				{
-					if (node is ExpressionStatement)
+					var expressionStatement = node as ExpressionStatement;
+					if (expressionStatement != null)
 					{
-						return TransformExprStmt((ExpressionStatement)node);
+						return TransformExprStmt(expressionStatement);
 					}
-					if (node is Assignment)
+					var assignment = node as Assignment;
+					if (assignment != null)
 					{
-						return TransformAssignment((Assignment)node);
+						return TransformAssignment(assignment);
 					}
-					if (node is UnaryExpression)
+					var unaryExpression = node as UnaryExpression;
+					if (unaryExpression != null)
 					{
-						return TransformUnary((UnaryExpression)node);
+						return TransformUnary(unaryExpression);
 					}
-					if (node is XmlMemberGet)
+					var xmlMemberGet = node as XmlMemberGet;
+					if (xmlMemberGet != null)
 					{
-						return TransformXmlMemberGet((XmlMemberGet)node);
+						return TransformXmlMemberGet(xmlMemberGet);
 					}
-					if (node is InfixExpression)
+					var infixExpression = node as InfixExpression;
+					if (infixExpression != null)
 					{
-						return TransformInfix((InfixExpression)node);
+						return TransformInfix(infixExpression);
 					}
-					if (node is VariableDeclaration)
+					var variableDeclaration = node as VariableDeclaration;
+					if (variableDeclaration != null)
 					{
-						return TransformVariables((VariableDeclaration)node);
+						return TransformVariables(variableDeclaration);
 					}
-					if (node is ParenthesizedExpression)
+					var parenthesizedExpression = node as ParenthesizedExpression;
+					if (parenthesizedExpression != null)
 					{
-						return TransformParenExpr((ParenthesizedExpression)node);
+						return TransformParenExpr(parenthesizedExpression);
 					}
-					if (node is LabeledStatement)
+					var labeledStatement = node as LabeledStatement;
+					if (labeledStatement != null)
 					{
-						return TransformLabeledStatement((LabeledStatement)node);
+						return TransformLabeledStatement(labeledStatement);
 					}
-					if (node is LetNode)
+					var letNode = node as LetNode;
+					if (letNode != null)
 					{
-						return TransformLetNode((LetNode)node);
+						return TransformLetNode(letNode);
 					}
-					if (node is XmlRef)
+					var xmlRef = node as XmlRef;
+					if (xmlRef != null)
 					{
-						return TransformXmlRef((XmlRef)node);
+						return TransformXmlRef(xmlRef);
 					}
-					if (node is XmlLiteral)
+					var xmlLiteral = node as XmlLiteral;
+					if (xmlLiteral != null)
 					{
-						return TransformXmlLiteral((XmlLiteral)node);
+						return TransformXmlLiteral(xmlLiteral);
 					}
 					throw new ArgumentException("Can't transform: " + node);
 				}
@@ -477,9 +489,10 @@ namespace Rhino
 
 		private Node TransformBlock(AstNode node)
 		{
-			if (node is Scope)
+			var scope = node as Scope;
+			if (scope != null)
 			{
-				PushScope((Scope)node);
+				PushScope(scope);
 			}
 			try
 			{
@@ -591,9 +604,10 @@ namespace Rhino
 			{
 				int declType = -1;
 				AstNode iter = loop.GetIterator();
-				if (iter is VariableDeclaration)
+				var declaration = iter as VariableDeclaration;
+				if (declaration != null)
 				{
-					declType = ((VariableDeclaration)iter).GetType();
+					declType = declaration.GetType();
 				}
 				Node lhs = Transform(iter);
 				decompiler.AddToken(Token.IN);
@@ -1060,25 +1074,28 @@ namespace Rhino
 		private object GetPropKey(Node id)
 		{
 			object key;
-			if (id is Name)
+			var nameId = id as Name;
+			if (nameId != null)
 			{
-				string s = ((Name)id).GetIdentifier();
+				string s = nameId.GetIdentifier();
 				decompiler.AddName(s);
 				key = ScriptRuntime.GetIndexObject(s);
 			}
 			else
 			{
-				if (id is StringLiteral)
+				var stringLiteralId = id as StringLiteral;
+				if (stringLiteralId != null)
 				{
-					string s = ((StringLiteral)id).GetValue();
+					string s = stringLiteralId.GetValue();
 					decompiler.AddString(s);
 					key = ScriptRuntime.GetIndexObject(s);
 				}
 				else
 				{
-					if (id is NumberLiteral)
+					var numberLiteralId = id as NumberLiteral;
+					if (numberLiteralId != null)
 					{
-						double n = ((NumberLiteral)id).GetNumber();
+						double n = numberLiteralId.GetNumber();
 						decompiler.AddNumber(n);
 						key = ScriptRuntime.GetIndexObject(n);
 					}
@@ -1453,9 +1470,10 @@ namespace Rhino
 			Node pn = null;
 			foreach (XmlFragment frag in frags)
 			{
-				if (frag is XmlString)
+				var xmlString = frag as XmlString;
+				if (xmlString != null)
 				{
-					string xml = ((XmlString)frag).GetXml();
+					string xml = xmlString.GetXml();
 					decompiler.AddName(xml);
 					if (pn == null)
 					{
@@ -1536,9 +1554,10 @@ namespace Rhino
 				decompiler.AddName(ns);
 				decompiler.AddToken(Token.COLONCOLON);
 			}
-			if (node is XmlPropRef)
+			var xmlPropRef = node as XmlPropRef;
+			if (xmlPropRef != null)
 			{
-				string name = ((XmlPropRef)node).GetPropName().GetIdentifier();
+				string name = xmlPropRef.GetPropName().GetIdentifier();
 				decompiler.AddName(name);
 				return CreatePropertyGet(pn, ns, name, memberTypeFlags);
 			}
@@ -1779,9 +1798,10 @@ namespace Rhino
 					type = destructuring = kidType;
 					lvalue = kid;
 					destructuringLen = 0;
-					if (kid is ArrayLiteral)
+					var arrayLiteralKid = kid as ArrayLiteral;
+					if (arrayLiteralKid != null)
 					{
-						destructuringLen = ((ArrayLiteral)kid).GetDestructuringLength();
+						destructuringLen = arrayLiteralKid.GetDestructuringLength();
 					}
 				}
 				else
@@ -1804,9 +1824,10 @@ namespace Rhino
 					destructuring = type;
 					lvalue = lhs;
 					destructuringLen = 0;
-					if (lhs is ArrayLiteral)
+					var arrayLiteralLhs = lhs as ArrayLiteral;
+					if (arrayLiteralLhs != null)
 					{
-						destructuringLen = ((ArrayLiteral)lhs).GetDestructuringLength();
+						destructuringLen = arrayLiteralLhs.GetDestructuringLength();
 					}
 				}
 				else

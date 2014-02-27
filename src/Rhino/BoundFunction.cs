@@ -33,9 +33,10 @@ namespace Rhino
 			this.targetFunction = targetFunction;
 			this.boundThis = boundThis;
 			this.boundArgs = boundArgs;
-			if (targetFunction is BaseFunction)
+			var baseFunction = targetFunction as BaseFunction;
+			if (baseFunction != null)
 			{
-				length = Math.Max(0, ((BaseFunction)targetFunction).Length - boundArgs.Length);
+				length = Math.Max(0, baseFunction.Length - boundArgs.Length);
 			}
 			else
 			{
@@ -61,18 +62,20 @@ namespace Rhino
 
 		public override Scriptable Construct(Context cx, Scriptable scope, object[] extraArgs)
 		{
-			if (targetFunction is Function)
+			var function = targetFunction as Function;
+			if (function != null)
 			{
-				return ((Function)targetFunction).Construct(cx, scope, Concat(boundArgs, extraArgs));
+				return function.Construct(cx, scope, Concat(boundArgs, extraArgs));
 			}
 			throw ScriptRuntime.TypeError0("msg.not.ctor");
 		}
 
 		public override bool HasInstance(Scriptable instance)
 		{
-			if (targetFunction is Function)
+			var function = targetFunction as Function;
+			if (function != null)
 			{
-				return ((Function)targetFunction).HasInstance(instance);
+				return function.HasInstance(instance);
 			}
 			throw ScriptRuntime.TypeError0("msg.not.ctor");
 		}

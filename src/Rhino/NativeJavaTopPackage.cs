@@ -50,9 +50,10 @@ namespace Rhino
 				{
 					arg = ((Wrapper)arg).Unwrap();
 				}
-				if (arg is ClassLoader)
+				var classLoader = arg as ClassLoader;
+				if (classLoader != null)
 				{
-					loader = (ClassLoader)arg;
+					loader = classLoader;
 				}
 			}
 			if (loader == null)

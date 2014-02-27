@@ -391,17 +391,18 @@ namespace Rhino.XmlImpl
 		internal override bool EquivalentXml(object target)
 		{
 			bool result = false;
-			if (target is XML)
+			var xml = target as XML;
+			if (xml != null)
 			{
 				//    TODO    This is a horrifyingly inefficient way to do this so we should make it better.  It may also not work.
-				return this.node.ToXmlString(GetProcessor()).Equals(((XML)target).node.ToXmlString(GetProcessor()));
+				return this.node.ToXmlString(GetProcessor()).Equals(xml.node.ToXmlString(GetProcessor()));
 			}
 			else
 			{
-				if (target is XMLList)
+				var otherList = target as XMLList;
+				if (otherList != null)
 				{
 					//    TODO    Is this right?  Check the spec ...
-					XMLList otherList = (XMLList)target;
 					if (otherList.Length() == 1)
 					{
 						result = EquivalentXml(otherList.GetXML());
@@ -533,15 +534,16 @@ namespace Rhino.XmlImpl
 		//    long discussion.  See bug #354145.
 		private XmlNode[] GetNodesForInsert(object value)
 		{
-			if (value is XML)
+			var xml = value as XML;
+			if (xml != null)
 			{
-				return new XmlNode[] { ((XML)value).node };
+				return new XmlNode[] { xml.node };
 			}
 			else
 			{
-				if (value is XMLList)
+				var list = value as XMLList;
+				if (list != null)
 				{
-					XMLList list = (XMLList)value;
 					XmlNode[] rv = new XmlNode[list.Length()];
 					for (int i = 0; i < list.Length(); i++)
 					{

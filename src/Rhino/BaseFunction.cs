@@ -81,9 +81,10 @@ namespace Rhino
 		public override bool HasInstance(Scriptable instance)
 		{
 			object protoProp = ScriptableObject.GetProperty(this, "prototype");
-			if (protoProp is Scriptable)
+			var rhs = protoProp as Scriptable;
+			if (rhs != null)
 			{
-				return ScriptRuntime.JsDelegatesTo(instance, (Scriptable)protoProp);
+				return ScriptRuntime.JsDelegatesTo(instance, rhs);
 			}
 			throw ScriptRuntime.TypeError1("msg.instanceof.bad.prototype", GetFunctionName());
 		}
@@ -469,9 +470,10 @@ L0_break: ;
 			{
 				x = ((Delegator)x).Delegee;
 			}
-			if (x is Rhino.BaseFunction)
+			var baseFunction = x as BaseFunction;
+			if (baseFunction != null)
 			{
-				return (Rhino.BaseFunction)x;
+				return baseFunction;
 			}
 			throw ScriptRuntime.TypeError1("msg.incompat.call", f.GetFunctionName());
 		}
@@ -492,10 +494,10 @@ L0_break: ;
 
 		protected internal virtual Scriptable GetClassPrototype()
 		{
-			object protoVal = GetPrototypeProperty();
-			if (protoVal is Scriptable)
+			var prototype = GetPrototypeProperty() as Scriptable;
+			if (prototype != null)
 			{
-				return (Scriptable)protoVal;
+				return prototype;
 			}
 			return ScriptableObject.GetObjectPrototype(this);
 		}
@@ -512,10 +514,10 @@ L0_break: ;
 			Scriptable result = CreateObject(cx, scope);
 			if (result != null)
 			{
-				object val = Call(cx, scope, result, args);
-				if (val is Scriptable)
+				var val = Call(cx, scope, result, args) as Scriptable;
+				if (val != null)
 				{
-					result = (Scriptable)val;
+					result = val;
 				}
 			}
 			else

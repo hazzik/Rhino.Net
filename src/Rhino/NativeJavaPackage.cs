@@ -174,9 +174,9 @@ namespace Rhino
 
 		public override bool Equals(object obj)
 		{
-			if (obj is Rhino.NativeJavaPackage)
+			var njp = obj as NativeJavaPackage;
+			if (njp != null)
 			{
-				Rhino.NativeJavaPackage njp = (Rhino.NativeJavaPackage)obj;
 				return packageName.Equals(njp.packageName) && classLoader == njp.classLoader;
 			}
 			return false;

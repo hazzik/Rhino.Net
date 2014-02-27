@@ -207,9 +207,10 @@ namespace Rhino
 				new LazilyLoadedCtor(scope, "Namespace", xmlImpl, @sealed, true);
 				new LazilyLoadedCtor(scope, "QName", xmlImpl, @sealed, true);
 			}
-			if (scope is TopLevel)
+			var topLevel = scope as TopLevel;
+			if (topLevel != null)
 			{
-				((TopLevel)scope).CacheBuiltins();
+				topLevel.CacheBuiltins();
 			}
 			return scope;
 		}
@@ -326,9 +327,10 @@ namespace Rhino
 				{
 					return false;
 				}
-				if (val is string)
+				var str = val as string;
+				if (str != null)
 				{
-					return ((string)val).Length != 0;
+					return str.Length != 0;
 				}
 				if (val.IsNumber())
 				{
@@ -380,13 +382,10 @@ namespace Rhino
 				{
 					return NaN;
 				}
-				if (val is string)
+				var str = val as string;
+				if (str != null)
 				{
-					return ToNumber((string)val);
-				}
-				if (val is string)
-				{
-					return ToNumber(val.ToString());
+					return ToNumber(str);
 				}
 				if (val is bool)
 				{
@@ -906,11 +905,12 @@ namespace Rhino
 
 		public static string ToCharSequence(object val)
 		{
-			if (val is NativeString)
+			var nativeString = val as NativeString;
+			if (nativeString != null)
 			{
-				return ((NativeString)val).ToCharSequence();
+				return nativeString.ToCharSequence();
 			}
-			return val is string ? (string)val : ToString(val);
+			return val is string ? (string) val : ToString(val);
 		}
 
 		/// <summary>Convert the value to a string.</summary>
@@ -930,9 +930,10 @@ namespace Rhino
 				{
 					return "undefined";
 				}
-				if (val is string)
+				var str = val as string;
+				if (str != null)
 				{
-					return (string)val;
+					return str;
 				}
 				if (val is bool)
 				{
@@ -1047,21 +1048,20 @@ namespace Rhino
 			{
 				return ToString(value);
 			}
-			if (value is Scriptable)
+			var obj = value as Scriptable;
+			if (obj != null)
 			{
-				Scriptable obj = (Scriptable)value;
 				// Wrapped Java objects won't have "toSource" and will report
 				// errors for get()s of nonexistent name, so use has() first
 				if (ScriptableObject.HasProperty(obj, "toSource"))
 				{
-					object v = ScriptableObject.GetProperty(obj, "toSource");
-					if (v is Function)
+					var f = ScriptableObject.GetProperty(obj, "toSource") as Function;
+					if (f != null)
 					{
-						Function f = (Function)v;
 						return ToString(f.Call(cx, scope, obj, emptyArgs));
 					}
 				}
-				return ToString(value);
+				return ToString(obj);
 			}
 			WarnAboutNonJSObject(value);
 			return value.ToString();
@@ -1162,9 +1162,10 @@ namespace Rhino
 
 		public static Scriptable ToObject(Scriptable scope, object val)
 		{
-			if (val is Scriptable)
+			var scriptable = val as Scriptable;
+			if (scriptable != null)
 			{
-				return (Scriptable)val;
+				return scriptable;
 			}
 			return ToObject(Context.GetContext(), scope, val);
 		}
@@ -1172,9 +1173,10 @@ namespace Rhino
 		/// <summary>Warning: this doesn't allow to resolve primitive prototype properly when many top scopes are involved</summary>
 		public static Scriptable ToObjectOrNull(Context cx, object obj)
 		{
-			if (obj is Scriptable)
+			var scriptable = obj as Scriptable;
+			if (scriptable != null)
 			{
-				return (Scriptable)obj;
+				return scriptable;
 			}
 			else
 			{
@@ -1189,9 +1191,10 @@ namespace Rhino
 		/// <param name="scope">the scope that should be used to resolve primitive prototype</param>
 		public static Scriptable ToObjectOrNull(Context cx, object obj, Scriptable scope)
 		{
-			if (obj is Scriptable)
+			var scriptable = obj as Scriptable;
+			if (scriptable != null)
 			{
-				return (Scriptable)obj;
+				return scriptable;
 			}
 			else
 			{
@@ -1210,14 +1213,16 @@ namespace Rhino
 		/// </remarks>
 		public static Scriptable ToObject(Context cx, Scriptable scope, object val)
 		{
-			if (val is Scriptable)
+			var scriptable = val as Scriptable;
+			if (scriptable != null)
 			{
-				return (Scriptable)val;
+				return scriptable;
 			}
-			if (val is string)
+			var str = val as string;
+			if (str != null)
 			{
 				// FIXME we want to avoid toString() here, especially for concat()
-				NativeString result = new NativeString((string)val);
+				NativeString result = new NativeString(str);
 				SetBuiltinProtoAndParent(result, scope, TopLevel.Builtins.String);
 				return result;
 			}
@@ -1242,10 +1247,10 @@ namespace Rhino
 				throw TypeError0("msg.undef.to.object");
 			}
 			// Extension: Wrap as a LiveConnect object.
-			object wrapped = cx.GetWrapFactory().Wrap(cx, scope, val, null);
-			if (wrapped is Scriptable)
+			var wrapped = cx.GetWrapFactory().Wrap(cx, scope, val, null) as Scriptable;
+			if (wrapped != null)
 			{
-				return (Scriptable)wrapped;
+				return wrapped;
 			}
 			throw ErrorWithClassName("msg.invalid.type", val);
 		}
@@ -1457,9 +1462,10 @@ namespace Rhino
 		internal static Function GetExistingCtor(Context cx, Scriptable scope, string constructorName)
 		{
 			object ctorVal = ScriptableObject.GetProperty(scope, constructorName);
-			if (ctorVal is Function)
+			var ctor = ctorVal as Function;
+			if (ctor != null)
 			{
-				return (Function)ctorVal;
+				return ctor;
 			}
 			if (ctorVal == ScriptableConstants.NOT_FOUND)
 			{
@@ -1637,15 +1643,7 @@ namespace Rhino
 			}
 			else
 			{
-				string s;
-				if (id is string)
-				{
-					s = (string)id;
-				}
-				else
-				{
-					s = ToString(id);
-				}
+				string s = id as string ?? ToString(id);
 				long indexTest = IndexFromString(s);
 				if (indexTest >= 0)
 				{
@@ -1676,9 +1674,10 @@ namespace Rhino
 		public static object GetObjectElem(Scriptable obj, object elem, Context cx)
 		{
 			object result;
-			if (obj is XMLObject)
+			var xmlObject = obj as XMLObject;
+			if (xmlObject != null)
 			{
-				result = ((XMLObject)obj).Get(cx, elem);
+				result = xmlObject.Get(cx, elem);
 			}
 			else
 			{
@@ -1793,9 +1792,10 @@ namespace Rhino
 
 		public static object SetObjectElem(Scriptable obj, object elem, object value, Context cx)
 		{
-			if (obj is XMLObject)
+			var xmlObject = obj as XMLObject;
+			if (xmlObject != null)
 			{
-				((XMLObject)obj).Put(cx, elem, value);
+				xmlObject.Put(cx, elem, value);
 			}
 			else
 			{
@@ -1971,9 +1971,9 @@ namespace Rhino
 				if (scope is NativeWith)
 				{
 					Scriptable withObj = scope.Prototype;
-					if (withObj is XMLObject)
+					var xmlObj = withObj as XMLObject;
+					if (xmlObj != null)
 					{
-						XMLObject xmlObj = (XMLObject)withObj;
 						if (xmlObj.Has(name, xmlObj))
 						{
 							// function this should be the target object of with
@@ -2091,9 +2091,9 @@ namespace Rhino
 				while (scope is NativeWith)
 				{
 					Scriptable withObj = scope.Prototype;
-					if (withObj is XMLObject)
+					var xmlObject = withObj as XMLObject;
+					if (xmlObject != null)
 					{
-						XMLObject xmlObject = (XMLObject)withObj;
 						if (xmlObject.Has(cx, id))
 						{
 							return xmlObject;
@@ -2355,9 +2355,9 @@ childScopesChecks_break: ;
 				{
 					continue;
 				}
-				if (id is string)
+				var strId = id as string;
+				if (strId != null)
 				{
-					string strId = (string)id;
 					if (!x.obj.Has(strId, x.obj))
 					{
 						continue;
@@ -2580,9 +2580,10 @@ childScopesChecks_break: ;
 			if (!(value is Callable))
 			{
 				object noSuchMethod = ScriptableObject.GetProperty(thisObj, "__noSuchMethod__");
-				if (noSuchMethod is Callable)
+				var callable = noSuchMethod as Callable;
+				if (callable != null)
 				{
-					value = new ScriptRuntime.NoSuchMethodShim((Callable)noSuchMethod, property);
+					value = new ScriptRuntime.NoSuchMethodShim(callable, property);
 				}
 			}
 			if (!(value is Callable))
@@ -2613,9 +2614,10 @@ childScopesChecks_break: ;
 			}
 			Callable f = (Callable)value;
 			Scriptable thisObj = null;
-			if (f is Scriptable)
+			var scriptable = f as Scriptable;
+			if (scriptable != null)
 			{
-				thisObj = ((Scriptable)f).ParentScope;
+				thisObj = scriptable.ParentScope;
 			}
 			if (thisObj == null)
 			{
@@ -2803,9 +2805,10 @@ childScopesChecks_break: ;
 		internal static Callable GetCallable(Scriptable thisObj)
 		{
 			Callable function;
-			if (thisObj is Callable)
+			var callable = thisObj as Callable;
+			if (callable != null)
 			{
-				function = (Callable)thisObj;
+				function = callable;
 			}
 			else
 			{
@@ -2881,9 +2884,10 @@ childScopesChecks_break: ;
 			{
 				return "undefined";
 			}
-			if (value is ScriptableObject)
+			var scriptableObject = value as ScriptableObject;
+			if (scriptableObject != null)
 			{
-				return ((ScriptableObject)value).GetTypeOf();
+				return scriptableObject.GetTypeOf();
 			}
 			if (value is Scriptable)
 			{
@@ -2931,17 +2935,19 @@ childScopesChecks_break: ;
 			{
 				return WrapNumber(System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2));
 			}
-			if (val1 is XMLObject)
+			var xmlObject1 = val1 as XMLObject;
+			if (xmlObject1 != null)
 			{
-				object test = ((XMLObject)val1).AddValues(cx, true, val2);
+				object test = xmlObject1.AddValues(cx, true, val2);
 				if (test != ScriptableConstants.NOT_FOUND)
 				{
 					return test;
 				}
 			}
-			if (val2 is XMLObject)
+			var xmlObject2 = val2 as XMLObject;
+			if (xmlObject2 != null)
 			{
-				object test = ((XMLObject)val2).AddValues(cx, false, val1);
+				object test = xmlObject2.AddValues(cx, false, val1);
 				if (test != ScriptableConstants.NOT_FOUND)
 				{
 					return test;
@@ -3182,9 +3188,10 @@ search_break: ;
 				{
 					return true;
 				}
-				if (y is ScriptableObject)
+				var scriptableObjectY = y as ScriptableObject;
+				if (scriptableObjectY != null)
 				{
-					object test = ((ScriptableObject)y).EquivalentValues(x);
+					object test = scriptableObjectY.EquivalentValues(x);
 					if (test != ScriptableConstants.NOT_FOUND)
 					{
 						return ((bool)test);
@@ -3206,9 +3213,10 @@ search_break: ;
 					}
 					else
 					{
-						if (x is string)
+						var strX = x as string;
+						if (strX != null)
 						{
-							return EqString((string)x, y);
+							return EqString(strX, y);
 						}
 						else
 						{
@@ -3219,9 +3227,10 @@ search_break: ;
 								{
 									return b == ((bool)y);
 								}
-								if (y is ScriptableObject)
+								var scriptableObjectY = y as ScriptableObject;
+								if (scriptableObjectY != null)
 								{
-									object test = ((ScriptableObject)y).EquivalentValues(x);
+									object test = scriptableObjectY.EquivalentValues(x);
 									if (test != ScriptableConstants.NOT_FOUND)
 									{
 										return ((bool)test);
@@ -3235,17 +3244,19 @@ search_break: ;
 								{
 									if (y is Scriptable)
 									{
-										if (x is ScriptableObject)
+										var scriptableObjectX = x as ScriptableObject;
+										if (scriptableObjectX != null)
 										{
-											object test = ((ScriptableObject)x).EquivalentValues(y);
+											object test = scriptableObjectX.EquivalentValues(y);
 											if (test != ScriptableConstants.NOT_FOUND)
 											{
 												return ((bool)test);
 											}
 										}
-										if (y is ScriptableObject)
+										var scriptableObjectY = y as ScriptableObject;
+										if (scriptableObjectY != null)
 										{
-											object test = ((ScriptableObject)y).EquivalentValues(x);
+											object test = scriptableObjectY.EquivalentValues(x);
 											if (test != ScriptableConstants.NOT_FOUND)
 											{
 												return ((bool)test);
@@ -3265,9 +3276,10 @@ search_break: ;
 									{
 										if (y is bool)
 										{
-											if (x is ScriptableObject)
+											var scriptableObjectX = x as ScriptableObject;
+											if (scriptableObjectX != null)
 											{
-												object test = ((ScriptableObject)x).EquivalentValues(y);
+												object test = scriptableObjectX.EquivalentValues(y);
 												if (test != ScriptableConstants.NOT_FOUND)
 												{
 													return ((bool)test);
@@ -3284,9 +3296,10 @@ search_break: ;
 											}
 											else
 											{
-												if (y is string)
+												var strY = y as string;
+												if (strY != null)
 												{
-													return EqString((string)y, x);
+													return EqString(strY, x);
 												}
 											}
 										}
@@ -3341,10 +3354,11 @@ search_break: ;
 							{
 								if (y is Scriptable)
 								{
-									if (y is ScriptableObject)
+									var scriptableObjectY = y as ScriptableObject;
+									if (scriptableObjectY != null)
 									{
 										object xval = WrapNumber(x);
-										object test = ((ScriptableObject)y).EquivalentValues(xval);
+										object test = scriptableObjectY.EquivalentValues(xval);
 										if (test != ScriptableConstants.NOT_FOUND)
 										{
 											return ((bool)test);
@@ -3374,9 +3388,9 @@ search_break: ;
 				}
 				else
 				{
-					if (y is string)
+					var c = y as string;
+					if (c != null)
 					{
-						string c = (string)y;
 						return x.Length == c.Length && x.ToString().Equals(c.ToString());
 					}
 					else
@@ -3395,9 +3409,10 @@ search_break: ;
 							{
 								if (y is Scriptable)
 								{
-									if (y is ScriptableObject)
+									var scriptableObjectY = y as ScriptableObject;
+									if (scriptableObjectY != null)
 									{
-										object test = ((ScriptableObject)y).EquivalentValues(x.ToString());
+										object test = scriptableObjectY.EquivalentValues(x.ToString());
 										if (test != ScriptableConstants.NOT_FOUND)
 										{
 											return ((bool)test);
@@ -3792,10 +3807,11 @@ search_break: ;
 		{
 			object obj;
 			bool cacheObj;
-			if (t is JavaScriptException)
+			var javaScriptException = t as JavaScriptException;
+			if (javaScriptException != null)
 			{
 				cacheObj = false;
-				obj = ((JavaScriptException)t).GetValue();
+				obj = javaScriptException.GetValue();
 			}
 			else
 			{
@@ -3839,32 +3855,32 @@ search_break: ;
 			string errorName;
 			string errorMsg;
 			Exception javaException = null;
-			if (t is EcmaError)
+			var ecmaError = t as EcmaError;
+			if (ecmaError != null)
 			{
-				EcmaError ee = (EcmaError)t;
-				re = ee;
-				errorName = ee.GetName();
-				errorMsg = ee.GetErrorMessage();
+				re = ecmaError;
+				errorName = ecmaError.GetName();
+				errorMsg = ecmaError.GetErrorMessage();
 			}
 			else
 			{
-				if (t is WrappedException)
+				var wrappedException = t as WrappedException;
+				if (wrappedException != null)
 				{
-					WrappedException we = (WrappedException)t;
-					re = we;
-					javaException = we.GetWrappedException();
+					re = wrappedException;
+					javaException = wrappedException.GetWrappedException();
 					errorName = "JavaException";
 					errorMsg = javaException.GetType().FullName + ": " + javaException.Message;
 				}
 				else
 				{
-					if (t is EvaluatorException)
+					var evaluatorException = t as EvaluatorException;
+					if (evaluatorException != null)
 					{
 						// Pure evaluator exception, nor WrappedException instance
-						EvaluatorException ee = (EvaluatorException)t;
-						re = ee;
+						re = evaluatorException;
 						errorName = "InternalError";
-						errorMsg = ee.Message;
+						errorMsg = evaluatorException.Message;
 					}
 					else
 					{
@@ -3903,9 +3919,10 @@ search_break: ;
 			Scriptable errorObject = cx.NewObject(scope, errorName, args);
 			ScriptableObject.PutProperty(errorObject, "name", errorName);
 			// set exception in Error objects to enable non-ECMA "stack" property
-			if (errorObject is NativeError)
+			var nativeError = errorObject as NativeError;
+			if (nativeError != null)
 			{
-				((NativeError)errorObject).SetStackProvider(re);
+				nativeError.SetStackProvider(re);
 			}
 			if (javaException != null && IsVisible(cx, javaException))
 			{
@@ -3933,9 +3950,9 @@ search_break: ;
 			{
 				throw TypeError1("msg.undef.with", ToString(obj));
 			}
-			if (sobj is XMLObject)
+			var xmlObject = sobj as XMLObject;
+			if (xmlObject != null)
 			{
-				XMLObject xmlObject = (XMLObject)sobj;
 				return xmlObject.EnterWith(scope);
 			}
 			return new NativeWith(scope, sobj);
@@ -4094,17 +4111,18 @@ search_break: ;
 				object id = propertyIds[i];
 				int getterSetter = getterSetters == null ? 0 : getterSetters[i];
 				object value = propertyValues[i];
-				if (id is string)
+				var strId = id as string;
+				if (strId != null)
 				{
 					if (getterSetter == 0)
 					{
-						if (IsSpecialProperty((string)id))
+						if (IsSpecialProperty(strId))
 						{
-							SpecialRef(@object, (string)id, cx).Set(cx, value);
+							SpecialRef(@object, strId, cx).Set(cx, value);
 						}
 						else
 						{
-							@object.Put((string)id, @object, value);
+							@object.Put(strId, @object, value);
 						}
 					}
 					else
@@ -4112,7 +4130,7 @@ search_break: ;
 						ScriptableObject so = (ScriptableObject)@object;
 						Callable getterOrSetter = (Callable)value;
 						bool isSetter = getterSetter == 1;
-						so.SetGetterOrSetter((string)id, 0, getterOrSetter, isSetter);
+						so.SetGetterOrSetter(strId, 0, getterOrSetter, isSetter);
 					}
 				}
 				else

@@ -87,15 +87,15 @@ namespace Rhino
 			Type type;
 			try
 			{
-				if (member is BeanProperty)
+				var property = member as BeanProperty;
+				if (property != null)
 				{
-					BeanProperty bp = (BeanProperty)member;
-					if (bp.getter == null)
+					if (property.getter == null)
 					{
 						return ScriptableConstants.NOT_FOUND;
 					}
-					rval = bp.getter.Invoke(javaObject, Context.emptyArgs);
-					type = bp.getter.Method().ReturnType;
+					rval = property.getter.Invoke(javaObject, Context.emptyArgs);
+					type = property.getter.Method().ReturnType;
 				}
 				else
 				{
@@ -132,9 +132,9 @@ namespace Rhino
 				member = fam.field;
 			}
 			// Is this a bean property "set"?
-			if (member is BeanProperty)
+			var bp = member as BeanProperty;
+			if (bp != null)
 			{
-				BeanProperty bp = (BeanProperty)member;
 				if (bp.setter == null)
 				{
 					throw ReportMemberNotFound(name);
@@ -443,9 +443,9 @@ namespace Rhino
 
 			public override bool Equals(object o)
 			{
-				if (o is MethodSignature)
+				var ms = o as MethodSignature;
+				if (ms != null)
 				{
-					MethodSignature ms = (MethodSignature)o;
 					return ms.name.Equals(name) && Arrays.Equals(args, ms.args);
 				}
 				return false;
@@ -476,9 +476,10 @@ namespace Rhino
 				else
 				{
 					ObjArray overloadedMethods;
-					if (value is ObjArray)
+					var objArray = value as ObjArray;
+					if (objArray != null)
 					{
-						overloadedMethods = (ObjArray)value;
+						overloadedMethods = objArray;
 					}
 					else
 					{
@@ -505,10 +506,11 @@ namespace Rhino
 				{
 					MemberBox[] methodBoxes;
 					object value = entry.Value;
-					if (value is MethodInfo)
+					var methodInfo = value as MethodInfo;
+					if (methodInfo != null)
 					{
 						methodBoxes = new MemberBox[1];
-						methodBoxes[0] = new MemberBox((MethodInfo)value);
+						methodBoxes[0] = new MemberBox(methodInfo);
 					}
 					else
 					{
@@ -549,10 +551,10 @@ namespace Rhino
 					}
 					else
 					{
-						if (member is NativeJavaMethod)
+						var method = member as NativeJavaMethod;
+						if (method != null)
 						{
-							NativeJavaMethod method_1 = (NativeJavaMethod)member;
-							FieldAndMethods fam = new FieldAndMethods(scope, method_1.methods, field);
+							FieldAndMethods fam = new FieldAndMethods(scope, method.methods, field);
 							IDictionary<string, FieldAndMethods> fmht = isStatic ? staticFieldAndMethods : fieldAndMethods;
 							if (fmht == null)
 							{
@@ -571,9 +573,9 @@ namespace Rhino
 						}
 						else
 						{
-							if (member is FieldInfo)
+							var oldField = member as FieldInfo;
+							if (oldField != null)
 							{
-								FieldInfo oldField = (FieldInfo)member;
 								// If this newly reflected field shadows an inherited field,
 								// then replace it. Otherwise, since access to the field
 								// would be ambiguous from Java, no field should be
@@ -671,9 +673,9 @@ namespace Rhino
 						{
 							// Is this value a method?
 							object member = ht.Get(setterName);
-							if (member is NativeJavaMethod)
+							var njmSet = member as NativeJavaMethod;
+							if (njmSet != null)
 							{
-								NativeJavaMethod njmSet = (NativeJavaMethod)member;
 								if (getter != null)
 								{
 									// We have a getter. Now, do we have a matching
@@ -774,10 +776,9 @@ namespace Rhino
 			if (ht.ContainsKey(getterName))
 			{
 				// Check that the getter is a method.
-				object member = ht.Get(getterName);
-				if (member is NativeJavaMethod)
+				var njmGet = ht.Get(getterName) as NativeJavaMethod;
+				if (njmGet != null)
 				{
-					NativeJavaMethod njmGet = (NativeJavaMethod)member;
 					return ExtractGetMethod(njmGet.methods, isStatic);
 				}
 			}

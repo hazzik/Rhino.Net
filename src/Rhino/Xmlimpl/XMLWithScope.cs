@@ -42,9 +42,9 @@ namespace Rhino.XmlImpl
 			// is a element of the lhs (XMLList).
 			_currIndex = 0;
 			_dqPrototype = prototype;
-			if (prototype is XMLList)
+			var xl = prototype as XMLList;
+			if (xl != null)
 			{
-				XMLList xl = (XMLList)prototype;
 				if (xl.Length() > 0)
 				{
 					Prototype = (Scriptable)(xl.Get(0, null));
@@ -60,12 +60,12 @@ namespace Rhino.XmlImpl
 			// Return null to continue looping
 			XMLObject seed = _dqPrototype;
 			XMLList xmlL = _xmlList;
-			if (seed is XMLList)
+			var orgXmlL = seed as XMLList;
+			if (orgXmlL != null)
 			{
 				// We're a list so keep testing each element of the list if the
 				// result on the top of stack is true then that element is added
 				// to our result list.  If false, we try the next element.
-				XMLList orgXmlL = (XMLList)seed;
 				int idx = _currIndex;
 				if (value)
 				{

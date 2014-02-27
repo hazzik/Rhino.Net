@@ -55,9 +55,10 @@ namespace Rhino.RegExp
 					object arg1 = args.Length < 2 ? Undefined.instance : args[1];
 					string repstr = null;
 					Function lambda = null;
-					if (arg1 is Function)
+					var function = arg1 as Function;
+					if (function != null)
 					{
-						lambda = (Function)arg1;
+						lambda = function;
 					}
 					else
 					{
@@ -106,9 +107,10 @@ namespace Rhino.RegExp
 			}
 			else
 			{
-				if (args[0] is NativeRegExp)
+				var nativeRegExp = args[0] as NativeRegExp;
+				if (nativeRegExp != null)
 				{
-					re = (NativeRegExp)args[0];
+					re = nativeRegExp;
 				}
 				else
 				{
@@ -563,12 +565,12 @@ again_break: ;
 			int[] matchlen = new int[1];
 			Scriptable re = null;
 			RegExpProxy reProxy = null;
-			if (args[0] is Scriptable)
+			var test = args[0] as Scriptable;
+			if (test != null)
 			{
 				reProxy = ScriptRuntime.GetRegExpProxy(cx);
 				if (reProxy != null)
 				{
-					Scriptable test = (Scriptable)args[0];
 					if (reProxy.IsRegExp(test))
 					{
 						re = test;

@@ -196,11 +196,10 @@ namespace Rhino
 						throw Context.ReportRuntimeError0("msg.default.value");
 					}
 				}
-				object converterObject = Get(converterName, this);
-				if (converterObject is Function)
+				var converter = Get(converterName, this) as Function;
+				if (converter != null)
 				{
-					Function f = (Function)converterObject;
-					value = f.Call(Context.GetContext(), f.ParentScope, this, ScriptRuntime.emptyArgs);
+					value = converter.Call(Context.GetContext(), converter.ParentScope, this, ScriptRuntime.emptyArgs);
 				}
 				else
 				{
@@ -1069,18 +1068,20 @@ namespace Rhino
 			}
 			else
 			{
-				if (value is string)
+				var strValue = value as string;
+				if (strValue != null)
 				{
-					return ScriptRuntime.ToNumber((string)value);
+					return ScriptRuntime.ToNumber(strValue);
 				}
 				else
 				{
 					if (value is Scriptable)
 					{
-						if (value is Wrapper)
+						var wrapper = value as Wrapper;
+						if (wrapper != null)
 						{
 							// XXX: optimize tail-recursion?
-							return ToDouble(((Wrapper)value).Unwrap());
+							return ToDouble(wrapper.Unwrap());
 						}
 						else
 						{

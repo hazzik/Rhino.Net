@@ -72,9 +72,10 @@ namespace Rhino
 
 		internal override string Decompile(int indent, int flags)
 		{
-			if (script is NativeFunction)
+			var nativeFunction = script as NativeFunction;
+			if (nativeFunction != null)
 			{
-				return ((NativeFunction)script).Decompile(indent, flags);
+				return nativeFunction.Decompile(indent, flags);
 			}
 			return base.Decompile(indent, flags);
 		}

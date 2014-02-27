@@ -96,9 +96,10 @@ namespace Rhino
 									}
 									else
 									{
-										if (value is Wrapper)
+										var wrapper = value as Wrapper;
+										if (wrapper != null)
 										{
-											object wrapped = ((Wrapper)value).Unwrap();
+											object wrapped = wrapper.Unwrap();
 											s = wrapped.GetType().FullName;
 										}
 										else
@@ -252,9 +253,10 @@ namespace Rhino
 					{
 						throw Context.ReportRuntimeError3("msg.nonjava.method", GetFunctionName(), ScriptRuntime.ToString(thisObj), c.FullName);
 					}
-					if (o is Wrapper)
+					var wrapper = o as Wrapper;
+					if (wrapper != null)
 					{
-						javaObject = ((Wrapper)o).Unwrap();
+						javaObject = wrapper.Unwrap();
 						if (c.IsInstanceOfType(javaObject))
 						{
 							break;

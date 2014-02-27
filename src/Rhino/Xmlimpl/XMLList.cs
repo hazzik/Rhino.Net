@@ -220,9 +220,10 @@ namespace Rhino.XmlImpl
 					value = "undefined";
 				}
 			}
-			if (value is XMLObject)
+			var xmlObject = value as XMLObject;
+			if (xmlObject != null)
 			{
-				xmlValue = (XMLObject)value;
+				xmlValue = xmlObject;
 			}
 			else
 			{
@@ -262,25 +263,26 @@ namespace Rhino.XmlImpl
 					parent = Parent();
 				}
 			}
-			if (parent is XML)
+			var xmlParent = parent as XML;
+			if (xmlParent != null)
 			{
 				// found parent, alter doc
-				XML xmlParent = (XML)parent;
 				if (index < Length())
 				{
 					// We're replacing the the node.
 					XML xmlNode = GetXmlFromAnnotation(index);
-					if (xmlValue is XML)
+					var xml = xmlValue as XML;
+					if (xml != null)
 					{
-						ReplaceNode(xmlNode, (XML)xmlValue);
+						ReplaceNode(xmlNode, xml);
 						Replace(index, xmlNode);
 					}
 					else
 					{
-						if (xmlValue is XMLList)
+						var list = xmlValue as XMLList;
+						if (list != null)
 						{
 							// Replace the first one, and add the rest on the list.
-							XMLList list = (XMLList)xmlValue;
 							if (list.Length() > 0)
 							{
 								int lastIndexAdded = xmlNode.ChildIndex();
@@ -309,17 +311,18 @@ namespace Rhino.XmlImpl
 				if (index < Length())
 				{
 					XML xmlNode = GetXML(_annos, index);
-					if (xmlValue is XML)
+					var xml = xmlValue as XML;
+					if (xml != null)
 					{
-						ReplaceNode(xmlNode, (XML)xmlValue);
+						ReplaceNode(xmlNode, xml);
 						Replace(index, xmlNode);
 					}
 					else
 					{
-						if (xmlValue is XMLList)
+						var list = xmlValue as XMLList;
+						if (list != null)
 						{
 							// Replace the first one, and add the rest on the list.
-							XMLList list = (XMLList)xmlValue;
 							if (list.Length() > 0)
 							{
 								ReplaceNode(xmlNode, list.Item(0));
@@ -787,9 +790,9 @@ namespace Rhino.XmlImpl
 				}
 				else
 				{
-					if (target is XMLList)
+					var otherList = target as XMLList;
+					if (otherList != null)
 					{
-						XMLList otherList = (XMLList)target;
 						if (otherList.Length() == Length())
 						{
 							result = true;

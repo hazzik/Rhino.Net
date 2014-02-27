@@ -233,14 +233,16 @@ namespace Rhino
 				}
 				object self = GetAdapterSelf(adapterClass, adapter);
 				// Return unwrapped JavaAdapter if it implements Scriptable
-				if (self is Wrapper)
+				var wrapper = self as Wrapper;
+				if (wrapper != null)
 				{
-					object unwrapped = ((Wrapper)self).Unwrap();
+					object unwrapped = wrapper.Unwrap();
 					if (unwrapped is Scriptable)
 					{
-						if (unwrapped is ScriptableObject)
+						var scriptableObject = unwrapped as ScriptableObject;
+						if (scriptableObject != null)
 						{
-							ScriptRuntime.SetObjectProtoAndParent((ScriptableObject)unwrapped, scope);
+							ScriptRuntime.SetObjectProtoAndParent(scriptableObject, scope);
 						}
 						return unwrapped;
 					}
@@ -337,11 +339,10 @@ namespace Rhino
 					continue;
 				}
 				string id = (string)ids[i];
-				object value = ScriptableObject.GetProperty(obj, id);
-				if (value is Function)
+				var value = ScriptableObject.GetProperty(obj, id) as Function;
+				if (value != null)
 				{
-					Function f = (Function)value;
-					int length = ScriptRuntime.ToInt32(ScriptableObject.GetProperty(f, "length"));
+					int length = ScriptRuntime.ToInt32(ScriptableObject.GetProperty(value, "length"));
 					if (length < 0)
 					{
 						length = 0;

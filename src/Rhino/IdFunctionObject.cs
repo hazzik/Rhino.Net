@@ -135,9 +135,9 @@ namespace Rhino
 				sb.Append("() { ");
 			}
 			sb.Append("[native code for ");
-			if (idcall is Scriptable)
+			var sobj = idcall as Scriptable;
+			if (sobj != null)
 			{
-				Scriptable sobj = (Scriptable)idcall;
 				sb.Append(sobj.GetClassName());
 				sb.Append('.');
 			}

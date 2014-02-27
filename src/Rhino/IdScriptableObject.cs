@@ -810,9 +810,9 @@ namespace Rhino
 
 		public override void DefineOwnProperty(Context cx, object key, ScriptableObject desc)
 		{
-			if (key is string)
+			var name = key as string;
+			if (name != null)
 			{
-				string name = (string)key;
 				InstanceIdInfo info = FindInstanceIdInfo(name);
 				if (info != null)
 				{
@@ -825,7 +825,7 @@ namespace Rhino
 					{
 						// it will be replaced with a slot
 						CheckPropertyDefinition(desc);
-						ScriptableObject current = GetOwnPropertyDescriptor(cx, key);
+						ScriptableObject current = GetOwnPropertyDescriptor(cx, name);
 						CheckPropertyChange(name, current, desc);
 						PropertyAttributes attr = info.Attributes;
 						object value = GetProperty(desc, "value");
@@ -854,7 +854,7 @@ namespace Rhino
 						{
 							// it will be replaced with a slot
 							CheckPropertyDefinition(desc);
-							ScriptableObject current = GetOwnPropertyDescriptor(cx, key);
+							ScriptableObject current = GetOwnPropertyDescriptor(cx, name);
 							CheckPropertyChange(name, current, desc);
 							PropertyAttributes attr = prototypeValues.GetAttributes(id);
 							object value = GetProperty(desc, "value");

@@ -5,8 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#if XML
 
+using Rhino.Utils;
+#if XML
 using System;
 using Rhino;
 using Rhino.Xml;
@@ -27,9 +28,10 @@ namespace Rhino.XmlImpl
 		{
 			//    Could return DocumentFragment for XMLList
 			//    Probably a single node for XMLList with one element
-			if (xmlObject is XML)
+			var xml = xmlObject as XML;
+			if (xml != null)
 			{
-				return ((XML)xmlObject).ToDomNode();
+				return xml.ToDomNode();
 			}
 			else
 			{
@@ -134,16 +136,18 @@ namespace Rhino.XmlImpl
 		[Obsolete(@"")]
 		internal XMLName ToAttributeName(Context cx, object nameValue)
 		{
-			if (nameValue is XMLName)
+			var xmlName = nameValue as XMLName;
+			if (xmlName != null)
 			{
 				//    TODO    Will this always be an XMLName of type attribute name?
-				return (XMLName)nameValue;
+				return xmlName;
 			}
 			else
 			{
-				if (nameValue is QName)
+				var qname = nameValue as QName;
+				if (qname != null)
 				{
-					return XMLName.Create(((QName)nameValue).GetDelegate(), true, false);
+					return XMLName.Create(qname.GetDelegate(), true, false);
 				}
 				else
 				{
@@ -154,15 +158,7 @@ namespace Rhino.XmlImpl
 					else
 					{
 						//    TODO    Not 100% sure that putting these in global namespace is the right thing to do
-						string localName = null;
-						if (nameValue is string)
-						{
-							localName = (string)nameValue;
-						}
-						else
-						{
-							localName = ScriptRuntime.ToString(nameValue);
-						}
+						string localName = nameValue as string ?? ScriptRuntime.ToString(nameValue);
 						if (localName != null && localName.Equals("*"))
 						{
 							localName = null;
@@ -209,22 +205,24 @@ namespace Rhino.XmlImpl
 		internal XMLName ToXMLName(Context cx, object nameValue)
 		{
 			XMLName result;
-			if (nameValue is XMLName)
+			var xmlName = nameValue as XMLName;
+			if (xmlName != null)
 			{
-				result = (XMLName)nameValue;
+				result = xmlName;
 			}
 			else
 			{
-				if (nameValue is QName)
+				var qname = nameValue as QName;
+				if (qname != null)
 				{
-					QName qname = (QName)nameValue;
 					result = XMLName.FormProperty(qname.Uri(), qname.LocalName());
 				}
 				else
 				{
-					if (nameValue is string)
+					var s = nameValue as string;
+					if (s != null)
 					{
-						result = ToXMLNameFromString(cx, (string)nameValue);
+						result = ToXMLNameFromString(cx, s);
 					}
 					else
 					{
@@ -255,16 +253,17 @@ namespace Rhino.XmlImpl
 		internal XMLName ToXMLNameOrIndex(Context cx, object value)
 		{
 			XMLName result;
-			if (value is XMLName)
+			var name = value as XMLName;
+			if (name != null)
 			{
-				result = (XMLName)value;
+				result = name;
 			}
 			else
 			{
-				if (value is string)
+				var s = value as string;
+				if (s != null)
 				{
-					string str = (string)value;
-					long test = ScriptRuntime.TestUint32String(str);
+					long test = ScriptRuntime.TestUint32String(s);
 					if (test >= 0)
 					{
 						ScriptRuntime.StoreUint32Result(cx, test);
@@ -272,7 +271,7 @@ namespace Rhino.XmlImpl
 					}
 					else
 					{
-						result = ToXMLNameFromString(cx, str);
+						result = ToXMLNameFromString(cx, s);
 					}
 				}
 				else
@@ -293,9 +292,9 @@ namespace Rhino.XmlImpl
 					}
 					else
 					{
-						if (value is QName)
+						var qname = value as QName;
+						if (qname != null)
 						{
-							QName qname = (QName)value;
 							string uri = qname.Uri();
 							bool number = false;
 							result = null;
@@ -344,9 +343,9 @@ namespace Rhino.XmlImpl
 		internal object AddXMLObjects(Context cx, XMLObject obj1, XMLObject obj2)
 		{
 			XMLList listToAdd = NewXMLList();
-			if (obj1 is XMLList)
+			var list1 = obj1 as XMLList;
+			if (list1 != null)
 			{
-				XMLList list1 = (XMLList)obj1;
 				if (list1.Length() == 1)
 				{
 					listToAdd.AddToList(list1.Item(0));
@@ -356,16 +355,16 @@ namespace Rhino.XmlImpl
 					// Might be xmlFragment + xmlFragment + xmlFragment + ...;
 					// then the result will be an XMLList which we want to be an
 					// rValue and allow it to be assigned to an lvalue.
-					listToAdd = NewXMLListFrom(obj1);
+					listToAdd = NewXMLListFrom(list1);
 				}
 			}
 			else
 			{
 				listToAdd.AddToList(obj1);
 			}
-			if (obj2 is XMLList)
+			var list2 = obj2 as XMLList;
+			if (list2 != null)
 			{
-				XMLList list2 = (XMLList)obj2;
 				for (int i = 0; i < list2.Length(); i++)
 				{
 					listToAdd.AddToList(list2.Item(i));
@@ -449,9 +448,10 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				if (ns is Namespace)
+				var @namespace = ns as Namespace;
+				if (@namespace != null)
 				{
-					return (Namespace)ns;
+					return @namespace;
 				}
 				else
 				{
@@ -514,10 +514,11 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				if (inputObject is XMLObjectImpl)
+				var xmlObjectImpl = inputObject as XMLObjectImpl;
+				if (xmlObjectImpl != null)
 				{
 					// todo: faster way for XMLObjects?
-					frag = ((XMLObjectImpl)inputObject).ToXMLString();
+					frag = xmlObjectImpl.ToXMLString();
 				}
 				else
 				{
@@ -555,13 +556,14 @@ namespace Rhino.XmlImpl
 			{
 				throw ScriptRuntime.TypeError("Cannot convert " + @object + " to XML");
 			}
-			if (@object is XML)
+			var xml = @object as XML;
+			if (xml != null)
 			{
-				return (XML)@object;
+				return xml;
 			}
-			if (@object is XMLList)
+			var list = @object as XMLList;
+			if (list != null)
 			{
-				XMLList list = (XMLList)@object;
 				if (list.GetXML() != null)
 				{
 					return list.GetXML();
@@ -579,9 +581,9 @@ namespace Rhino.XmlImpl
 			{
 				@object = ((Wrapper)@object).Unwrap();
 			}
-			if (@object is System.Xml.XmlNode)
+			var node = @object as System.Xml.XmlNode;
+			if (node != null)
 			{
-				System.Xml.XmlNode node = (System.Xml.XmlNode)@object;
 				return NewXML(XmlNode.CreateElementFromNode(node));
 			}
 			//    Instead we just blindly cast to a String and let them convert anything.
@@ -616,17 +618,17 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				if (inputObject is XML)
+				var xml = inputObject as XML;
+				if (xml != null)
 				{
-					XML xml = (XML)inputObject;
 					rv.GetNodeList().Add(xml);
 					return rv;
 				}
 				else
 				{
-					if (inputObject is XMLList)
+					var xmll = inputObject as XMLList;
+					if (xmll != null)
 					{
-						XMLList xmll = (XMLList)inputObject;
 						rv.GetNodeList().Add(xmll.GetNodeList());
 						return rv;
 					}
@@ -662,9 +664,9 @@ namespace Rhino.XmlImpl
 			// This is duplication of constructQName(cx, namespaceValue, nameValue)
 			// but for XMLName
 			string localName;
-			if (nameValue is QName)
+			var qname = nameValue as QName;
+			if (qname != null)
 			{
-				QName qname = (QName)nameValue;
 				localName = qname.LocalName();
 			}
 			else
@@ -691,9 +693,10 @@ namespace Rhino.XmlImpl
 				}
 				else
 				{
-					if (namespaceValue is Namespace)
+					var value = namespaceValue as Namespace;
+					if (value != null)
 					{
-						ns = ((Namespace)namespaceValue).GetDelegate();
+						ns = value.GetDelegate();
 					}
 					else
 					{
@@ -730,15 +733,16 @@ namespace Rhino.XmlImpl
 
 		internal XmlNode.QName ToNodeQName(Context cx, object nameValue, bool attribute)
 		{
-			if (nameValue is XMLName)
+			var xmlName = nameValue as XMLName;
+			if (xmlName != null)
 			{
-				return ((XMLName)nameValue).ToQname();
+				return xmlName.ToQname();
 			}
 			else
 			{
-				if (nameValue is QName)
+				var qname = nameValue as QName;
+				if (qname != null)
 				{
-					QName qname = (QName)nameValue;
 					return qname.GetDelegate();
 				}
 				else
@@ -749,15 +753,7 @@ namespace Rhino.XmlImpl
 					}
 					else
 					{
-						string local = null;
-						if (nameValue is string)
-						{
-							local = (string)nameValue;
-						}
-						else
-						{
-							local = ScriptRuntime.ToString(nameValue);
-						}
+						string local = nameValue as string ?? ScriptRuntime.ToString(nameValue);
 						return ToNodeQName(cx, local, attribute);
 					}
 				}

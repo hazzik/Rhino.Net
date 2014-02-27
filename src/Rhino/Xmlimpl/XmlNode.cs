@@ -233,9 +233,9 @@ namespace Rhino.XmlImpl
 
 		internal virtual void DeleteMe()
 		{
-			if (dom is XmlAttribute)
+			var attr = dom as XmlAttribute;
+			if (attr != null)
 			{
-				XmlAttribute attr = (XmlAttribute)dom;
 				attr.OwnerElement.Attributes.RemoveNamedItemNS(attr.NamespaceURI, attr.LocalName);
 			}
 			else
@@ -349,9 +349,10 @@ namespace Rhino.XmlImpl
 			}
 			while (target != null)
 			{
-				if (target is XmlElement)
+				var xmlElement = target as XmlElement;
+				if (xmlElement != null)
 				{
-					AddNamespaces(rv, (XmlElement)target);
+					AddNamespaces(rv, xmlElement);
 				}
 				target = target.ParentNode;
 			}
@@ -369,10 +370,11 @@ namespace Rhino.XmlImpl
 		internal virtual Namespace[] GetNamespaceDeclarations()
 		{
 			//    ECMA357 13.4.4.24
-			if (dom is XmlElement)
+			var xmlElement = dom as XmlElement;
+			if (xmlElement != null)
 			{
 				Namespaces rv = new Namespaces();
-				AddNamespaces(rv, (XmlElement)dom);
+				AddNamespaces(rv, xmlElement);
 				return rv.GetNamespaces();
 			}
 			else
@@ -1087,9 +1089,9 @@ namespace Rhino.XmlImpl
 					// Missing argument do nothing...
 					return;
 				}
-				if (toAdd is XMLList)
+				var xmlSrc = toAdd as XMLList;
+				if (xmlSrc != null)
 				{
-					XMLList xmlSrc = (XMLList)toAdd;
 					for (int i = 0; i < xmlSrc.Length(); i++)
 					{
 						_add((xmlSrc.Item(i)).GetAnnotation());
@@ -1103,9 +1105,10 @@ namespace Rhino.XmlImpl
 					}
 					else
 					{
-						if (toAdd is XmlNode)
+						var xmlNode = toAdd as XmlNode;
+						if (xmlNode != null)
 						{
-							_add((XmlNode)toAdd);
+							_add(xmlNode);
 						}
 					}
 				}

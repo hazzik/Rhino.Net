@@ -151,9 +151,10 @@ namespace Rhino
 				Scriptable p = (Scriptable)args[0];
 				do
 				{
-					if (p is Wrapper)
+					var wrapper = p as Wrapper;
+					if (wrapper != null)
 					{
-						object o = ((Wrapper)p).Unwrap();
+						object o = wrapper.Unwrap();
 						if (c.IsInstanceOfType(o))
 						{
 							return p;

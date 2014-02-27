@@ -148,9 +148,10 @@ namespace Rhino.Tools
 
 		public static void ReportException(ErrorReporter er, RhinoException ex)
 		{
-			if (er is Rhino.Tools.ToolErrorReporter)
+			var toolErrorReporter = er as ToolErrorReporter;
+			if (toolErrorReporter != null)
 			{
-				((Rhino.Tools.ToolErrorReporter)er).ReportException(ex);
+				toolErrorReporter.ReportException(ex);
 			}
 			else
 			{
@@ -161,9 +162,9 @@ namespace Rhino.Tools
 
 		public virtual void ReportException(RhinoException ex)
 		{
-			if (ex is WrappedException)
+			var we = ex as WrappedException;
+			if (we != null)
 			{
-				WrappedException we = (WrappedException)ex;
 				err.WriteLine(we);
 			}
 			else

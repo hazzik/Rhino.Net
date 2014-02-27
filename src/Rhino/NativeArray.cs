@@ -881,10 +881,10 @@ again_break: ;
 					for (int i = 0; i < e.Length; i++)
 					{
 						object id = e[i];
-						if (id is string)
+						var strId = id as string;
+						if (strId != null)
 						{
 							// > MAXINT will appear as string
-							string strId = (string)id;
 							long index = ToArrayIndex(strId);
 							if (index >= longVal)
 							{
@@ -916,15 +916,17 @@ again_break: ;
 		internal static long GetLengthProperty(Context cx, Scriptable obj)
 		{
 			// These will both give numeric lengths within Uint32 range.
-			if (obj is NativeString)
+			var nativeString = obj as NativeString;
+			if (nativeString != null)
 			{
-				return ((NativeString)obj).GetLength();
+				return nativeString.GetLength();
 			}
 			else
 			{
-				if (obj is NativeArray)
+				var nativeArray = obj as NativeArray;
+				if (nativeArray != null)
 				{
-					return ((NativeArray)obj).GetLength();
+					return nativeArray.GetLength();
 				}
 			}
 			return ScriptRuntime.ToUInt32(ScriptRuntime.GetObjectProp(obj, "length", cx));
@@ -1059,9 +1061,9 @@ again_break: ;
 						}
 						else
 						{
-							if (elem is string)
+							var s = elem as string;
+							if (s != null)
 							{
-								string s = (string)elem;
 								if (toSource)
 								{
 									result.Append('\"');
@@ -1122,9 +1124,9 @@ again_break: ;
 			}
 			// if no args, use "," as separator
 			string separator = (args.Length < 1 || args[0] == Undefined.instance) ? "," : ScriptRuntime.ToString(args[0]);
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly)
 				{
 					StringBuilder sb = new StringBuilder();
@@ -1183,9 +1185,9 @@ again_break: ;
 		/// <summary>See ECMA 15.4.4.4</summary>
 		private static Scriptable Js_reverse(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly)
 				{
 					for (int i = 0, j = ((int)na.length) - 1; i < j; i++, j--)
@@ -1361,9 +1363,9 @@ again_break: ;
 		/// <remarks>Non-ECMA methods.</remarks>
 		private static object Js_push(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.EnsureCapacity((int)na.length + args.Length))
 				{
 					for (int i = 0; i < args.Length; i++)
@@ -1394,9 +1396,9 @@ again_break: ;
 		private static object Js_pop(Context cx, Scriptable thisObj, object[] args)
 		{
 			object result;
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.length > 0)
 				{
 					na.length--;
@@ -1426,9 +1428,9 @@ again_break: ;
 
 		private static object Js_shift(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.length > 0)
 				{
 					na.length--;
@@ -1467,9 +1469,9 @@ again_break: ;
 
 		private static object Js_unshift(Context cx, Scriptable thisObj, object[] args)
 		{
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly && na.EnsureCapacity((int)na.length + args.Length))
 				{
 					Array.Copy(na.dense, 0, na.dense, args.Length, (int)na.length);
@@ -1505,11 +1507,10 @@ again_break: ;
 
 		private static object Js_splice(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 		{
-			NativeArray na = null;
 			bool denseMode = false;
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				na = (NativeArray)thisObj;
 				denseMode = na.denseOnly;
 			}
 			scope = GetTopLevelScope(scope);
@@ -1655,11 +1656,11 @@ again_break: ;
 					int length = (int)denseThis.length;
 					for (int i = 0; i < args.Length && canUseDense; i++)
 					{
-						if (args[i] is NativeArray)
+						var arg = args[i] as NativeArray;
+						if (arg != null)
 						{
 							// only try to use dense approach for Array-like
 							// objects that are actually NativeArrays
-							NativeArray arg = (NativeArray)args[i];
 							canUseDense = arg.denseOnly;
 							length += (int) arg.length;
 						}
@@ -1674,9 +1675,9 @@ again_break: ;
 						int cursor = (int)denseThis.length;
 						for (int i_1 = 0; i_1 < args.Length && canUseDense; i_1++)
 						{
-							if (args[i_1] is NativeArray)
+							var arg = args[i_1] as NativeArray;
+							if (arg != null)
 							{
-								NativeArray arg = (NativeArray)args[i_1];
 								Array.Copy(arg.dense, 0, denseResult.dense, cursor, (int)arg.length);
 								cursor += (int)arg.length;
 							}
@@ -1729,7 +1730,7 @@ again_break: ;
 				{
 					SetElem(cx, result, slot++, args[i_2]);
 				}
-			}
+			} 
 			SetLengthProperty(cx, result, slot);
 			return result;
 		}
@@ -1858,9 +1859,9 @@ again_break: ;
 					}
 				}
 			}
-			if (thisObj is NativeArray)
+			var na = thisObj as NativeArray;
+			if (na != null)
 			{
-				NativeArray na = (NativeArray)thisObj;
 				if (na.denseOnly)
 				{
 					if (isLast)
@@ -2173,9 +2174,10 @@ again_break: ;
 			}
 			else
 			{
-				if (value is Wrapper)
+				var wrapper = value as Wrapper;
+				if (wrapper != null)
 				{
-					return ((Wrapper)value).Unwrap();
+					return wrapper.Unwrap();
 				}
 				else
 				{

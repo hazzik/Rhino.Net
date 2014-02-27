@@ -396,16 +396,17 @@ L0_break: ;
 		//    See ECMA357 13.3.2
 		internal QName ConstructQName(XMLLibImpl lib, Context cx, object @namespace, object name)
 		{
-			string nameString = null;
-			if (name is QName)
+			string nameString;
+			var qname = name as QName;
+			if (qname != null)
 			{
 				if (@namespace == Undefined.instance)
 				{
-					return (QName)name;
+					return qname;
 				}
 				else
 				{
-					nameString = ((QName)name).LocalName();
+					nameString = qname.LocalName();
 				}
 			}
 			if (name == Undefined.instance)
@@ -434,14 +435,7 @@ L0_break: ;
 			else
 			{
 				//    leave as null
-				if (@namespace is Namespace)
-				{
-					namespaceNamespace = (Namespace)@namespace;
-				}
-				else
-				{
-					namespaceNamespace = lib.NewNamespace(ScriptRuntime.ToString(@namespace));
-				}
+				namespaceNamespace = @namespace as Namespace ?? lib.NewNamespace(ScriptRuntime.ToString(@namespace));
 			}
 			string q_localName = nameString;
 			string q_uri;
@@ -467,9 +461,10 @@ L0_break: ;
 
 		internal QName CastToQName(XMLLibImpl lib, Context cx, object qnameValue)
 		{
-			if (qnameValue is QName)
+			var qname = qnameValue as QName;
+			if (qname != null)
 			{
-				return (QName)qnameValue;
+				return qname;
 			}
 			return ConstructQName(lib, cx, qnameValue);
 		}

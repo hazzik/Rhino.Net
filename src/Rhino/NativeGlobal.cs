@@ -613,9 +613,9 @@ namespace Rhino
 
 		internal static bool IsEvalFunction(object functionObj)
 		{
-			if (functionObj is IdFunctionObject)
+			var function = functionObj as IdFunctionObject;
+			if (function != null)
 			{
-				IdFunctionObject function = (IdFunctionObject)functionObj;
 				if (function.HasTag(FTAG) && function.MethodId() == Id_eval)
 				{
 					return true;

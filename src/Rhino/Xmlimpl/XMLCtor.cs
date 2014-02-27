@@ -399,9 +399,10 @@ L0_break: ;
 					}
 					else
 					{
-						if (args[0] is Scriptable)
+						var scriptable = args[0] as Scriptable;
+						if (scriptable != null)
 						{
-							ReadSettings((Scriptable)args[0]);
+							ReadSettings(scriptable);
 						}
 					}
 					return Undefined.instance;

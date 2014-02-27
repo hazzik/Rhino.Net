@@ -361,10 +361,10 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				Scriptable proto = Prototype;
-				if (proto is XMLObject)
+				var prototype = Prototype as XMLObject;
+				if (prototype != null)
 				{
-					return ((XMLObject)proto).GetFunctionProperty(cx, id);
+					return prototype.GetFunctionProperty(cx, id);
 				}
 			}
 			return ScriptableConstants.NOT_FOUND;
@@ -378,10 +378,10 @@ namespace Rhino.XmlImpl
 			}
 			else
 			{
-				Scriptable proto = Prototype;
-				if (proto is XMLObject)
+				var prototype = Prototype as XMLObject;
+				if (prototype != null)
 				{
-					return ((XMLObject)proto).GetFunctionProperty(cx, name);
+					return prototype.GetFunctionProperty(cx, name);
 				}
 			}
 			return ScriptableConstants.NOT_FOUND;
@@ -430,18 +430,19 @@ namespace Rhino.XmlImpl
 
 		public sealed override object AddValues(Context cx, bool thisIsLeft, object value)
 		{
-			if (value is XMLObject)
+			var xmlObject = value as XMLObject;
+			if (xmlObject != null)
 			{
 				XMLObject v1;
 				XMLObject v2;
 				if (thisIsLeft)
 				{
 					v1 = this;
-					v2 = (XMLObject)value;
+					v2 = xmlObject;
 				}
 				else
 				{
-					v1 = (XMLObject)value;
+					v1 = xmlObject;
 					v2 = this;
 				}
 				return lib.AddXMLObjects(cx, v1, v2);
@@ -937,9 +938,10 @@ L0_break: ;
 				case Id_constructor:
 				{
 					IdFunctionObject ctor;
-					if (this is XML)
+					var xml = this as XML;
+					if (xml != null)
 					{
-						ctor = new XMLCtor((XML)this, XMLOBJECT_TAG, id, 1);
+						ctor = new XMLCtor(xml, XMLOBJECT_TAG, id, 1);
 					}
 					else
 					{
@@ -1450,9 +1452,10 @@ L0_break: ;
 					}
 					string localName;
 					object arg = Arg(args, 0);
-					if (arg is QName)
+					var qName = arg as QName;
+					if (qName != null)
 					{
-						localName = ((QName)arg).LocalName();
+						localName = qName.LocalName();
 					}
 					else
 					{

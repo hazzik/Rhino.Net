@@ -225,9 +225,9 @@ namespace Rhino
 				else
 				{
 					Context cx = Context.GetContext();
-					if (setter is MemberBox)
+					var nativeSetter = setter as MemberBox;
+					if (nativeSetter != null)
 					{
-						MemberBox nativeSetter = (MemberBox)setter;
 						Type[] pTypes = nativeSetter.argTypes;
 						// XXX: cache tag since it is already calculated in
 						// defineProperty ?
@@ -250,9 +250,9 @@ namespace Rhino
 					}
 					else
 					{
-						if (setter is Function)
+						var f = setter as Function;
+						if (f != null)
 						{
-							Function f = (Function)setter;
 							f.Call(cx, f.ParentScope, start, new object[] { value });
 						}
 					}
@@ -265,9 +265,9 @@ namespace Rhino
 			{
 				if (getter != null)
 				{
-					if (getter is MemberBox)
+					var nativeGetter = getter as MemberBox;
+					if (nativeGetter != null)
 					{
-						MemberBox nativeGetter = (MemberBox)getter;
 						object getterThis;
 						object[] args;
 						if (nativeGetter.delegateTo == null)
@@ -284,9 +284,9 @@ namespace Rhino
 					}
 					else
 					{
-						if (getter is Function)
+						var f = getter as Function;
+						if (f != null)
 						{
-							Function f = (Function)getter;
 							Context cx = Context.GetContext();
 							return f.Call(cx, f.ParentScope, start, ScriptRuntime.emptyArgs);
 						}
@@ -570,9 +570,10 @@ namespace Rhino
 			{
 				throw Kit.CodeBug();
 			}
-			if (start is ConstProperties)
+			var cp = start as ConstProperties;
+			if (cp != null)
 			{
-				((ConstProperties)start).PutConst(name, start, value);
+				cp.PutConst(name, start, value);
 			}
 			else
 			{
@@ -590,9 +591,10 @@ namespace Rhino
 			{
 				throw Kit.CodeBug();
 			}
-			if (start is ConstProperties)
+			var cp = start as ConstProperties;
+			if (cp != null)
 			{
-				((ConstProperties)start).DefineConst(name, start);
+				cp.DefineConst(name, start);
 			}
 		}
 
@@ -780,11 +782,11 @@ namespace Rhino
 			{
 				return null;
 			}
-			if (slot is GetterSlot)
+			var gslot = slot as GetterSlot;
+			if (gslot != null)
 			{
-				GetterSlot gslot = (GetterSlot)slot;
 				object result = isSetter ? gslot.setter : gslot.getter;
-				return result != null ? result : Undefined.instance;
+				return result ?? Undefined.instance;
 			}
 			else
 			{
@@ -799,14 +801,14 @@ namespace Rhino
 		/// <returns>whether the property is a getter or a setter</returns>
 		protected internal virtual bool IsGetterOrSetter(string name, int index, bool setter)
 		{
-			Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
-			if (slot is GetterSlot)
+			var getterSlot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY)) as GetterSlot;
+			if (getterSlot != null)
 			{
-				if (setter && ((GetterSlot)slot).setter != null)
+				if (setter && getterSlot.setter != null)
 				{
 					return true;
 				}
-				if (!setter && ((GetterSlot)slot).getter != null)
+				if (!setter && getterSlot.getter != null)
 				{
 					return true;
 				}
@@ -1474,12 +1476,13 @@ namespace Rhino
 			string className = proto.GetClassName();
 			// check for possible redefinition
 			object existing = GetProperty(GetTopLevelScope(scope), className);
-			if (existing is BaseFunction)
+			var baseFunction = existing as BaseFunction;
+			if (baseFunction != null)
 			{
-				object existingProto = ((BaseFunction)existing).GetPrototypeProperty();
+				object existingProto = baseFunction.GetPrototypeProperty();
 				if (existingProto != null && clazz == existingProto.GetType())
 				{
-					return (BaseFunction)existing;
+					return baseFunction;
 				}
 			}
 			// Set the prototype's prototype, trying to map Java inheritance to JS
@@ -1684,9 +1687,10 @@ namespace Rhino
 			if (@sealed)
 			{
 				ctor.SealObject();
-				if (proto is ScriptableObject)
+				var scriptableObject = proto as ScriptableObject;
+				if (scriptableObject != null)
 				{
-					((ScriptableObject)proto).SealObject();
+					scriptableObject.SealObject();
 				}
 			}
 			return ctor;
@@ -1837,9 +1841,9 @@ namespace Rhino
 		/// </remarks>
 		public static void DefineConstProperty(Scriptable destination, string propertyName)
 		{
-			if (destination is ConstProperties)
+			var cp = destination as ConstProperties;
+			if (cp != null)
 			{
-				ConstProperties cp = (ConstProperties)destination;
 				cp.DefineConst(propertyName, destination);
 			}
 			else
@@ -2437,15 +2441,16 @@ namespace Rhino
 			scope = GetTopLevelScope(scope);
 			object ctor = GetProperty(scope, className);
 			object proto;
-			if (ctor is BaseFunction)
+			var baseFunction = ctor as BaseFunction;
+			if (baseFunction != null)
 			{
-				proto = ((BaseFunction)ctor).GetPrototypeProperty();
+				proto = baseFunction.GetPrototypeProperty();
 			}
 			else
 			{
-				if (ctor is Scriptable)
+				var ctorObj = ctor as Scriptable;
+				if (ctorObj != null)
 				{
-					Scriptable ctorObj = (Scriptable)ctor;
 					proto = ctorObj.Get("prototype", ctorObj);
 				}
 				else
@@ -2453,9 +2458,10 @@ namespace Rhino
 					return null;
 				}
 			}
-			if (proto is Scriptable)
+			var prototype = proto as Scriptable;
+			if (prototype != null)
 			{
-				return (Scriptable)proto;
+				return prototype;
 			}
 			return null;
 		}
@@ -2510,9 +2516,9 @@ namespace Rhino
 					while (slot != null)
 					{
 						object value = slot.value;
-						if (value is LazilyLoadedCtor)
+						var initializer = value as LazilyLoadedCtor;
+						if (initializer != null)
 						{
-							LazilyLoadedCtor initializer = (LazilyLoadedCtor)value;
 							try
 							{
 								initializer.Init();
@@ -2726,9 +2732,9 @@ namespace Rhino
 			{
 				return;
 			}
-			if (@base is ConstProperties)
+			var cp = @base as ConstProperties;
+			if (cp != null)
 			{
-				ConstProperties cp = (ConstProperties)@base;
 				if (cp.IsConst(name))
 				{
 					throw ScriptRuntime.TypeError1("msg.const.redecl", name);
@@ -2804,14 +2810,11 @@ namespace Rhino
 		/// <since>1.5R2</since>
 		public static void PutConstProperty(Scriptable obj, string name, object value)
 		{
-			Scriptable @base = GetBase(obj, name);
-			if (@base == null)
+			Scriptable @base = GetBase(obj, name) ?? obj;
+			var constProperties = @base as ConstProperties;
+			if (constProperties != null)
 			{
-				@base = obj;
-			}
-			if (@base is ConstProperties)
-			{
-				((ConstProperties)@base).PutConst(name, obj, value);
+				constProperties.PutConst(name, obj, value);
 			}
 		}
 
@@ -3053,9 +3056,9 @@ namespace Rhino
 			scope = GetTopLevelScope(scope);
 			for (; ; )
 			{
-				if (scope is ScriptableObject)
+				var so = scope as ScriptableObject;
+				if (so != null)
 				{
-					ScriptableObject so = (ScriptableObject)scope;
 					object value = so.GetAssociatedValue(key);
 					if (value != null)
 					{
@@ -3710,9 +3713,10 @@ namespace Rhino
 		public virtual object Get(object key)
 		{
 			object value = null;
-			if (key is string)
+			var strKey = key as string;
+			if (strKey != null)
 			{
-				value = Get((string)key, this);
+				value = Get(strKey, this);
 			}
 			else
 			{
@@ -3727,9 +3731,10 @@ namespace Rhino
 			}
 			else
 			{
-				if (value is Wrapper)
+				var wrapper = value as Wrapper;
+				if (wrapper != null)
 				{
-					return ((Wrapper)value).Unwrap();
+					return wrapper.Unwrap();
 				}
 				else
 				{

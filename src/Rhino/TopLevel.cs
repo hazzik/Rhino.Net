@@ -114,9 +114,10 @@ namespace Rhino
 		{
 			// must be called with top level scope
 			System.Diagnostics.Debug.Assert(scope.ParentScope == null);
-			if (scope is TopLevel)
+			var topLevel = scope as TopLevel;
+			if (topLevel != null)
 			{
-				Function result = ((TopLevel)scope).GetBuiltinCtor(type);
+				Function result = topLevel.GetBuiltinCtor(type);
 				if (result != null)
 				{
 					return result;
@@ -143,9 +144,10 @@ namespace Rhino
 		{
 			// must be called with top level scope
 			System.Diagnostics.Debug.Assert(scope.ParentScope == null);
-			if (scope is TopLevel)
+			var topLevel = scope as TopLevel;
+			if (topLevel != null)
 			{
-				Scriptable result = ((TopLevel)scope).GetBuiltinPrototype(type);
+				Scriptable result = topLevel.GetBuiltinPrototype(type);
 				if (result != null)
 				{
 					return result;

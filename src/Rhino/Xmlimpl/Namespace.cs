@@ -352,17 +352,17 @@ L0_break: ;
 		{
 			string prefix;
 			string uri;
-			if (uriValue is Namespace)
+			var ns = uriValue as Namespace;
+			if (ns != null)
 			{
-				Namespace ns = (Namespace)uriValue;
 				prefix = ns.Prefix();
 				uri = ns.Uri();
 			}
 			else
 			{
-				if (uriValue is QName)
+				var qname = uriValue as QName;
+				if (qname != null)
 				{
-					QName qname = (QName)uriValue;
 					uri = qname.Uri();
 					if (uri != null)
 					{
@@ -386,20 +386,16 @@ L0_break: ;
 
 		internal virtual Namespace CastToNamespace(object namespaceObj)
 		{
-			if (namespaceObj is Namespace)
-			{
-				return (Namespace)namespaceObj;
-			}
-			return ConstructNamespace(namespaceObj);
+			return namespaceObj as Namespace ?? ConstructNamespace(namespaceObj);
 		}
 
 		private Namespace ConstructNamespace(object prefixValue, object uriValue)
 		{
 			string prefix;
 			string uri;
-			if (uriValue is QName)
+			var qname = uriValue as QName;
+			if (qname != null)
 			{
-				QName qname = (QName)uriValue;
 				uri = qname.Uri();
 				if (uri == null)
 				{

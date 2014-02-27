@@ -386,10 +386,11 @@ namespace Rhino.XmlImpl
 				else
 				{
 					// Convert text into XML if needed.
-					XMLObjectImpl xmlValue = null;
-					if (value is XMLObjectImpl)
+					XMLObjectImpl xmlValue;
+					var xmlObjectImpl = value as XMLObjectImpl;
+					if (xmlObjectImpl != null)
 					{
-						xmlValue = (XMLObjectImpl)value;
+						xmlValue = xmlObjectImpl;
 						// Check for attribute type and convert to textNode
 						if (xmlValue is XML)
 						{
@@ -398,14 +399,15 @@ namespace Rhino.XmlImpl
 								xmlValue = target.MakeXmlFromString(xmlName, xmlValue.ToString());
 							}
 						}
-						if (xmlValue is XMLList)
+						var xmlList = xmlValue as XMLList;
+						if (xmlList != null)
 						{
 							for (int i = 0; i < xmlValue.Length(); i++)
 							{
-								XML xml = ((XMLList)xmlValue).Item(i);
+								XML xml = xmlList.Item(i);
 								if (xml.IsAttribute())
 								{
-									((XMLList)xmlValue).Replace(i, target.MakeXmlFromString(xmlName, xml.ToString()));
+									xmlList.Replace(i, target.MakeXmlFromString(xmlName, xml.ToString()));
 								}
 							}
 						}

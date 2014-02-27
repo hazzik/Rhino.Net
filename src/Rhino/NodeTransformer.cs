@@ -578,10 +578,11 @@ siblingLoop_break: ;
 					scopeNode.SetType(Token.COMMA);
 					result.AddChildToBack(scopeNode);
 					scopeNode.AddChildToBack(body);
-					if (body is Scope)
+					var scope = body as Scope;
+					if (scope != null)
 					{
-						Scope scopeParent = ((Scope)body).GetParentScope();
-						((Scope)body).SetParentScope((Scope)scopeNode);
+						Scope scopeParent = scope.GetParentScope();
+						scope.SetParentScope((Scope)scopeNode);
 						((Scope)scopeNode).SetParentScope(scopeParent);
 					}
 				}
@@ -591,10 +592,11 @@ siblingLoop_break: ;
 					scopeNode.SetType(Token.BLOCK);
 					result.AddChildToBack(scopeNode);
 					scopeNode.AddChildrenToBack(body);
-					if (body is Scope)
+					var scope = body as Scope;
+					if (scope != null)
 					{
-						Scope scopeParent = ((Scope)body).GetParentScope();
-						((Scope)body).SetParentScope((Scope)scopeNode);
+						Scope scopeParent = scope.GetParentScope();
+						scope.SetParentScope((Scope)scopeNode);
 						((Scope)scopeNode).SetParentScope(scopeParent);
 					}
 				}
@@ -606,7 +608,7 @@ siblingLoop_break: ;
 		{
 			if (previous == null)
 			{
-				if (!(current == parent.GetFirstChild()))
+				if (current != parent.GetFirstChild())
 				{
 					Kit.CodeBug();
 				}

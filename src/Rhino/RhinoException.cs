@@ -272,10 +272,10 @@ namespace Rhino
 			ScriptStackElement[][] interpreterStack = null;
 			if (interpreterStackInfo != null)
 			{
-				Evaluator interpreter = Context.CreateInterpreter();
-				if (interpreter is Interpreter)
+				var interpreter = Context.CreateInterpreter() as Interpreter;
+				if (interpreter != null)
 				{
-					interpreterStack = ((Interpreter)interpreter).GetScriptStackElements(this);
+					interpreterStack = interpreter.GetScriptStackElements(this);
 				}
 			}
 			int interpreterStackIndex = 0;

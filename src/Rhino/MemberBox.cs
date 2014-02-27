@@ -154,9 +154,10 @@ namespace Rhino
 					e = e.InnerException;
 				}
 				while ((e is TargetInvocationException));
-				if (e is ContinuationPending)
+				var continuationPending = e as ContinuationPending;
+				if (continuationPending != null)
 				{
-					throw (ContinuationPending)e;
+					throw continuationPending;
 				}
 				throw Context.ThrowAsScriptRuntimeEx(e);
 			}
@@ -268,23 +269,23 @@ namespace Rhino
 		/// <exception cref="System.IO.IOException"></exception>
 		private static void WriteMember(ObjectOutputStream @out, MethodBase member)
 		{
-		    if (member == null)
-		    {
-		        @out.WriteBoolean(false);
-		        return;
-		    }
-		    @out.WriteBoolean(true);
-		    if (!(member is MethodInfo || member is ConstructorInfo))
-		    {
-		        throw new ArgumentException("not Method or Constructor");
-		    }
-		    @out.WriteBoolean(member is MethodInfo);
-		    @out.WriteObject(member.Name);
-		    @out.WriteObject(member.DeclaringType);
-		    WriteParameters(@out, member.GetParameterTypes());
+			if (member == null)
+			{
+				@out.WriteBoolean(false);
+				return;
+			}
+			@out.WriteBoolean(true);
+			if (!(member is MethodInfo || member is ConstructorInfo))
+			{
+				throw new ArgumentException("not Method or Constructor");
+			}
+			@out.WriteBoolean(member is MethodInfo);
+			@out.WriteObject(member.Name);
+			@out.WriteObject(member.DeclaringType);
+			WriteParameters(@out, member.GetParameterTypes());
 		}
 
-	    /// <summary>Reads a Method or a Constructor from the stream.</summary>
+		/// <summary>Reads a Method or a Constructor from the stream.</summary>
 		/// <remarks>Reads a Method or a Constructor from the stream.</remarks>
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
