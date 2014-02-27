@@ -884,7 +884,7 @@ namespace Rhino
 										// Make a new java array, and coerce the JS array components
 										// to the target (component) type.
 										NativeArray array = (NativeArray)value;
-										long length = array.GetLength();
+										long length = array.Length;
 										Type arrayType = type.GetElementType();
 										Array result = System.Array.CreateInstance(arrayType, (int)length);
 										for (int i = 0; i < length; ++i)

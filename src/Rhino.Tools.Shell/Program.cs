@@ -263,7 +263,7 @@ namespace Rhino.Tools.Shell
 					LanguageVersion version;
 					try
 					{
-					    version = (LanguageVersion) System.Convert.ToInt32(args [i]);
+						version = (LanguageVersion) System.Convert.ToInt32(args [i]);
 					}
 					catch (FormatException)
 					{
@@ -552,7 +552,7 @@ goodUsage_break: ;
 								}
 							}
 							NativeArray h = global.history;
-							h.Put((int)h.GetLength(), h, source);
+							h.Put((int)h.Length, h, source);
 						}
 					}
 					catch (RhinoException rex)

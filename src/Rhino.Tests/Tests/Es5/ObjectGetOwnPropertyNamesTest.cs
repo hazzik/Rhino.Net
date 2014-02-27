@@ -24,7 +24,7 @@ namespace Rhino.Tests.Es5
 			@object.DefineProperty("b", "2", PropertyAttributes.DONTENUM);
 			object result = Evaluator.Eval("Object.getOwnPropertyNames(obj)", "obj", @object);
 			NativeArray names = (NativeArray)result;
-			NUnit.Framework.Assert.AreEqual(2, names.GetLength());
+			NUnit.Framework.Assert.AreEqual(2, names.Length);
 			NUnit.Framework.Assert.AreEqual("a", names.Get(0, names));
 			NUnit.Framework.Assert.AreEqual("b", names.Get(1, names));
 		}

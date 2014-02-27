@@ -206,7 +206,7 @@ namespace Rhino
 				var nativeArray = val as NativeArray;
 				if (nativeArray != null)
 				{
-					long len = nativeArray.GetLength();
+					long len = nativeArray.Length;
 					for (long i = 0; i < len; i++)
 					{
 						// indices greater than MAX_INT are represented as strings
@@ -533,7 +533,7 @@ namespace Rhino
 			string stepback = state.indent;
 			state.indent = state.indent + state.gap;
 			IList<object> partial = new List<object>();
-			long len = value.GetLength();
+			long len = value.Length;
 			for (long index = 0; index < len; index++)
 			{
 				object strP;

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -135,7 +135,7 @@ namespace Rhino.Tests.Json
 		[NUnit.Framework.Test]
 		public virtual void ShouldParseEmptyJsonArray()
 		{
-			NUnit.Framework.Assert.AreEqual(0, ((NativeArray)parser.ParseValue("[]")).GetLength());
+			NUnit.Framework.Assert.AreEqual(0, ((NativeArray)parser.ParseValue("[]")).Length);
 		}
 
 		/// <exception cref="System.Exception"></exception>
@@ -148,7 +148,7 @@ namespace Rhino.Tests.Json
 			NUnit.Framework.Assert.AreEqual(null, actual.Get(2, actual));
 			NativeArray innerArr = (NativeArray)actual.Get(3, actual);
 			NUnit.Framework.Assert.AreEqual(false, innerArr.Get(0, innerArr));
-			NUnit.Framework.Assert.AreEqual(4, actual.GetLength());
+			NUnit.Framework.Assert.AreEqual(4, actual.Length);
 		}
 
 		/// <exception cref="System.Exception"></exception>

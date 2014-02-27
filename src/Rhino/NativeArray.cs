@@ -802,9 +802,9 @@ again_break: ;
 			}
 		}
 
-		public virtual long GetLength()
+		public virtual long Length
 		{
-			return length;
+			get { return length; }
 		}
 
 		/// <summary>
@@ -926,7 +926,7 @@ again_break: ;
 				var nativeArray = obj as NativeArray;
 				if (nativeArray != null)
 				{
-					return nativeArray.GetLength();
+					return nativeArray.Length;
 				}
 			}
 			return ScriptRuntime.ToUInt32(ScriptRuntime.GetObjectProp(obj, "length", cx));
