@@ -823,9 +823,9 @@ again_break: ;
 			return target.Substring((int) start, (int) end - (int) start);
 		}
 
-		internal int GetLength()
+		internal int Length
 		{
-			return @string.Length;
+			get { return @string.Length; }
 		}
 
 		private static string Js_substr(string target, object[] args)

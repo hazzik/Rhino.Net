@@ -919,7 +919,7 @@ again_break: ;
 			var nativeString = obj as NativeString;
 			if (nativeString != null)
 			{
-				return nativeString.GetLength();
+				return nativeString.Length;
 			}
 			else
 			{
