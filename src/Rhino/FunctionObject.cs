@@ -270,7 +270,7 @@ namespace Rhino
 
 		/// <summary>Get Java method or constructor this function represent.</summary>
 		/// <remarks>Get Java method or constructor this function represent.</remarks>
-		public virtual MemberInfo GetMethodOrConstructor()
+		public virtual MethodBase GetMethodOrConstructor()
 		{
 			return member.method;
 		}

@@ -266,7 +266,7 @@ namespace Rhino
 		/// recreate upon deserialization.
 		/// </remarks>
 		/// <exception cref="System.IO.IOException"></exception>
-		private static void WriteMember(ObjectOutputStream @out, MemberInfo member)
+		private static void WriteMember(ObjectOutputStream @out, MethodBase member)
 		{
 			if (member == null)
 			{
@@ -295,7 +295,7 @@ namespace Rhino
 		/// <remarks>Reads a Method or a Constructor from the stream.</remarks>
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
-		private static MemberInfo ReadMember(ObjectInputStream @in)
+		private static MethodBase ReadMember(ObjectInputStream @in)
 		{
 			if (!@in.ReadBoolean())
 			{
