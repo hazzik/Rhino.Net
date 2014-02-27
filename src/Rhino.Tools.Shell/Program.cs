@@ -461,7 +461,7 @@ goodUsage_break: ;
 			{
 				exObj = ex;
 			}
-			throw Kit.InitCause(new InvalidOperationException("Can not load security support: " + exObj), exObj);
+			throw new InvalidOperationException("Can not load security support: " + exObj, exObj);
 		}
 #endif
 

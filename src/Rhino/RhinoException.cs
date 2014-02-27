@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
-using Rhino;
 using Sharpen;
 
 namespace Rhino
@@ -22,7 +22,7 @@ namespace Rhino
 	[System.Serializable]
 	public abstract class RhinoException : Exception
 	{
-		internal RhinoException()
+		protected RhinoException()
 		{
 			Evaluator e = Context.CreateInterpreter();
 			if (e != null)
@@ -31,13 +31,28 @@ namespace Rhino
 			}
 		}
 
-		internal RhinoException(string details) : base(details)
+		protected RhinoException(string details) : base(details)
 		{
 			Evaluator e = Context.CreateInterpreter();
 			if (e != null)
 			{
 				e.CaptureStackInfo(this);
 			}
+		}
+
+		protected RhinoException(string message, Exception inner)
+			: base(message, inner)
+		{
+			Evaluator e = Context.CreateInterpreter();
+			if (e != null)
+			{
+				e.CaptureStackInfo(this);
+			}
+		}
+
+		protected RhinoException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{
 		}
 
 		public sealed override string Message

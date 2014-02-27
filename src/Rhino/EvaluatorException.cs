@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-using Rhino;
-using Sharpen;
+using System;
+using System.Runtime.Serialization;
 
 namespace Rhino
 {
@@ -17,6 +17,10 @@ namespace Rhino
 	public class EvaluatorException : RhinoException
 	{
 		public EvaluatorException(string detail) : base(detail)
+		{
+		}
+
+		protected EvaluatorException(string message, Exception inner) : base(message, inner)
 		{
 		}
 
@@ -53,6 +57,10 @@ namespace Rhino
 		public EvaluatorException(string detail, string sourceName, int lineNumber, string lineSource, int columnNumber) : base(detail)
 		{
 			RecordErrorOrigin(sourceName, lineNumber, lineSource, columnNumber);
+		}
+
+		protected EvaluatorException(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
 		}
 	}
 }

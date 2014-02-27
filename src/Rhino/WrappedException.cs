@@ -23,10 +23,9 @@ namespace Rhino
 	public class WrappedException : EvaluatorException
 	{
 		/// <seealso cref="Context.ThrowAsScriptRuntimeEx(System.Exception)">Context.ThrowAsScriptRuntimeEx(System.Exception)</seealso>
-		public WrappedException(Exception exception) : base("Wrapped " + exception.ToString())
+		public WrappedException(Exception exception) : base("Wrapped " + exception, exception)
 		{
 			this.exception = exception;
-			Kit.InitCause(this, exception);
 			int[] linep = new int[] { 0 };
 			string sourceName = Context.GetSourcePositionFromStack(linep);
 			int lineNumber = linep[0];

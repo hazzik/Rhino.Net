@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Security;
-using Rhino;
 using Sharpen;
 
 namespace Rhino
@@ -19,30 +18,6 @@ namespace Rhino
 	/// <summary>Collection of utilities</summary>
 	public class Kit
 	{
-		/// <summary>
-		/// Reflection of Throwable.initCause(Throwable) from JDK 1.4
-		/// or nul if it is not available.
-		/// </summary>
-		/// <remarks>
-		/// Reflection of Throwable.initCause(Throwable) from JDK 1.4
-		/// or nul if it is not available.
-		/// </remarks>
-		private static readonly MethodInfo Throwable_initCause;
-
-		static Kit()
-		{
-			// Are we running on a JDK 1.4 or later system?
-			try
-			{
-				Type ThrowableClass = ClassOrNull("java.lang.Throwable");
-				Type[] signature = new Type[] { ThrowableClass };
-				Throwable_initCause = ThrowableClass.GetMethod("initCause", signature);
-			}
-			catch (Exception)
-			{
-			}
-		}
-
 		// Assume any exceptions means the method does not exist.
 		public static Type ClassOrNull(string className)
 		{
@@ -136,32 +111,6 @@ namespace Rhino
 				return false;
 			}
 			return true;
-		}
-
-		/// <summary>
-		/// If initCause methods exists in Throwable, call
-		/// <tt>ex.initCause(cause)</tt> or otherwise do nothing.
-		/// </summary>
-		/// <remarks>
-		/// If initCause methods exists in Throwable, call
-		/// <tt>ex.initCause(cause)</tt> or otherwise do nothing.
-		/// </remarks>
-		/// <returns>The <tt>ex</tt> argument.</returns>
-		public static Exception InitCause(Exception ex, Exception cause)
-		{
-			if (Throwable_initCause != null)
-			{
-				object[] args = new object[] { cause };
-				try
-				{
-					Throwable_initCause.Invoke(ex, args);
-				}
-				catch (Exception)
-				{
-				}
-			}
-			// Ignore any exceptions
-			return ex;
 		}
 
 		/// <summary>

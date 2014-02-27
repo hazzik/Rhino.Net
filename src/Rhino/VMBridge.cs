@@ -89,7 +89,7 @@ namespace Rhino
 			catch (MissingMethodException ex)
 			{
 				// Should not happen
-				throw Kit.InitCause(new InvalidOperationException(), ex);
+				throw new InvalidOperationException("Invalid operation", ex);
 			}
 			return c;
 		}
@@ -117,12 +117,12 @@ namespace Rhino
 			catch (MemberAccessException ex)
 			{
 				// Should not happen
-				throw Kit.InitCause(new InvalidOperationException(), ex);
+				throw new InvalidOperationException("Invalid operation", ex);
 			}
 			catch (InstantiationException ex)
 			{
 				// Should not happen
-				throw Kit.InitCause(new InvalidOperationException(), ex);
+				throw new InvalidOperationException("Invalid operation", ex);
 			}
 			return proxy;
 		}
