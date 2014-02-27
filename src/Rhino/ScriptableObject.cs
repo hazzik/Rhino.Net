@@ -1460,7 +1460,7 @@ namespace Rhino
 			ConstructorInfo protoCtor = null;
 			for (int i_1 = 0; i_1 < ctors.Length; i_1++)
 			{
-				if (ctors[i_1].GetParameterTypes().Length == 0)
+				if (ctors[i_1].GetParameters().Length == 0)
 				{
 					protoCtor = ctors[i_1];
 					break;
@@ -1530,13 +1530,13 @@ namespace Rhino
 				{
 					if (ctors.Length == 2)
 					{
-						if (ctors[0].GetParameterTypes().Length == 0)
+						if (ctors[0].GetParameters().Length == 0)
 						{
 							ctorMember = ctors[1];
 						}
 						else
 						{
-							if (ctors[1].GetParameterTypes().Length == 0)
+							if (ctors[1].GetParameters().Length == 0)
 							{
 								ctorMember = ctors[0];
 							}
