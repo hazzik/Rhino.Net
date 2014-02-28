@@ -1712,10 +1712,10 @@ again_break: ;
 			}
 			for (int i_2 = 0; i_2 < args.Length; i_2++)
 			{
-				if (ScriptRuntime.InstanceOf(i_2, ctor, cx))
+				if (ScriptRuntime.InstanceOf(args[i_2], ctor, cx))
 				{
 					// ScriptRuntime.instanceOf => instanceof Scriptable
-					Scriptable arg = (Scriptable)i_2;
+					Scriptable arg = (Scriptable)args[i_2];
 					length_1 = GetLengthProperty(cx, arg);
 					for (long j = 0; j < length_1; j++, slot++)
 					{
@@ -1728,7 +1728,7 @@ again_break: ;
 				}
 				else
 				{
-					SetElem(cx, result, slot++, i_2);
+					SetElem(cx, result, slot++, args[i_2]);
 				}
 			} 
 			SetLengthProperty(cx, result, slot);
