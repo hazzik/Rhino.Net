@@ -41,7 +41,7 @@ namespace Rhino.XmlImpl
 			{
 				throw new ArgumentException();
 			}
-			XmlNode rv = null;
+			XmlNode rv;
 			if (GetUserData(node) == null)
 			{
 				rv = new XmlNode();

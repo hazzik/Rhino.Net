@@ -97,11 +97,12 @@ namespace Rhino
 				}
 				if (id == constructorId)
 				{
-					if (!(value is IdFunctionObject))
+					var idFunctionObject = value as IdFunctionObject;
+					if (idFunctionObject == null)
 					{
 						throw new ArgumentException("consructor should be initialized with IdFunctionObject");
 					}
-					constructor = (IdFunctionObject)value;
+					constructor = idFunctionObject;
 					constructorAttrs = attributes;
 					return;
 				}
@@ -878,9 +879,10 @@ namespace Rhino
 		protected internal override ScriptableObject GetOwnPropertyDescriptor(Context cx, object id)
 		{
 			ScriptableObject desc = base.GetOwnPropertyDescriptor(cx, id);
-			if (desc == null && id is string)
+			var strId = id as string;
+			if (desc == null && strId != null)
 			{
-				desc = GetBuiltInDescriptor((string)id);
+				desc = GetBuiltInDescriptor(strId);
 			}
 			return desc;
 		}

@@ -28,9 +28,9 @@ namespace Rhino
 			this.value = value;
 			// Fill in fileName and lineNumber automatically when not specified
 			// explicitly, see Bugzilla issue #342807
-			if (value is NativeError && Context.GetContext().HasFeature(LanguageFeatures.LocationInformationInError))
+			var error = value as NativeError;
+			if (error != null && Context.GetContext().HasFeature(LanguageFeatures.LocationInformationInError))
 			{
-				NativeError error = (NativeError)value;
 				if (!error.Has("fileName", error))
 				{
 					error.Put("fileName", error, sourceName);

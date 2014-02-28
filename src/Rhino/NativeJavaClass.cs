@@ -308,9 +308,14 @@ namespace Rhino
 		/// </remarks>
 		public override bool HasInstance(Scriptable value)
 		{
-			if (value is Wrapper && !(value is NativeJavaClass))
+			var valueWrapper = value as Wrapper;
+			if (valueWrapper == null)
 			{
-				object instance = ((Wrapper)value).Unwrap();
+				return false;
+			}
+			if (!(value is NativeJavaClass))
+			{
+				object instance = valueWrapper.Unwrap();
 				return GetClassObject().IsInstanceOfType(instance);
 			}
 			// value wasn't something we understand

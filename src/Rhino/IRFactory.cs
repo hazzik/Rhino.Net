@@ -2780,7 +2780,8 @@ namespace Rhino
 		// Check if node is the target of a destructuring bind.
 		internal bool IsDestructuring(Node n)
 		{
-			return n is DestructuringForm && ((DestructuringForm)n).IsDestructuring();
+			var destructuringForm = n as DestructuringForm;
+			return destructuringForm != null && destructuringForm.IsDestructuring();
 		}
 
 		internal Node DecompileFunctionHeader(FunctionNode fn)

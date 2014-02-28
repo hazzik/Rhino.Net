@@ -73,9 +73,10 @@ namespace Rhino
 		internal virtual Rhino.NativeJavaPackage ForcePackage(string name, Scriptable scope)
 		{
 			object cached = base.Get(name, this);
-			if (cached != null && cached is Rhino.NativeJavaPackage)
+			var nativeJavaPackage = cached as NativeJavaPackage;
+			if (nativeJavaPackage != null)
 			{
-				return (Rhino.NativeJavaPackage)cached;
+				return nativeJavaPackage;
 			}
 			else
 			{

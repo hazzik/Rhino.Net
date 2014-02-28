@@ -209,7 +209,7 @@ namespace Rhino
 					{
 						return arg;
 					}
-					return ScriptRuntime.ToBoolean(arg) ? true : false;
+					return ScriptRuntime.ToBoolean(arg);
 				}
 
 				case JAVA_DOUBLE_TYPE:

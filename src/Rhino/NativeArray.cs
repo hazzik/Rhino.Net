@@ -1645,15 +1645,15 @@ again_break: ;
 			scope = GetTopLevelScope(scope);
 			Function ctor = ScriptRuntime.GetExistingCtor(cx, scope, "Array");
 			Scriptable result = ctor.Construct(cx, scope, ScriptRuntime.emptyArgs);
-			if (thisObj is NativeArray && result is NativeArray)
+			var denseThis = thisObj as NativeArray;
+			var denseResult = result as NativeArray;
+			if (denseThis != null && denseResult != null)
 			{
-				NativeArray denseThis = (NativeArray)thisObj;
-				NativeArray denseResult = (NativeArray)result;
 				if (denseThis.denseOnly && denseResult.denseOnly)
 				{
 					// First calculate length of resulting array
 					bool canUseDense = true;
-					int length = (int)denseThis.length;
+					int length = (int) denseThis.length;
 					for (int i = 0; i < args.Length && canUseDense; i++)
 					{
 						var arg = args[i] as NativeArray;
@@ -1671,15 +1671,15 @@ again_break: ;
 					}
 					if (canUseDense && denseResult.EnsureCapacity(length))
 					{
-						Array.Copy(denseThis.dense, 0, denseResult.dense, 0, (int)denseThis.length);
-						int cursor = (int)denseThis.length;
+						Array.Copy(denseThis.dense, 0, denseResult.dense, 0, (int) denseThis.length);
+						int cursor = (int) denseThis.length;
 						for (int i_1 = 0; i_1 < args.Length && canUseDense; i_1++)
 						{
 							var arg = args[i_1] as NativeArray;
 							if (arg != null)
 							{
-								Array.Copy(arg.dense, 0, denseResult.dense, cursor, (int)arg.length);
-								cursor += (int)arg.length;
+								Array.Copy(arg.dense, 0, denseResult.dense, cursor, (int) arg.length);
+								cursor += (int) arg.length;
 							}
 							else
 							{
@@ -1712,10 +1712,10 @@ again_break: ;
 			}
 			for (int i_2 = 0; i_2 < args.Length; i_2++)
 			{
-				if (ScriptRuntime.InstanceOf(args[i_2], ctor, cx))
+				if (ScriptRuntime.InstanceOf(i_2, ctor, cx))
 				{
 					// ScriptRuntime.instanceOf => instanceof Scriptable
-					Scriptable arg = (Scriptable)args[i_2];
+					Scriptable arg = (Scriptable)i_2;
 					length_1 = GetLengthProperty(cx, arg);
 					for (long j = 0; j < length_1; j++, slot++)
 					{
@@ -1728,7 +1728,7 @@ again_break: ;
 				}
 				else
 				{
-					SetElem(cx, result, slot++, args[i_2]);
+					SetElem(cx, result, slot++, i_2);
 				}
 			} 
 			SetLengthProperty(cx, result, slot);
@@ -1917,11 +1917,11 @@ again_break: ;
 		private object IterativeMethod(Context cx, int id, Scriptable scope, Scriptable thisObj, object[] args)
 		{
 			object callbackArg = args.Length > 0 ? args[0] : Undefined.instance;
-			if (callbackArg == null || !(callbackArg is Function))
+			var f = callbackArg as Function;
+			if (f == null)
 			{
 				throw ScriptRuntime.NotFunctionError(callbackArg);
 			}
-			Function f = (Function)callbackArg;
 			Scriptable parent = GetTopLevelScope(f);
 			Scriptable thisArg;
 			if (args.Length < 2 || args[1] == null || args[1] == Undefined.instance)
@@ -1933,7 +1933,7 @@ again_break: ;
 				thisArg = ScriptRuntime.ToObject(cx, scope, args[1]);
 			}
 			long length = GetLengthProperty(cx, thisObj);
-			int resultLength = id == Id_map ? (int)length : 0;
+			int resultLength = id == Id_map ? (int) length : 0;
 			Scriptable array = cx.NewArray(scope, resultLength);
 			long j = 0;
 			for (long i = 0; i < length; i++)
@@ -2013,6 +2013,7 @@ again_break: ;
 					return Undefined.instance;
 				}
 			}
+			throw ScriptRuntime.NotFunctionError(callbackArg);
 		}
 
 		/// <summary>Implements the methods "reduce" and "reduceRight".</summary>
@@ -2020,11 +2021,11 @@ again_break: ;
 		private object ReduceMethod(Context cx, int id, Scriptable scope, Scriptable thisObj, object[] args)
 		{
 			object callbackArg = args.Length > 0 ? args[0] : Undefined.instance;
-			if (callbackArg == null || !(callbackArg is Function))
+			var f = callbackArg as Function;
+			if (f == null)
 			{
 				throw ScriptRuntime.NotFunctionError(callbackArg);
 			}
-			Function f = (Function)callbackArg;
 			Scriptable parent = GetTopLevelScope(f);
 			long length = GetLengthProperty(cx, thisObj);
 			// hack to serve both reduce and reduceRight with the same loop

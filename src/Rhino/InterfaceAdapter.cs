@@ -69,7 +69,7 @@ namespace Rhino
 						string methodName = methods[0].Name;
 						for (int i = 1; i < length; i++)
 						{
-							if (!methodName.Equals(methods[i].Name))
+							if (methodName != methods[i].Name)
 							{
 								throw Context.ReportRuntimeError1("msg.no.function.interface.conversion", cl.FullName);
 							}

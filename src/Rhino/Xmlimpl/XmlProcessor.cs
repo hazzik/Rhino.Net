@@ -178,9 +178,9 @@ namespace Rhino.XmlImpl
 
 		private void AddTextNodesToRemoveAndTrim(IList<System.Xml.XmlNode> toRemove, System.Xml.XmlNode node)
 		{
-			if (node is XmlText)
+			var text = node as XmlText;
+			if (text != null)
 			{
-				XmlText text = (XmlText)node;
 				bool BUG_369394_IS_VALID = false;
 				if (!BUG_369394_IS_VALID)
 				{
@@ -195,7 +195,7 @@ namespace Rhino.XmlImpl
 				}
 				if (text.Data.Length == 0)
 				{
-					toRemove.Add(node);
+					toRemove.Add(text);
 				}
 			}
 			if (node.ChildNodes != null)
@@ -328,9 +328,10 @@ namespace Rhino.XmlImpl
 
 		internal virtual string EscapeTextValue(object value)
 		{
-			if (value is XMLObjectImpl)
+			var xmlObjectImpl = value as XMLObjectImpl;
+			if (xmlObjectImpl != null)
 			{
-				return ((XMLObjectImpl)value).ToXMLString();
+				return xmlObjectImpl.ToXMLString();
 			}
 			string text = ScriptRuntime.ToString(value);
 			if (text.Length == 0)
@@ -375,28 +376,31 @@ namespace Rhino.XmlImpl
 					s.Append(' ');
 				}
 			}
-			if (node is XmlText)
+			var text = node as XmlText;
+			if (text != null)
 			{
-				string data = ((XmlText)node).Data;
+				string data = text.Data;
 				//    TODO Does Java trim() work same as XMLWhitespace?
 				string v = (prettyPrint) ? data.Trim() : data;
 				s.Append(EscapeElementValue(v));
 				return s.ToString();
 			}
-			if (node is XmlAttribute)
+			var attribute = node as XmlAttribute;
+			if (attribute != null)
 			{
-				string value = ((XmlAttribute)node).Value;
+				string value = attribute.Value;
 				s.Append(EscapeAttributeValue(value));
 				return s.ToString();
 			}
-			if (node is XmlComment)
+			var comment = node as XmlComment;
+			if (comment != null)
 			{
-				s.Append("<!--" + ((XmlComment)node).GetNodeValue() + "-->");
+				s.Append("<!--" + comment.GetNodeValue() + "-->");
 				return s.ToString();
 			}
-			if (node is XmlProcessingInstruction)
+			var pi = node as XmlProcessingInstruction;
+			if (pi != null)
 			{
-				XmlProcessingInstruction pi = (XmlProcessingInstruction)node;
 				s.Append("<?" + pi.Target + " " + pi.GetData() + "?>");
 				return s.ToString();
 			}
@@ -422,36 +426,38 @@ namespace Rhino.XmlImpl
 			//    would contribute to the length and it might never terminate).
 			List<System.Xml.XmlNode> toIndent = new List<System.Xml.XmlNode>();
 			bool indentChildren = false;
-			for (int i_2 = 0; i_2 < e.ChildNodes.Count; i_2++)
+			for (int i = 0; i < e.ChildNodes.Count; i++)
 			{
-				if (i_2 == 1)
+				if (i == 1)
 				{
 					indentChildren = true;
 				}
-				if (e.ChildNodes.Item(i_2) is XmlText)
+				var item = e.ChildNodes.Item(i);
+				if (item is XmlText)
 				{
-					toIndent.Add(e.ChildNodes.Item(i_2));
+					toIndent.Add(item);
 				}
 				else
 				{
 					indentChildren = true;
-					toIndent.Add(e.ChildNodes.Item(i_2));
+					toIndent.Add(item);
 				}
 			}
 			if (indentChildren)
 			{
-				for (int i_3 = 0; i_3 < toIndent.Count; i_3++)
+				for (int i = 0; i < toIndent.Count; i++)
 				{
-					e.InsertBefore(e.OwnerDocument.CreateTextNode(beforeContent), toIndent[i_3]);
+					e.InsertBefore(e.OwnerDocument.CreateTextNode(beforeContent), toIndent[i]);
 				}
 			}
 			XmlNodeList nodes = e.ChildNodes;
 			List<XmlElement> list = new List<XmlElement>();
-			for (int i_4 = 0; i_4 < nodes.Count; i_4++)
+			for (int i = 0; i < nodes.Count; i++)
 			{
-				if (nodes.Item(i_4) is XmlElement)
+				var node = nodes.Item(i) as XmlElement;
+				if (node != null)
 				{
-					list.Add((XmlElement)nodes.Item(i_4));
+					list.Add(node);
 				}
 			}
 			foreach (XmlElement elem in list)

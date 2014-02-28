@@ -438,11 +438,11 @@ L0_break: ;
 
 				case Id_bind:
 				{
-					if (!(thisObj is Callable))
+					var targetFunction = thisObj as Callable;
+					if (targetFunction == null)
 					{
 						throw ScriptRuntime.NotFunctionError(thisObj);
 					}
-					Callable targetFunction = (Callable)thisObj;
 					int argc = args.Length;
 					Scriptable boundThis;
 					object[] boundArgs;

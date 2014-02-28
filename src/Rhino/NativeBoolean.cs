@@ -108,7 +108,8 @@ namespace Rhino
 				}
 				else
 				{
-					b = args[0] is ScriptableObject && ((ScriptableObject)args[0]).AvoidObjectDetection() ? true : ScriptRuntime.ToBoolean(args[0]);
+					var scriptableObject = args[0] as ScriptableObject;
+					b = scriptableObject != null && scriptableObject.AvoidObjectDetection() || ScriptRuntime.ToBoolean(args[0]);
 				}
 				if (thisObj == null)
 				{

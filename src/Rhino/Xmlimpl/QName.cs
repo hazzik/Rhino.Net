@@ -357,11 +357,12 @@ L0_break: ;
 
 		private QName RealThis(Scriptable thisObj, IdFunctionObject f)
 		{
-			if (!(thisObj is QName))
+			var qname = thisObj as QName;
+			if (qname == null)
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (QName)thisObj;
+			return qname;
 		}
 
 		internal QName NewQName(XMLLibImpl lib, string q_uri, string q_localName, string q_prefix)

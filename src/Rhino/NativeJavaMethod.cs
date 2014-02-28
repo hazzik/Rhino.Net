@@ -698,11 +698,11 @@ search_break: ;
 
 		public override bool Equals(object other)
 		{
-			if (!(other is ResolvedOverload))
+			var ovl = other as ResolvedOverload;
+			if (ovl == null)
 			{
 				return false;
 			}
-			ResolvedOverload ovl = (ResolvedOverload)other;
 			return Arrays.Equals(types, ovl.types) && index == ovl.index;
 		}
 

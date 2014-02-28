@@ -577,9 +577,10 @@ namespace Rhino.XmlImpl
 			//            See ECMA357 10.3
 			// Extension: if object is a DOM node, use that to construct the XML
 			// object.
-			if (@object is Wrapper)
+			var wrapper = @object as Wrapper;
+			if (wrapper != null)
 			{
-				@object = ((Wrapper)@object).Unwrap();
+				@object = wrapper.Unwrap();
 			}
 			var node = @object as System.Xml.XmlNode;
 			if (node != null)

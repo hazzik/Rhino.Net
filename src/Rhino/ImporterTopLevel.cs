@@ -178,11 +178,12 @@ namespace Rhino
 			for (int i = 0; i != args.Length; i++)
 			{
 				object arg = args[i];
-				if (!(arg is NativeJavaClass))
+				var nativeJavaClass = arg as NativeJavaClass;
+				if (nativeJavaClass == null)
 				{
 					throw Context.ReportRuntimeError1("msg.not.class", Context.ToString(arg));
 				}
-				ImportClass((NativeJavaClass)arg);
+				ImportClass(nativeJavaClass);
 			}
 			return Undefined.instance;
 		}
@@ -192,11 +193,12 @@ namespace Rhino
 			for (int i = 0; i != args.Length; i++)
 			{
 				object arg = args[i];
-				if (!(arg is NativeJavaPackage))
+				var nativeJavaPackage = arg as NativeJavaPackage;
+				if (nativeJavaPackage == null)
 				{
 					throw Context.ReportRuntimeError1("msg.not.pkg", Context.ToString(arg));
 				}
-				ImportPackage((NativeJavaPackage)arg);
+				ImportPackage(nativeJavaPackage);
 			}
 			return Undefined.instance;
 		}
@@ -303,11 +305,12 @@ namespace Rhino
 				// function that ignore thisObj
 				return this;
 			}
-			if (!(thisObj is Rhino.ImporterTopLevel))
+			var importerTopLevel = thisObj as ImporterTopLevel;
+			if (importerTopLevel == null)
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (Rhino.ImporterTopLevel)thisObj;
+			return importerTopLevel;
 		}
 
 		// #string_id_map#

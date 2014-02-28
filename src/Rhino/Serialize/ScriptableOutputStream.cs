@@ -172,7 +172,7 @@ namespace Rhino.Serialize
 			foreach (string name in names)
 			{
 				result = ScriptableObject.GetProperty((Scriptable) result, name);
-				if (result == null || !(result is Scriptable))
+				if (!(result is Scriptable))
 				{
 					break;
 				}

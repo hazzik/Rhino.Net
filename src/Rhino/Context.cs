@@ -867,12 +867,13 @@ namespace Rhino
 		/// <exception cref="Rhino.ContinuationPending"></exception>
 		public virtual object ExecuteScriptWithContinuations(Script script, Scriptable scope)
 		{
-			if (!(script is InterpretedFunction) || !((InterpretedFunction)script).IsScript())
+			var function = script as InterpretedFunction;
+			if (function == null || !function.IsScript())
 			{
-				// Can only be applied to scripts
-				throw new ArgumentException("Script argument was not" + " a script or was not created by interpreted mode ");
+				throw new ArgumentException("Script argument was not a script or was not created by interpreted mode ");
 			}
-			return CallFunctionWithContinuations((InterpretedFunction)script, scope, ScriptRuntime.emptyArgs);
+			// Can only be applied to scripts
+			return CallFunctionWithContinuations(function, scope, ScriptRuntime.emptyArgs);
 		}
 
 		/// <summary>Call function that may pause execution by capturing a continuation.</summary>
@@ -1499,9 +1500,10 @@ namespace Rhino
 					throw (Exception)e;
 				}
 			}
-			if (e is RhinoException)
+			var rhinoException = e as RhinoException;
+			if (rhinoException != null)
 			{
-				throw (RhinoException)e;
+				throw rhinoException;
 			}
 			throw new WrappedException(e);
 		}
