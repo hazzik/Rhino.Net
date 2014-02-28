@@ -75,7 +75,7 @@ namespace Rhino
 		{
 			if (id == Id_length)
 			{
-				return ScriptRuntime.WrapInt(@string.Length);
+				return @string.Length;
 			}
 			return base.GetInstanceIdValue(id);
 		}
@@ -488,19 +488,19 @@ namespace Rhino
 						}
 						else
 						{
-							return ScriptRuntime.WrapInt(c);
+							return (int) c;
 						}
 						goto case Id_indexOf;
 					}
 
 					case Id_indexOf:
 					{
-						return ScriptRuntime.WrapInt(Js_indexOf(ScriptRuntime.ToString(thisObj), args));
+						return Js_indexOf(ScriptRuntime.ToString(thisObj), args);
 					}
 
 					case Id_lastIndexOf:
 					{
-						return ScriptRuntime.WrapInt(Js_lastIndexOf(ScriptRuntime.ToString(thisObj), args));
+						return Js_lastIndexOf(ScriptRuntime.ToString(thisObj), args);
 					}
 
 					case Id_split:

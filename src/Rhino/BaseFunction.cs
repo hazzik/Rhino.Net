@@ -243,12 +243,12 @@ L0_break: ;
 			{
 				case Id_length:
 				{
-					return ScriptRuntime.WrapInt(Length);
+					return Length;
 				}
 
 				case Id_arity:
 				{
-					return ScriptRuntime.WrapInt(Arity);
+					return Arity;
 				}
 
 				case Id_name:

@@ -236,7 +236,7 @@ L0_break: ;
 
 				case Id_prettyIndent:
 				{
-					return ScriptRuntime.WrapInt(options.GetPrettyIndent());
+					return options.GetPrettyIndent();
 				}
 
 				case Id_prettyPrinting:

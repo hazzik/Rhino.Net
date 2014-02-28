@@ -960,7 +960,7 @@ namespace Rhino.Tools.Shell
 			{
 				return arg;
 			}
-			return ScriptRuntime.WrapInt(ScriptRuntime.ToInt32(arg));
+			return ScriptRuntime.ToInt32(arg);
 		}
 
 		public ShellConsole GetConsole(Encoding cs)

@@ -1299,7 +1299,7 @@ L0_break: ;
 					{
 						XmlMethodNotFound(realThis, "childIndex");
 					}
-					return ScriptRuntime.WrapInt(xml.ChildIndex());
+					return xml.ChildIndex();
 				}
 
 				case Id_inScopeNamespaces:
@@ -1565,7 +1565,7 @@ L0_break: ;
 
 				case Id_length:
 				{
-					return ScriptRuntime.WrapInt(realThis.Length());
+					return realThis.Length();
 				}
 
 				case Id_normalize:
