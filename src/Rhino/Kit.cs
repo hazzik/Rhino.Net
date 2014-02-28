@@ -431,11 +431,11 @@ check_break: ;
 
 			public override bool Equals(object anotherObj)
 			{
-				if (!(anotherObj is ComplexKey))
+				var another = anotherObj as ComplexKey;
+				if (another == null)
 				{
 					return false;
 				}
-				ComplexKey another = (ComplexKey)anotherObj;
 				return key1.Equals(another.key1) && key2.Equals(another.key2);
 			}
 

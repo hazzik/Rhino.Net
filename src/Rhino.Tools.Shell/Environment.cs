@@ -57,11 +57,10 @@ namespace Rhino.Tools.Shell
 		public Environment(ScriptableObject scope)
 		{
 			ParentScope = scope;
-			object ctor = ScriptRuntime.GetTopLevelProp(scope, "Environment");
-			if (ctor != null && ctor is Scriptable)
+			var ctor = ScriptRuntime.GetTopLevelProp(scope, "Environment") as Scriptable;
+			if (ctor != null)
 			{
-				Scriptable s = (Scriptable)ctor;
-				Prototype = (Scriptable)s.Get("prototype", s);
+				Prototype = (Scriptable) ctor.Get("prototype", ctor);
 			}
 		}
 

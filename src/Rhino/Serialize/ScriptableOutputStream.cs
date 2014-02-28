@@ -59,9 +59,10 @@ namespace Rhino.Serialize
 		{
 			foreach (object id in ids)
 			{
-				if (id is string && (scope.Get((string)id, scope) is Scriptable))
+				var strId = id as string;
+				if (strId != null && (scope.Get(strId, scope) is Scriptable))
 				{
-					this.AddExcludedName((string)id);
+					this.AddExcludedName(strId);
 				}
 			}
 		}

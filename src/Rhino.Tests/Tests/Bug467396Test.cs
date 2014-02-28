@@ -22,7 +22,7 @@ namespace Rhino.Tests
 	public class Bug467396Test
 	{
 		[NUnit.Framework.Test]
-		public virtual void TestOverloadedVarargs()
+		public void TestOverloadedVarargs()
 		{
 			Context cx = ContextFactory.GetGlobal().EnterContext();
 			try
@@ -49,9 +49,10 @@ namespace Rhino.Tests
 			}
 		}
 
-		private object Unwrap(object obj)
+		private static object Unwrap(object obj)
 		{
-			return obj is Wrapper ? ((Wrapper)obj).Unwrap() : obj;
+			var wrapper = obj as Wrapper;
+			return wrapper != null ? wrapper.Unwrap() : obj;
 		}
 	}
 }

@@ -197,7 +197,8 @@ namespace Rhino.CommonJS.Module.Provider
 
 		protected internal override bool EntityNeedsRevalidation(object validator)
 		{
-			return !(validator is UrlValidator) || ((UrlValidator)validator).EntityNeedsRevalidation();
+			var urlValidator = validator as UrlValidator;
+			return urlValidator == null || urlValidator.EntityNeedsRevalidation();
 		}
 
 		[Serializable]

@@ -12,7 +12,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Rhino.Tools.Shell;
-using Sharpen;
 using Thread = System.Threading.Thread;
 
 namespace Rhino.Drivers
@@ -22,13 +21,13 @@ namespace Rhino.Drivers
 	{
 		public static bool DIRECTORY_FILTER(FileSystemInfo pathname)
 		{
-			return pathname is DirectoryInfo && !pathname.Name.Equals("CVS");
+			return pathname is DirectoryInfo && pathname.Name != "CVS";
 		}
 
 		public static bool TEST_FILTER(FileSystemInfo pathname)
 		{
 			var name = pathname.Name;
-			return name.EndsWith(".js") && !name.Equals("shell.js") && !name.Equals("browser.js") && !name.Equals("template.js");
+			return name.EndsWith(".js") && name != "shell.js" && name != "browser.js" && name != "template.js";
 		}
 
 		public static string GetStackTrace(Exception t)

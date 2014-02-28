@@ -73,15 +73,23 @@ namespace Rhino.Optimizer
 
 		public static object Add(object val1, double val2)
 		{
-			if (val1 is Scriptable)
+			var scriptableVal1 = val1 as Scriptable;
+			if (scriptableVal1 != null)
 			{
-				val1 = ((Scriptable)val1).GetDefaultValue(null);
+				val1 = scriptableVal1.GetDefaultValue(null);
 			}
-			if (!(val1 is string))
+			var strVal1 = val1 as string;
+			if (strVal1 != null)
 			{
-				return ToNumber(val1) + val2;
+				return strVal1 + ToString(val2);
 			}
-			return (string) val1 + ToString(val2);
+			return ToNumber(val1) + val2;
+		}
+
+		private static object Val1(object val1)
+		{
+			var scriptableVal1 = val1 as Scriptable;
+			return scriptableVal1 != null ? scriptableVal1.GetDefaultValue(null) : val1;
 		}
 
 		[UsedImplicitly]
@@ -91,11 +99,12 @@ namespace Rhino.Optimizer
 			{
 				val2 = ((Scriptable)val2).GetDefaultValue(null);
 			}
-			if (!(val2 is string))
+			var strVal2 = val2 as string;
+			if (strVal2 != null)
 			{
-				return ToNumber(val2) + val1;
+				return ToString(val1) + strVal2;
 			}
-			return ToString(val1) + (string) val2;
+			return ToNumber(val2) + val1;
 		}
 
 		[UsedImplicitly]

@@ -161,7 +161,10 @@ namespace Rhino.Optimizer
 
 		private static Exception ReportClassFileFormatException(ScriptNode scriptOrFn, string message)
 		{
-			var msg = scriptOrFn is FunctionNode ? ScriptRuntime.GetMessage2("msg.while.compiling.fn", ((FunctionNode)scriptOrFn).GetFunctionName(), message) : ScriptRuntime.GetMessage1("msg.while.compiling.script", message);
+			var fn = scriptOrFn as FunctionNode;
+			string msg = fn != null
+				? ScriptRuntime.GetMessage2("msg.while.compiling.fn", fn.GetFunctionName(), message)
+				: ScriptRuntime.GetMessage1("msg.while.compiling.script", message);
 			return Context.ReportRuntimeError(msg, scriptOrFn.GetSourceName(), scriptOrFn.GetLineno(), null, 0);
 		}
 

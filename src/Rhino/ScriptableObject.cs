@@ -728,11 +728,12 @@ namespace Rhino
 			else
 			{
 				Slot slot = UnwrapSlot(GetSlot(name, index, SLOT_QUERY));
-				if (!(slot is GetterSlot))
+				var getterSlot = slot as GetterSlot;
+				if (getterSlot == null)
 				{
 					return;
 				}
-				gslot = (GetterSlot)slot;
+				gslot = getterSlot;
 			}
 			if (!force)
 			{
@@ -988,14 +989,18 @@ namespace Rhino
 					{
 						return v;
 					}
-					if (tryToString && v is Wrapper)
+					if (tryToString)
 					{
-						// Let a wrapped java.lang.String pass for a primitive
-						// string.
-						object u = ((Wrapper)v).Unwrap();
-						if (u is string)
+						var vWrapper = v as Wrapper;
+						if (vWrapper != null)
 						{
-							return u;
+							// Let a wrapped java.lang.String pass for a primitive
+							// string.
+							object u = vWrapper.Unwrap();
+							if (u is string)
+							{
+								return u;
+							}
 						}
 					}
 				}
@@ -1823,13 +1828,13 @@ namespace Rhino
 		/// </remarks>
 		public static void DefineProperty(Scriptable destination, string propertyName, object value, PropertyAttributes attributes)
 		{
-			if (!(destination is ScriptableObject))
+			var so = destination as ScriptableObject;
+			if (so == null)
 			{
 				destination.Put(propertyName, destination, value);
 				return;
 			}
-			ScriptableObject so = (ScriptableObject)destination;
-			so.DefineProperty(propertyName, value, (PropertyAttributes) attributes);
+			so.DefineProperty(propertyName, value, attributes);
 		}
 
 		/// <summary>Utility method to add properties to arbitrary Scriptable object.</summary>
@@ -2348,20 +2353,22 @@ namespace Rhino
 
 		protected internal static Scriptable EnsureScriptable(object arg)
 		{
-			if (!(arg is Scriptable))
+			var scriptable = arg as Scriptable;
+			if (scriptable == null)
 			{
 				throw ScriptRuntime.TypeError1("msg.arg.not.object", ScriptRuntime.TypeOf(arg));
 			}
-			return (Scriptable)arg;
+			return scriptable;
 		}
 
 		protected internal static ScriptableObject EnsureScriptableObject(object arg)
 		{
-			if (!(arg is ScriptableObject))
+			var scriptableObject = arg as ScriptableObject;
+			if (scriptableObject == null)
 			{
 				throw ScriptRuntime.TypeError1("msg.arg.not.object", ScriptRuntime.TypeOf(arg));
 			}
-			return (ScriptableObject)arg;
+			return scriptableObject;
 		}
 
 		/// <summary>
@@ -2970,12 +2977,11 @@ namespace Rhino
 		/// <param name="args">the arguments for the call</param>
 		public static object CallMethod(Context cx, Scriptable obj, string methodName, object[] args)
 		{
-			object funObj = GetProperty(obj, methodName);
-			if (!(funObj is Function))
+			var fun = GetProperty(obj, methodName) as Function;
+			if (fun == null)
 			{
 				throw ScriptRuntime.NotFunctionError(obj, methodName);
 			}
-			Function fun = (Function)funObj;
 			// XXX: What should be the scope when calling funObj?
 			// The following favor scope stored in the object on the assumption
 			// that is more useful especially under dynamic scope setup.
@@ -3221,7 +3227,8 @@ namespace Rhino
 
 		private static Slot UnwrapSlot(Slot slot)
 		{
-			return (slot is RelinkedSlot) ? ((RelinkedSlot)slot).slot : slot;
+			var relinkedSlot = slot as RelinkedSlot;
+			return relinkedSlot != null ? relinkedSlot.slot : slot;
 		}
 
 		/// <summary>Locate the slot with given name or index.</summary>

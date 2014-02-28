@@ -71,16 +71,17 @@ namespace Rhino.XmlImpl
 
 		private bool Equals(Namespace n)
 		{
-			return Uri().Equals(n.Uri());
+			return Uri() == n.Uri();
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Namespace))
+			var @namespace = obj as Namespace;
+			if (@namespace == null)
 			{
 				return false;
 			}
-			return Equals((Namespace)obj);
+			return Equals(@namespace);
 		}
 
 		public override int GetHashCode()
@@ -90,12 +91,12 @@ namespace Rhino.XmlImpl
 
 		protected internal override object EquivalentValues(object value)
 		{
-			if (!(value is Namespace))
+			var @namespace = value as Namespace;
+			if (@namespace == null)
 			{
 				return ScriptableConstants.NOT_FOUND;
 			}
-			bool result = Equals((Namespace)value);
-			return result ? true : false;
+			return Equals(@namespace);
 		}
 
 		public override string GetClassName()
@@ -325,11 +326,12 @@ L0_break: ;
 
 		private Namespace RealThis(Scriptable thisObj, IdFunctionObject f)
 		{
-			if (!(thisObj is Namespace))
+			var @namespace = thisObj as Namespace;
+			if (@namespace == null)
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (Namespace)thisObj;
+			return @namespace;
 		}
 
 		internal virtual Namespace NewNamespace(string uri)

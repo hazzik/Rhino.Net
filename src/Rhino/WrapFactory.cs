@@ -77,7 +77,7 @@ namespace Rhino
 				{
 					if (obj is char)
 					{
-						return ((char)obj).ToString();
+						return ((char) obj).ToString();
 					}
 				}
 			}

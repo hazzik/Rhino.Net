@@ -106,11 +106,12 @@ namespace Rhino.XmlImpl
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is QName))
+			var qname = obj as QName;
+			if (qname == null)
 			{
 				return false;
 			}
-			return Equals((QName)obj);
+			return Equals(qname);
 		}
 
 		public override int GetHashCode()
@@ -120,12 +121,12 @@ namespace Rhino.XmlImpl
 
 		protected internal override object EquivalentValues(object value)
 		{
-			if (!(value is QName))
+			var qname = value as QName;
+			if (qname == null)
 			{
 				return ScriptableConstants.NOT_FOUND;
 			}
-			bool result = Equals((QName)value);
-			return result ? true : false;
+			return Equals(qname);
 		}
 
 		private bool Equals(QName q)

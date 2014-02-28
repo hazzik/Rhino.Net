@@ -86,9 +86,10 @@ namespace Rhino.Tests
 		{
 			object arg = args.Length > 0 ? args[0] : Undefined.instance;
 			object privateValue = Undefined.instance;
-			if (thisObj is ScriptableObject)
+			var scriptableObject = thisObj as ScriptableObject;
+			if (scriptableObject != null)
 			{
-				privateValue = ((ScriptableObject)thisObj).GetAssociatedValue(key);
+				privateValue = scriptableObject.GetAssociatedValue(key);
 			}
 			return arg.ToString() + privateValue;
 		}

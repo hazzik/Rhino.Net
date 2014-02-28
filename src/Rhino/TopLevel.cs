@@ -191,8 +191,8 @@ namespace Rhino
 		public virtual Scriptable GetBuiltinPrototype(Builtins type)
 		{
 			BaseFunction func = GetBuiltinCtor(type);
-			object proto = func != null ? func.GetPrototypeProperty() : null;
-			return proto is Scriptable ? (Scriptable)proto : null;
+			object prototype = func != null ? func.GetPrototypeProperty() : null;
+			return prototype as Scriptable;
 		}
 	}
 }

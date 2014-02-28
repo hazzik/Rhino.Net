@@ -59,8 +59,10 @@ namespace Rhino
 		/// <seealso cref="Function.Call(Context, Scriptable, Scriptable, object[])">Function.Call(Context, Scriptable, Scriptable, object[])</seealso>
 		public override object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
 		{
-			object sync = syncObject != null ? syncObject : thisObj;
-			lock (sync is Wrapper ? ((Wrapper)sync).Unwrap() : sync)
+			object sync = syncObject ?? thisObj;
+			var wrapper = sync as Wrapper;
+			object o = wrapper != null ? wrapper.Unwrap() : sync;
+			lock (o)
 			{
 				return ((Function)obj).Call(cx, scope, thisObj, args);
 			}

@@ -3163,11 +3163,11 @@ search_break: ;
 
 		public static object ToPrimitive(object val, Type typeHint)
 		{
-			if (!(val is Scriptable))
+			var s = val as Scriptable;
+			if (s == null)
 			{
 				return val;
 			}
-			Scriptable s = (Scriptable)val;
 			object result = s.GetDefaultValue(typeHint);
 			if (result is Scriptable)
 			{
@@ -3262,12 +3262,14 @@ search_break: ;
 												return ((bool)test);
 											}
 										}
-										if (x is Wrapper && y is Wrapper)
+										var xWrapper = x as Wrapper;
+										var yWrapper = y as Wrapper;
+										if (xWrapper != null && yWrapper != null)
 										{
 											// See bug 413838. Effectively an extension to ECMA for
 											// the LiveConnect case.
-											object unwrappedX = ((Wrapper)x).Unwrap();
-											object unwrappedY = ((Wrapper)y).Unwrap();
+											object unwrappedX = xWrapper.Unwrap();
+											object unwrappedY = yWrapper.Unwrap();
 											return unwrappedX == unwrappedY || (IsPrimitive(unwrappedX) && IsPrimitive(unwrappedY) && Eq(unwrappedX, unwrappedY));
 										}
 										return false;
@@ -3464,7 +3466,7 @@ search_break: ;
 					{
 						if (y is string)
 						{
-							return x.ToString().Equals(y.ToString());
+							return x.ToString() == y.ToString();
 						}
 					}
 					else
@@ -3480,9 +3482,11 @@ search_break: ;
 						{
 							if (x is Scriptable)
 							{
-								if (x is Wrapper && y is Wrapper)
+								var xWrapper = x as Wrapper;
+								var yWrapper = y as Wrapper;
+								if (xWrapper != null && yWrapper != null)
 								{
-									return ((Wrapper)x).Unwrap() == ((Wrapper)y).Unwrap();
+									return xWrapper.Unwrap() == yWrapper.Unwrap();
 								}
 							}
 							else
@@ -3503,16 +3507,18 @@ search_break: ;
 		public static bool InstanceOf(object a, object b, Context cx)
 		{
 			// Check RHS is an object
-			if (!(b is Scriptable))
+			var scriptableB = b as Scriptable;
+			if (scriptableB == null)
 			{
 				throw TypeError0("msg.instanceof.not.object");
 			}
+			var scriptableA = a as Scriptable;
 			// for primitive values on LHS, return false
-			if (!(a is Scriptable))
+			if (scriptableA == null)
 			{
 				return false;
 			}
-			return ((Scriptable)b).HasInstance((Scriptable)a);
+			return scriptableB.HasInstance(scriptableA);
 		}
 
 		/// <summary>Delegates to</summary>
@@ -3546,11 +3552,12 @@ search_break: ;
 		/// <returns>true if property name or element number a is a property of b</returns>
 		public static bool In(object a, object b, Context cx)
 		{
-			if (!(b is Scriptable))
+			var scriptable = b as Scriptable;
+			if (scriptable == null)
 			{
 				throw TypeError0("msg.in.not.object");
 			}
-			return HasObjectElem((Scriptable)b, a, cx);
+			return HasObjectElem(scriptable, a, cx);
 		}
 
 		public static bool Cmp_LT(object val1, object val2)
@@ -3564,13 +3571,15 @@ search_break: ;
 			}
 			else
 			{
-				if (val1 is Scriptable)
+				var scriptable = val1 as Scriptable;
+				if (scriptable != null)
 				{
-					val1 = ((Scriptable)val1).GetDefaultValue(NumberClass);
+					val1 = scriptable.GetDefaultValue(NumberClass);
 				}
-				if (val2 is Scriptable)
+				var scriptable2 = val2 as Scriptable;
+				if (scriptable2 != null)
 				{
-					val2 = ((Scriptable)val2).GetDefaultValue(NumberClass);
+					val2 = scriptable2.GetDefaultValue(NumberClass);
 				}
 				if (val1 is string && val2 is string)
 				{
@@ -3593,13 +3602,15 @@ search_break: ;
 			}
 			else
 			{
-				if (val1 is Scriptable)
+				var scriptable1 = val1 as Scriptable;
+				if (scriptable1 != null)
 				{
-					val1 = ((Scriptable)val1).GetDefaultValue(NumberClass);
+					val1 = scriptable1.GetDefaultValue(NumberClass);
 				}
-				if (val2 is Scriptable)
+				var scriptable2 = val2 as Scriptable;
+				if (scriptable2 != null)
 				{
-					val2 = ((Scriptable)val2).GetDefaultValue(NumberClass);
+					val2 = scriptable2.GetDefaultValue(NumberClass);
 				}
 				if (val1 is string && val2 is string)
 				{
@@ -3966,12 +3977,12 @@ search_break: ;
 
 		public static Scriptable EnterDotQuery(object value, Scriptable scope)
 		{
-			if (!(value is XMLObject))
+			var xmlObject = value as XMLObject;
+			if (xmlObject == null)
 			{
 				throw NotXmlError(value);
 			}
-			XMLObject @object = (XMLObject)value;
-			return @object.EnterDotQuery(scope);
+			return xmlObject.EnterDotQuery(scope);
 		}
 
 		public static object UpdateDotQuery(bool value, Scriptable scope)
@@ -4033,7 +4044,7 @@ search_break: ;
 				if (type == FunctionNode.FUNCTION_EXPRESSION_STATEMENT)
 				{
 					string name = function.GetFunctionName();
-					if (name != null && name.Length != 0)
+					if (!string.IsNullOrEmpty(name))
 					{
 						// Always put function expression statements into initial
 						// activation object ignoring the with statement to follow
@@ -4467,21 +4478,21 @@ search_break: ;
 
 		public static Ref MemberRef(object obj, object elem, Context cx, int memberTypeFlags)
 		{
-			if (!(obj is XMLObject))
+			var xmlObject = obj as XMLObject;
+			if (xmlObject == null)
 			{
 				throw NotXmlError(obj);
 			}
-			XMLObject xmlObject = (XMLObject)obj;
 			return xmlObject.MemberRef(cx, elem, memberTypeFlags);
 		}
 
 		public static Ref MemberRef(object obj, object @namespace, object elem, Context cx, int memberTypeFlags)
 		{
-			if (!(obj is XMLObject))
+			var xmlObject = obj as XMLObject;
+			if (xmlObject == null)
 			{
 				throw NotXmlError(obj);
 			}
-			XMLObject xmlObject = (XMLObject)obj;
 			return xmlObject.MemberRef(cx, @namespace, elem, memberTypeFlags);
 		}
 

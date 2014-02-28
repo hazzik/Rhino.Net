@@ -205,17 +205,20 @@ namespace Rhino.RegExp
 
 		internal virtual Scriptable Compile(Context cx, Scriptable scope, object[] args)
 		{
-			if (args.Length > 0 && args[0] is NativeRegExp)
+			if (args.Length > 0)
 			{
-				if (args.Length > 1 && args[1] != Undefined.instance)
+				var thatObj = args[0] as NativeRegExp;
+				if (thatObj != null)
 				{
-					// report error
-					throw ScriptRuntime.TypeError0("msg.bad.regexp.compile");
+					if (args.Length > 1 && args[1] != Undefined.instance)
+					{
+						// report error
+						throw ScriptRuntime.TypeError0("msg.bad.regexp.compile");
+					}
+					this.re = thatObj.re;
+					this.lastIndex = thatObj.lastIndex;
+					return this;
 				}
-				NativeRegExp thatObj = (NativeRegExp)args[0];
-				this.re = thatObj.re;
-				this.lastIndex = thatObj.lastIndex;
-				return this;
 			}
 			string s = args.Length == 0 ? string.Empty : EscapeRegExp(args[0]);
 			string global = args.Length > 1 && args[1] != Undefined.instance ? ScriptRuntime.ToString(args[1]) : null;
@@ -3246,11 +3249,12 @@ L0_break: ;
 
 		private static NativeRegExp RealThis(Scriptable thisObj, IdFunctionObject f)
 		{
-			if (!(thisObj is NativeRegExp))
+			var regExp = thisObj as NativeRegExp;
+			if (regExp == null)
 			{
 				throw IncompatibleCallError(f);
 			}
-			return (NativeRegExp)thisObj;
+			return regExp;
 		}
 
 		// #string_id_map#

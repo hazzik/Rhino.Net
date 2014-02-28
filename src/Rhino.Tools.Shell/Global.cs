@@ -14,6 +14,7 @@ using System.Net;
 using System.Text;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
+using Rhino.Serialize;
 using Sharpen;
 using Thread = System.Threading.Thread;
 
@@ -324,13 +325,13 @@ namespace Rhino.Tools.Shell
 			{
 				throw ReportRuntimeError("msg.expected.string.arg");
 			}
-			object arg0 = args[0];
-			if (arg0 is Wrapper)
+			var wrapper = args[0] as Wrapper;
+			if (wrapper != null)
 			{
-				object wrapped = ((Wrapper)arg0).Unwrap();
-				if (wrapped is Type)
+				var type = wrapper.Unwrap() as Type;
+				if (type != null)
 				{
-					return (Type)wrapped;
+					return type;
 				}
 			}
 			string className = Context.ToString(args[0]);
@@ -388,21 +389,23 @@ namespace Rhino.Tools.Shell
 			if (HasProperty(this, "prompts"))
 			{
 				object promptsJS = GetProperty(this, "prompts");
-				if (promptsJS is Scriptable)
+				var s = promptsJS as Scriptable;
+				if (s != null)
 				{
-					Scriptable s = (Scriptable)promptsJS;
 					if (HasProperty(s, 0) && HasProperty(s, 1))
 					{
 						object elem0 = GetProperty(s, 0);
-						if (elem0 is Function)
+						var function0 = elem0 as Function;
+						if (function0 != null)
 						{
-							elem0 = ((Function)elem0).Call(cx, this, s, new object[0]);
+							elem0 = function0.Call(cx, this, s, new object[0]);
 						}
 						prompts[0] = Context.ToString(elem0);
 						object elem1 = GetProperty(s, 1);
-						if (elem1 is Function)
+						var function1 = elem1 as Function;
+						if (function1 != null)
 						{
-							elem1 = ((Function)elem1).Call(cx, this, s, new object[0]);
+							elem1 = function1.Call(cx, this, s, new object[0]);
 						}
 						prompts[1] = Context.ToString(elem1);
 					}
@@ -589,8 +592,7 @@ namespace Rhino.Tools.Shell
 		}
 
 		/// <summary>
-		/// The spawn function runs a given function or script in a different
-		/// thread.
+		/// The spawn function runs a given function or script in a different thread.
 		/// </summary>
 		/// <remarks>
 		/// The spawn function runs a given function or script in a different
@@ -606,34 +608,37 @@ namespace Rhino.Tools.Shell
 		public static object Spawn(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
 			Scriptable scope = funObj.ParentScope;
-			if (args.Length != 0 && args[0] is Function)
+			if (args.Length != 0)
 			{
-				object[] newArgs = null;
-				if (args.Length > 1 && args[1] is Scriptable)
+				var function0 = args[0] as Function;
+				if (function0 != null)
 				{
-					newArgs = cx.GetElements((Scriptable)args[1]);
-				}
-				if (newArgs == null)
-				{
-					newArgs = ScriptRuntime.emptyArgs;
-				}
-				var thread = new Thread(() => cx.GetFactory().Call(c => ((Function) args[0]).Call(c, scope, scope, newArgs)));
-				thread.Start();
-				return thread;
-			}
-			else
-			{
-				if (args.Length != 0 && args[0] is Script)
-				{
-					var thread = new Thread(() => cx.GetFactory().Call(c => ((Script) args[0]).Exec(c, scope)));
+					object[] newArgs = null;
+					if (args.Length > 1)
+					{
+						var scriptable1 = args[1] as Scriptable;
+						if (scriptable1 != null)
+						{
+							newArgs = cx.GetElements(scriptable1);
+						}
+					}
+					if (newArgs == null)
+					{
+						newArgs = ScriptRuntime.emptyArgs;
+					}
+					var thread = new Thread(() => cx.GetFactory().Call(c => function0.Call(c, scope, scope, newArgs)));
 					thread.Start();
 					return thread;
 				}
-				else
+				var script0 = args[0] as Script;
+				if (script0 != null)
 				{
-					throw ReportRuntimeError("msg.spawn.args");
+					var thread = new Thread(() => cx.GetFactory().Call(c => script0.Exec(c, scope)));
+					thread.Start();
+					return thread;
 				}
 			}
+			throw ReportRuntimeError("msg.spawn.args");
 		}
 
 		/// <summary>
@@ -663,19 +668,20 @@ namespace Rhino.Tools.Shell
 		/// </remarks>
 		public static object Sync(Context cx, Scriptable thisObj, object[] args, Function funObj)
 		{
-			if (args.Length >= 1 && args.Length <= 2 && args[0] is Function)
+			if (args.Length >= 1 && args.Length <= 2)
 			{
-				object syncObject = null;
-				if (args.Length == 2 && args[1] != Undefined.instance)
+				var function0 = args[0] as Function;
+				if (function0 != null)
 				{
-					syncObject = args[1];
+					object syncObject = null;
+					if (args.Length == 2 && args[1] != Undefined.instance)
+					{
+						syncObject = args[1];
+					}
+					return new Synchronizer(function0, syncObject);
 				}
-				return new Synchronizer((Function)args[0], syncObject);
 			}
-			else
-			{
-				throw ReportRuntimeError("msg.sync.args");
-			}
+			throw ReportRuntimeError("msg.sync.args");
 		}
 
 		/// <summary>
@@ -748,21 +754,20 @@ namespace Rhino.Tools.Shell
 					}
 					else
 					{
-						if (!(envObj is Scriptable))
+						var envHash = envObj as Scriptable;
+						if (envHash == null)
 						{
 							throw ReportRuntimeError("msg.runCommand.bad.env");
 						}
-						Scriptable envHash = (Scriptable)envObj;
 						object[] ids = GetPropertyIds(envHash);
 						environment = new string[ids.Length];
 						for (int i = 0; i != ids.Length; ++i)
 						{
 							object keyObj = ids[i];
 							object val;
-							string key;
-							if (keyObj is string)
+							var key = keyObj as string;
+							if (key != null)
 							{
-								key = (string)keyObj;
 								val = GetProperty(envHash, key);
 							}
 							else
@@ -869,10 +874,10 @@ namespace Rhino.Tools.Shell
 					}
 				}
 			}
-			for (int i_1 = 0; i_1 != args.Length; ++i_1)
+			for (int i = 0; i != args.Length; ++i)
 			{
-				object arg = args[i_1];
-				((ScriptableObject)arg).SealObject();
+				object arg = args[i];
+				((ScriptableObject) arg).SealObject();
 			}
 		}
 
@@ -1006,11 +1011,12 @@ namespace Rhino.Tools.Shell
 		private static Global GetInstance(Function function)
 		{
 			Scriptable scope = function.ParentScope;
-			if (!(scope is Global))
+			var @global = scope as Global;
+			if (@global == null)
 			{
 				throw ReportRuntimeError("msg.bad.shell.function.scope", scope.ToString());
 			}
-			return (Global)scope;
+			return @global;
 		}
 
 		/// <summary>Runs the given process using Runtime.exec().</summary>

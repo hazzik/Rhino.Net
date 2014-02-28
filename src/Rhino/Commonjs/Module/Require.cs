@@ -218,11 +218,12 @@ namespace Rhino.CommonJS.Module
 			Uri @base = null;
 			if (id.StartsWith("./") || id.StartsWith("../"))
 			{
-				if (!(thisObj is ModuleScope))
+				var moduleScope = thisObj as ModuleScope;
+				if (moduleScope == null)
 				{
 					throw ScriptRuntime.ThrowError(cx, scope, "Can't resolve relative module ID \"" + id + "\" when require() is used outside of a module");
 				}
-				ModuleScope moduleScope = (ModuleScope)thisObj;
+
 				@base = moduleScope.GetBase();
 				Uri current = moduleScope.GetUri();
 				uri = current.Resolve(id);

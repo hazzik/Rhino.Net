@@ -484,10 +484,11 @@ namespace Rhino.Ast
 			if (isExpressionClosure)
 			{
 				AstNode body = GetBody();
-				if (body.GetLastChild() is ReturnStatement)
+				var lastChild = body.GetLastChild() as ReturnStatement;
+				if (lastChild != null)
 				{
 					// omit "return" keyword, just print the expression
-					body = ((ReturnStatement)body.GetLastChild()).GetReturnValue();
+					body = lastChild.GetReturnValue();
 					sb.Append(body.ToSource(0));
 					if (functionType == FUNCTION_STATEMENT)
 					{

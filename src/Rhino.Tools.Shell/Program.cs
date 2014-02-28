@@ -678,19 +678,20 @@ goodUsage_break: ;
 
 		private static byte[] GetDigest(object source)
 		{
-			byte[] bytes;
 			byte[] digest = null;
 			if (source != null)
 			{
-				if (source is string)
+				var s = source as string;
+				byte[] bytes;
+				if (s != null)
 				{
 					try
 					{
-						bytes = Runtime.GetBytesForString(((string)source), "UTF-8");
+						bytes = Runtime.GetBytesForString(s, "UTF-8");
 					}
 					catch (UnsupportedEncodingException)
 					{
-						bytes = Runtime.GetBytesForString(((string)source));
+						bytes = Runtime.GetBytesForString(s);
 					}
 				}
 				else
