@@ -302,7 +302,7 @@ namespace Rhino.Tools.Debugger
 			int hash = sourceUrl.IndexOf('#');
 			if (hash >= 0)
 			{
-				sourceUrl = Sharpen.Runtime.Substring(sourceUrl, 0, hash);
+				sourceUrl = sourceUrl.Substring(0, hash);
 			}
 			try
 			{
@@ -317,7 +317,7 @@ namespace Rhino.Tools.Debugger
 							string home = SecurityUtilities.GetSystemProperty("user.home");
 							if (home != null)
 							{
-								string pathFromHome = Sharpen.Runtime.Substring(sourceUrl, 2);
+								string pathFromHome = sourceUrl.Substring(2);
 								FilePath f = new FilePath(new FilePath(home), pathFromHome);
 								if (f.Exists())
 								{
@@ -503,7 +503,7 @@ openStream_break: ;
 					if (sb == null)
 					{
 						sb = new StringBuilder();
-						sb.Append(Sharpen.Runtime.Substring(url, 0, searchStart));
+						sb.Append(url.Substring(0, searchStart));
 					}
 					sb.Append(replace);
 				}
@@ -511,7 +511,7 @@ openStream_break: ;
 				{
 					if (cursor != urlLength)
 					{
-						sb.Append(Sharpen.Runtime.Substring(url, cursor));
+						sb.Append(url.Substring(cursor));
 					}
 					url = sb.ToString();
 				}

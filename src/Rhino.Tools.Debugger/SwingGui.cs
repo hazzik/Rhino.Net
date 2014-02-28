@@ -280,7 +280,7 @@ namespace Rhino.Tools.Debugger
 				int i = n.LastIndexOf('.');
 				if (i > 0 && i < n.Length - 1)
 				{
-					string ext = Sharpen.Runtime.Substring(n, i + 1).ToLower();
+					string ext = n.Substring(i + 1).ToLower();
 					if (ext.Equals("js"))
 					{
 						return true;
@@ -350,7 +350,7 @@ namespace Rhino.Tools.Debugger
 			string shortName = url;
 			if (lastSlash >= 0 && lastSlash + 1 < url.Length)
 			{
-				shortName = Sharpen.Runtime.Substring(url, lastSlash + 1);
+				shortName = url.Substring(lastSlash + 1);
 			}
 			return shortName;
 		}
@@ -379,7 +379,7 @@ namespace Rhino.Tools.Debugger
 				//1 D:\foo.js
 				//2 D:\bar.js
 				int pos = text.IndexOf(' ');
-				if (Sharpen.Runtime.Substring(text, pos + 1).Equals(name))
+				if (text.Substring(pos + 1) == name)
 				{
 					windowMenu.Remove(item);
 					// Cascade    [0]
@@ -410,7 +410,7 @@ namespace Rhino.Tools.Debugger
 								else
 								{
 									pos = text.IndexOf(' ');
-									thisItem.SetText((char)('0' + j) + " " + Sharpen.Runtime.Substring(text, pos + 1));
+									thisItem.SetText((char)('0' + j) + " " + text.Substring(pos + 1));
 									thisItem.SetMnemonic('0' + j);
 									j++;
 								}
@@ -664,7 +664,7 @@ namespace Rhino.Tools.Debugger
 				string shortName = url;
 				if (url.Length > 20)
 				{
-					shortName = "..." + Sharpen.Runtime.Substring(url, url.Length - 17);
+					shortName = "..." + url.Substring(url.Length - 17);
 				}
 				string location = "\"" + shortName + "\", line " + lineNumber;
 				ctx.InsertItemAt(location, i);
