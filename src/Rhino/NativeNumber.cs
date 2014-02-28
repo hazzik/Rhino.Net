@@ -46,10 +46,10 @@ namespace Rhino
 		{
 			PropertyAttributes attr = PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY;
 			ctor.DefineProperty("NaN", ScriptRuntime.NaN, attr);
-			ctor.DefineProperty("POSITIVE_INFINITY", ScriptRuntime.WrapNumber(double.PositiveInfinity), attr);
-			ctor.DefineProperty("NEGATIVE_INFINITY", ScriptRuntime.WrapNumber(double.NegativeInfinity), attr);
-			ctor.DefineProperty("MAX_VALUE", ScriptRuntime.WrapNumber(double.MaxValue), attr);
-			ctor.DefineProperty("MIN_VALUE", ScriptRuntime.WrapNumber(double.MinValue), attr);
+			ctor.DefineProperty("POSITIVE_INFINITY", double.PositiveInfinity, attr);
+			ctor.DefineProperty("NEGATIVE_INFINITY", double.NegativeInfinity, attr);
+			ctor.DefineProperty("MAX_VALUE", double.MaxValue, attr);
+			ctor.DefineProperty("MIN_VALUE", double.MinValue, attr);
 			base.FillConstructorProperties(ctor);
 		}
 
@@ -139,7 +139,7 @@ namespace Rhino
 					return new Rhino.NativeNumber(val);
 				}
 				// Number(val) converts val to a number value.
-				return ScriptRuntime.WrapNumber(val);
+				return val;
 			}
 			// The rest of Number.prototype methods require thisObj to be Number
 			if (!(thisObj is Rhino.NativeNumber))
@@ -164,7 +164,7 @@ namespace Rhino
 
 				case Id_valueOf:
 				{
-					return ScriptRuntime.WrapNumber(value);
+					return value;
 				}
 
 				case Id_toFixed:

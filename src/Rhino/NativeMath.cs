@@ -260,7 +260,7 @@ namespace Rhino
 						throw new InvalidOperationException(id.ToString());
 					}
 				}
-				InitPrototypeValue(id, name, ScriptRuntime.WrapNumber(x), PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT);
+				InitPrototypeValue(id, name, x, PropertyAttributes.DONTENUM | PropertyAttributes.READONLY | PropertyAttributes.PERMANENT);
 			}
 		}
 
@@ -447,7 +447,7 @@ namespace Rhino
 					throw new InvalidOperationException(methodId.ToString());
 				}
 			}
-			return ScriptRuntime.WrapNumber(x);
+			return x;
 		}
 
 		// See Ecma 15.8.2.13

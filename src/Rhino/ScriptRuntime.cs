@@ -2932,7 +2932,7 @@ childScopesChecks_break: ;
 		{
 			if (val1.IsNumber() && val2.IsNumber())
 			{
-				return WrapNumber(System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2));
+				return System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2);
 			}
 			var xmlObject1 = val1 as XMLObject;
 			if (xmlObject1 != null)
@@ -2964,11 +2964,11 @@ childScopesChecks_break: ;
 			{
 				if ((val1.IsNumber()) && (val2.IsNumber()))
 				{
-					return WrapNumber(System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2));
+					return System.Convert.ToDouble(val1) + System.Convert.ToDouble(val2);
 				}
 				else
 				{
-					return WrapNumber(ToNumber(val1) + ToNumber(val2));
+					return ToNumber(val1) + ToNumber(val2);
 				}
 			}
 			return ToCharSequence(val1) + ToCharSequence(val2);
@@ -3056,7 +3056,7 @@ search_break: ;
 				if (post)
 				{
 					// convert result to number
-					value = WrapNumber(number);
+					value = number;
 				}
 			}
 			if ((incrDecrMask & Node.DECR_FLAG) == 0)
@@ -3067,7 +3067,7 @@ search_break: ;
 			{
 				--number;
 			}
-			double result = WrapNumber(number);
+			double result = number;
 			target.Put(id, protoChainStart, result);
 			if (post)
 			{
@@ -3094,7 +3094,7 @@ search_break: ;
 				if (post)
 				{
 					// convert result to number
-					value = WrapNumber(number);
+					value = number;
 				}
 			}
 			if ((incrDecrMask & Node.DECR_FLAG) == 0)
@@ -3105,7 +3105,7 @@ search_break: ;
 			{
 				--number;
 			}
-			double result = WrapNumber(number);
+			double result = number;
 			SetObjectElem(obj, index, result, cx);
 			if (post)
 			{
@@ -3132,7 +3132,7 @@ search_break: ;
 				if (post)
 				{
 					// convert result to number
-					value = WrapNumber(number);
+					value = number;
 				}
 			}
 			if ((incrDecrMask & Node.DECR_FLAG) == 0)
@@ -3143,7 +3143,7 @@ search_break: ;
 			{
 				--number;
 			}
-			double result = WrapNumber(number);
+			double result = number;
 			@ref.Set(cx, result);
 			if (post)
 			{
@@ -3358,7 +3358,7 @@ search_break: ;
 									var scriptableObjectY = y as ScriptableObject;
 									if (scriptableObjectY != null)
 									{
-										object xval = WrapNumber(x);
+										object xval = x;
 										object test = scriptableObjectY.EquivalentValues(xval);
 										if (test != ScriptableConstants.NOT_FOUND)
 										{

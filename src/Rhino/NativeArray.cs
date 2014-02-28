@@ -105,7 +105,7 @@ namespace Rhino
 		{
 			if (id == Id_length)
 			{
-				return ScriptRuntime.WrapNumber(length);
+				return (double) length;
 			}
 			return base.GetInstanceIdValue(id);
 		}
@@ -934,7 +934,7 @@ again_break: ;
 
 		private static object SetLengthProperty(Context cx, Scriptable target, long length)
 		{
-			return ScriptRuntime.SetObjectProp(target, "length", ScriptRuntime.WrapNumber(length), cx);
+			return ScriptRuntime.SetObjectProp(target, "length", (double) length, cx);
 		}
 
 		private static void DeleteElem(Scriptable target, long index)
@@ -1372,7 +1372,7 @@ again_break: ;
 					{
 						na.dense[(int)na.length++] = args[i];
 					}
-					return ScriptRuntime.WrapNumber(na.length);
+					return (double) na.length;
 				}
 			}
 			long length = GetLengthProperty(cx, thisObj);
@@ -1480,7 +1480,7 @@ again_break: ;
 						na.dense[i] = args[i];
 					}
 					na.length += args.Length;
-					return ScriptRuntime.WrapNumber(na.length);
+					return (double) na.length;
 				}
 			}
 			long length = GetLengthProperty(cx, thisObj);
@@ -1502,7 +1502,7 @@ again_break: ;
 				length += args.Length;
 				return SetLengthProperty(cx, thisObj, length);
 			}
-			return ScriptRuntime.WrapNumber(length);
+			return (double) length;
 		}
 
 		private static object Js_splice(Context cx, Scriptable scope, Scriptable thisObj, object[] args)

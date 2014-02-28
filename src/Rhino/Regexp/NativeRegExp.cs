@@ -3105,7 +3105,7 @@ L0_break: ;
 			{
 				case Id_lastIndex:
 				{
-					return ScriptRuntime.WrapNumber(lastIndex);
+					return lastIndex;
 				}
 
 				case Id_source:

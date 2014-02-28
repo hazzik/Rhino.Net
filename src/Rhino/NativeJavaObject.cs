@@ -206,7 +206,7 @@ namespace Rhino
 					if (hint == ScriptRuntime.NumberClass && javaObject is bool)
 					{
 						bool b = ((bool)javaObject);
-						value = ScriptRuntime.WrapNumber(b ? 1.0 : 0.0);
+						value = b ? 1.0 : 0.0;
 					}
 					else
 					{

@@ -1177,7 +1177,7 @@ namespace Rhino
 								object value = stack[stackTop];
 								if (value == DBL_MRK)
 								{
-									value = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									value = sDbl[stackTop];
 								}
 								--stackTop;
 								int sourceLine = GetIndex(iCode, frame.pc);
@@ -1456,7 +1456,7 @@ namespace Rhino
 								object rhs = stack[stackTop];
 								if (rhs == DBL_MRK)
 								{
-									rhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									rhs = sDbl[stackTop];
 								}
 								--stackTop;
 								Scriptable lhs = (Scriptable)stack[stackTop];
@@ -1469,7 +1469,7 @@ namespace Rhino
 								object rhs = stack[stackTop];
 								if (rhs == DBL_MRK)
 								{
-									rhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									rhs = sDbl[stackTop];
 								}
 								--stackTop;
 								Scriptable lhs = (Scriptable)stack[stackTop];
@@ -1489,7 +1489,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.GetObjectPropNoWarn(lhs, stringReg, cx);
 								goto Loop_continue;
@@ -1500,7 +1500,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.GetObjectProp(lhs, stringReg, cx, frame.scope);
 								goto Loop_continue;
@@ -1511,13 +1511,13 @@ namespace Rhino
 								object rhs = stack[stackTop];
 								if (rhs == DBL_MRK)
 								{
-									rhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									rhs = sDbl[stackTop];
 								}
 								--stackTop;
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.SetObjectProp(lhs, stringReg, rhs, cx);
 								goto Loop_continue;
@@ -1528,7 +1528,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.PropIncrDecr(lhs, stringReg, cx, iCode[frame.pc]);
 								++frame.pc;
@@ -1565,7 +1565,7 @@ namespace Rhino
 								object value = stack[stackTop];
 								if (value == DBL_MRK)
 								{
-									value = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									value = sDbl[stackTop];
 								}
 								--stackTop;
 								Ref @ref = (Ref)stack[stackTop];
@@ -1619,7 +1619,7 @@ namespace Rhino
 								object obj = stack[stackTop];
 								if (obj == DBL_MRK)
 								{
-									obj = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									obj = sDbl[stackTop];
 								}
 								// stringReg: property
 								stack[stackTop] = ScriptRuntime.GetPropFunctionAndThis(obj, stringReg, cx, frame.scope);
@@ -1633,12 +1633,12 @@ namespace Rhino
 								object obj = stack[stackTop - 1];
 								if (obj == DBL_MRK)
 								{
-									obj = ScriptRuntime.WrapNumber(sDbl[stackTop - 1]);
+									obj = sDbl[stackTop - 1];
 								}
 								object id = stack[stackTop];
 								if (id == DBL_MRK)
 								{
-									id = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									id = sDbl[stackTop];
 								}
 								stack[stackTop - 1] = ScriptRuntime.GetElemFunctionAndThis(obj, id, cx);
 								stack[stackTop] = ScriptRuntime.LastStoredScriptable(cx);
@@ -1650,7 +1650,7 @@ namespace Rhino
 								object value = stack[stackTop];
 								if (value == DBL_MRK)
 								{
-									value = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									value = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.GetValueFunctionAndThis(value, cx);
 								++stackTop;
@@ -1839,7 +1839,7 @@ namespace Rhino
 								{
 									if (lhs == DBL_MRK)
 									{
-										lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+										lhs = sDbl[stackTop];
 									}
 									throw ScriptRuntime.NotFunctionError(lhs);
 								}
@@ -1863,7 +1863,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.TypeOf(lhs);
 								goto Loop_continue;
@@ -2022,7 +2022,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								--stackTop;
 								frame.scope = ScriptRuntime.EnterWith(lhs, cx, frame.scope);
@@ -2065,7 +2065,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								--stackTop;
 								indexReg += frame.localShift;
@@ -2090,7 +2090,7 @@ namespace Rhino
 								object obj = stack[stackTop];
 								if (obj == DBL_MRK)
 								{
-									obj = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									obj = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.SpecialRef(obj, stringReg, cx);
 								goto Loop_continue;
@@ -2116,7 +2116,7 @@ namespace Rhino
 								object name = stack[stackTop];
 								if (name == DBL_MRK)
 								{
-									name = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									name = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.NameRef(name, cx, frame.scope, indexReg);
 								goto Loop_continue;
@@ -2178,7 +2178,7 @@ namespace Rhino
 								object value = stack[stackTop];
 								if (value == DBL_MRK)
 								{
-									value = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									value = sDbl[stackTop];
 								}
 								--stackTop;
 								int i = (int)sDbl[stackTop];
@@ -2240,7 +2240,7 @@ namespace Rhino
 								object lhs = stack[stackTop];
 								if (lhs == DBL_MRK)
 								{
-									lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									lhs = sDbl[stackTop];
 								}
 								--stackTop;
 								frame.scope = ScriptRuntime.EnterDotQuery(lhs, frame.scope);
@@ -2268,7 +2268,7 @@ namespace Rhino
 								object value = stack[stackTop];
 								if (value == DBL_MRK)
 								{
-									value = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+									value = sDbl[stackTop];
 								}
 								stack[stackTop] = ScriptRuntime.SetDefaultNamespace(value, cx);
 								goto Loop_continue;
@@ -2669,7 +2669,7 @@ StateLoop_break: ;
 				// Must be instance of Error or code bug
 				throw (Exception) throwable;
 			}
-			return (interpreterResult != DBL_MRK) ? interpreterResult : ScriptRuntime.WrapNumber(interpreterResultDbl);
+			return (interpreterResult != DBL_MRK) ? interpreterResult : interpreterResultDbl;
 		}
 
 		private static int DoInOrInstanceof(Context cx, int op, object[] stack, double[] sDbl, int stackTop)
@@ -2677,13 +2677,13 @@ StateLoop_break: ;
 			object rhs = stack[stackTop];
 			if (rhs == UniqueTag.DOUBLE_MARK)
 			{
-				rhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				rhs = sDbl[stackTop];
 			}
 			--stackTop;
 			object lhs = stack[stackTop];
 			if (lhs == UniqueTag.DOUBLE_MARK)
 			{
-				lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				lhs = sDbl[stackTop];
 			}
 			bool valBln;
 			if (op == Token.IN)
@@ -2837,13 +2837,13 @@ object_compare_break: ;
 			object rhs = stack[stackTop];
 			if (rhs == UniqueTag.DOUBLE_MARK)
 			{
-				rhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				rhs = sDbl[stackTop];
 			}
 			--stackTop;
 			object lhs = stack[stackTop];
 			if (lhs == UniqueTag.DOUBLE_MARK)
 			{
-				lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				lhs = sDbl[stackTop];
 			}
 			stack[stackTop] = ScriptRuntime.Delete(lhs, rhs, cx, op == Icode_DELNAME);
 			return stackTop;
@@ -2855,7 +2855,7 @@ object_compare_break: ;
 			object lhs = stack[stackTop];
 			if (lhs == UniqueTag.DOUBLE_MARK)
 			{
-				lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				lhs = sDbl[stackTop];
 			}
 			object value;
 			object id = stack[stackTop + 1];
@@ -2878,12 +2878,12 @@ object_compare_break: ;
 			object rhs = stack[stackTop + 2];
 			if (rhs == UniqueTag.DOUBLE_MARK)
 			{
-				rhs = ScriptRuntime.WrapNumber(sDbl[stackTop + 2]);
+				rhs = sDbl[stackTop + 2];
 			}
 			object lhs = stack[stackTop];
 			if (lhs == UniqueTag.DOUBLE_MARK)
 			{
-				lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				lhs = sDbl[stackTop];
 			}
 			object value;
 			object id = stack[stackTop + 1];
@@ -2905,13 +2905,13 @@ object_compare_break: ;
 			object rhs = stack[stackTop];
 			if (rhs == UniqueTag.DOUBLE_MARK)
 			{
-				rhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				rhs = sDbl[stackTop];
 			}
 			--stackTop;
 			object lhs = stack[stackTop];
 			if (lhs == UniqueTag.DOUBLE_MARK)
 			{
-				lhs = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				lhs = sDbl[stackTop];
 			}
 			stack[stackTop] = ScriptRuntime.ElemIncrDecr(lhs, rhs, cx, iCode[frame.pc]);
 			++frame.pc;
@@ -2931,7 +2931,7 @@ object_compare_break: ;
 				object function = stack[stackTop];
 				if (function == UniqueTag.DOUBLE_MARK)
 				{
-					function = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+					function = sDbl[stackTop];
 				}
 				object[] outArgs = GetArgsArray(stack, sDbl, stackTop + 1, indexReg);
 				stack[stackTop] = ScriptRuntime.NewSpecial(cx, function, outArgs, frame.scope, callType);
@@ -2971,7 +2971,7 @@ object_compare_break: ;
 				object val = stack[stackTop];
 				if (val == UniqueTag.DOUBLE_MARK)
 				{
-					val = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+					val = sDbl[stackTop];
 				}
 				string stringReg = frame.idata.argNames[indexReg];
 				var cp = frame.scope as ConstProperties;
@@ -3002,7 +3002,7 @@ object_compare_break: ;
 				object val = stack[stackTop];
 				if (val == UniqueTag.DOUBLE_MARK)
 				{
-					val = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+					val = sDbl[stackTop];
 				}
 				string stringReg = frame.idata.argNames[indexReg];
 				frame.scope.Put(stringReg, frame.scope, val);
@@ -3063,13 +3063,13 @@ object_compare_break: ;
 			object elem = stack[stackTop];
 			if (elem == UniqueTag.DOUBLE_MARK)
 			{
-				elem = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				elem = sDbl[stackTop];
 			}
 			--stackTop;
 			object obj = stack[stackTop];
 			if (obj == UniqueTag.DOUBLE_MARK)
 			{
-				obj = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				obj = sDbl[stackTop];
 			}
 			stack[stackTop] = ScriptRuntime.MemberRef(obj, elem, cx, flags);
 			return stackTop;
@@ -3080,19 +3080,19 @@ object_compare_break: ;
 			object elem = stack[stackTop];
 			if (elem == UniqueTag.DOUBLE_MARK)
 			{
-				elem = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				elem = sDbl[stackTop];
 			}
 			--stackTop;
 			object ns = stack[stackTop];
 			if (ns == UniqueTag.DOUBLE_MARK)
 			{
-				ns = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				ns = sDbl[stackTop];
 			}
 			--stackTop;
 			object obj = stack[stackTop];
 			if (obj == UniqueTag.DOUBLE_MARK)
 			{
-				obj = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				obj = sDbl[stackTop];
 			}
 			stack[stackTop] = ScriptRuntime.MemberRef(obj, ns, elem, cx, flags);
 			return stackTop;
@@ -3103,13 +3103,13 @@ object_compare_break: ;
 			object name = stack[stackTop];
 			if (name == UniqueTag.DOUBLE_MARK)
 			{
-				name = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				name = sDbl[stackTop];
 			}
 			--stackTop;
 			object ns = stack[stackTop];
 			if (ns == UniqueTag.DOUBLE_MARK)
 			{
-				ns = ScriptRuntime.WrapNumber(sDbl[stackTop]);
+				ns = sDbl[stackTop];
 			}
 			stack[stackTop] = ScriptRuntime.NameRef(ns, name, cx, frame.scope, flags);
 			return stackTop;
@@ -3130,7 +3130,7 @@ object_compare_break: ;
 				object val = stack[shift];
 				if (val == UniqueTag.DOUBLE_MARK)
 				{
-					val = ScriptRuntime.WrapNumber(sDbl[shift]);
+					val = sDbl[shift];
 				}
 				elements[i] = val;
 			}
@@ -3341,7 +3341,7 @@ object_compare_break: ;
 			frame.pc--;
 			// we want to come back here when we resume
 			ScriptRuntime.ExitActivationFunction(cx);
-			return (frame.result != UniqueTag.DOUBLE_MARK) ? frame.result : ScriptRuntime.WrapNumber(frame.resultDbl);
+			return (frame.result != UniqueTag.DOUBLE_MARK) ? frame.result : frame.resultDbl;
 		}
 
 		private static object ThawGenerator(Interpreter.CallFrame frame, int stackTop, Interpreter.GeneratorState generatorState, int op)
@@ -3380,7 +3380,7 @@ object_compare_break: ;
 				object obj = stack[stackTop + 2];
 				if (obj == UniqueTag.DOUBLE_MARK)
 				{
-					obj = ScriptRuntime.WrapNumber(sDbl[stackTop + 2]);
+					obj = sDbl[stackTop + 2];
 				}
 				applyThis = ScriptRuntime.ToObjectOrNull(cx, obj);
 			}
@@ -3667,7 +3667,7 @@ object_compare_break: ;
 							{
 								resultDbl = cjump.resultDbl;
 							}
-							result = ScriptRuntime.WrapNumber(resultDbl);
+							result = resultDbl;
 						}
 						frame.debuggerFrame.OnExit(cx, false, result);
 					}
@@ -3882,7 +3882,7 @@ object_compare_break: ;
 			// handle object(lhs) + number(d) code
 			if (lhs is Scriptable)
 			{
-				rhs = ScriptRuntime.WrapNumber(d);
+				rhs = d;
 				if (!leftRightOrder)
 				{
 					object tmp = lhs;
@@ -3963,7 +3963,7 @@ object_compare_break: ;
 				object val = stack[shift];
 				if (val == UniqueTag.DOUBLE_MARK)
 				{
-					val = ScriptRuntime.WrapNumber(sDbl[shift]);
+					val = sDbl[shift];
 				}
 				args[i] = val;
 			}

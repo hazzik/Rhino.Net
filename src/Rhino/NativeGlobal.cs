@@ -128,7 +128,7 @@ namespace Rhino
 				f.ExportAsScopeProperty();
 			}
 			ScriptableObject.DefineProperty(scope, "NaN", ScriptRuntime.NaN, PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
-			ScriptableObject.DefineProperty(scope, "Infinity", ScriptRuntime.WrapNumber(double.PositiveInfinity), PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
+			ScriptableObject.DefineProperty(scope, "Infinity", double.PositiveInfinity, PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
 			ScriptableObject.DefineProperty(scope, "undefined", Undefined.instance, PropertyAttributes.READONLY | PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT);
 			string[] errorMethods = new string[] { "ConversionError", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "InternalError", "JavaException" };
 			for (int i = 0; i < errorMethods.Length; i++)
@@ -324,7 +324,7 @@ namespace Rhino
 				}
 			}
 			double d = ScriptRuntime.StringToNumber(s, start, radix);
-			return ScriptRuntime.WrapNumber(negative ? -d : d);
+			return negative ? -d : d;
 		}
 
 		/// <summary>The global method parseFloat, as per ECMA-262 15.1.2.3.</summary>
@@ -378,7 +378,7 @@ namespace Rhino
 					{
 						d = double.PositiveInfinity;
 					}
-					return ScriptRuntime.WrapNumber(d);
+					return d;
 				}
 				return ScriptRuntime.NaN;
 			}

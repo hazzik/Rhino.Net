@@ -431,18 +431,18 @@ namespace Rhino
 			{
 				case ConstructorId_now:
 				{
-					return ScriptRuntime.WrapNumber(Now());
+					return Now();
 				}
 
 				case ConstructorId_parse:
 				{
 					string dataStr = ScriptRuntime.ToString(args, 0);
-					return ScriptRuntime.WrapNumber(Date_parseString(dataStr));
+					return Date_parseString(dataStr);
 				}
 
 				case ConstructorId_UTC:
 				{
-					return ScriptRuntime.WrapNumber(JsStaticFunction_UTC(args));
+					return JsStaticFunction_UTC(args);
 				}
 
 				case Id_constructor:
@@ -539,7 +539,7 @@ namespace Rhino
 				case Id_valueOf:
 				case Id_getTime:
 				{
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getYear:
@@ -568,7 +568,7 @@ namespace Rhino
 							}
 						}
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getMonth:
@@ -582,7 +582,7 @@ namespace Rhino
 						}
 						t = MonthFromTime(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getDate:
@@ -596,7 +596,7 @@ namespace Rhino
 						}
 						t = DateFromTime(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getDay:
@@ -610,7 +610,7 @@ namespace Rhino
 						}
 						t = WeekDay(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getHours:
@@ -624,7 +624,7 @@ namespace Rhino
 						}
 						t = HourFromTime(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getMinutes:
@@ -638,7 +638,7 @@ namespace Rhino
 						}
 						t = MinFromTime(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getSeconds:
@@ -652,7 +652,7 @@ namespace Rhino
 						}
 						t = SecFromTime(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getMilliseconds:
@@ -666,7 +666,7 @@ namespace Rhino
 						}
 						t = MsFromTime(t);
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_getTimezoneOffset:
@@ -675,14 +675,14 @@ namespace Rhino
 					{
 						t = (t - LocalTime(t)) / msPerMinute;
 					}
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_setTime:
 				{
 					t = TimeClip(ScriptRuntime.ToNumber(args, 0));
 					realThis.date = t;
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_setMilliseconds:
@@ -696,7 +696,7 @@ namespace Rhino
 				{
 					t = MakeTime(t, args, id);
 					realThis.date = t;
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_setDate:
@@ -708,7 +708,7 @@ namespace Rhino
 				{
 					t = MakeDate(t, args, id);
 					realThis.date = t;
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_setYear:
@@ -738,7 +738,7 @@ namespace Rhino
 						t = TimeClip(t);
 					}
 					realThis.date = t;
-					return ScriptRuntime.WrapNumber(t);
+					return t;
 				}
 
 				case Id_toISOString:
