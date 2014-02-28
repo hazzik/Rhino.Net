@@ -1214,7 +1214,7 @@ namespace Rhino
 								--stackTop;
 								bool valBln = DoEquals(stack, sDbl, stackTop);
 								valBln ^= (op == Token.NE);
-								stack[stackTop] = ScriptRuntime.WrapBoolean(valBln);
+								stack[stackTop] = valBln;
 								goto Loop_continue;
 							}
 
@@ -1224,7 +1224,7 @@ namespace Rhino
 								--stackTop;
 								bool valBln = DoShallowEquals(stack, sDbl, stackTop);
 								valBln ^= (op == Token.SHNE);
-								stack[stackTop] = ScriptRuntime.WrapBoolean(valBln);
+								stack[stackTop] = valBln;
 								goto Loop_continue;
 							}
 
@@ -1440,7 +1440,7 @@ namespace Rhino
 
 							case Token.NOT:
 							{
-								stack[stackTop] = ScriptRuntime.WrapBoolean(!Stack_boolean(frame, stackTop));
+								stack[stackTop] = !Stack_boolean(frame, stackTop);
 								goto Loop_continue;
 							}
 
@@ -2694,7 +2694,7 @@ StateLoop_break: ;
 			{
 				valBln = ScriptRuntime.InstanceOf(lhs, rhs, cx);
 			}
-			stack[stackTop] = ScriptRuntime.WrapBoolean(valBln);
+			stack[stackTop] = valBln;
 			return stackTop;
 		}
 
@@ -2787,7 +2787,7 @@ number_compare_break: ;
 				}
 			}
 object_compare_break: ;
-			stack[stackTop] = ScriptRuntime.WrapBoolean(valBln);
+			stack[stackTop] = valBln;
 			return stackTop;
 		}
 

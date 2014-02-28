@@ -239,7 +239,7 @@ namespace Rhino
 							result = thisObj.Has(s, thisObj);
 						}
 					}
-					return ScriptRuntime.WrapBoolean(result);
+					return result;
 				}
 
 				case Id_propertyIsEnumerable:
@@ -274,7 +274,7 @@ namespace Rhino
 							}
 						}
 					}
-					return ScriptRuntime.WrapBoolean(result);
+					return result;
 				}
 
 				case Id_isPrototypeOf:
@@ -294,7 +294,7 @@ namespace Rhino
 						}
 						while (v != null);
 					}
-					return ScriptRuntime.WrapBoolean(result);
+					return result;
 				}
 
 				case Id_toSource:

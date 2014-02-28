@@ -610,7 +610,7 @@ namespace Rhino
 					{
 						string s1 = ScriptRuntime.ToString(thisObj);
 						string s2 = ScriptRuntime.ToString(args, 0);
-						return ScriptRuntime.WrapBoolean((id == Id_equals) ? s1.Equals(s2) : s1.Equals(s2, StringComparison.CurrentCultureIgnoreCase));
+						return (id == Id_equals) ? s1.Equals(s2) : s1.Equals(s2, StringComparison.CurrentCultureIgnoreCase);
 					}
 
 					case Id_match:

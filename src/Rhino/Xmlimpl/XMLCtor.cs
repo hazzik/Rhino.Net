@@ -221,17 +221,17 @@ L0_break: ;
 			{
 				case Id_ignoreComments:
 				{
-					return ScriptRuntime.WrapBoolean(options.IsIgnoreComments());
+					return options.IsIgnoreComments();
 				}
 
 				case Id_ignoreProcessingInstructions:
 				{
-					return ScriptRuntime.WrapBoolean(options.IsIgnoreProcessingInstructions());
+					return options.IsIgnoreProcessingInstructions();
 				}
 
 				case Id_ignoreWhitespace:
 				{
-					return ScriptRuntime.WrapBoolean(options.IsIgnoreWhitespace());
+					return options.IsIgnoreWhitespace();
 				}
 
 				case Id_prettyIndent:
@@ -241,7 +241,7 @@ L0_break: ;
 
 				case Id_prettyPrinting:
 				{
-					return ScriptRuntime.WrapBoolean(options.IsPrettyPrinting());
+					return options.IsPrettyPrinting();
 				}
 			}
 			return base.GetInstanceIdValue(id);

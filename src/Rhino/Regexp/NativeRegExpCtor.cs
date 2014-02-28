@@ -460,7 +460,7 @@ L0_break: ;
 					case Id_multiline:
 					case Id_STAR:
 					{
-						return ScriptRuntime.WrapBoolean(impl.multiline);
+						return impl.multiline;
 					}
 
 					case Id_input:

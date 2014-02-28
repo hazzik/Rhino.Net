@@ -1527,7 +1527,7 @@ L0_break: ;
 
 				case Id_contains:
 				{
-					return ScriptRuntime.WrapBoolean(realThis.Contains(Arg(args, 0)));
+					return realThis.Contains(Arg(args, 0));
 				}
 
 				case Id_copy:
@@ -1550,17 +1550,17 @@ L0_break: ;
 				case Id_hasOwnProperty:
 				{
 					XMLName xmlName = lib.ToXMLName(cx, Arg(args, 0));
-					return ScriptRuntime.WrapBoolean(realThis.HasOwnProperty(xmlName));
+					return realThis.HasOwnProperty(xmlName);
 				}
 
 				case Id_hasComplexContent:
 				{
-					return ScriptRuntime.WrapBoolean(realThis.HasComplexContent());
+					return realThis.HasComplexContent();
 				}
 
 				case Id_hasSimpleContent:
 				{
-					return ScriptRuntime.WrapBoolean(realThis.HasSimpleContent());
+					return realThis.HasSimpleContent();
 				}
 
 				case Id_length:
@@ -1587,7 +1587,7 @@ L0_break: ;
 
 				case Id_propertyIsEnumerable:
 				{
-					return ScriptRuntime.WrapBoolean(realThis.PropertyIsEnumerable(Arg(args, 0)));
+					return realThis.PropertyIsEnumerable(Arg(args, 0));
 				}
 
 				case Id_text:

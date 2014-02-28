@@ -3115,17 +3115,17 @@ L0_break: ;
 
 				case Id_global:
 				{
-					return ScriptRuntime.WrapBoolean((re.flags & JSREG_GLOB) != 0);
+					return (re.flags & JSREG_GLOB) != 0;
 				}
 
 				case Id_ignoreCase:
 				{
-					return ScriptRuntime.WrapBoolean((re.flags & JSREG_FOLD) != 0);
+					return (re.flags & JSREG_FOLD) != 0;
 				}
 
 				case Id_multiline:
 				{
-					return ScriptRuntime.WrapBoolean((re.flags & JSREG_MULTILINE) != 0);
+					return (re.flags & JSREG_MULTILINE) != 0;
 				}
 			}
 			return base.GetInstanceIdValue(id);

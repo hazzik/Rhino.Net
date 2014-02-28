@@ -1900,7 +1900,7 @@ namespace Rhino
 
 		public static object RefDel(Ref @ref, Context cx)
 		{
-			return WrapBoolean(@ref.Delete(cx));
+			return @ref.Delete(cx);
 		}
 
 		internal static bool IsSpecialProperty(string s)
@@ -1939,8 +1939,7 @@ namespace Rhino
 				}
 				throw UndefDeleteError(obj, id);
 			}
-			bool result = DeleteObjectElem(sobj, id, cx);
-			return WrapBoolean(result);
+			return DeleteObjectElem(sobj, id, cx);
 		}
 
 		/// <summary>Looks up a name in the scope chain and returns its value.</summary>

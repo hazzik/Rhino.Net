@@ -45,7 +45,7 @@ namespace Rhino
 			// as a change in round 2.
 			if (typeHint == ScriptRuntime.BooleanClass)
 			{
-				return ScriptRuntime.WrapBoolean(booleanValue);
+				return booleanValue;
 			}
 			return base.GetDefaultValue(typeHint);
 		}
@@ -116,7 +116,7 @@ namespace Rhino
 					return new Rhino.NativeBoolean(b);
 				}
 				// Boolean(val) converts val to a boolean.
-				return ScriptRuntime.WrapBoolean(b);
+				return b;
 			}
 			// The rest of Boolean.prototype methods require thisObj to be Boolean
 			if (!(thisObj is Rhino.NativeBoolean))
@@ -138,7 +138,7 @@ namespace Rhino
 
 				case Id_valueOf:
 				{
-					return ScriptRuntime.WrapBoolean(value);
+					return value;
 				}
 			}
 			throw new ArgumentException(id.ToString());

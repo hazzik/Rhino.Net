@@ -193,7 +193,7 @@ namespace Rhino
 							double d = ScriptRuntime.ToNumber(args[0]);
 							result = (!Double.IsNaN(d) && d != double.PositiveInfinity && d != double.NegativeInfinity);
 						}
-						return ScriptRuntime.WrapBoolean(result);
+						return result;
 					}
 
 					case Id_isNaN:
@@ -209,14 +209,14 @@ namespace Rhino
 							double d = ScriptRuntime.ToNumber(args[0]);
 							result = Double.IsNaN(d);
 						}
-						return ScriptRuntime.WrapBoolean(result);
+						return result;
 					}
 
 					case Id_isXMLName:
 					{
 						object name = (args.Length == 0) ? Undefined.instance : args[0];
 						XMLLib xmlLib = XMLLib.ExtractFromScope(scope);
-						return ScriptRuntime.WrapBoolean(xmlLib.IsXMLName(cx, name));
+						return xmlLib.IsXMLName(cx, name);
 					}
 
 					case Id_parseFloat:
