@@ -52,9 +52,9 @@ namespace Rhino
 		{
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			return functionName;
+			get { return functionName; }
 		}
 
 		internal static string ScriptSignature(object[] values)
@@ -139,7 +139,7 @@ namespace Rhino
 			if (!justbody)
 			{
 				sb.Append("function ");
-				sb.Append(GetFunctionName());
+				sb.Append(FunctionName);
 				sb.Append("() {");
 			}
 			sb.Append("/*\n");
@@ -182,7 +182,7 @@ namespace Rhino
 			if (index < 0)
 			{
 				Type c = methods[0].Method().DeclaringType;
-				string sig = c.FullName + '.' + GetFunctionName() + '(' + ScriptSignature(args) + ')';
+				string sig = c.FullName + '.' + FunctionName + '(' + ScriptSignature(args) + ')';
 				throw Context.ReportRuntimeError1("msg.java.no_such_method", sig);
 			}
 			MemberBox meth = methods[index];
@@ -251,7 +251,7 @@ namespace Rhino
 				{
 					if (o == null)
 					{
-						throw Context.ReportRuntimeError3("msg.nonjava.method", GetFunctionName(), ScriptRuntime.ToString(thisObj), c.FullName);
+						throw Context.ReportRuntimeError3("msg.nonjava.method", FunctionName, ScriptRuntime.ToString(thisObj), c.FullName);
 					}
 					var wrapper = o as Wrapper;
 					if (wrapper != null)

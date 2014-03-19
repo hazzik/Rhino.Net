@@ -42,10 +42,13 @@ namespace Rhino
 			return NativeJavaClass.ConstructSpecific(cx, scope, args, ctor);
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			string sig = JavaMembers.LiveConnectSignature(ctor.argTypes);
-			return System.String.Concat("<init>", sig);
+			get
+			{
+				string sig = JavaMembers.LiveConnectSignature(ctor.argTypes);
+				return System.String.Concat("<init>", sig);
+			}
 		}
 
 		public override string ToString()

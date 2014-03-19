@@ -4023,7 +4023,7 @@ search_break: ;
 		{
 			if (type == FunctionNode.FUNCTION_STATEMENT)
 			{
-				string name = function.GetFunctionName();
+				string name = function.FunctionName;
 				if (name != null && name.Length != 0)
 				{
 					if (!fromEvalCode)
@@ -4042,7 +4042,7 @@ search_break: ;
 			{
 				if (type == FunctionNode.FUNCTION_EXPRESSION_STATEMENT)
 				{
-					string name = function.GetFunctionName();
+					string name = function.FunctionName;
 					if (!string.IsNullOrEmpty(name))
 					{
 						// Always put function expression statements into initial

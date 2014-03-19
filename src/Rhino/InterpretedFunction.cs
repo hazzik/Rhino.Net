@@ -86,9 +86,9 @@ namespace Rhino
 			return f;
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			return (idata.itsName == null) ? string.Empty : idata.itsName;
+			get { return (idata.itsName == null) ? string.Empty : idata.itsName; }
 		}
 
 		/// <summary>Calls the function.</summary>

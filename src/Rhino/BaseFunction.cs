@@ -86,7 +86,7 @@ namespace Rhino
 			{
 				return ScriptRuntime.JsDelegatesTo(instance, rhs);
 			}
-			throw ScriptRuntime.TypeError1("msg.instanceof.bad.prototype", GetFunctionName());
+			throw ScriptRuntime.TypeError1("msg.instanceof.bad.prototype", FunctionName);
 		}
 
 		private const int Id_length = 1;
@@ -253,7 +253,7 @@ L0_break: ;
 
 				case Id_name:
 				{
-					return GetFunctionName();
+					return FunctionName;
 				}
 
 				case Id_prototype:
@@ -475,7 +475,7 @@ L0_break: ;
 			{
 				return baseFunction;
 			}
-			throw ScriptRuntime.TypeError1("msg.incompat.call", f.GetFunctionName());
+			throw ScriptRuntime.TypeError1("msg.incompat.call", f.FunctionName);
 		}
 
 		/// <summary>
@@ -527,7 +527,7 @@ L0_break: ;
 				{
 					// It is program error not to return Scriptable from
 					// the call method if createObject returns null.
-					throw new InvalidOperationException("Bad implementaion of call as constructor, name=" + GetFunctionName() + " in " + GetType().FullName);
+					throw new InvalidOperationException("Bad implementaion of call as constructor, name=" + FunctionName + " in " + GetType().FullName);
 				}
 				result = (Scriptable)val;
 				if (result.Prototype == null)
@@ -592,7 +592,7 @@ L0_break: ;
 			if (!justbody)
 			{
 				sb.Append("function ");
-				sb.Append(GetFunctionName());
+				sb.Append(FunctionName);
 				sb.Append("() {\n\t");
 			}
 			sb.Append("[native code, arity=");
@@ -615,9 +615,9 @@ L0_break: ;
 			get { return 0; }
 		}
 
-		public virtual string GetFunctionName()
+		public virtual string FunctionName
 		{
-			return string.Empty;
+			get { return string.Empty; }
 		}
 
 		protected internal virtual bool HasPrototypeProperty()
@@ -832,7 +832,7 @@ L0_break: ;
 
 		private const int MAX_PROTOTYPE_ID = Id_bind;
 
-		private object prototypeProperty;
+		protected object prototypeProperty;
 
 		private PropertyAttributes prototypePropertyAttributes = PropertyAttributes.PERMANENT | PropertyAttributes.DONTENUM;
 		// #/string_id_map#

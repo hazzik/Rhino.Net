@@ -419,9 +419,9 @@ namespace Rhino.CommonJS.Module
 			}
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			return "require";
+			get { return "require"; }
 		}
 
 		public override int Arity

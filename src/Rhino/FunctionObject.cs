@@ -263,9 +263,9 @@ namespace Rhino
 			get { return Arity; }
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			return functionName ?? string.Empty;
+			get { return functionName ?? string.Empty; }
 		}
 
 		/// <summary>Get Java method or constructor this function represent.</summary>

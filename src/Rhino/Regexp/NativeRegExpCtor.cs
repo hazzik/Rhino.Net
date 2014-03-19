@@ -31,9 +31,9 @@ namespace Rhino.RegExp
 		{
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			return "RegExp";
+			get { return "RegExp"; }
 		}
 
 		public override object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] args)

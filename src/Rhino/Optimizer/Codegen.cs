@@ -636,7 +636,7 @@ namespace Rhino.Optimizer
 
 		private void GenerateGetFunctionName(CachingTypeBuilder type, FieldInfo idField)
 		{
-			var method = type.DefineMethod("GetFunctionName", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof (string), Type.EmptyTypes);
+			var method = type.DefineMethod("get_FunctionName", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof (string), Type.EmptyTypes);
 			var il = method.GetILGenerator();
 
 			GenerateNativeFunctionBody(idField, il, node =>

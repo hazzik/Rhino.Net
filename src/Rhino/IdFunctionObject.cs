@@ -131,7 +131,7 @@ namespace Rhino
 			if (!justbody)
 			{
 				sb.Append("function ");
-				sb.Append(GetFunctionName());
+				sb.Append(FunctionName);
 				sb.Append("() { ");
 			}
 			sb.Append("[native code for ");
@@ -141,7 +141,7 @@ namespace Rhino
 				sb.Append(sobj.GetClassName());
 				sb.Append('.');
 			}
-			sb.Append(GetFunctionName());
+			sb.Append(FunctionName);
 			sb.Append(", arity=");
 			sb.Append(Arity);
 			sb.Append(justbody ? "]\n" : "] }\n");
@@ -158,9 +158,9 @@ namespace Rhino
 			get { return Arity; }
 		}
 
-		public override string GetFunctionName()
+		public override string FunctionName
 		{
-			return (functionName == null) ? string.Empty : functionName;
+			get { return (functionName == null) ? string.Empty : functionName; }
 		}
 
 		public Exception Unknown()

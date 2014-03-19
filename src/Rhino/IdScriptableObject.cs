@@ -796,7 +796,7 @@ namespace Rhino
 		/// <exception cref="System.Exception">if no more instanceof target can be found</exception>
 		protected internal static EcmaError IncompatibleCallError(IdFunctionObject f)
 		{
-			throw ScriptRuntime.TypeError1("msg.incompat.call", f.GetFunctionName());
+			throw ScriptRuntime.TypeError1("msg.incompat.call", f.FunctionName);
 		}
 
 		private IdFunctionObject NewIdFunction(object tag, int id, string name, int arity, Scriptable scope)
