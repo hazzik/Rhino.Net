@@ -4024,7 +4024,7 @@ search_break: ;
 			if (type == FunctionNode.FUNCTION_STATEMENT)
 			{
 				string name = function.FunctionName;
-				if (name != null && name.Length != 0)
+				if (!string.IsNullOrEmpty(name))
 				{
 					if (!fromEvalCode)
 					{

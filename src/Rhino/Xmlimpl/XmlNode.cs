@@ -770,7 +770,7 @@ namespace Rhino.XmlImpl
 				Namespace rv = new Namespace();
 				rv.uri = uri;
 				// Avoid null prefix for "" namespace
-				if (uri == null || uri.Length == 0)
+				if (string.IsNullOrEmpty(uri))
 				{
 					rv.prefix = string.Empty;
 				}
