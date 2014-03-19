@@ -11,16 +11,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security;
 using System.Text;
-using Rhino;
 using Rhino.Debug;
-using Rhino.Tools.Debugger;
 using Sharpen;
 
 namespace Rhino.Tools.Debugger
 {
 	/// <summary>Dim or Debugger Implementation for Rhino.</summary>
 	/// <remarks>Dim or Debugger Implementation for Rhino.</remarks>
-	public class Dim
+	public sealed class Dim : IDisposable
 	{
 		public const int STEP_OVER = 0;
 
@@ -34,29 +32,13 @@ namespace Rhino.Tools.Debugger
 
 		public const int EXIT = 5;
 
-		private const int IPROXY_DEBUG = 0;
-
-		private const int IPROXY_LISTEN = 1;
-
-		private const int IPROXY_COMPILE_SCRIPT = 2;
-
-		private const int IPROXY_EVAL_SCRIPT = 3;
-
-		private const int IPROXY_STRING_IS_COMPILABLE = 4;
-
-		private const int IPROXY_OBJECT_TO_STRING = 5;
-
-		private const int IPROXY_OBJECT_PROPERTY = 6;
-
-		private const int IPROXY_OBJECT_IDS = 7;
-
 		/// <summary>Interface to the debugger GUI.</summary>
 		/// <remarks>Interface to the debugger GUI.</remarks>
 		private GuiCallback callback;
 
 		/// <summary>Whether the debugger should break.</summary>
 		/// <remarks>Whether the debugger should break.</remarks>
-		private bool breakFlag;
+		internal bool breakFlag;
 
 		/// <summary>
 		/// The ScopeProvider object that provides the scope in which to
@@ -78,7 +60,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Information about the current stack at the point of interruption.</summary>
 		/// <remarks>Information about the current stack at the point of interruption.</remarks>
-		private volatile Dim.ContextData interruptedContextData;
+		private volatile ContextData interruptedContextData;
 
 		/// <summary>The ContextFactory to listen to for debugging information.</summary>
 		/// <remarks>The ContextFactory to listen to for debugging information.</remarks>
@@ -92,14 +74,14 @@ namespace Rhino.Tools.Debugger
 		/// Synchronization object used to allow script evaluations to
 		/// happen when a thread is resumed.
 		/// </remarks>
-		private object monitor = new object();
+		private readonly object monitor = new object();
 
 		/// <summary>
 		/// Synchronization object used to wait for valid
 		/// <see cref="interruptedContextData">interruptedContextData</see>
 		/// .
 		/// </summary>
-		private object eventThreadMonitor = new object();
+		private readonly object eventThreadMonitor = new object();
 
 		/// <summary>The action to perform to end the interruption loop.</summary>
 		/// <remarks>The action to perform to end the interruption loop.</remarks>
@@ -124,7 +106,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="evalRequest">evalRequest</see>
 		/// .
 		/// </summary>
-		private Dim.StackFrame evalFrame;
+		private StackFrame evalFrame;
 
 		/// <summary>
 		/// The result of evaluating
@@ -139,7 +121,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Whether the debugger should break when a script function is entered.</summary>
 		/// <remarks>Whether the debugger should break when a script function is entered.</remarks>
-		private bool breakOnEnter;
+		internal bool breakOnEnter;
 
 		/// <summary>
 		/// Whether the debugger should break when a script function is returned
@@ -149,99 +131,99 @@ namespace Rhino.Tools.Debugger
 		/// Whether the debugger should break when a script function is returned
 		/// from.
 		/// </remarks>
-		private bool breakOnReturn;
+		internal bool breakOnReturn;
 
 		/// <summary>Table mapping URLs to information about the script source.</summary>
 		/// <remarks>Table mapping URLs to information about the script source.</remarks>
-		private readonly IDictionary<string, Dim.SourceInfo> urlToSourceInfo = Sharpen.Collections.SynchronizedMap(new Dictionary<string, Dim.SourceInfo>());
+		private readonly IDictionary<string, SourceInfo> urlToSourceInfo = Sharpen.Collections.SynchronizedMap(new Dictionary<string, SourceInfo>());
 
 		/// <summary>Table mapping function names to information about the function.</summary>
 		/// <remarks>Table mapping function names to information about the function.</remarks>
-		private readonly IDictionary<string, Dim.FunctionSource> functionNames = Sharpen.Collections.SynchronizedMap(new Dictionary<string, Dim.FunctionSource>());
+		private readonly IDictionary<string, FunctionSource> functionNames = Sharpen.Collections.SynchronizedMap(new Dictionary<string, FunctionSource>());
 
 		/// <summary>Table mapping functions to information about the function.</summary>
 		/// <remarks>Table mapping functions to information about the function.</remarks>
-		private readonly IDictionary<DebuggableScript, Dim.FunctionSource> functionToSource = Sharpen.Collections.SynchronizedMap(new Dictionary<DebuggableScript, Dim.FunctionSource>());
+		private readonly IDictionary<DebuggableScript, FunctionSource> functionToSource = Sharpen.Collections.SynchronizedMap(new Dictionary<DebuggableScript, FunctionSource>());
 
 		/// <summary>
 		/// ContextFactory.Listener instance attached to
 		/// <see cref="contextFactory">contextFactory</see>
 		/// .
 		/// </summary>
-		private Dim.DimIProxy listener;
+		private ContextFactory.Listener listener;
 
 		// Constants for instructing the debugger what action to perform
 		// to end interruption.  Used by 'returnValue'.
 		// Constants for the DimIProxy interface implementation class.
 		/// <summary>Sets the GuiCallback object to use.</summary>
 		/// <remarks>Sets the GuiCallback object to use.</remarks>
-		public virtual void SetGuiCallback(GuiCallback callback)
+		public void SetGuiCallback(GuiCallback callback)
 		{
 			this.callback = callback;
 		}
 
 		/// <summary>Tells the debugger to break at the next opportunity.</summary>
 		/// <remarks>Tells the debugger to break at the next opportunity.</remarks>
-		public virtual void SetBreak()
+		public void SetBreak()
 		{
 			this.breakFlag = true;
 		}
 
 		/// <summary>Sets the ScopeProvider to be used.</summary>
 		/// <remarks>Sets the ScopeProvider to be used.</remarks>
-		public virtual void SetScopeProvider(ScopeProvider scopeProvider)
+		public void SetScopeProvider(ScopeProvider scopeProvider)
 		{
 			this.scopeProvider = scopeProvider;
 		}
 
 		/// <summary>Sets the ScopeProvider to be used.</summary>
 		/// <remarks>Sets the ScopeProvider to be used.</remarks>
-		public virtual void SetSourceProvider(SourceProvider sourceProvider)
+		public void SetSourceProvider(SourceProvider sourceProvider)
 		{
 			this.sourceProvider = sourceProvider;
 		}
 
 		/// <summary>Switches context to the stack frame with the given index.</summary>
 		/// <remarks>Switches context to the stack frame with the given index.</remarks>
-		public virtual void ContextSwitch(int frameIndex)
+		public void ContextSwitch(int frameIndex)
 		{
 			this.frameIndex = frameIndex;
 		}
 
 		/// <summary>Sets whether the debugger should break on exceptions.</summary>
 		/// <remarks>Sets whether the debugger should break on exceptions.</remarks>
-		public virtual void SetBreakOnExceptions(bool breakOnExceptions)
+		public void SetBreakOnExceptions(bool breakOnExceptions)
 		{
 			this.breakOnExceptions = breakOnExceptions;
 		}
 
 		/// <summary>Sets whether the debugger should break on function entering.</summary>
 		/// <remarks>Sets whether the debugger should break on function entering.</remarks>
-		public virtual void SetBreakOnEnter(bool breakOnEnter)
+		public void SetBreakOnEnter(bool breakOnEnter)
 		{
 			this.breakOnEnter = breakOnEnter;
 		}
 
 		/// <summary>Sets whether the debugger should break on function return.</summary>
 		/// <remarks>Sets whether the debugger should break on function return.</remarks>
-		public virtual void SetBreakOnReturn(bool breakOnReturn)
+		public void SetBreakOnReturn(bool breakOnReturn)
 		{
 			this.breakOnReturn = breakOnReturn;
 		}
 
 		/// <summary>Attaches the debugger to the given ContextFactory.</summary>
 		/// <remarks>Attaches the debugger to the given ContextFactory.</remarks>
-		public virtual void AttachTo(ContextFactory factory)
+		public void AttachTo(ContextFactory factory)
 		{
 			Detach();
 			this.contextFactory = factory;
-			this.listener = new Dim.DimIProxy(this, IPROXY_LISTEN);
+			this.listener = new ListenerImpl(this);
 			factory.AddListener(this.listener);
 		}
 
 		/// <summary>Detaches the debugger from the current ContextFactory.</summary>
 		/// <remarks>Detaches the debugger from the current ContextFactory.</remarks>
-		public virtual void Detach()
+		public void Detach()
 		{
 			if (listener != null)
 			{
@@ -253,20 +235,20 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Releases resources associated with this debugger.</summary>
 		/// <remarks>Releases resources associated with this debugger.</remarks>
-		public virtual void Dispose()
+		public void Dispose()
 		{
 			Detach();
 		}
 
 		/// <summary>Returns the FunctionSource object for the given script or function.</summary>
 		/// <remarks>Returns the FunctionSource object for the given script or function.</remarks>
-		private Dim.FunctionSource GetFunctionSource(DebuggableScript fnOrScript)
+		internal FunctionSource GetFunctionSource(DebuggableScript fnOrScript)
 		{
-			Dim.FunctionSource fsource = FunctionSource(fnOrScript);
+			FunctionSource fsource = FunctionSource(fnOrScript);
 			if (fsource == null)
 			{
 				string url = GetNormalizedUrl(fnOrScript);
-				Dim.SourceInfo si = SourceInfo(url);
+				SourceInfo si = SourceInfo(url);
 				if (si == null)
 				{
 					if (!fnOrScript.IsGeneratedScript())
@@ -373,7 +355,7 @@ openStream_break: ;
 
 		/// <summary>Registers the given script as a top-level script in the debugger.</summary>
 		/// <remarks>Registers the given script as a top-level script in the debugger.</remarks>
-		private void RegisterTopScript(DebuggableScript topScript, string source)
+		internal void RegisterTopScript(DebuggableScript topScript, string source)
 		{
 			if (!topScript.IsTopLevel())
 			{
@@ -389,10 +371,10 @@ openStream_break: ;
 					source = providedSource;
 				}
 			}
-			Dim.SourceInfo sourceInfo = new Dim.SourceInfo(source, functions, url);
+			SourceInfo sourceInfo = new SourceInfo(source, functions, url);
 			lock (urlToSourceInfo)
 			{
-				Dim.SourceInfo old = urlToSourceInfo.Get(url);
+				SourceInfo old = urlToSourceInfo.Get(url);
 				if (old != null)
 				{
 					sourceInfo.CopyBreakpointsFrom(old);
@@ -400,8 +382,8 @@ openStream_break: ;
 				urlToSourceInfo [url] = sourceInfo;
 				for (int i = 0; i != sourceInfo.FunctionSourcesTop(); ++i)
 				{
-					Dim.FunctionSource fsource = sourceInfo.FunctionSource(i);
-					string name = fsource.Name();
+					FunctionSource fsource = sourceInfo.GetFunctionSource(i);
+					string name = fsource.Name;
 					if (name.Length != 0)
 					{
 						functionNames [name] = fsource;
@@ -412,7 +394,7 @@ openStream_break: ;
 			{
 				for (int i = 0; i != functions.Length; ++i)
 				{
-					Dim.FunctionSource fsource = sourceInfo.FunctionSource(i);
+					FunctionSource fsource = sourceInfo.GetFunctionSource(i);
 					functionToSource [functions[i]] = fsource;
 				}
 			}
@@ -421,14 +403,14 @@ openStream_break: ;
 
 		/// <summary>Returns the FunctionSource object for the given function or script.</summary>
 		/// <remarks>Returns the FunctionSource object for the given function or script.</remarks>
-		private Dim.FunctionSource FunctionSource(DebuggableScript fnOrScript)
+		private FunctionSource FunctionSource(DebuggableScript fnOrScript)
 		{
 			return functionToSource.Get(fnOrScript);
 		}
 
 		/// <summary>Returns an array of all function names.</summary>
 		/// <remarks>Returns an array of all function names.</remarks>
-		public virtual string[] FunctionNames()
+		public string[] FunctionNames()
 		{
 			lock (urlToSourceInfo)
 			{
@@ -438,14 +420,14 @@ openStream_break: ;
 
 		/// <summary>Returns the FunctionSource object for the function with the given name.</summary>
 		/// <remarks>Returns the FunctionSource object for the function with the given name.</remarks>
-		public virtual Dim.FunctionSource FunctionSourceByName(string functionName)
+		public FunctionSource FunctionSourceByName(string functionName)
 		{
 			return functionNames.Get(functionName);
 		}
 
 		/// <summary>Returns the SourceInfo object for the given URL.</summary>
 		/// <remarks>Returns the SourceInfo object for the given URL.</remarks>
-		public virtual Dim.SourceInfo SourceInfo(string url)
+		public SourceInfo SourceInfo(string url)
 		{
 			return urlToSourceInfo.Get(url);
 		}
@@ -546,9 +528,9 @@ openStream_break: ;
 
 		/// <summary>Clears all breakpoints.</summary>
 		/// <remarks>Clears all breakpoints.</remarks>
-		public virtual void ClearAllBreakpoints()
+		public void ClearAllBreakpoints()
 		{
-			foreach (Dim.SourceInfo si in urlToSourceInfo.Values)
+			foreach (SourceInfo si in urlToSourceInfo.Values)
 			{
 				si.RemoveAllBreakpoints();
 			}
@@ -556,7 +538,7 @@ openStream_break: ;
 
 		/// <summary>Called when a breakpoint has been hit.</summary>
 		/// <remarks>Called when a breakpoint has been hit.</remarks>
-		private void HandleBreakpointHit(Dim.StackFrame frame, Context cx)
+		internal void HandleBreakpointHit(StackFrame frame, Context cx)
 		{
 			breakFlag = false;
 			Interrupted(cx, frame, null);
@@ -564,11 +546,11 @@ openStream_break: ;
 
 		/// <summary>Called when a script exception has been thrown.</summary>
 		/// <remarks>Called when a script exception has been thrown.</remarks>
-		private void HandleExceptionThrown(Context cx, Exception ex, Dim.StackFrame frame)
+		internal void HandleExceptionThrown(Context cx, Exception ex, StackFrame frame)
 		{
 			if (breakOnExceptions)
 			{
-				Dim.ContextData cd = frame.ContextData();
+				ContextData cd = frame.ContextData();
 				if (cd.lastProcessedException != ex)
 				{
 					Interrupted(cx, frame, ex);
@@ -579,14 +561,14 @@ openStream_break: ;
 
 		/// <summary>Returns the current ContextData object.</summary>
 		/// <remarks>Returns the current ContextData object.</remarks>
-		public virtual Dim.ContextData CurrentContextData()
+		public ContextData CurrentContextData()
 		{
 			return interruptedContextData;
 		}
 
 		/// <summary>Sets the action to perform to end interruption.</summary>
 		/// <remarks>Sets the action to perform to end interruption.</remarks>
-		public virtual void SetReturnValue(int returnValue)
+		public void SetReturnValue(int returnValue)
 		{
 			lock (monitor)
 			{
@@ -597,7 +579,7 @@ openStream_break: ;
 
 		/// <summary>Resumes execution of script.</summary>
 		/// <remarks>Resumes execution of script.</remarks>
-		public virtual void Go()
+		public void Go()
 		{
 			lock (monitor)
 			{
@@ -608,19 +590,19 @@ openStream_break: ;
 
 		/// <summary>Evaluates the given script.</summary>
 		/// <remarks>Evaluates the given script.</remarks>
-		public virtual string Eval(string expr)
+		public string Eval(string expr)
 		{
 			string result = "undefined";
 			if (expr == null)
 			{
 				return result;
 			}
-			Dim.ContextData contextData = CurrentContextData();
+			ContextData contextData = CurrentContextData();
 			if (contextData == null || frameIndex >= contextData.FrameCount())
 			{
 				return result;
 			}
-			Dim.StackFrame frame = contextData.GetFrame(frameIndex);
+			StackFrame frame = contextData.GetFrame(frameIndex);
 			if (contextData.eventThreadFlag)
 			{
 				Context cx = Context.GetCurrentContext();
@@ -657,63 +639,67 @@ openStream_break: ;
 
 		/// <summary>Compiles the given script.</summary>
 		/// <remarks>Compiles the given script.</remarks>
-		public virtual void CompileScript(string url, string text)
+		public void CompileScript(string url, string text)
 		{
-			Dim.DimIProxy action = new Dim.DimIProxy(this, IPROXY_COMPILE_SCRIPT);
-			action.url = url;
-			action.text = text;
-			action.WithContext();
+			contextFactory.Call(cx => cx.CompileString(text, url, 1, null));
 		}
 
 		/// <summary>Evaluates the given script.</summary>
-		/// <remarks>Evaluates the given script.</remarks>
-		public virtual void EvalScript(string url, string text)
+		public void EvalScript(string url, string text)
 		{
-			Dim.DimIProxy action = new Dim.DimIProxy(this, IPROXY_EVAL_SCRIPT);
-			action.url = url;
-			action.text = text;
-			action.WithContext();
+			contextFactory.Call(cx =>
+			{
+				Scriptable scope = null;
+				if (scopeProvider != null)
+				{
+					scope = scopeProvider.GetScope();
+				}
+				if (scope == null)
+				{
+					scope = new ImporterTopLevel(cx);
+				}
+				cx.EvaluateString(scope, text, url, 1, null);
+				return null;
+			});
 		}
 
 		/// <summary>Converts the given script object to a string.</summary>
-		/// <remarks>Converts the given script object to a string.</remarks>
-		public virtual string ObjectToString(object @object)
+		public string ObjectToString(object @object)
 		{
-			Dim.DimIProxy action = new Dim.DimIProxy(this, IPROXY_OBJECT_TO_STRING);
-			action.@object = @object;
-			action.WithContext();
-			return action.stringResult;
+			return (string) contextFactory.Call(cx =>
+			{
+				if (@object == Undefined.instance)
+					return "undefined";
+
+				if (@object == null)
+					return "null";
+
+				if (@object is NativeCall)
+					return "[object Call]";
+
+				return Context.ToString(@object);
+			});
 		}
 
 		/// <summary>Returns whether the given string is syntactically valid script.</summary>
 		/// <remarks>Returns whether the given string is syntactically valid script.</remarks>
-		public virtual bool StringIsCompilableUnit(string str)
+		public bool StringIsCompilableUnit(string str)
 		{
-			Dim.DimIProxy action = new Dim.DimIProxy(this, IPROXY_STRING_IS_COMPILABLE);
-			action.text = str;
-			action.WithContext();
-			return action.booleanResult;
+			return (bool) contextFactory.Call(cx => cx.StringIsCompilableUnit(str));
 		}
 
 		/// <summary>Returns the value of a property on the given script object.</summary>
 		/// <remarks>Returns the value of a property on the given script object.</remarks>
-		public virtual object GetObjectProperty(object @object, object id)
+		public object GetObjectProperty(object @object, object id)
 		{
-			Dim.DimIProxy action = new Dim.DimIProxy(this, IPROXY_OBJECT_PROPERTY);
-			action.@object = @object;
-			action.id = id;
-			action.WithContext();
-			return action.objectResult;
+			return contextFactory.Call(cx => GetObjectPropertyImpl(cx, @object, id));
 		}
 
 		/// <summary>Returns an array of the property names on the given script object.</summary>
 		/// <remarks>Returns an array of the property names on the given script object.</remarks>
-		public virtual object[] GetObjectIds(object @object)
+		public object[] GetObjectIds(object @object)
 		{
-			Dim.DimIProxy action = new Dim.DimIProxy(this, IPROXY_OBJECT_IDS);
-			action.@object = @object;
-			action.WithContext();
-			return action.objectArrayResult;
+			return (object[]) contextFactory.Call(cx => GetObjectIdsImpl(cx, @object));
 		}
 
 		/// <summary>Returns the value of a property on the given script object.</summary>
@@ -744,7 +730,7 @@ openStream_break: ;
 						else
 						{
 							result = ScriptableObject.GetProperty(scriptable, name);
-							if (result == ScriptableObject.NOT_FOUND)
+							if (result == ScriptableConstants.NOT_FOUND)
 							{
 								result = Undefined.instance;
 							}
@@ -756,7 +742,7 @@ openStream_break: ;
 			{
 				int index = System.Convert.ToInt32(((int)id));
 				result = ScriptableObject.GetProperty(scriptable, index);
-				if (result == ScriptableObject.NOT_FOUND)
+				if (result == ScriptableConstants.NOT_FOUND)
 				{
 					result = Undefined.instance;
 				}
@@ -813,9 +799,9 @@ openStream_break: ;
 
 		/// <summary>Interrupts script execution.</summary>
 		/// <remarks>Interrupts script execution.</remarks>
-		private void Interrupted(Context cx, Dim.StackFrame frame, Exception scriptException)
+		private void Interrupted(Context cx, StackFrame frame, Exception scriptException)
 		{
-			Dim.ContextData contextData = frame.ContextData();
+			ContextData contextData = frame.ContextData();
 			bool eventThreadFlag = callback.IsGuiEventThread();
 			contextData.eventThreadFlag = eventThreadFlag;
 			bool recursiveEventThreadCall = false;
@@ -1000,7 +986,7 @@ interruptedCheck_break: ;
 
 		/// <summary>Evaluates script in the given stack frame.</summary>
 		/// <remarks>Evaluates script in the given stack frame.</remarks>
-		private static string Do_eval(Context cx, Dim.StackFrame frame, string expr)
+		private static string Do_eval(Context cx, StackFrame frame, string expr)
 		{
 			string resultString;
 			Rhino.Debug.Debugger saved_debugger = cx.GetDebugger();
@@ -1032,751 +1018,546 @@ interruptedCheck_break: ;
 				cx.SetOptimizationLevel(saved_level);
 				cx.SetDebugger(saved_debugger, saved_data);
 			}
-			if (resultString == null)
-			{
-				resultString = "null";
-			}
-			return resultString;
+			return resultString ?? "null";
+		}
+	}
+
+	internal sealed class DebuggerImpl : Debug.Debugger
+	{
+		/// <summary>The debugger.</summary>
+		private readonly Dim dim;
+
+		internal DebuggerImpl(Dim dim)
+		{
+			this.dim = dim;
 		}
 
-		/// <summary>
-		/// Proxy class to implement debug interfaces without bloat of class
-		/// files.
-		/// </summary>
-		/// <remarks>
-		/// Proxy class to implement debug interfaces without bloat of class
-		/// files.
-		/// </remarks>
-		private class DimIProxy : ContextAction, ContextFactory.Listener, Rhino.Debug.Debugger
+		/// <summary>Returns a StackFrame for the given function or script.</summary>
+		/// <remarks>Returns a StackFrame for the given function or script.</remarks>
+		public DebugFrame GetFrame(Context cx, DebuggableScript fnOrScript)
 		{
-			/// <summary>The debugger.</summary>
-			/// <remarks>The debugger.</remarks>
-			private Dim dim;
-
-			/// <summary>The interface implementation type.</summary>
-			/// <remarks>
-			/// The interface implementation type.  One of the IPROXY_* constants
-			/// defined in
-			/// <see cref="Dim">Dim</see>
-			/// .
-			/// </remarks>
-			private int type;
-
-			/// <summary>The URL origin of the script to compile or evaluate.</summary>
-			/// <remarks>The URL origin of the script to compile or evaluate.</remarks>
-			private string url;
-
-			/// <summary>The text of the script to compile, evaluate or test for compilation.</summary>
-			/// <remarks>The text of the script to compile, evaluate or test for compilation.</remarks>
-			private string text;
-
-			/// <summary>The object to convert, get a property from or enumerate.</summary>
-			/// <remarks>The object to convert, get a property from or enumerate.</remarks>
-			private object @object;
-
-			/// <summary>
-			/// The property to look up in
-			/// <see cref="@object">@object</see>
-			/// .
-			/// </summary>
-			private object id;
-
-			/// <summary>The boolean result of the action.</summary>
-			/// <remarks>The boolean result of the action.</remarks>
-			private bool booleanResult;
-
-			/// <summary>The String result of the action.</summary>
-			/// <remarks>The String result of the action.</remarks>
-			private string stringResult;
-
-			/// <summary>The Object result of the action.</summary>
-			/// <remarks>The Object result of the action.</remarks>
-			private object objectResult;
-
-			/// <summary>The Object[] result of the action.</summary>
-			/// <remarks>The Object[] result of the action.</remarks>
-			private object[] objectArrayResult;
-
-			/// <summary>Creates a new DimIProxy.</summary>
-			/// <remarks>Creates a new DimIProxy.</remarks>
-			private DimIProxy(Dim dim, int type)
-			{
-				this.dim = dim;
-				this.type = type;
-			}
-
-			// ContextAction
-			/// <summary>
-			/// Performs the action given by
-			/// <see cref="type">type</see>
-			/// .
-			/// </summary>
-			public virtual object Run(Context cx)
-			{
-				switch (type)
-				{
-					case IPROXY_COMPILE_SCRIPT:
-					{
-						cx.CompileString(text, url, 1, null);
-						break;
-					}
-
-					case IPROXY_EVAL_SCRIPT:
-					{
-						Scriptable scope = null;
-						if (dim.scopeProvider != null)
-						{
-							scope = dim.scopeProvider.GetScope();
-						}
-						if (scope == null)
-						{
-							scope = new ImporterTopLevel(cx);
-						}
-						cx.EvaluateString(scope, text, url, 1, null);
-						break;
-					}
-
-					case IPROXY_STRING_IS_COMPILABLE:
-					{
-						booleanResult = cx.StringIsCompilableUnit(text);
-						break;
-					}
-
-					case IPROXY_OBJECT_TO_STRING:
-					{
-						if (@object == Undefined.instance)
-						{
-							stringResult = "undefined";
-						}
-						else
-						{
-							if (@object == null)
-							{
-								stringResult = "null";
-							}
-							else
-							{
-								if (@object is NativeCall)
-								{
-									stringResult = "[object Call]";
-								}
-								else
-								{
-									stringResult = Context.ToString(@object);
-								}
-							}
-						}
-						break;
-					}
-
-					case IPROXY_OBJECT_PROPERTY:
-					{
-						objectResult = dim.GetObjectPropertyImpl(cx, @object, id);
-						break;
-					}
-
-					case IPROXY_OBJECT_IDS:
-					{
-						objectArrayResult = dim.GetObjectIdsImpl(cx, @object);
-						break;
-					}
-
-					default:
-					{
-						throw Kit.CodeBug();
-					}
-				}
+			var item = dim.GetFunctionSource(fnOrScript);
+			if (item == null) // Can not debug if source is not available
 				return null;
-			}
 
-			/// <summary>
-			/// Performs the action given by
-			/// <see cref="type">type</see>
-			/// with the attached
-			/// <see cref="Rhino.ContextFactory">Rhino.ContextFactory</see>
-			/// .
-			/// </summary>
-			private void WithContext()
-			{
-				dim.contextFactory.Call(this);
-			}
+			return new StackFrame(cx, dim, item);
+		}
 
-			// ContextFactory.Listener
-			/// <summary>Called when a Context is created.</summary>
-			/// <remarks>Called when a Context is created.</remarks>
-			public virtual void ContextCreated(Context cx)
-			{
-				if (type != IPROXY_LISTEN)
-				{
-					Kit.CodeBug();
-				}
-				Dim.ContextData contextData = new Dim.ContextData();
-				Rhino.Debug.Debugger debugger = new Dim.DimIProxy(dim, IPROXY_DEBUG);
-				cx.SetDebugger(debugger, contextData);
-				cx.SetGeneratingDebug(true);
-				cx.SetOptimizationLevel(-1);
-			}
+		/// <summary>Called when compilation is finished.</summary>
+		/// <remarks>Called when compilation is finished.</remarks>
+		public void HandleCompilationDone(Context cx, DebuggableScript fnOrScript, string source)
+		{
+			if (!fnOrScript.IsTopLevel())
+				return;
+				
+			dim.RegisterTopScript(fnOrScript, source);
+		}
+	}
 
-			/// <summary>Called when a Context is destroyed.</summary>
-			/// <remarks>Called when a Context is destroyed.</remarks>
-			public virtual void ContextReleased(Context cx)
-			{
-				if (type != IPROXY_LISTEN)
-				{
-					Kit.CodeBug();
-				}
-			}
+	internal sealed class ListenerImpl : ContextFactory.Listener
+	{
+		internal ListenerImpl(Dim dim)
+		{
+			this.dim = dim;
+		}
 
-			// Debugger
-			/// <summary>Returns a StackFrame for the given function or script.</summary>
-			/// <remarks>Returns a StackFrame for the given function or script.</remarks>
-			public virtual DebugFrame GetFrame(Context cx, DebuggableScript fnOrScript)
-			{
-				if (type != IPROXY_DEBUG)
-				{
-					Kit.CodeBug();
-				}
-				Dim.FunctionSource item = dim.GetFunctionSource(fnOrScript);
-				if (item == null)
-				{
-					// Can not debug if source is not available
-					return null;
-				}
-				return new Dim.StackFrame(cx, dim, item);
-			}
+		/// <summary>The debugger.</summary>
+		private readonly Dim dim;
 
-			/// <summary>Called when compilation is finished.</summary>
-			/// <remarks>Called when compilation is finished.</remarks>
-			public virtual void HandleCompilationDone(Context cx, DebuggableScript fnOrScript, string source)
+		/// <summary>Called when a Context is created.</summary>
+		public void ContextCreated(Context cx)
+		{
+			cx.SetDebugger(new DebuggerImpl(dim), new ContextData());
+			cx.SetGeneratingDebug(true);
+			cx.SetOptimizationLevel(-1);
+		}
+
+		/// <summary>Called when a Context is destroyed.</summary>
+		public void ContextReleased(Context cx)
+		{
+		}
+	}
+
+	/// <summary>Class to store information about a stack.</summary>
+	/// <remarks>Class to store information about a stack.</remarks>
+	public sealed class ContextData
+	{
+		/// <summary>The stack frames.</summary>
+		/// <remarks>The stack frames.</remarks>
+		private readonly ObjArray frameStack = new ObjArray();
+
+		/// <summary>Whether the debugger should break at the next line in this context.</summary>
+		/// <remarks>Whether the debugger should break at the next line in this context.</remarks>
+		internal bool breakNextLine;
+
+		/// <summary>The frame depth the debugger should stop at.</summary>
+		/// <remarks>
+		/// The frame depth the debugger should stop at.  Used to implement
+		/// "step over" and "step out".
+		/// </remarks>
+		internal int stopAtFrameDepth = -1;
+
+		/// <summary>Whether this context is in the event thread.</summary>
+		/// <remarks>Whether this context is in the event thread.</remarks>
+		internal bool eventThreadFlag;
+
+		/// <summary>The last exception that was processed.</summary>
+		/// <remarks>The last exception that was processed.</remarks>
+		internal Exception lastProcessedException;
+
+		/// <summary>Returns the ContextData for the given Context.</summary>
+		/// <remarks>Returns the ContextData for the given Context.</remarks>
+		public static ContextData Get(Context cx)
+		{
+			return (ContextData)cx.GetDebuggerContextData();
+		}
+
+		/// <summary>Returns the number of stack frames.</summary>
+		/// <remarks>Returns the number of stack frames.</remarks>
+		public int FrameCount()
+		{
+			return frameStack.Size();
+		}
+
+		/// <summary>Returns the stack frame with the given index.</summary>
+		/// <remarks>Returns the stack frame with the given index.</remarks>
+		public StackFrame GetFrame(int frameNumber)
+		{
+			int num = frameStack.Size() - frameNumber - 1;
+			return (StackFrame)frameStack.Get(num);
+		}
+
+		/// <summary>Pushes a stack frame on to the stack.</summary>
+		/// <remarks>Pushes a stack frame on to the stack.</remarks>
+		internal void PushFrame(StackFrame frame)
+		{
+			frameStack.Push(frame);
+		}
+
+		/// <summary>Pops a stack frame from the stack.</summary>
+		/// <remarks>Pops a stack frame from the stack.</remarks>
+		internal void PopFrame()
+		{
+			frameStack.Pop();
+		}
+	}
+
+	/// <summary>Object to represent one stack frame.</summary>
+	/// <remarks>Object to represent one stack frame.</remarks>
+	public sealed class StackFrame : DebugFrame
+	{
+		/// <summary>The debugger.</summary>
+		/// <remarks>The debugger.</remarks>
+		private Dim dim;
+
+		/// <summary>The ContextData for the Context being debugged.</summary>
+		/// <remarks>The ContextData for the Context being debugged.</remarks>
+		private ContextData contextData;
+
+		/// <summary>The scope.</summary>
+		/// <remarks>The scope.</remarks>
+		public Scriptable scope;
+
+		/// <summary>The 'this' object.</summary>
+		/// <remarks>The 'this' object.</remarks>
+		public Scriptable thisObj;
+
+		/// <summary>Information about the function.</summary>
+		/// <remarks>Information about the function.</remarks>
+		private FunctionSource fsource;
+
+		/// <summary>Array of breakpoint state for each source line.</summary>
+		/// <remarks>Array of breakpoint state for each source line.</remarks>
+		private bool[] breakpoints;
+
+		/// <summary>Current line number.</summary>
+		/// <remarks>Current line number.</remarks>
+		private int lineNumber;
+
+		/// <summary>Creates a new StackFrame.</summary>
+		/// <remarks>Creates a new StackFrame.</remarks>
+		internal StackFrame(Context cx, Dim dim, FunctionSource fsource)
+		{
+			this.dim = dim;
+			this.contextData = Debugger.ContextData.Get(cx);
+			this.fsource = fsource;
+			this.breakpoints = fsource.SourceInfo.breakpoints;
+			this.lineNumber = fsource.FirstLine;
+		}
+
+		/// <summary>Called when the stack frame is entered.</summary>
+		/// <remarks>Called when the stack frame is entered.</remarks>
+		public void OnEnter(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
+		{
+			contextData.PushFrame(this);
+			this.scope = scope;
+			this.thisObj = thisObj;
+			if (dim.breakOnEnter)
 			{
-				if (type != IPROXY_DEBUG)
+				dim.HandleBreakpointHit(this, cx);
+			}
+		}
+
+		/// <summary>Called when the current position has changed.</summary>
+		/// <remarks>Called when the current position has changed.</remarks>
+		public void OnLineChange(Context cx, int lineno)
+		{
+			this.lineNumber = lineno;
+			if (!breakpoints[lineno] && !dim.breakFlag)
+			{
+				bool lineBreak = contextData.breakNextLine;
+				if (lineBreak && contextData.stopAtFrameDepth >= 0)
 				{
-					Kit.CodeBug();
+					lineBreak = (contextData.FrameCount() <= contextData.stopAtFrameDepth);
 				}
-				if (!fnOrScript.IsTopLevel())
+				if (!lineBreak)
 				{
 					return;
 				}
-				dim.RegisterTopScript(fnOrScript, source);
+				contextData.stopAtFrameDepth = -1;
+				contextData.breakNextLine = false;
 			}
+			dim.HandleBreakpointHit(this, cx);
 		}
 
-		/// <summary>Class to store information about a stack.</summary>
-		/// <remarks>Class to store information about a stack.</remarks>
-		public class ContextData
+		/// <summary>Called when an exception has been thrown.</summary>
+		/// <remarks>Called when an exception has been thrown.</remarks>
+		public void OnExceptionThrown(Context cx, Exception exception)
 		{
-			/// <summary>The stack frames.</summary>
-			/// <remarks>The stack frames.</remarks>
-			private ObjArray frameStack = new ObjArray();
-
-			/// <summary>Whether the debugger should break at the next line in this context.</summary>
-			/// <remarks>Whether the debugger should break at the next line in this context.</remarks>
-			private bool breakNextLine;
-
-			/// <summary>The frame depth the debugger should stop at.</summary>
-			/// <remarks>
-			/// The frame depth the debugger should stop at.  Used to implement
-			/// "step over" and "step out".
-			/// </remarks>
-			private int stopAtFrameDepth = -1;
-
-			/// <summary>Whether this context is in the event thread.</summary>
-			/// <remarks>Whether this context is in the event thread.</remarks>
-			private bool eventThreadFlag;
-
-			/// <summary>The last exception that was processed.</summary>
-			/// <remarks>The last exception that was processed.</remarks>
-			private Exception lastProcessedException;
-
-			/// <summary>Returns the ContextData for the given Context.</summary>
-			/// <remarks>Returns the ContextData for the given Context.</remarks>
-			public static Dim.ContextData Get(Context cx)
-			{
-				return (Dim.ContextData)cx.GetDebuggerContextData();
-			}
-
-			/// <summary>Returns the number of stack frames.</summary>
-			/// <remarks>Returns the number of stack frames.</remarks>
-			public virtual int FrameCount()
-			{
-				return frameStack.Size();
-			}
-
-			/// <summary>Returns the stack frame with the given index.</summary>
-			/// <remarks>Returns the stack frame with the given index.</remarks>
-			public virtual Dim.StackFrame GetFrame(int frameNumber)
-			{
-				int num = frameStack.Size() - frameNumber - 1;
-				return (Dim.StackFrame)frameStack.Get(num);
-			}
-
-			/// <summary>Pushes a stack frame on to the stack.</summary>
-			/// <remarks>Pushes a stack frame on to the stack.</remarks>
-			private void PushFrame(Dim.StackFrame frame)
-			{
-				frameStack.Push(frame);
-			}
-
-			/// <summary>Pops a stack frame from the stack.</summary>
-			/// <remarks>Pops a stack frame from the stack.</remarks>
-			private void PopFrame()
-			{
-				frameStack.Pop();
-			}
+			dim.HandleExceptionThrown(cx, exception, this);
 		}
 
-		/// <summary>Object to represent one stack frame.</summary>
-		/// <remarks>Object to represent one stack frame.</remarks>
-		public class StackFrame : DebugFrame
+		/// <summary>Called when the stack frame has been left.</summary>
+		/// <remarks>Called when the stack frame has been left.</remarks>
+		public void OnExit(Context cx, bool byThrow, object resultOrException)
 		{
-			/// <summary>The debugger.</summary>
-			/// <remarks>The debugger.</remarks>
-			private Dim dim;
-
-			/// <summary>The ContextData for the Context being debugged.</summary>
-			/// <remarks>The ContextData for the Context being debugged.</remarks>
-			private Dim.ContextData contextData;
-
-			/// <summary>The scope.</summary>
-			/// <remarks>The scope.</remarks>
-			private Scriptable scope;
-
-			/// <summary>The 'this' object.</summary>
-			/// <remarks>The 'this' object.</remarks>
-			private Scriptable thisObj;
-
-			/// <summary>Information about the function.</summary>
-			/// <remarks>Information about the function.</remarks>
-			private Dim.FunctionSource fsource;
-
-			/// <summary>Array of breakpoint state for each source line.</summary>
-			/// <remarks>Array of breakpoint state for each source line.</remarks>
-			private bool[] breakpoints;
-
-			/// <summary>Current line number.</summary>
-			/// <remarks>Current line number.</remarks>
-			private int lineNumber;
-
-			/// <summary>Creates a new StackFrame.</summary>
-			/// <remarks>Creates a new StackFrame.</remarks>
-			private StackFrame(Context cx, Dim dim, Dim.FunctionSource fsource)
-			{
-				this.dim = dim;
-				this.contextData = Dim.ContextData.Get(cx);
-				this.fsource = fsource;
-				this.breakpoints = fsource.SourceInfo().breakpoints;
-				this.lineNumber = fsource.FirstLine();
-			}
-
-			/// <summary>Called when the stack frame is entered.</summary>
-			/// <remarks>Called when the stack frame is entered.</remarks>
-			public virtual void OnEnter(Context cx, Scriptable scope, Scriptable thisObj, object[] args)
-			{
-				contextData.PushFrame(this);
-				this.scope = scope;
-				this.thisObj = thisObj;
-				if (dim.breakOnEnter)
-				{
-					dim.HandleBreakpointHit(this, cx);
-				}
-			}
-
-			/// <summary>Called when the current position has changed.</summary>
-			/// <remarks>Called when the current position has changed.</remarks>
-			public virtual void OnLineChange(Context cx, int lineno)
-			{
-				this.lineNumber = lineno;
-				if (!breakpoints[lineno] && !dim.breakFlag)
-				{
-					bool lineBreak = contextData.breakNextLine;
-					if (lineBreak && contextData.stopAtFrameDepth >= 0)
-					{
-						lineBreak = (contextData.FrameCount() <= contextData.stopAtFrameDepth);
-					}
-					if (!lineBreak)
-					{
-						return;
-					}
-					contextData.stopAtFrameDepth = -1;
-					contextData.breakNextLine = false;
-				}
-				dim.HandleBreakpointHit(this, cx);
-			}
-
-			/// <summary>Called when an exception has been thrown.</summary>
-			/// <remarks>Called when an exception has been thrown.</remarks>
-			public virtual void OnExceptionThrown(Context cx, Exception exception)
-			{
-				dim.HandleExceptionThrown(cx, exception, this);
-			}
-
-			/// <summary>Called when the stack frame has been left.</summary>
-			/// <remarks>Called when the stack frame has been left.</remarks>
-			public virtual void OnExit(Context cx, bool byThrow, object resultOrException)
-			{
-				if (dim.breakOnReturn && !byThrow)
-				{
-					dim.HandleBreakpointHit(this, cx);
-				}
-				contextData.PopFrame();
-			}
-
-			/// <summary>Called when a 'debugger' statement is executed.</summary>
-			/// <remarks>Called when a 'debugger' statement is executed.</remarks>
-			public virtual void OnDebuggerStatement(Context cx)
+			if (dim.breakOnReturn && !byThrow)
 			{
 				dim.HandleBreakpointHit(this, cx);
 			}
-
-			/// <summary>Returns the SourceInfo object for the function.</summary>
-			/// <remarks>Returns the SourceInfo object for the function.</remarks>
-			public virtual Dim.SourceInfo SourceInfo()
-			{
-				return fsource.SourceInfo();
-			}
-
-			/// <summary>Returns the ContextData object for the Context.</summary>
-			/// <remarks>Returns the ContextData object for the Context.</remarks>
-			public virtual Dim.ContextData ContextData()
-			{
-				return contextData;
-			}
-
-			/// <summary>Returns the scope object for this frame.</summary>
-			/// <remarks>Returns the scope object for this frame.</remarks>
-			public virtual object Scope()
-			{
-				return scope;
-			}
-
-			/// <summary>Returns the 'this' object for this frame.</summary>
-			/// <remarks>Returns the 'this' object for this frame.</remarks>
-			public virtual object ThisObj()
-			{
-				return thisObj;
-			}
-
-			/// <summary>Returns the source URL.</summary>
-			/// <remarks>Returns the source URL.</remarks>
-			public virtual string GetUrl()
-			{
-				return fsource.SourceInfo().Url();
-			}
-
-			/// <summary>Returns the current line number.</summary>
-			/// <remarks>Returns the current line number.</remarks>
-			public virtual int GetLineNumber()
-			{
-				return lineNumber;
-			}
-
-			/// <summary>Returns the current function name.</summary>
-			/// <remarks>Returns the current function name.</remarks>
-			public virtual string GetFunctionName()
-			{
-				return fsource.Name();
-			}
+			contextData.PopFrame();
 		}
 
-		/// <summary>Class to store information about a function.</summary>
-		/// <remarks>Class to store information about a function.</remarks>
-		public class FunctionSource
+		/// <summary>Called when a 'debugger' statement is executed.</summary>
+		/// <remarks>Called when a 'debugger' statement is executed.</remarks>
+		public void OnDebuggerStatement(Context cx)
 		{
-			/// <summary>Information about the source of the function.</summary>
-			/// <remarks>Information about the source of the function.</remarks>
-			private Dim.SourceInfo sourceInfo;
-
-			/// <summary>Line number of the first line of the function.</summary>
-			/// <remarks>Line number of the first line of the function.</remarks>
-			private int firstLine;
-
-			/// <summary>The function name.</summary>
-			/// <remarks>The function name.</remarks>
-			private string name;
-
-			/// <summary>Creates a new FunctionSource.</summary>
-			/// <remarks>Creates a new FunctionSource.</remarks>
-			private FunctionSource(Dim.SourceInfo sourceInfo, int firstLine, string name)
-			{
-				if (name == null)
-				{
-					throw new ArgumentException();
-				}
-				this.sourceInfo = sourceInfo;
-				this.firstLine = firstLine;
-				this.name = name;
-			}
-
-			/// <summary>
-			/// Returns the SourceInfo object that describes the source of the
-			/// function.
-			/// </summary>
-			/// <remarks>
-			/// Returns the SourceInfo object that describes the source of the
-			/// function.
-			/// </remarks>
-			public virtual Dim.SourceInfo SourceInfo()
-			{
-				return sourceInfo;
-			}
-
-			/// <summary>Returns the line number of the first line of the function.</summary>
-			/// <remarks>Returns the line number of the first line of the function.</remarks>
-			public virtual int FirstLine()
-			{
-				return firstLine;
-			}
-
-			/// <summary>Returns the name of the function.</summary>
-			/// <remarks>Returns the name of the function.</remarks>
-			public virtual string Name()
-			{
-				return name;
-			}
+			dim.HandleBreakpointHit(this, cx);
 		}
 
-		/// <summary>Class to store information about a script source.</summary>
-		/// <remarks>Class to store information about a script source.</remarks>
-		public class SourceInfo
+		/// <summary>Returns the SourceInfo object for the function.</summary>
+		/// <remarks>Returns the SourceInfo object for the function.</remarks>
+		public SourceInfo SourceInfo()
 		{
-			/// <summary>An empty array of booleans.</summary>
-			/// <remarks>An empty array of booleans.</remarks>
-			private static readonly bool[] EMPTY_BOOLEAN_ARRAY = new bool[0];
+			return fsource.SourceInfo;
+		}
 
-			/// <summary>The script.</summary>
-			/// <remarks>The script.</remarks>
-			private string source;
+		/// <summary>Returns the ContextData object for the Context.</summary>
+		/// <remarks>Returns the ContextData object for the Context.</remarks>
+		public ContextData ContextData()
+		{
+			return contextData;
+		}
 
-			/// <summary>The URL of the script.</summary>
-			/// <remarks>The URL of the script.</remarks>
-			private string url;
+		/// <summary>Returns the scope object for this frame.</summary>
+		/// <remarks>Returns the scope object for this frame.</remarks>
+		public object Scope()
+		{
+			return scope;
+		}
 
-			/// <summary>Array indicating which lines can have breakpoints set.</summary>
-			/// <remarks>Array indicating which lines can have breakpoints set.</remarks>
-			private bool[] breakableLines;
+		/// <summary>Returns the 'this' object for this frame.</summary>
+		/// <remarks>Returns the 'this' object for this frame.</remarks>
+		public object ThisObj()
+		{
+			return thisObj;
+		}
 
-			/// <summary>Array indicating whether a breakpoint is set on the line.</summary>
-			/// <remarks>Array indicating whether a breakpoint is set on the line.</remarks>
-			private bool[] breakpoints;
+		/// <summary>Returns the source URL.</summary>
+		/// <remarks>Returns the source URL.</remarks>
+		public string GetUrl()
+		{
+			return fsource.SourceInfo.Url();
+		}
 
-			/// <summary>Array of FunctionSource objects for the functions in the script.</summary>
-			/// <remarks>Array of FunctionSource objects for the functions in the script.</remarks>
-			private Dim.FunctionSource[] functionSources;
+		/// <summary>Returns the current line number.</summary>
+		/// <remarks>Returns the current line number.</remarks>
+		public int GetLineNumber()
+		{
+			return lineNumber;
+		}
 
-			/// <summary>Creates a new SourceInfo object.</summary>
-			/// <remarks>Creates a new SourceInfo object.</remarks>
-			private SourceInfo(string source, DebuggableScript[] functions, string normilizedUrl)
+		/// <summary>Returns the current function name.</summary>
+		/// <remarks>Returns the current function name.</remarks>
+		public string GetFunctionName()
+		{
+			return fsource.Name;
+		}
+	}
+
+	/// <summary>Class to store information about a script source.</summary>
+	/// <remarks>Class to store information about a script source.</remarks>
+	public sealed class SourceInfo
+	{
+		/// <summary>An empty array of booleans.</summary>
+		/// <remarks>An empty array of booleans.</remarks>
+		private static readonly bool[] EMPTY_BOOLEAN_ARRAY = new bool[0];
+
+		/// <summary>The script.</summary>
+		/// <remarks>The script.</remarks>
+		private readonly string source;
+
+		/// <summary>The URL of the script.</summary>
+		/// <remarks>The URL of the script.</remarks>
+		private readonly string url;
+
+		/// <summary>Array indicating which lines can have breakpoints set.</summary>
+		/// <remarks>Array indicating which lines can have breakpoints set.</remarks>
+		private readonly bool[] breakableLines;
+
+		/// <summary>Array indicating whether a breakpoint is set on the line.</summary>
+		/// <remarks>Array indicating whether a breakpoint is set on the line.</remarks>
+		internal readonly bool[] breakpoints;
+
+		/// <summary>Array of FunctionSource objects for the functions in the script.</summary>
+		/// <remarks>Array of FunctionSource objects for the functions in the script.</remarks>
+		private readonly FunctionSource[] functionSources;
+
+		/// <summary>Creates a new SourceInfo object.</summary>
+		/// <remarks>Creates a new SourceInfo object.</remarks>
+		internal SourceInfo(string source, DebuggableScript[] functions, string normilizedUrl)
+		{
+			this.source = source;
+			this.url = normilizedUrl;
+			int N = functions.Length;
+			int[][] lineArrays = new int[N][];
+			for (int i = 0; i != N; ++i)
 			{
-				this.source = source;
-				this.url = normilizedUrl;
-				int N = functions.Length;
-				int[][] lineArrays = new int[N][];
-				for (int i = 0; i != N; ++i)
+				lineArrays[i] = functions[i].GetLineNumbers();
+			}
+			int minAll = 0;
+			int maxAll = -1;
+			int[] firstLines = new int[N];
+			for (int i_1 = 0; i_1 != N; ++i_1)
+			{
+				int[] lines = lineArrays[i_1];
+				if (lines == null || lines.Length == 0)
 				{
-					lineArrays[i] = functions[i].GetLineNumbers();
-				}
-				int minAll = 0;
-				int maxAll = -1;
-				int[] firstLines = new int[N];
-				for (int i_1 = 0; i_1 != N; ++i_1)
-				{
-					int[] lines = lineArrays[i_1];
-					if (lines == null || lines.Length == 0)
-					{
-						firstLines[i_1] = -1;
-					}
-					else
-					{
-						int min;
-						int max;
-						min = max = lines[0];
-						for (int j = 1; j != lines.Length; ++j)
-						{
-							int line = lines[j];
-							if (line < min)
-							{
-								min = line;
-							}
-							else
-							{
-								if (line > max)
-								{
-									max = line;
-								}
-							}
-						}
-						firstLines[i_1] = min;
-						if (minAll > maxAll)
-						{
-							minAll = min;
-							maxAll = max;
-						}
-						else
-						{
-							if (min < minAll)
-							{
-								minAll = min;
-							}
-							if (max > maxAll)
-							{
-								maxAll = max;
-							}
-						}
-					}
-				}
-				if (minAll > maxAll)
-				{
-					// No line information
-					this.breakableLines = EMPTY_BOOLEAN_ARRAY;
-					this.breakpoints = EMPTY_BOOLEAN_ARRAY;
+					firstLines[i_1] = -1;
 				}
 				else
 				{
-					if (minAll < 0)
+					int max;
+					int min = max = lines[0];
+					for (int j = 1; j != lines.Length; ++j)
 					{
-						// Line numbers can not be negative
-						throw new InvalidOperationException(minAll.ToString());
-					}
-					int linesTop = maxAll + 1;
-					this.breakableLines = new bool[linesTop];
-					this.breakpoints = new bool[linesTop];
-					for (int i_2 = 0; i_2 != N; ++i_2)
-					{
-						int[] lines = lineArrays[i_2];
-						if (lines != null && lines.Length != 0)
+						int line = lines[j];
+						if (line < min)
 						{
-							for (int j = 0; j != lines.Length; ++j)
+							min = line;
+						}
+						else
+						{
+							if (line > max)
 							{
-								int line = lines[j];
-								this.breakableLines[line] = true;
+								max = line;
 							}
 						}
 					}
-				}
-				this.functionSources = new Dim.FunctionSource[N];
-				for (int i_3 = 0; i_3 != N; ++i_3)
-				{
-					string name = functions[i_3].GetFunctionName();
-					if (name == null)
+					firstLines[i_1] = min;
+					if (minAll > maxAll)
 					{
-						name = string.Empty;
-					}
-					this.functionSources[i_3] = new Dim.FunctionSource(this, firstLines[i_3], name);
-				}
-			}
-
-			/// <summary>Returns the source text.</summary>
-			/// <remarks>Returns the source text.</remarks>
-			public virtual string Source()
-			{
-				return this.source;
-			}
-
-			/// <summary>Returns the script's origin URL.</summary>
-			/// <remarks>Returns the script's origin URL.</remarks>
-			public virtual string Url()
-			{
-				return this.url;
-			}
-
-			/// <summary>Returns the number of FunctionSource objects stored in this object.</summary>
-			/// <remarks>Returns the number of FunctionSource objects stored in this object.</remarks>
-			public virtual int FunctionSourcesTop()
-			{
-				return functionSources.Length;
-			}
-
-			/// <summary>Returns the FunctionSource object with the given index.</summary>
-			/// <remarks>Returns the FunctionSource object with the given index.</remarks>
-			public virtual Dim.FunctionSource FunctionSource(int i)
-			{
-				return functionSources[i];
-			}
-
-			/// <summary>
-			/// Copies the breakpoints from the given SourceInfo object into this
-			/// one.
-			/// </summary>
-			/// <remarks>
-			/// Copies the breakpoints from the given SourceInfo object into this
-			/// one.
-			/// </remarks>
-			private void CopyBreakpointsFrom(Dim.SourceInfo old)
-			{
-				int end = old.breakpoints.Length;
-				if (end > this.breakpoints.Length)
-				{
-					end = this.breakpoints.Length;
-				}
-				for (int line = 0; line != end; ++line)
-				{
-					if (old.breakpoints[line])
-					{
-						this.breakpoints[line] = true;
-					}
-				}
-			}
-
-			/// <summary>
-			/// Returns whether the given line number can have a breakpoint set on
-			/// it.
-			/// </summary>
-			/// <remarks>
-			/// Returns whether the given line number can have a breakpoint set on
-			/// it.
-			/// </remarks>
-			public virtual bool BreakableLine(int line)
-			{
-				return (line < this.breakableLines.Length) && this.breakableLines[line];
-			}
-
-			/// <summary>Returns whether there is a breakpoint set on the given line.</summary>
-			/// <remarks>Returns whether there is a breakpoint set on the given line.</remarks>
-			public virtual bool Breakpoint(int line)
-			{
-				if (!BreakableLine(line))
-				{
-					throw new ArgumentException(line.ToString());
-				}
-				return line < this.breakpoints.Length && this.breakpoints[line];
-			}
-
-			/// <summary>Sets or clears the breakpoint flag for the given line.</summary>
-			/// <remarks>Sets or clears the breakpoint flag for the given line.</remarks>
-			public virtual bool Breakpoint(int line, bool value)
-			{
-				if (!BreakableLine(line))
-				{
-					throw new ArgumentException(line.ToString());
-				}
-				bool changed;
-				lock (breakpoints)
-				{
-					if (breakpoints[line] != value)
-					{
-						breakpoints[line] = value;
-						changed = true;
+						minAll = min;
+						maxAll = max;
 					}
 					else
 					{
-						changed = false;
+						if (min < minAll)
+						{
+							minAll = min;
+						}
+						if (max > maxAll)
+						{
+							maxAll = max;
+						}
 					}
 				}
-				return changed;
 			}
-
-			/// <summary>Removes all breakpoints from the script.</summary>
-			/// <remarks>Removes all breakpoints from the script.</remarks>
-			public virtual void RemoveAllBreakpoints()
+			if (minAll > maxAll)
 			{
-				lock (breakpoints)
+				// No line information
+				this.breakableLines = EMPTY_BOOLEAN_ARRAY;
+				this.breakpoints = EMPTY_BOOLEAN_ARRAY;
+			}
+			else
+			{
+				if (minAll < 0)
 				{
-					for (int line = 0; line != breakpoints.Length; ++line)
+					// Line numbers can not be negative
+					throw new InvalidOperationException(minAll.ToString());
+				}
+				int linesTop = maxAll + 1;
+				this.breakableLines = new bool[linesTop];
+				this.breakpoints = new bool[linesTop];
+				for (int i_2 = 0; i_2 != N; ++i_2)
+				{
+					int[] lines = lineArrays[i_2];
+					if (lines != null && lines.Length != 0)
 					{
-						breakpoints[line] = false;
+						for (int j = 0; j != lines.Length; ++j)
+						{
+							int line = lines[j];
+							this.breakableLines[line] = true;
+						}
 					}
+				}
+			}
+			this.functionSources = new FunctionSource[N];
+			for (int i_3 = 0; i_3 != N; ++i_3)
+			{
+				string name = functions[i_3].GetFunctionName();
+				if (name == null)
+				{
+					name = String.Empty;
+				}
+				this.functionSources[i_3] = new FunctionSource(this, firstLines[i_3], name);
+			}
+		}
+
+		/// <summary>Returns the source text.</summary>
+		/// <remarks>Returns the source text.</remarks>
+		public string Source()
+		{
+			return source;
+		}
+
+		/// <summary>Returns the script's origin URL.</summary>
+		/// <remarks>Returns the script's origin URL.</remarks>
+		public string Url()
+		{
+			return url;
+		}
+
+		/// <summary>Returns the number of FunctionSource objects stored in this object.</summary>
+		/// <remarks>Returns the number of FunctionSource objects stored in this object.</remarks>
+		public int FunctionSourcesTop()
+		{
+			return functionSources.Length;
+		}
+
+		/// <summary>Returns the FunctionSource object with the given index.</summary>
+		/// <remarks>Returns the FunctionSource object with the given index.</remarks>
+		public FunctionSource GetFunctionSource(int i)
+		{
+			return functionSources[i];
+		}
+
+		/// <summary>
+		/// Copies the breakpoints from the given SourceInfo object into this
+		/// one.
+		/// </summary>
+		/// <remarks>
+		/// Copies the breakpoints from the given SourceInfo object into this
+		/// one.
+		/// </remarks>
+		internal void CopyBreakpointsFrom(SourceInfo old)
+		{
+			int end = old.breakpoints.Length;
+			if (end > breakpoints.Length)
+			{
+				end = breakpoints.Length;
+			}
+			for (int line = 0; line != end; ++line)
+			{
+				if (old.breakpoints[line])
+				{
+					breakpoints[line] = true;
 				}
 			}
 		}
+
+		/// <summary>
+		/// Returns whether the given line number can have a breakpoint set on
+		/// it.
+		/// </summary>
+		/// <remarks>
+		/// Returns whether the given line number can have a breakpoint set on
+		/// it.
+		/// </remarks>
+		public bool BreakableLine(int line)
+		{
+			return (line < breakableLines.Length) && breakableLines[line];
+		}
+
+		/// <summary>Returns whether there is a breakpoint set on the given line.</summary>
+		/// <remarks>Returns whether there is a breakpoint set on the given line.</remarks>
+		public bool Breakpoint(int line)
+		{
+			if (!BreakableLine(line))
+			{
+				throw new ArgumentException(line.ToString());
+			}
+			return line < breakpoints.Length && breakpoints[line];
+		}
+
+		/// <summary>Sets or clears the breakpoint flag for the given line.</summary>
+		/// <remarks>Sets or clears the breakpoint flag for the given line.</remarks>
+		public bool Breakpoint(int line, bool value)
+		{
+			if (!BreakableLine(line))
+			{
+				throw new ArgumentException(line.ToString());
+			}
+			bool changed;
+			lock (breakpoints)
+			{
+				if (breakpoints[line] != value)
+				{
+					breakpoints[line] = value;
+					changed = true;
+				}
+				else
+				{
+					changed = false;
+				}
+			}
+			return changed;
+		}
+
+		/// <summary>Removes all breakpoints from the script.</summary>
+		/// <remarks>Removes all breakpoints from the script.</remarks>
+		public void RemoveAllBreakpoints()
+		{
+			lock (breakpoints)
+			{
+				for (int line = 0; line != breakpoints.Length; ++line)
+				{
+					breakpoints[line] = false;
+				}
+			}
+		}
+	}
+
+	/// <summary>Class to store information about a function.</summary>
+	public sealed class FunctionSource
+	{
+		/// <summary>Creates a new FunctionSource.</summary>
+		internal FunctionSource(SourceInfo sourceInfo, int firstLine, string name)
+		{
+			if (name == null)
+				throw new ArgumentException();
+			SourceInfo = sourceInfo;
+			FirstLine = firstLine;
+			Name = name;
+		}
+
+		/// <summary> Returns the SourceInfo object that describes the source of the function. </summary>
+		public SourceInfo SourceInfo { get; private set; }
+
+		/// <summary>Returns the line number of the first line of the function.</summary>
+		public int FirstLine { get; private set; }
+
+		/// <summary>Returns the name of the function.</summary>
+		public string Name { get; private set; }
 	}
 }

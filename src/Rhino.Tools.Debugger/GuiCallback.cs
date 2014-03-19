@@ -20,11 +20,11 @@ namespace Rhino.Tools.Debugger
 	{
 		/// <summary>Called when the source text of some script has been changed.</summary>
 		/// <remarks>Called when the source text of some script has been changed.</remarks>
-		void UpdateSourceText(Dim.SourceInfo sourceInfo);
+		void UpdateSourceText(SourceInfo sourceInfo);
 
 		/// <summary>Called when the interrupt loop has been entered.</summary>
 		/// <remarks>Called when the interrupt loop has been entered.</remarks>
-		void EnterInterrupt(Dim.StackFrame lastFrame, string threadTitle, string alertMessage);
+		void EnterInterrupt(StackFrame lastFrame, string threadTitle, string alertMessage);
 
 		/// <summary>Returns whether the current thread is the GUI's event thread.</summary>
 		/// <remarks>

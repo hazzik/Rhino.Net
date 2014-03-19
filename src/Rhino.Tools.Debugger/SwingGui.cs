@@ -468,7 +468,7 @@ namespace Rhino.Tools.Debugger
 			FileWindow w = GetFileWindow(sourceUrl);
 			if (w == null)
 			{
-				Dim.SourceInfo si = dim.SourceInfo(sourceUrl);
+				SourceInfo si = dim.SourceInfo(sourceUrl);
 				CreateFileWindow(si, -1);
 				w = GetFileWindow(sourceUrl);
 			}
@@ -503,7 +503,7 @@ namespace Rhino.Tools.Debugger
 		/// <see cref="FileWindow">FileWindow</see>
 		/// for the given source.
 		/// </summary>
-		protected internal virtual void CreateFileWindow(Dim.SourceInfo sourceInfo, int line)
+		protected internal virtual void CreateFileWindow(SourceInfo sourceInfo, int line)
 		{
 			bool activate = true;
 			string url = sourceInfo.Url();
@@ -567,7 +567,7 @@ namespace Rhino.Tools.Debugger
 		/// for the given source exists
 		/// and could be updated, false otherwise.
 		/// </returns>
-		protected internal virtual bool UpdateFileWindow(Dim.SourceInfo sourceInfo)
+		protected internal virtual bool UpdateFileWindow(SourceInfo sourceInfo)
 		{
 			string fileName = sourceInfo.Url();
 			FileWindow w = GetFileWindow(fileName);
@@ -646,7 +646,7 @@ namespace Rhino.Tools.Debugger
 				MessageDialogWrapper.ShowMessageDialog(this, alertMessage, "Exception in Script", JOptionPane.ERROR_MESSAGE);
 			}
 			UpdateEnabled(true);
-			Dim.ContextData contextData = lastFrame.ContextData();
+			ContextData contextData = lastFrame.ContextData();
 			JComboBox ctx = context.context;
 			IList<string> toolTips = context.toolTips;
 			context.DisableUpdate();
@@ -837,7 +837,7 @@ namespace Rhino.Tools.Debugger
 		// GuiCallback
 		/// <summary>Called when the source text for a script has been updated.</summary>
 		/// <remarks>Called when the source text for a script has been updated.</remarks>
-		public virtual void UpdateSourceText(Dim.SourceInfo sourceInfo)
+		public virtual void UpdateSourceText(SourceInfo sourceInfo)
 		{
 			RunProxy proxy = new RunProxy(this, RunProxy.UPDATE_SOURCE_TEXT);
 			proxy.sourceInfo = sourceInfo;
@@ -2209,12 +2209,12 @@ namespace Rhino.Tools.Debugger
 						return;
 					}
 					SetVisible(false);
-					Dim.FunctionSource item = debugGui.dim.FunctionSourceByName(value);
+					FunctionSource item = debugGui.dim.FunctionSourceByName(value);
 					if (item != null)
 					{
-						Dim.SourceInfo si = item.SourceInfo();
+						SourceInfo si = item.SourceInfo;
 						string url = si.Url();
-						int lineNumber = item.FirstLine();
+						int lineNumber = item.FirstLine;
 						debugGui.ShowFileWindow(url, lineNumber);
 					}
 				}
@@ -2430,7 +2430,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>The SourceInfo object that describes the file.</summary>
 		/// <remarks>The SourceInfo object that describes the file.</remarks>
-		private Dim.SourceInfo sourceInfo;
+		private SourceInfo sourceInfo;
 
 		/// <summary>The FileTextArea that displays the file.</summary>
 		/// <remarks>The FileTextArea that displays the file.</remarks>
@@ -2534,7 +2534,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Creates a new FileWindow.</summary>
 		/// <remarks>Creates a new FileWindow.</remarks>
-		public FileWindow(SwingGui debugGui, Dim.SourceInfo sourceInfo) : base(SwingGui.GetShortName(sourceInfo.Url()), true, true, true, true)
+		public FileWindow(SwingGui debugGui, SourceInfo sourceInfo) : base(SwingGui.GetShortName(sourceInfo.Url()), true, true, true, true)
 		{
 			this.debugGui = debugGui;
 			this.sourceInfo = sourceInfo;
@@ -2588,7 +2588,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>Called when the text of the script has changed.</summary>
 		/// <remarks>Called when the text of the script has changed.</remarks>
-		public virtual void UpdateText(Dim.SourceInfo sourceInfo)
+		public virtual void UpdateText(SourceInfo sourceInfo)
 		{
 			this.sourceInfo = sourceInfo;
 			string newText = sourceInfo.Source();
@@ -3660,7 +3660,7 @@ namespace Rhino.Tools.Debugger
 			}
 			if (e.GetActionCommand().Equals("ContextSwitch"))
 			{
-				Dim.ContextData contextData = debugGui.dim.CurrentContextData();
+				ContextData contextData = debugGui.dim.CurrentContextData();
 				if (contextData == null)
 				{
 					return;
@@ -4032,7 +4032,7 @@ namespace Rhino.Tools.Debugger
 
 		/// <summary>The source for which to update the text.</summary>
 		/// <remarks>The source for which to update the text.</remarks>
-		internal Dim.SourceInfo sourceInfo;
+		internal SourceInfo sourceInfo;
 
 		/// <summary>The frame to interrupt in.</summary>
 		/// <remarks>The frame to interrupt in.</remarks>
