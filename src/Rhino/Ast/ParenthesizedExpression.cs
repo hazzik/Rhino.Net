@@ -44,7 +44,7 @@ namespace Rhino.Ast
 			}
 		}
 
-		public ParenthesizedExpression(AstNode expr) : this(expr != null ? expr.GetPosition() : 0, expr != null ? expr.GetLength() : 1, expr)
+		public ParenthesizedExpression(AstNode expr) : this(expr != null ? expr.Position : 0, expr != null ? expr.GetLength() : 1, expr)
 		{
 		}
 

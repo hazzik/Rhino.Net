@@ -174,16 +174,11 @@ namespace Rhino.Ast
 			length = len;
 		}
 
-		/// <summary>Returns relative position in parent</summary>
-		public virtual int GetPosition()
+		/// <summary>Gets or sets relative position in parent</summary>
+		public virtual int Position
 		{
-			return position;
-		}
-
-		/// <summary>Sets relative position in parent</summary>
-		public virtual void SetPosition(int position)
-		{
-			this.position = position;
+			get { return position; }
+			set { position = value; }
 		}
 
 		/// <summary>Returns the absolute document position of the node.</summary>
@@ -198,7 +193,7 @@ namespace Rhino.Ast
 			AstNode parent = this.parent;
 			while (parent != null)
 			{
-				pos += parent.GetPosition();
+				pos += parent.Position;
 				parent = parent.GetParent();
 			}
 			return pos;
@@ -227,7 +222,7 @@ namespace Rhino.Ast
 		/// </remarks>
 		public virtual void SetBounds(int position, int end)
 		{
-			SetPosition(position);
+			Position = position;
 			SetLength(end - position);
 		}
 
@@ -275,12 +270,12 @@ namespace Rhino.Ast
 			// Convert position back to absolute.
 			if (this.parent != null)
 			{
-				SetRelative(-this.parent.GetPosition());
+				SetRelative(-this.parent.Position);
 			}
 			this.parent = parent;
 			if (parent != null)
 			{
-				SetRelative(parent.GetPosition());
+				SetRelative(parent.Position);
 			}
 		}
 
@@ -299,8 +294,8 @@ namespace Rhino.Ast
 		public virtual void AddChild(AstNode kid)
 		{
 			AssertNotNull(kid);
-			int end = kid.GetPosition() + kid.GetLength();
-			SetLength(end - this.GetPosition());
+			int end = kid.Position + kid.GetLength();
+			SetLength(end - this.Position);
 			AddChildToBack(kid);
 			kid.SetParent(this);
 		}
@@ -718,7 +713,7 @@ namespace Rhino.Ast
 				buffer.Append(node.GetAbsolutePosition()).Append("\t");
 				buffer.Append(MakeIndent(node.Depth()));
 				buffer.Append(name).Append(" ");
-				buffer.Append(node.GetPosition()).Append(" ");
+				buffer.Append(node.Position).Append(" ");
 				buffer.Append(node.GetLength());
 				if (tt == Token.NAME)
 				{

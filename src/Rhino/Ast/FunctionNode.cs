@@ -274,7 +274,7 @@ namespace Rhino.Ast
 			{
 				SetIsExpressionClosure(true);
 			}
-			int absEnd = body.GetPosition() + body.GetLength();
+			int absEnd = body.Position + body.GetLength();
 			body.SetParent(this);
 			this.SetLength(absEnd - this.position);
 			SetEncodedSourceBounds(this.position, absEnd);

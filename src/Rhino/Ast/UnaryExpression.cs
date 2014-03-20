@@ -86,9 +86,9 @@ namespace Rhino.Ast
 		public UnaryExpression(int @operator, int operatorPosition, AstNode operand, bool postFix)
 		{
 			AssertNotNull(operand);
-			int beg = postFix ? operand.GetPosition() : operatorPosition;
+			int beg = postFix ? operand.Position : operatorPosition;
 			// JavaScript only has ++ and -- postfix operators, so length is 2
-			int end = postFix ? operatorPosition + 2 : operand.GetPosition() + operand.GetLength();
+			int end = postFix ? operatorPosition + 2 : operand.Position + operand.GetLength();
 			SetBounds(beg, end);
 			SetOperator(@operator);
 			SetOperand(operand);

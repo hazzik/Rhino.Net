@@ -288,7 +288,7 @@ namespace Rhino
 		// is only true before the node is added to its parent.
 		private int GetNodeEnd(AstNode n)
 		{
-			return n.GetPosition() + n.GetLength();
+			return n.Position + n.GetLength();
 		}
 
 		private void RecordComment(int lineno, string comment)
@@ -517,7 +517,7 @@ namespace Rhino
 				// before parsing the children.  In order for the child node offsets
 				// to be correct, we adjust the loop's reported position back to an
 				// absolute source offset, and restore it when we call exitLoop().
-				loop.SetRelative(-currentLabel.GetPosition());
+				loop.SetRelative(-currentLabel.Position);
 			}
 		}
 
@@ -530,7 +530,7 @@ namespace Rhino
 			if (loop.GetParent() != null)
 			{
 				// see comment in enterLoop
-				loop.SetRelative(loop.GetParent().GetPosition());
+				loop.SetRelative(loop.GetParent().Position);
 			}
 			PopScope();
 		}
@@ -843,7 +843,7 @@ bodyLoop_break: ;
 		{
 			if (MatchToken(Token.RP))
 			{
-				fnNode.SetRp(ts.tokenBeg - fnNode.GetPosition());
+				fnNode.SetRp(ts.tokenBeg - fnNode.Position);
 				return;
 			}
 			// Would prefer not to call createDestructuringAssignment until codegen,
@@ -909,7 +909,7 @@ bodyLoop_break: ;
 			}
 			if (MustMatchToken(Token.RP, "msg.no.paren.after.parms"))
 			{
-				fnNode.SetRp(ts.tokenBeg - fnNode.GetPosition());
+				fnNode.SetRp(ts.tokenBeg - fnNode.Position);
 			}
 		}
 
@@ -1078,7 +1078,7 @@ bodyLoop_break: ;
 			// warning if the condition is parenthesized, like "if ((a = 7)) ...".
 			if (data.condition is Assignment)
 			{
-				AddStrictWarning("msg.equal.as.assign", string.Empty, data.condition.GetPosition(), data.condition.GetLength());
+				AddStrictWarning("msg.equal.as.assign", string.Empty, data.condition.Position, data.condition.GetLength());
 			}
 			return data;
 		}
@@ -1094,7 +1094,7 @@ bodyLoop_break: ;
 				{
 					if (compilerEnv.IsStrictMode() && !pn.HasSideEffects())
 					{
-						int beg = pn.GetPosition();
+						int beg = pn.Position;
 						beg = Math.Max(beg, LineBeginningFor(beg));
 						AddStrictWarning(pn is EmptyStatement ? "msg.extra.trailing.semi" : "msg.no.side.effects", string.Empty, beg, NodeEnd(pn) - beg);
 					}
@@ -1293,7 +1293,7 @@ guessingStatementEnd_break: ;
 		private void AutoInsertSemicolon(AstNode pn)
 		{
 			int ttFlagged = PeekFlaggedToken();
-			int pos = pn.GetPosition();
+			int pos = pn.Position;
 			switch (ttFlagged & CLEAR_TI_MASK)
 			{
 				case Token.SEMI:
@@ -2181,7 +2181,7 @@ switchLoop_break: ;
 						Label dup = ls.GetLabelByName(name);
 						ReportError("msg.dup.label", dup.GetAbsolutePosition(), dup.GetLength());
 					}
-					ReportError("msg.dup.label", label.GetPosition(), label.GetLength());
+					ReportError("msg.dup.label", label.Position, label.GetLength());
 				}
 			}
 			bundle.AddLabel(label);
@@ -2502,7 +2502,7 @@ switchLoop_break: ;
 		private AstNode Expr()
 		{
 			AstNode pn = AssignExpr();
-			int pos = pn.GetPosition();
+			int pos = pn.Position;
 			while (MatchToken(Token.COMMA))
 			{
 				int opPos = ts.tokenBeg;
@@ -2582,7 +2582,7 @@ switchLoop_break: ;
 					colonPos = ts.tokenBeg;
 				}
 				AstNode ifFalse = AssignExpr();
-				int beg = pn.GetPosition();
+				int beg = pn.Position;
 				int len = GetNodeEnd(ifFalse) - beg;
 				ConditionalExpression ce = new ConditionalExpression(beg, len);
 				ce.SetLineno(line);
@@ -3069,7 +3069,7 @@ switchLoop_break: ;
 			{
 				CodeBug();
 			}
-			int pos = pn.GetPosition();
+			int pos = pn.Position;
 			int lineno;
 			for (; ; )
 			{
@@ -3261,8 +3261,8 @@ tailLoop_break: ;
 			{
 				result.SetType(Token.DOT);
 			}
-			int pos = pn.GetPosition();
-			result.SetPosition(pos);
+			int pos = pn.Position;
+			result.Position = pos;
 			result.SetLength(GetNodeEnd(@ref) - pos);
 			result.SetOperatorPosition(dotPos - pos);
 			result.SetLineno(pn.GetLineno());
@@ -3575,7 +3575,7 @@ tailLoop_break: ;
 					pn.SetJsDocNode(jsdocNode);
 				}
 				MustMatchToken(Token.RP, "msg.no.paren");
-				pn.SetLength(ts.tokenEnd - pn.GetPosition());
+				pn.SetLength(ts.tokenEnd - pn.Position);
 				pn.SetLineno(lineno);
 				return pn;
 			}
@@ -4146,7 +4146,7 @@ commaLoop_break: ;
 				{
 					ReportError("msg.bad.object.init");
 				}
-				AstNode nn = new Name(property.GetPosition(), property.GetString());
+				AstNode nn = new Name(property.Position, property.GetString());
 				ObjectProperty pn = new ObjectProperty();
 				pn.PutProp(Node.DESTRUCTURING_SHORTHAND, true);
 				pn.SetLeftAndRight(property, nn);
@@ -4320,7 +4320,7 @@ commaLoop_break: ;
 		// Return end of node.  Assumes node does NOT have a parent yet.
 		private int NodeEnd(AstNode node)
 		{
-			return node.GetPosition() + node.GetLength();
+			return node.Position + node.GetLength();
 		}
 
 		private void SaveNameTokenData(int pos, string name, int lineno)
@@ -4404,7 +4404,7 @@ commaLoop_break: ;
 				if (elems.Count > 0)
 				{
 					object foo = elems[0];
-					pos = ((AstNode) foo).GetPosition();
+					pos = ((AstNode) foo).Position;
 				}
 				pos = Math.Max(pos, LineBeginningFor(commaPos));
 				AddWarning("msg.extra.trailing.comma", pos, commaPos - pos);

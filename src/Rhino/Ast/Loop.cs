@@ -48,8 +48,8 @@ namespace Rhino.Ast
 		public virtual void SetBody(AstNode body)
 		{
 			this.body = body;
-			int end = body.GetPosition() + body.GetLength();
-			this.SetLength(end - this.GetPosition());
+			int end = body.Position + body.GetLength();
+			this.SetLength(end - this.Position);
 			body.SetParent(this);
 		}
 

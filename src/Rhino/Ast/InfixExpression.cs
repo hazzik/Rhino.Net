@@ -67,7 +67,7 @@ namespace Rhino.Ast
 		public InfixExpression(int @operator, AstNode left, AstNode right, int operatorPos)
 		{
 			SetType(@operator);
-			SetOperatorPosition(operatorPos - left.GetPosition());
+			SetOperatorPosition(operatorPos - left.Position);
 			SetLeftAndRight(left, right);
 		}
 
@@ -76,8 +76,8 @@ namespace Rhino.Ast
 			AssertNotNull(left);
 			AssertNotNull(right);
 			// compute our bounds while children have absolute positions
-			int beg = left.GetPosition();
-			int end = right.GetPosition() + right.GetLength();
+			int beg = left.Position;
+			int end = right.Position + right.GetLength();
 			SetBounds(beg, end);
 			// this updates their positions to be parent-relative
 			SetLeft(left);

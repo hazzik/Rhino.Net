@@ -155,8 +155,8 @@ namespace Rhino.Ast
 			{
 				statements = new List<AstNode>();
 			}
-			int end = statement.GetPosition() + statement.GetLength();
-			this.SetLength(end - this.GetPosition());
+			int end = statement.Position + statement.GetLength();
+			this.SetLength(end - this.Position);
 			statements.Add(statement);
 			statement.SetParent(this);
 		}
