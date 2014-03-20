@@ -2497,7 +2497,7 @@ retry_break: ;
 				}
 			}
 			int n = sourceReader.Read(sourceBuffer, sourceEnd, sourceBuffer.Length - sourceEnd);
-			if (n < 0)
+			if (n <= 0)
 			{
 				return false;
 			}

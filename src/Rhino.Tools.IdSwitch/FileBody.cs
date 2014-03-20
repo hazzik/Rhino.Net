@@ -62,7 +62,7 @@ namespace Rhino.Tools.Idswitch
 			for (; ; )
 			{
 				int n_read = r.Read(buffer, offset, capacity - offset);
-				if (n_read < 0)
+				if (n_read <= 0)
 				{
 					break;
 				}

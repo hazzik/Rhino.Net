@@ -1161,7 +1161,7 @@ namespace Rhino.Tools.Shell
 							break;
 						}
 					}
-					if (n < 0)
+					if (n <= 0)
 					{
 						break;
 					}
