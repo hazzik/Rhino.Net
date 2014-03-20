@@ -1672,7 +1672,7 @@ namespace Rhino
 			if (functionType == FunctionNode.FUNCTION_EXPRESSION)
 			{
 				Name name = fnNode.GetFunctionName();
-				if (name != null && name.Length() != 0 && fnNode.GetSymbol(name.GetIdentifier()) == null)
+				if (name != null && name.IdentifierLength() != 0 && fnNode.GetSymbol(name.GetIdentifier()) == null)
 				{
 					// A function expression needs to have its name as a
 					// variable (if it isn't already allocated as a variable).

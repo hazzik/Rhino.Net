@@ -190,7 +190,7 @@ namespace Rhino.Ast
 		/// method, which returns the range of
 		/// characters that this node overlaps in the source input.
 		/// </summary>
-		public virtual int Length()
+		public virtual int IdentifierLength()
 		{
 			return identifier == null ? 0 : identifier.Length;
 		}

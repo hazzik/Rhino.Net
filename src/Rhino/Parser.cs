@@ -968,7 +968,7 @@ bodyLoop_break: ;
 			{
 				syntheticType = FunctionNode.FUNCTION_EXPRESSION;
 			}
-			if (syntheticType != FunctionNode.FUNCTION_EXPRESSION && name != null && name.Length() > 0)
+			if (syntheticType != FunctionNode.FUNCTION_EXPRESSION && name != null && name.IdentifierLength() > 0)
 			{
 				// Function statements define a symbol in the enclosing scope
 				DefineSymbol(Token.FUNCTION, name.GetIdentifier());
@@ -989,7 +989,7 @@ bodyLoop_break: ;
 				fnNode.SetLength(ts.tokenEnd - functionSourceStart);
 				if (compilerEnv.IsStrictMode() && !fnNode.GetBody().HasConsistentReturnUsage())
 				{
-					string msg = (name != null && name.Length() > 0) ? "msg.no.return.value" : "msg.anon.no.return.value";
+					string msg = (name != null && name.IdentifierLength() > 0) ? "msg.no.return.value" : "msg.anon.no.return.value";
 					AddStrictWarning(msg, name == null ? string.Empty : name.GetIdentifier());
 				}
 			}
@@ -2086,7 +2086,7 @@ switchLoop_break: ;
 			if (InsideFunction() && NowAllSet(before, endFlags, Node.END_YIELDS | Node.END_RETURNS_VALUE))
 			{
 				Name name = ((FunctionNode)currentScriptOrFn).GetFunctionName();
-				if (name == null || name.Length() == 0)
+				if (name == null || name.IdentifierLength() == 0)
 				{
 					AddError("msg.anon.generator.returns", string.Empty);
 				}
@@ -4165,7 +4165,7 @@ commaLoop_break: ;
 			FunctionNode fn = Function(FunctionNode.FUNCTION_EXPRESSION);
 			// We've already parsed the function name, so fn should be anonymous.
 			Name name = fn.GetFunctionName();
-			if (name != null && name.Length() != 0)
+			if (name != null && name.IdentifierLength() != 0)
 			{
 				ReportError("msg.bad.prop");
 			}
