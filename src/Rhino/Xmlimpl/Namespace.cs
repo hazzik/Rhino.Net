@@ -336,7 +336,7 @@ L0_break: ;
 
 		internal virtual Namespace NewNamespace(string uri)
 		{
-			Namespace prototype = (this.prototype == null) ? this : this.prototype;
+			Namespace prototype = this.prototype ?? this;
 			return Create(this.ParentScope, prototype, XmlNode.Namespace.Create(uri));
 		}
 
@@ -346,7 +346,7 @@ L0_break: ;
 			{
 				return NewNamespace(uri);
 			}
-			Namespace prototype = (this.prototype == null) ? this : this.prototype;
+			Namespace prototype = this.prototype ?? this;
 			return Create(this.ParentScope, prototype, XmlNode.Namespace.Create(prefix, uri));
 		}
 

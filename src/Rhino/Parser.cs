@@ -1034,7 +1034,7 @@ bodyLoop_break: ;
 				CodeBug();
 			}
 			int pos = ts.tokenBeg;
-			AstNode block = parent != null ? parent : new Block(pos);
+			AstNode block = parent ?? new Block(pos);
 			block.SetLineno(ts.lineno);
 			int tt;
 			while ((tt = PeekToken()) > Token.EOF && tt != Token.RC)
@@ -1349,7 +1349,7 @@ guessingStatementEnd_break: ;
 				elsePos = ts.tokenBeg - pos;
 				ifFalse = Statement();
 			}
-			int end = GetNodeEnd(ifFalse != null ? ifFalse : ifTrue);
+			int end = GetNodeEnd(ifFalse ?? ifTrue);
 			IfStatement pn = new IfStatement(pos, end - pos);
 			pn.SetCondition(data.condition);
 			pn.SetParens(data.lp - pos, data.rp - pos);

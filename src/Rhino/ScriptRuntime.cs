@@ -339,7 +339,8 @@ namespace Rhino
 				}
 				if (val is Scriptable)
 				{
-					if (val is ScriptableObject && ((ScriptableObject)val).AvoidObjectDetection())
+					var so = val as ScriptableObject;
+					if (so != null && so.AvoidObjectDetection())
 					{
 						return false;
 					}

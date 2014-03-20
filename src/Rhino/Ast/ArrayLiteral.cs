@@ -79,7 +79,7 @@ namespace Rhino.Ast
 		/// </returns>
 		public virtual IList<AstNode> GetElements()
 		{
-			return elements != null ? elements : NO_ELEMS;
+			return elements ?? NO_ELEMS;
 		}
 
 		/// <summary>Sets the element list, and sets each element's parent to this node.</summary>

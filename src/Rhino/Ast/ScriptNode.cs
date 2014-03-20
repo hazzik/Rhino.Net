@@ -231,7 +231,7 @@ namespace Rhino.Ast
 
 		public virtual IList<FunctionNode> GetFunctions()
 		{
-			return functions == null ? EMPTY_LIST : functions;
+			return functions ?? EMPTY_LIST;
 		}
 
 		/// <summary>

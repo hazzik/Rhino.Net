@@ -1898,7 +1898,7 @@ namespace Rhino
 			{
 				attributes |= PropertyAttributes.READONLY;
 			}
-			DefineProperty(propertyName, null, getter, setter == null ? null : setter, attributes);
+			DefineProperty(propertyName, null, getter, setter, attributes);
 		}
 
 		/// <summary>Define a JavaScript property.</summary>

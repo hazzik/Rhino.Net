@@ -165,7 +165,7 @@ namespace Rhino.Ast
 		/// </returns>
 		public virtual IList<AstNode> GetParams()
 		{
-			return @params != null ? @params : NO_PARAMS;
+			return @params ?? NO_PARAMS;
 		}
 
 		/// <summary>

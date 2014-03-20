@@ -39,7 +39,7 @@ namespace Rhino
 			this.function = function;
 			ParentScope = scope;
 			// leave prototype null
-			this.originalArgs = (args == null) ? ScriptRuntime.emptyArgs : args;
+			this.originalArgs = args ?? ScriptRuntime.emptyArgs;
 			// initialize values of arguments
 			int paramAndVarCount = function.GetParamAndVarCount();
 			int paramCount = function.GetParamCount();

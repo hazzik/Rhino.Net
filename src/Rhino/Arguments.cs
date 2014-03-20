@@ -357,7 +357,7 @@ L0_break: ;
 
 				case Id_caller:
 				{
-					callerObj = (value != null) ? value : UniqueTag.NULL_VALUE;
+					callerObj = value ?? UniqueTag.NULL_VALUE;
 					return;
 				}
 

@@ -86,7 +86,7 @@ namespace Rhino.Ast
 		/// </summary>
 		public virtual IList<CatchClause> GetCatchClauses()
 		{
-			return catchClauses != null ? catchClauses : NO_CATCHES;
+			return catchClauses ?? NO_CATCHES;
 		}
 
 		/// <summary>

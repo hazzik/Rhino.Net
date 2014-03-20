@@ -86,7 +86,7 @@ namespace Rhino.Ast
 
 		public override string ToSource(int depth)
 		{
-			return MakeIndent(depth) + "/" + value + "/" + (flags == null ? string.Empty : flags);
+			return MakeIndent(depth) + "/" + value + "/" + (flags ?? string.Empty);
 		}
 
 		/// <summary>Visits this node.</summary>

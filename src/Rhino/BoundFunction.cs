@@ -56,7 +56,7 @@ namespace Rhino
 
 		public override object Call(Context cx, Scriptable scope, Scriptable thisObj, object[] extraArgs)
 		{
-			Scriptable callThis = boundThis != null ? boundThis : ScriptRuntime.GetTopCallScope(cx);
+			Scriptable callThis = boundThis ?? ScriptRuntime.GetTopCallScope(cx);
 			return targetFunction.Call(cx, scope, callThis, Concat(boundArgs, extraArgs));
 		}
 

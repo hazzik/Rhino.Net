@@ -160,7 +160,7 @@ namespace Rhino
 
 		public override string FunctionName
 		{
-			get { return (functionName == null) ? string.Empty : functionName; }
+			get { return functionName ?? string.Empty; }
 		}
 
 		public Exception Unknown()

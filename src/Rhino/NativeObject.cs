@@ -412,7 +412,7 @@ namespace Rhino
 					object nameArg = args.Length < 2 ? Undefined.instance : args[1];
 					string name = ScriptRuntime.ToString(nameArg);
 					Scriptable desc = obj.GetOwnPropertyDescriptor(cx, name);
-					return desc == null ? Undefined.instance : desc;
+					return desc ?? Undefined.instance;
 				}
 
 				case ConstructorId_defineProperty:

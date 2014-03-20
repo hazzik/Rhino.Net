@@ -197,7 +197,7 @@ namespace Rhino.Ast
 
 		public override string ToSource(int depth)
 		{
-			return MakeIndent(depth) + (identifier == null ? "<null>" : identifier);
+			return MakeIndent(depth) + (identifier ?? "<null>");
 		}
 
 		/// <summary>Visits this node.</summary>

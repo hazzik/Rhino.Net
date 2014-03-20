@@ -86,7 +86,7 @@ namespace Rhino.Ast
 		/// </returns>
 		public virtual IList<AstNode> GetArguments()
 		{
-			return arguments != null ? arguments : NO_ARGS;
+			return arguments ?? NO_ARGS;
 		}
 
 		/// <summary>Sets function argument list</summary>

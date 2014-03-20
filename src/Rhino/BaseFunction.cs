@@ -277,7 +277,7 @@ L0_break: ;
 				{
 					if ((prototypePropertyAttributes & PropertyAttributes.READONLY) == 0)
 					{
-						prototypeProperty = (value != null) ? value : UniqueTag.NULL_VALUE;
+						prototypeProperty = value ?? UniqueTag.NULL_VALUE;
 					}
 					return;
 				}
@@ -488,7 +488,7 @@ L0_break: ;
 			{
 				throw new InvalidOperationException();
 			}
-			prototypeProperty = (value != null) ? value : UniqueTag.NULL_VALUE;
+			prototypeProperty = value ?? UniqueTag.NULL_VALUE;
 			prototypePropertyAttributes = PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY;
 		}
 

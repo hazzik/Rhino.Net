@@ -74,7 +74,7 @@ namespace Rhino.Ast
 		/// </remarks>
 		public virtual IList<ObjectProperty> GetElements()
 		{
-			return elements != null ? elements : NO_ELEMS;
+			return elements ?? NO_ELEMS;
 		}
 
 		/// <summary>Sets the element list, and updates the parent of each element.</summary>

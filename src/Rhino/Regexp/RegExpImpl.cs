@@ -38,10 +38,9 @@ namespace Rhino.RegExp
 			{
 				case RegExpProxyConstants.RA_MATCH:
 				{
-					object rval;
 					data.optarg = 1;
-					rval = MatchOrReplace(cx, scope, thisObj, args, this, data, false);
-					return data.arrayobj == null ? rval : data.arrayobj;
+					object rval = MatchOrReplace(cx, scope, thisObj, args, this, data, false);
+					return data.arrayobj ?? rval;
 				}
 
 				case RegExpProxyConstants.RA_SEARCH:

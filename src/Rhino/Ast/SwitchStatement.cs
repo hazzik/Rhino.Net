@@ -102,7 +102,7 @@ namespace Rhino.Ast
 		/// </remarks>
 		public virtual IList<SwitchCase> GetCases()
 		{
-			return cases != null ? cases : NO_CASES;
+			return cases ?? NO_CASES;
 		}
 
 		/// <summary>

@@ -542,7 +542,7 @@ namespace Rhino.Ast
 		{
 			int max = items.Count;
 			int count = 0;
-			foreach (AstNode item in items)
+			foreach (T item in items)
 			{
 				sb.Append(item.ToSource(0));
 				if (count++ < max - 1)
@@ -629,7 +629,7 @@ namespace Rhino.Ast
 		/// Permits AST nodes to be sorted based on start position and length.
 		/// This makes it easy to sort Comment and Error nodes into a set of
 		/// other AST nodes:  just put them all into a
-		/// <see cref="Sharpen.SortedSet{E}">Sharpen.SortedSet&lt;E&gt;</see>
+		/// <see cref="SortedSet{T}">Sharpen.SortedSet&lt;E&gt;</see>
 		/// ,
 		/// for instance.
 		/// </remarks>

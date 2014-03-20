@@ -309,7 +309,7 @@ namespace Rhino.XmlImpl
 
 		private string ToUri(string ns)
 		{
-			return (ns == null) ? string.Empty : ns;
+			return ns ?? string.Empty;
 		}
 
 		private void AddNamespaces(Namespaces rv, XmlElement element)
@@ -654,7 +654,7 @@ namespace Rhino.XmlImpl
 		internal QName GetQname()
 		{
 			string uri = (dom.NamespaceURI) == null ? string.Empty : dom.NamespaceURI;
-			string prefix = (dom.Prefix == null) ? string.Empty : dom.Prefix;
+			string prefix = dom.Prefix ?? string.Empty;
 			return QName.Create(uri, dom.LocalName, prefix);
 		}
 
