@@ -108,7 +108,7 @@ namespace Rhino.Ast
 			AssertNotNull(comment);
 			if (comments == null)
 			{
-				comments = new TreeSet<Comment>(new AstNode.PositionComparator());
+				comments = new SortedSet<Comment>(new AstNode.PositionComparator());
 			}
 			comments.Add(comment);
 			comment.SetParent(this);
