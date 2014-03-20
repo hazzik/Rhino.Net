@@ -102,7 +102,7 @@ namespace Rhino.XmlImpl
 			return base.GetMaxInstanceId() + MAX_INSTANCE_ID;
 		}
 
-		protected internal override int FindInstanceIdInfo(string s)
+		protected internal override InstanceIdInfo FindInstanceIdInfo(string s)
 		{
 			int id;
 			// #generated# Last update: 2007-08-20 09:01:10 EDT
