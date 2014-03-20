@@ -1,0 +1,343 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data xml:space="preserve" name="msg.expected.string.arg">
+    <value>Expected a string argument.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.class.not.found">
+    <value>Class "{0}" not found.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.couldnt.open">
+    <value>Couldn''t open file "{0}".</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.couldnt.open.url">
+    <value>Couldn''t open URL "{0}": {1}.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.couldnt.read.source">
+    <value>Couldn''t read source file "{0}": {1}.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.no-opt">
+    <value>Must have the org.mozilla.javascript.optimizer package available to compile to class files.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.invalid">
+    <value>Invalid option "{0}"</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.usage">
+    <value>Usage: java {0} [options...] [files]
+Valid options are:
+    -?, -help          Displays help messages.
+    -w                 Enable warnings.
+    -version 100|110|120|130|140|150|160|170|180
+                       Set a specific language version.
+    -opt [-1|0-9]      Set optimization level.
+    -f script-filename Execute script file, or "-" for interactive.
+    -e script-source   Evaluate inline script.
+    -modules [uri]     Add a single path or URL element to the CommonJS
+                       module search path. (implies -require)
+    -require           Enable CommonJS module support.
+    -sandbox           Enable CommonJS sandbox mode. (implies -require)
+    -debug             Generate debug code.
+    -strict            Enable strict mode warnings.
+    -fatal-warnings    Treat warnings as errors.
+    -encoding charset  Use specified character encoding as default when reading scripts.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.help">
+    <value>
+Command                Description 
+=======                =========== 
+help()                 Display usage and help messages. 
+defineClass(className) Define an extension using the Java class 
+                       named with the string argument. 
+                       Uses ScriptableObject.defineClass(). 
+load(["foo.js", ...])  Load JavaScript source files named by 
+                       string arguments. 
+loadClass(className)   Load a class named by a string argument. 
+                       The class must be a script compiled to a 
+                       class file. 
+print([expr ...])      Evaluate and print expressions. 
+quit()                 Quit the shell. 
+version([number])      Get or set the JavaScript version number. 
+gc()                   Runs the garbage collector.
+spawn(arg)             Evaluate function or script name on a new thread 
+sync(function [, obj]) Creates a synchronized version of the function, 
+                       where the synchronization object is the obj 
+                       argument or "this" if obj is undefined
+readFile(fileName [, encoding])
+                       Returns the content of the file as a string. 
+                       Encoding of the string can be optionally specified. 
+readUrl(url [, encoding]) 
+                       Similar to readFile, reads the contents of the url.
+runCommand(name ...)   Runs a specified shell command. Additional arguments are 
+                       passed to the command 
+seal(args ...)         Seals the supplied objects 
+toint32(arg)           Converts the argument into a 32-bit integer 
+serialize(obj, fileName) 
+                      Serializes an object and saves it to a file 
+deserialize(fileName)  Reconstructs a serialized object 
+environment            Returns the current environment object 
+history                Displays the shell command history</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.warning">
+    <value>warning: {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.format1">
+    <value>{0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.format2">
+    <value>line {0}: {1}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.format3">
+    <value>"{0}", line {1}: {2}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.uncaughtJSException">
+    <value>exception from uncaught JavaScript throw: {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.uncaughtEcmaError">
+    <value>uncaught JavaScript runtime exception: {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.jsc.bad.usage">
+    <value>Didn''t understand "{1}". 
+For more information, try java {0} -h</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.jsc.usage">
+    <value>Usage: java {0} [OPTION]... SOURCE...
+Valid options are: 
+  -version VERSION   Use the specified language version.
+                       VERSION should be one of 100|110|120|130|140|150|160|170.
+  -opt LEVEL         Use optimization with the specified level.
+                       LEVEL should be one of 0..9.
+  -debug, -g         Include debug information.
+  -nosource          Do not include source to function objects.
+                       It makes f.toString() useless and violates ECMAScript
+                       standard but makes generated classes smaller and
+                       saves memory.
+  -o CLASSNAME       Use specified name as the last component of the main
+                       generated class name. When specified, only one script
+                       SOURCE is allowed. If omitted, it defaults to source
+                       name with stripped .js suffix.
+  -package PACKAGE   Place generated classes in the specified package.
+  -d DIRECTORY       Use DIRECTORY as destination directory for generated
+                       classes. If omitted, it defaults to parent directory
+                       of SOURCE.
+  -encoding charset  Sets the character encoding of the source files. 
+  -extends CLASS     The main generated class will extend the specified
+                       class CLASS.
+  -implements INTERFACE1,INTERFACE2,... The main generated class will
+                       implement the specified list of interfaces.
+  -main-method-class CLASS Specify the class name used for main method 
+                       implementation. The class must have a method matching
+                       "public static void main(Script sc, String[] args)"
+  -observe-instruction-count Generate code that contains callbacks to 
+                       accumulate counts of executed instructions. Code 
+                       compiled with this flag can be monitored using 
+                       Context.setInstructionObserverThreshold. 
+  -help, --help, -h  Print this help and exit.
+</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.no.file">
+    <value>A file name must be specified to compile.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.invalid.classfile.name">
+    <value>File "{0}" is not a valid class file name.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.extension.not.js">
+    <value>File "{0}" is not a valid js file name.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.jsfile.not.found">
+    <value>File "{0}" not found.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.multiple.js.to.file">
+    <value>Cannot compile multiple js files to "{0}".</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.package.name">
+    <value>"{0}" is not a valid package name.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.spawn.args">
+    <value>Argument to spawn() must be a function or script.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.must.implement.Script">
+    <value>Argument to loadClass() must be the name of a class that implements the Script interface. Class files generated by compiling scripts will implement Script.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.must.implement.Scriptable">
+    <value>Argument to defineClass() must be the name of a class that implements the Scriptable interface.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.runCommand.bad.args">
+    <value>The first argument to runCommand must be a command name.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.runCommand.bad.env">
+    <value>A value of the env property of option object for runCommnad must be an object.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.seal.not.object">
+    <value>seal function can only be applied to objects</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.seal.not.scriptable">
+    <value>seal function supports only sealing of ScriptableObject instances</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.readFile.bad.args">
+    <value>readFile require at least file path to be specified</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.readUrl.bad.args">
+    <value>readUrl require at least file path to be specified</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.shell.bad.function.scope">
+    <value>Wrong scope object for shell function: {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.same_string">
+    <value>The string {0} is used second time in the switch code. Previous occurrence was at line {1}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.file_end_in_switch">
+    <value>End of file inside tag {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.bad_tag_order">
+    <value>String switch tag {0} is not allowed here</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.no_end_with_value">
+    <value>End for tag {0} can not contain value</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.no_value_allowed">
+    <value>Tag {0} can not contain value</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.no_end_usage">
+    <value>Tag {0} can not be used as end tag</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.no_file_argument">
+    <value>File argument should be given</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.too_many_arguments">
+    <value>Too many arguments are given</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.bad_option">
+    <value>Invalid option {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.bad_option_char">
+    <value>Invalid option letter {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.bad_invocation">
+    <value>StringIdMap: {0}
+For more information, try
+java org.mozilla.javascript.tools.idswitch.StringIdMap --help</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.io_error">
+    <value>StringIdMap: IO error, {0}</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.usage">
+    <value>Usage: java org.mozilla.javascript.tools.idswitch.StringIdMap [OPTIONS] JAVA_SOURCE_FILE
+Generates efficient string dispatch code in JAVA_SOURCE_FILE.
+The resulting Java source fragment replaces the old dispatch code.
+If JAVA_SOURCE_FILE is -, standard input is used for Java source and the
+result is sent to standard output.
+
+  -h, --help          display this help and exit
+      --version       display version information and exit
+
+Note: the original file will be overwritten without any backup actions
+      and all code inside #generated# tag will be replaced by new one.</value>
+    <comment></comment>
+  </data>
+  <data xml:space="preserve" name="msg.idswitch.version">
+    <value>org.mozilla.javascript.tools.idswitch.StringIdMap version 0.2</value>
+    <comment></comment>
+  </data>
+</root>

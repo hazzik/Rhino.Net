@@ -8,10 +8,9 @@
 
 using System;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
-using Rhino;
 using Rhino.Ast;
+using Rhino.Resources;
 using Rhino.Utils;
 using Rhino.V8dtoa;
 using Rhino.Xml;
@@ -4262,21 +4261,15 @@ search_break: ;
 		{
 			public virtual string GetMessage(string messageId, object[] arguments)
 			{
-				string defaultResource = "Rhino.resources.Messages";
 				Context cx = Context.GetCurrentContext();
-				CultureInfo locale = cx != null ? cx.GetLocale() : CultureInfo.CurrentCulture;
-				// ResourceBundle does caching.
-				ResourceBundle rb = ResourceBundle.GetBundle(defaultResource, locale);
-				string formatString;
-				try
-				{
-					formatString = rb.GetString(messageId);
-				}
-				catch (MissingResourceException)
-				{
-					throw new Exception("no message resource found for message property " + messageId);
-				}
-				return string.Format(formatString, arguments ?? new object[0]);
+				CultureInfo culture = cx == null
+					? CultureInfo.CurrentCulture
+					: cx.GetLocale();
+
+				string formatString = Messages.ResourceManager.GetString(messageId, culture);
+				return arguments == null
+					? formatString
+					: string.Format(formatString, arguments);
 			}
 		}
 

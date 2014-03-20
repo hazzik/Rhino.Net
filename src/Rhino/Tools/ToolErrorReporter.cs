@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Rhino;
+using Rhino.Tools.Resources;
 using Sharpen;
 
 namespace Rhino.Tools
@@ -61,26 +62,13 @@ namespace Rhino.Tools
 		public static string GetMessage(string messageId, object[] args)
 		{
 			Context cx = Context.GetCurrentContext();
-			CultureInfo locale = cx == null ? CultureInfo.CurrentCulture : cx.GetLocale();
-			// ResourceBundle does caching.
-			ResourceBundle rb = ResourceBundle.GetBundle("Rhino.Tools.resources.Messages", locale);
-			string formatString;
-			try
-			{
-				formatString = rb.GetString(messageId);
-			}
-			catch (MissingResourceException)
-			{
-				throw new Exception("no message resource found for message property " + messageId);
-			}
-			if (args == null)
-			{
-				return formatString;
-			}
-			else
-			{
-				return string.Format(formatString, args);
-			}
+			CultureInfo culture = cx == null
+				? CultureInfo.CurrentCulture
+				: cx.GetLocale();
+			string formatString = Messages.ResourceManager.GetString(messageId, culture);
+			return args == null
+				? formatString
+				: string.Format(formatString, args);
 		}
 
 		private static string GetExceptionMessage(RhinoException ex)

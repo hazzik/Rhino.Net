@@ -163,7 +163,17 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Optimizer\IdentityGenerator.cs" />
+    <Compile Include="Resources\Messages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
     <Compile Include="PropertyAttributes.cs" />
+    <Compile Include="Tools\Resources\Messages.Designer.cs">
+      <DependentUpon>Messages.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="Utils\MemberInfoEx.cs" />
     <Compile Include="Compatibility\TypeEx.cs" />
     <Compile Include="Compatibility\ClassLoader.cs" />
@@ -253,7 +263,6 @@
     <Compile Include="RegExp\NativeRegExpCtor.cs" />
     <Compile Include="RegExp\RegExpImpl.cs" />
     <Compile Include="RegExp\SubString.cs" />
-    <Compile Include="resources\Messages.cs" />
     <Compile Include="RhinoException.cs" />
     <Compile Include="RhinoSecurityManager.cs" />
     <Compile Include="Script.cs" />
@@ -270,7 +279,6 @@
     <Compile Include="Synchronizer.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenStream.cs" />
-    <Compile Include="Tools\resources\Messages.cs" />
     <Compile Include="Tools\SourceReader.cs" />
     <Compile Include="Tools\ToolErrorReporter.cs" />
     <Compile Include="TopLevel.cs" />
@@ -308,10 +316,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="resources\Messages.properties" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Tools\resources\Messages.properties" />
+    <EmbeddedResource Include="Resources\Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\Resources\Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
