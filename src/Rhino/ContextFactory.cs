@@ -403,7 +403,7 @@ namespace Rhino
 			}
 		}
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		/// <summary>Create class loader for generated classes.</summary>
 		/// <remarks>
 		/// Create class loader for generated classes.

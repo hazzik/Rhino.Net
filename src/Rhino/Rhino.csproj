@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AllFeatures|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\AllFeatures\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ENCHANCED_SECURITY;INTERFACE_ADAPTER;COMPILATION;XML;SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ENHANCED_SECURITY;INTERFACE_ADAPTER;COMPILATION;XML;SERIALIZATION</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>

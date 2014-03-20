@@ -26,7 +26,7 @@ namespace Rhino
 			set { context.Value [0] = value; }
 		}
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		internal static ClassLoader GetCurrentThreadClassLoader()
 		{
 			return Thread.CurrentThread.GetContextClassLoader();

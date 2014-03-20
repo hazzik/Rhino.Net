@@ -937,7 +937,7 @@ namespace Rhino
 			{
 				Kit.CodeBug();
 			}
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 			if (cx.interpreterSecurityDomain != ifun.securityDomain)
 			{
 				object savedDomain = cx.interpreterSecurityDomain;
@@ -1697,7 +1697,7 @@ namespace Rhino
 								var interpretedFunction = fun as InterpretedFunction;
 								if (interpretedFunction != null)
 								{
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 									if (frame.fnOrScript.securityDomain == interpretedFunction.securityDomain)
 									#endif
 									{
@@ -1771,7 +1771,7 @@ namespace Rhino
 										var iApplyCallable = applyCallable as InterpretedFunction;
 										if (iApplyCallable != null)
 										{
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 											if (frame.fnOrScript.securityDomain == iApplyCallable.securityDomain)
 #endif
 											{
@@ -1792,7 +1792,7 @@ namespace Rhino
 									var ifun = noSuchMethodMethod as InterpretedFunction;
 									if (ifun != null)
 									{
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 										if (frame.fnOrScript.securityDomain == ifun.securityDomain)
 #endif
 										{
@@ -1821,7 +1821,7 @@ namespace Rhino
 								var interpretedFunction = lhs as InterpretedFunction;
 								if (interpretedFunction != null)
 								{
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 									if (frame.fnOrScript.securityDomain == interpretedFunction.securityDomain)
 #endif
 									{

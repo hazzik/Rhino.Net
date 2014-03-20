@@ -1692,7 +1692,7 @@ namespace Rhino
 			maximumInterpreterStackDepth = max;
 		}
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		/// <summary>Set the security controller for this context.</summary>
 		/// <remarks>
 		/// Set the security controller for this context.
@@ -2126,7 +2126,7 @@ namespace Rhino
 			f.ObserveInstructionCount(this, instructionCount);
 		}
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		/// <summary>Create class loader for generated classes.</summary>
 		/// <remarks>
 		/// Create class loader for generated classes.
@@ -2222,7 +2222,7 @@ namespace Rhino
 			{
 				sourceName = "unnamed script";
 			}
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 			if (securityDomain != null && GetSecurityController() == null)
 			{
 				throw new ArgumentException("securityDomain should be null if setSecurityController() was never called");
@@ -2432,7 +2432,7 @@ namespace Rhino
 			return version == LanguageVersion.VERSION_DEFAULT || version >= LanguageVersion.VERSION_1_3;
 		}
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		// The method must NOT be public or protected
 		internal virtual SecurityController GetSecurityController()
 		{
@@ -2530,7 +2530,7 @@ namespace Rhino
 
 		internal LanguageVersion version;
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		private SecurityController securityController;
 #endif
 

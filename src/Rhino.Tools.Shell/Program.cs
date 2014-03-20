@@ -54,7 +54,7 @@ namespace Rhino.Tools.Shell
 
 		internal static Require require;
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		private static SecurityProxy securityImpl;
 #endif
 
@@ -77,7 +77,7 @@ namespace Rhino.Tools.Shell
 		{
 			try
 			{
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 				if (bool.GetBoolean("rhino.use_java_policy_security"))
 				{
 					InitJavaPolicySecuritySupport();
@@ -434,7 +434,7 @@ goodUsage_break: ;
 			return null;
 		}
 
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 		private static void InitJavaPolicySecuritySupport()
 		{
 			Exception exObj;
@@ -614,13 +614,13 @@ goodUsage_break: ;
 		/// <exception cref="System.IO.IOException"></exception>
 		public static void ProcessFile(Context cx, Scriptable scope, string filename)
 		{
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 			if (securityImpl == null)
 #endif
 			{
 				ProcessFileSecure(cx, scope, filename, null);
 			}
-#if ENCHANCED_SECURITY
+#if ENHANCED_SECURITY
 			else
 			{
 				securityImpl.CallProcessFileSecure(cx, scope, filename);
