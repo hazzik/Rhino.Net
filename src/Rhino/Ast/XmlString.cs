@@ -52,7 +52,7 @@ namespace Rhino.Ast
 		{
 			AssertNotNull(s);
 			xml = s;
-			SetLength(s.Length);
+			Length = s.Length;
 		}
 
 		/// <summary>Returns the xml string for this component.</summary>

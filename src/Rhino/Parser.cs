@@ -288,7 +288,7 @@ namespace Rhino
 		// is only true before the node is added to its parent.
 		private int GetNodeEnd(AstNode n)
 		{
-			return n.Position + n.GetLength();
+			return n.Position + n.Length;
 		}
 
 		private void RecordComment(int lineno, string comment)
@@ -715,7 +715,7 @@ namespace Rhino
 					root.AddComment(c);
 				}
 			}
-			root.SetLength(end - pos);
+			root.Length = end - pos;
 			root.SetSourceName(sourceURI);
 			root.SetBaseLineno(baseLineno);
 			root.SetEndLineno(ts.lineno);
@@ -820,7 +820,7 @@ bodyLoop_break: ;
 			{
 				end = ts.tokenEnd;
 			}
-			pn.SetLength(end - pos);
+			pn.Length = end - pos;
 			return pn;
 		}
 
@@ -986,7 +986,7 @@ bodyLoop_break: ;
 				ParseFunctionParams(fnNode);
 				fnNode.SetBody(ParseFunctionBody());
 				fnNode.SetEncodedSourceBounds(functionSourceStart, ts.tokenEnd);
-				fnNode.SetLength(ts.tokenEnd - functionSourceStart);
+				fnNode.Length = ts.tokenEnd - functionSourceStart;
 				if (compilerEnv.IsStrictMode() && !fnNode.GetBody().HasConsistentReturnUsage())
 				{
 					string msg = (name != null && name.IdentifierLength() > 0) ? "msg.no.return.value" : "msg.anon.no.return.value";
@@ -1041,7 +1041,7 @@ bodyLoop_break: ;
 			{
 				block.AddChild(Statement());
 			}
-			block.SetLength(ts.tokenBeg - pos);
+			block.Length = ts.tokenBeg - pos;
 			return block;
 		}
 
@@ -1078,7 +1078,7 @@ bodyLoop_break: ;
 			// warning if the condition is parenthesized, like "if ((a = 7)) ...".
 			if (data.condition is Assignment)
 			{
-				AddStrictWarning("msg.equal.as.assign", string.Empty, data.condition.Position, data.condition.GetLength());
+				AddStrictWarning("msg.equal.as.assign", string.Empty, data.condition.Position, data.condition.Length);
 			}
 			return data;
 		}
@@ -1301,7 +1301,7 @@ guessingStatementEnd_break: ;
 					// Consume ';' as a part of expression
 					ConsumeToken();
 					// extend the node bounds to include the semicolon.
-					pn.SetLength(ts.tokenEnd - pos);
+					pn.Length = ts.tokenEnd - pos;
 					break;
 				}
 
@@ -1397,7 +1397,7 @@ guessingStatementEnd_break: ;
 					{
 						case Token.RC:
 						{
-							pn.SetLength(ts.tokenEnd - pos);
+							pn.Length = ts.tokenEnd - pos;
 							goto switchLoop_break;
 						}
 
@@ -1428,7 +1428,7 @@ guessingStatementEnd_break: ;
 					}
 					SwitchCase caseNode = new SwitchCase(casePos);
 					caseNode.SetExpression(caseExpression);
-					caseNode.SetLength(ts.tokenEnd - pos);
+					caseNode.Length = ts.tokenEnd - pos;
 					// include colon
 					caseNode.SetLineno(caseLineno);
 					while ((tt = PeekToken()) != Token.RC && tt != Token.CASE && tt != Token.DEFAULT && tt != Token.EOF)
@@ -1466,7 +1466,7 @@ switchLoop_break: ;
 				pn.SetCondition(data.condition);
 				pn.SetParens(data.lp - pos, data.rp - pos);
 				AstNode body = Statement();
-				pn.SetLength(GetNodeEnd(body) - pos);
+				pn.Length = GetNodeEnd(body) - pos;
 				pn.SetBody(body);
 			}
 			finally
@@ -1511,7 +1511,7 @@ switchLoop_break: ;
 			{
 				end = ts.tokenEnd;
 			}
-			pn.SetLength(end - pos);
+			pn.Length = end - pos;
 			return pn;
 		}
 
@@ -1635,7 +1635,7 @@ switchLoop_break: ;
 				try
 				{
 					AstNode body = Statement();
-					pn.SetLength(GetNodeEnd(body) - forPos);
+					pn.Length = GetNodeEnd(body) - forPos;
 					pn.SetBody(body);
 				}
 				finally
@@ -1769,7 +1769,7 @@ switchLoop_break: ;
 					{
 						tryEnd = ts.tokenEnd;
 					}
-					catchNode.SetLength(tryEnd - catchPos);
+					catchNode.Length = tryEnd - catchPos;
 					if (clauses == null)
 					{
 						clauses = new List<CatchClause>();
@@ -2115,7 +2115,7 @@ switchLoop_break: ;
 			{
 				Statements(block);
 				MustMatchToken(Token.RC, "msg.no.brace.block");
-				block.SetLength(ts.tokenEnd - pos);
+				block.Length = ts.tokenEnd - pos;
 				return block;
 			}
 			finally
@@ -2179,9 +2179,9 @@ switchLoop_break: ;
 					if (compilerEnv.IsIdeMode())
 					{
 						Label dup = ls.GetLabelByName(name);
-						ReportError("msg.dup.label", dup.GetAbsolutePosition(), dup.GetLength());
+						ReportError("msg.dup.label", dup.GetAbsolutePosition(), dup.Length);
 					}
-					ReportError("msg.dup.label", label.Position, label.GetLength());
+					ReportError("msg.dup.label", label.Position, label.Length);
 				}
 			}
 			bundle.AddLabel(label);
@@ -2252,7 +2252,7 @@ switchLoop_break: ;
 			}
 			// If stmt has parent assigned its position already is relative
 			// (See bug #710225)
-			bundle.SetLength(stmt.GetParent() == null ? GetNodeEnd(stmt) - pos : GetNodeEnd(stmt));
+			bundle.Length = stmt.GetParent() == null ? GetNodeEnd(stmt) - pos : GetNodeEnd(stmt);
 			bundle.SetStatement(stmt);
 			return bundle;
 		}
@@ -2355,7 +2355,7 @@ switchLoop_break: ;
 					break;
 				}
 			}
-			pn.SetLength(end - pos);
+			pn.Length = end - pos;
 			pn.SetIsStatement(isStatement);
 			return pn;
 		}
@@ -2387,8 +2387,8 @@ switchLoop_break: ;
 					// position stmt at LC
 					AstNode stmt = Statements();
 					MustMatchToken(Token.RC, "msg.no.curly.let");
-					stmt.SetLength(ts.tokenEnd - beg);
-					pn.SetLength(ts.tokenEnd - pos);
+					stmt.Length = ts.tokenEnd - beg;
+					pn.Length = ts.tokenEnd - pos;
 					pn.SetBody(stmt);
 					pn.SetType(Token.LET);
 				}
@@ -2396,7 +2396,7 @@ switchLoop_break: ;
 				{
 					// let expression
 					AstNode expr = Expr();
-					pn.SetLength(GetNodeEnd(expr) - pos);
+					pn.Length = GetNodeEnd(expr) - pos;
 					pn.SetBody(expr);
 					if (isStatement)
 					{
@@ -2920,7 +2920,7 @@ switchLoop_break: ;
 						MustMatchToken(Token.RC, "msg.syntax");
 						XmlExpression xexpr = new XmlExpression(beg, expr);
 						xexpr.SetIsXmlAttribute(ts.IsXMLAttribute());
-						xexpr.SetLength(ts.tokenEnd - beg);
+						xexpr.Length = ts.tokenEnd - beg;
 						pn.AddFragment(xexpr);
 						break;
 					}
@@ -3040,7 +3040,7 @@ switchLoop_break: ;
 					end = GetNodeEnd(initializer);
 					nx.SetInitializer(initializer);
 				}
-				nx.SetLength(end - pos);
+				nx.Length = end - pos;
 				pn = nx;
 			}
 			pn.SetLineno(lineno);
@@ -3154,7 +3154,7 @@ switchLoop_break: ;
 						}
 						f.SetArguments(args);
 						f.SetRp(ts.tokenBeg - pos);
-						f.SetLength(ts.tokenEnd - pos);
+						f.Length = ts.tokenEnd - pos;
 						pn = f;
 						break;
 					}
@@ -3263,7 +3263,7 @@ tailLoop_break: ;
 			}
 			int pos = pn.Position;
 			result.Position = pos;
-			result.SetLength(GetNodeEnd(@ref) - pos);
+			result.Length = GetNodeEnd(@ref) - pos;
 			result.SetOperatorPosition(dotPos - pos);
 			result.SetLineno(pn.GetLineno());
 			result.SetLeft(pn);
@@ -3575,7 +3575,7 @@ tailLoop_break: ;
 					pn.SetJsDocNode(jsdocNode);
 				}
 				MustMatchToken(Token.RP, "msg.no.paren");
-				pn.SetLength(ts.tokenEnd - pn.Position);
+				pn.Length = ts.tokenEnd - pn.Position;
 				pn.SetLineno(lineno);
 				return pn;
 			}
@@ -3702,7 +3702,7 @@ tailLoop_break: ;
 			{
 				pn.AddElement(e);
 			}
-			pn.SetLength(end - pos);
+			pn.Length = end - pos;
 			return pn;
 		}
 
@@ -3812,7 +3812,7 @@ tailLoop_break: ;
 				{
 					rp = ts.tokenBeg - pos;
 				}
-				pn.SetLength(ts.tokenEnd - pos);
+				pn.Length = ts.tokenEnd - pos;
 				pn.SetIterator(iter);
 				pn.SetIteratedObject(obj);
 				pn.SetInPosition(inPos);
@@ -3925,7 +3925,7 @@ tailLoop_break: ;
 				{
 					rp = ts.tokenBeg - pos;
 				}
-				pn.SetLength(ts.tokenEnd - pos);
+				pn.Length = ts.tokenEnd - pos;
 				pn.SetIterator(iter);
 				pn.SetIteratedObject(obj);
 				pn.SetInPosition(inPos);
@@ -4181,7 +4181,7 @@ commaLoop_break: ;
 			int end = GetNodeEnd(fn);
 			pn.SetLeft(propName);
 			pn.SetRight(fn);
-			pn.SetLength(end - pos);
+			pn.Length = end - pos;
 			return pn;
 		}
 
@@ -4320,7 +4320,7 @@ commaLoop_break: ;
 		// Return end of node.  Assumes node does NOT have a parent yet.
 		private int NodeEnd(AstNode node)
 		{
-			return node.Position + node.GetLength();
+			return node.Position + node.Length;
 		}
 
 		private void SaveNameTokenData(int pos, string name, int lineno)

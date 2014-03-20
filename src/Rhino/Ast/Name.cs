@@ -75,7 +75,7 @@ namespace Rhino.Ast
 				type = Token.NAME;
 			}
 			SetIdentifier(name);
-			SetLength(name.Length);
+			Length = name.Length;
 		}
 
 		/// <summary>Returns the node's identifier</summary>
@@ -90,7 +90,7 @@ namespace Rhino.Ast
 		{
 			AssertNotNull(identifier);
 			this.identifier = identifier;
-			SetLength(identifier.Length);
+			Length = identifier.Length;
 		}
 
 		/// <summary>

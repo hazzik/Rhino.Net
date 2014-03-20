@@ -88,7 +88,7 @@ namespace Rhino.Ast
 			AssertNotNull(operand);
 			int beg = postFix ? operand.Position : operatorPosition;
 			// JavaScript only has ++ and -- postfix operators, so length is 2
-			int end = postFix ? operatorPosition + 2 : operand.Position + operand.GetLength();
+			int end = postFix ? operatorPosition + 2 : operand.Position + operand.Length;
 			SetBounds(beg, end);
 			SetOperator(@operator);
 			SetOperand(operand);

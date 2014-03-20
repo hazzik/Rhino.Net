@@ -79,7 +79,7 @@ namespace Rhino.Ast
 		/// the wrapped node.
 		/// </summary>
 		/// <param name="expr">the wrapped expression</param>
-		public ExpressionStatement(AstNode expr) : this(expr.Position, expr.GetLength(), expr)
+		public ExpressionStatement(AstNode expr) : this(expr.Position, expr.Length, expr)
 		{
 		}
 

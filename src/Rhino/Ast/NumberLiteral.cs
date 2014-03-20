@@ -57,7 +57,7 @@ namespace Rhino.Ast
 				type = Token.NUMBER;
 			}
 			SetValue(value);
-			SetLength(value.Length);
+			Length = value.Length;
 		}
 
 		/// <summary>Constructor.</summary>

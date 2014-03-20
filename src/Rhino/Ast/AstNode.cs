@@ -200,15 +200,10 @@ namespace Rhino.Ast
 		}
 
 		/// <summary>Returns node length</summary>
-		public virtual int GetLength()
+		public virtual int Length
 		{
-			return length;
-		}
-
-		/// <summary>Sets node length</summary>
-		public virtual void SetLength(int length)
-		{
-			this.length = length;
+			get { return length; }
+			set { length = value; }
 		}
 
 		/// <summary>Sets the node start and end positions.</summary>
@@ -223,7 +218,7 @@ namespace Rhino.Ast
 		public virtual void SetBounds(int position, int end)
 		{
 			Position = position;
-			SetLength(end - position);
+			Length = end - position;
 		}
 
 		/// <summary>Make this node's position relative to a parent.</summary>
@@ -294,8 +289,8 @@ namespace Rhino.Ast
 		public virtual void AddChild(AstNode kid)
 		{
 			AssertNotNull(kid);
-			int end = kid.Position + kid.GetLength();
-			SetLength(end - this.Position);
+			int end = kid.Position + kid.Length;
+			Length = end - this.Position;
 			AddChildToBack(kid);
 			kid.SetParent(this);
 		}
@@ -656,8 +651,8 @@ namespace Rhino.Ast
 			{
 				return 1;
 			}
-			int len1 = this.GetLength();
-			int len2 = other.GetLength();
+			int len1 = this.Length;
+			int len2 = other.Length;
 			if (len1 < len2)
 			{
 				return -1;
@@ -714,7 +709,7 @@ namespace Rhino.Ast
 				buffer.Append(MakeIndent(node.Depth()));
 				buffer.Append(name).Append(" ");
 				buffer.Append(node.Position).Append(" ");
-				buffer.Append(node.GetLength());
+				buffer.Append(node.Length);
 				if (tt == Token.NAME)
 				{
 					buffer.Append(" ").Append(((Name)node).GetIdentifier());

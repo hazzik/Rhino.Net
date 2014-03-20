@@ -87,7 +87,7 @@ namespace Rhino.Ast
 
 		public override string ToSource(int depth)
 		{
-			StringBuilder sb = new StringBuilder(GetLength() + 10);
+			StringBuilder sb = new StringBuilder(Length + 10);
 			sb.Append(MakeIndent(depth));
 			sb.Append(value);
 			return sb.ToString();

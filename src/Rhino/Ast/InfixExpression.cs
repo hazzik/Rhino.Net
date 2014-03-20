@@ -77,7 +77,7 @@ namespace Rhino.Ast
 			AssertNotNull(right);
 			// compute our bounds while children have absolute positions
 			int beg = left.Position;
-			int end = right.Position + right.GetLength();
+			int end = right.Position + right.Length;
 			SetBounds(beg, end);
 			// this updates their positions to be parent-relative
 			SetLeft(left);

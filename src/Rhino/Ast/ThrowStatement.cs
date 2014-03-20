@@ -54,7 +54,7 @@ namespace Rhino.Ast
 			SetExpression(expr);
 		}
 
-		public ThrowStatement(int pos, AstNode expr) : base(pos, expr.GetLength())
+		public ThrowStatement(int pos, AstNode expr) : base(pos, expr.Length)
 		{
 			{
 				type = Token.THROW;
