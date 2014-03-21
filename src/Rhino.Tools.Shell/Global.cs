@@ -469,7 +469,7 @@ namespace Rhino.Tools.Shell
 				StringBuilder @out = new StringBuilder();
 				StringBuilder err = new StringBuilder();
 				SetOut(new StringWriter(@out));
-				SetErr(new StringWriter(err));
+				SetError(new StringWriter(err));
 				string resultString = string.Empty;
 				ErrorReporter savedErrorReporter = cx.GetErrorReporter();
 				cx.SetErrorReporter(new ToolErrorReporter(false, GetErr()));
@@ -489,7 +489,7 @@ namespace Rhino.Tools.Shell
 				finally
 				{
 					SetOut(savedOut);
-					SetErr(savedErr);
+					SetError(savedErr);
 					cx.SetErrorReporter(savedErrorReporter);
 					resultString += err.ToString() + @out.ToString();
 				}
@@ -999,7 +999,7 @@ namespace Rhino.Tools.Shell
 			return errStream ?? Console.Error;
 		}
 
-		public void SetErr(TextWriter err)
+		public void SetError(TextWriter err)
 		{
 			errStream = err;
 		}

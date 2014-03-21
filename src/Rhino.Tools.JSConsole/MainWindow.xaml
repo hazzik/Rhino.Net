@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:jsConsole="clr-namespace:Rhino.Tools.JsConsole"
         x:Class="Rhino.Tools.JsConsole.MainWindow"
-        Title="Rhino.Net JavaScript Console" Height="350" Width="525" Loaded="WindowLoaded">
+        Title="Rhino.Net JavaScript Console" Height="350" Width="525" Initialized="MainWindowInitialized">
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

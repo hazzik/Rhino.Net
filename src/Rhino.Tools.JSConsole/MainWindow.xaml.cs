@@ -44,14 +44,14 @@ namespace Rhino.Tools.JsConsole
 			ConsoleTextArea.Paste();
 		}
 
-		private void WindowLoaded(object sender, RoutedEventArgs e)
+		private void MainWindowInitialized(object sender, EventArgs eventArgs)
 		{
-			Console.SetIn(ConsoleTextArea.GetIn());
-			Console.SetOut(ConsoleTextArea.GetOut());
-			Console.SetError(ConsoleTextArea.GetError());
-			Program.SetIn(ConsoleTextArea.GetIn());
-			Program.SetOut(ConsoleTextArea.GetOut());
-			Program.SetErr(ConsoleTextArea.GetError());
+			Console.SetIn(ConsoleTextArea.In);
+			Console.SetOut(ConsoleTextArea.Out);
+			Console.SetError(ConsoleTextArea.Error);
+			Program.SetIn(ConsoleTextArea.In);
+			Program.SetOut(ConsoleTextArea.Out);
+			Program.SetErr(ConsoleTextArea.Error);
 			var thread = new Thread(() => Program.Main(new string[0]))
 			{
 				IsBackground = true,

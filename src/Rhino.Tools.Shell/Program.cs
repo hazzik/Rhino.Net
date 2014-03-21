@@ -790,7 +790,7 @@ goodUsage_break: ;
 
 		public static void SetErr(TextWriter err)
 		{
-			GetGlobal().SetErr(err);
+			GetGlobal().SetError(err);
 		}
 
 		internal class ScriptReference : SoftReference<Script>

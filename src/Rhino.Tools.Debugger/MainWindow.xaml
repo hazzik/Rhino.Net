@@ -1,0 +1,83 @@
+﻿<Window x:Class="Rhino.Tools.Debugger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xceed="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:local="clr-namespace:Rhino.Tools.Debugger"
+        Title="MainWindow" Height="434" Width="684"
+        Initialized="MainWindowInitialized">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open ..." Click="OpenClick" />
+                <MenuItem Header="_Run ..." Click="RunClick" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="ExitClick" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Cu_t" Click="CutClick" />
+                <MenuItem Header="_Copy" Click="CopyClick" />
+                <MenuItem Header="_Paste" Click="PasteClick" />
+                <Separator />
+                <MenuItem Header="Go to Function" Click="GoToFunctionClick" />
+            </MenuItem>
+            <MenuItem Header="_Debug">
+                <MenuItem Header="Break" x:Name="MiBreak" Click="BreakClick" />
+                <MenuItem Header="Go" x:Name="MiGo" Click="GoClick" />
+                <MenuItem Header="Step Into" x:Name="MiStepInto" Click="StepIntoClick" />
+                <MenuItem Header="Step Over" x:Name="MiStepOver" Click="StepOverClick" />
+                <MenuItem Header="Step Out" x:Name="MiStepOut" Click="StepOutClick" />
+                <Separator />
+                <MenuItem Header="Break on Exceptions" IsCheckable="True" Click="BreakOnExceptionsToggle" />
+                <MenuItem Header="Break on Function Enter" IsCheckable="True" Click="BreakOnFunctionEnterToggle" />
+                <MenuItem Header="Break on Function Return" IsCheckable="True" Click="BreakOnFunctionReturnToggle" />
+            </MenuItem>
+            <MenuItem Header="_Window">
+                <MenuItem Header="Console" Click="ConsoleClick" />
+            </MenuItem>
+        </Menu>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <ComboBox x:Name="Context" MinWidth="100" SelectionChanged="ContextSwitch" IsEnabled="False" />
+            <Button Click="BreakClick" x:Name="BtnBreak" Content="Break" />
+            <Button Click="GoClick" x:Name="BtnGo">Go</Button>
+            <Button Click="StepIntoClick" x:Name="BtnStepInto">Step Into</Button>
+            <Button Click="StepOverClick" x:Name="BtnStepOver">Step Over</Button>
+            <Button Click="StepOutClick" x:Name="BtnStepOut">Step Out</Button>
+        </StackPanel>
+        <xceed:DockingManager Grid.Row="2" Name="DockingManager" x:FieldModifier="private">
+            <xceed:LayoutRoot>
+                <xceed:LayoutPanel Orientation="Vertical">
+                    <xceed:LayoutDocumentPaneGroup>
+                        <xceed:LayoutDocumentPane>
+                            <xceed:LayoutDocument Title="JavaScript Console" CanClose="False">
+                                <local:InternalConsole x:Name="Console" />
+                            </xceed:LayoutDocument>
+                        </xceed:LayoutDocumentPane>
+                    </xceed:LayoutDocumentPaneGroup>
+                    <xceed:LayoutAnchorablePaneGroup DockHeight="150" Orientation="Horizontal">
+                        <xceed:LayoutAnchorablePane>
+                            <xceed:LayoutAnchorable Title="this">
+                                <local:ContextWindow x:Name="ThisTable" />
+                            </xceed:LayoutAnchorable>
+                            <xceed:LayoutAnchorable Title="Locals">
+                                <local:ContextWindow x:Name="LocalsTable" />
+                            </xceed:LayoutAnchorable>
+                        </xceed:LayoutAnchorablePane>
+                        <xceed:LayoutAnchorablePane>
+                            <xceed:LayoutAnchorable Title="Watch">
+                                <local:EvaluatorWindow x:Name="Evaluator" />
+                            </xceed:LayoutAnchorable>
+                            <xceed:LayoutAnchorable Title="Evaluate">
+                                <local:EvalTextArea x:Name="EvalTextArea"/>
+                            </xceed:LayoutAnchorable>
+                        </xceed:LayoutAnchorablePane>
+                    </xceed:LayoutAnchorablePaneGroup>
+                </xceed:LayoutPanel>
+            </xceed:LayoutRoot>
+        </xceed:DockingManager>
+    </Grid>
+</Window>

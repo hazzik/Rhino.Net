@@ -152,7 +152,7 @@ namespace Rhino.Drivers
 			MemoryStream @out = new MemoryStream();
 			TextWriter p = new StreamWriter(@out);
 			global.SetOut(p);
-			global.SetErr(p);
+			global.SetError(p);
 			global.DefineFunctionProperties(new[] { "options" }, typeof(ShellTest), PropertyAttributes.DONTENUM | PropertyAttributes.PERMANENT | PropertyAttributes.READONLY);
 			// test suite expects keywords to be disallowed as identifiers
 			shellContextFactory.SetAllowReservedKeywords(false);

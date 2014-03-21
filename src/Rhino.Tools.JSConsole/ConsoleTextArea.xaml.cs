@@ -22,7 +22,7 @@ namespace Rhino.Tools.JsConsole
 			var inputStream = new PipedInputStream();
 			outPipe.Attach(inputStream);
 			inPipe = new StreamWriter(outPipe);
-			@in = new StreamReader(inputStream); ;
+			@in = new StreamReader(inputStream);
 		}
 
 		private readonly TextWriter @out;
@@ -41,24 +41,19 @@ namespace Rhino.Tools.JsConsole
 
 		private void ReturnPressed()
 		{
-			lock (this)
-			{
-				var segment = Text.Substring(outputMark);
-				if (segment.Length > 0)
-				{
-					history.Add(segment);
-				}
-				historyIndex = history.Count;
-				inPipe.Write(segment);
-				AppendText(Environment.NewLine);
-				outputMark = Text.Length;
-				inPipe.Write(Environment.NewLine);
-				inPipe.Flush();
-				@out.Flush();
-			}
+		    var text = Text.Substring(outputMark);
+		    if (string.IsNullOrWhiteSpace(text) == false)
+		        history.Add(text);
+		    historyIndex = history.Count;
+		    inPipe.Write(text);
+		    AppendText(Environment.NewLine);
+		    outputMark = Text.Length;
+		    inPipe.Write(Environment.NewLine);
+		    inPipe.Flush();
+		    @out.Flush();
 		}
 
-		public void Eval(string str)
+	    public void Eval(string str)
 		{
 			inPipe.Write(str);
 			inPipe.Write("\n");
@@ -69,25 +64,24 @@ namespace Rhino.Tools.JsConsole
 
 		private void OnKeyDown(object sender, KeyEventArgs e)
 		{
-			Key code = e.Key;
-			switch (code)
+		    switch (e.Key)
 			{
 				case Key.Left:
 				case Key.Back:
-					if (SelectionStart <= outputMark)
+					if (CaretIndex == outputMark)
 					{
 						e.Handled = true;
 					}
 					break;
 				case Key.Delete:
-					if (SelectionStart < outputMark)
+                    if (CaretIndex < outputMark)
 					{
 						e.Handled = true;
 					}
 					break;
 				case Key.Home:
 				{
-					int caretPos = SelectionStart;
+                    int caretPos = CaretIndex;
 					if (caretPos == outputMark)
 					{
 						e.Handled = true;
@@ -98,8 +92,15 @@ namespace Rhino.Tools.JsConsole
 						{
 							if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
 							{
-								SelectionStart = outputMark;
-								e.Handled = true;
+                                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                                {
+                                    Select(outputMark, CaretIndex);
+                                }
+                                else
+                                {
+                                    CaretIndex = outputMark;
+                                }
+                                e.Handled = true;
 							}
 						}
 					}
@@ -156,15 +157,6 @@ namespace Rhino.Tools.JsConsole
 					e.Handled = true;
 					break;
 				}
-				default:
-				{
-					if (SelectionStart < outputMark)
-					{
-						SelectionStart = outputMark;
-					}
-					break;
-				}
-
 			}
 		}
 
@@ -186,19 +178,19 @@ namespace Rhino.Tools.JsConsole
 			}
 		}
 
-		public TextReader GetIn()
+		public TextReader In
 		{
-			return @in;
+			get { return @in; }
 		}
 
-		public TextWriter GetOut()
+		public TextWriter Out
 		{
-			return @out;
+			get { return @out; }
 		}
 
-		public TextWriter GetError()
+		public TextWriter Error
 		{
-			return error;
+			get { return error; }
 		}
 	}
 }

@@ -4,13 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D48B7E46-3660-4DA4-804D-3B9594ADFF65}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{D693B419-B3E7-47FA-851A-A66C493426E9}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Rhino.Tools.Debugger</RootNamespace>
     <AssemblyName>Rhino.Tools.Debugger</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -27,46 +29,188 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ENHANCED_SECURITY;INTERFACE_ADAPTER;COMPILATION;XML;SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accessibility" />
+    <Reference Include="Aga.Controls">
+      <HintPath>..\lib\Aga.Controls\Aga.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit">
+      <HintPath>..\packages\AvalonEdit.4.4.0.9727\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationUI, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="ReachFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Printing" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.2\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.2\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.2\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.2\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading">
+      <HintPath>..\packages\Rx-XAML.2.2.2\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.AvalonDock">
+      <HintPath>..\packages\AvalonDock.2.0.2000\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
+      <HintPath>..\packages\AvalonDock.2.0.2000\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Expression">
+      <HintPath>..\packages\AvalonDock.2.0.2000\lib\net40\Xceed.Wpf.AvalonDock.Themes.Expression.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
+      <HintPath>..\packages\AvalonDock.2.0.2000\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
+      <HintPath>..\packages\AvalonDock.2.0.2000\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="BraceFoldingStrategy.cs" />
+    <Compile Include="ContextData.cs" />
+    <Compile Include="ContextWindow.xaml.cs">
+      <DependentUpon>ContextWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DebuggerImpl.cs" />
     <Compile Include="Dim.cs" />
+    <Compile Include="EvalTextArea.xaml.cs">
+      <DependentUpon>EvalTextArea.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EvaluatorViewModel.cs" />
+    <Compile Include="EvaluatorWindow.xaml.cs">
+      <DependentUpon>EvaluatorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FindFunctionDialog.xaml.cs">
+      <DependentUpon>FindFunctionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FunctionSource.cs" />
     <Compile Include="GuiCallback.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="InternalConsole.xaml.cs">
+      <DependentUpon>InternalConsole.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ListenerImpl.cs" />
     <Compile Include="ScopeProvider.cs" />
+    <Compile Include="ScopeProviderImpl.cs" />
+    <Compile Include="SourceInfo.cs" />
     <Compile Include="SourceProvider.cs" />
-    <Compile Include="SwingGui.cs" />
-    <Compile Include="Treetable\AbstractCellEditor.cs" />
-    <Compile Include="Treetable\JTreeTable.cs" />
-    <Compile Include="Treetable\TreeTableModel.cs" />
-    <Compile Include="Treetable\TreeTableModelAdapter.cs" />
+    <Compile Include="StackFrame.cs" />
+    <Compile Include="VariableModel.cs" />
+    <Page Include="ContextWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EvalTextArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EvaluatorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FileWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FindFunctionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FileWindow.xaml.cs">
+      <DependentUpon>FileWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="InternalConsole.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IProgramFlowInfo.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProgramFlowMargin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rhino.Tools.JSConsole\Rhino.Tools.JsConsole.csproj">
+      <Project>{F587D0D4-EB39-4742-B656-DC1C4BBD6AA3}</Project>
+      <Name>Rhino.Tools.JsConsole</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.Tools.Shell\Rhino.Tools.Shell.csproj">
       <Project>{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}</Project>
       <Name>Rhino.Tools.Shell</Name>
     </ProjectReference>
     <ProjectReference Include="..\Rhino\Rhino.csproj">
-      <Project>{ffa067fa-eb0f-4b26-92ff-76d435d1f690}</Project>
+      <Project>{FFA067FA-EB0F-4B26-92FF-76D435D1F690}</Project>
       <Name>Rhino</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sharpen\Sharpen\Sharpen.csproj">
-      <Project>{72944A6C-45FF-4EF8-B349-8C9CABF519D4}</Project>
+      <Project>{72944a6c-45ff-4ef8-b349-8c9cabf519d4}</Project>
       <Name>Sharpen</Name>
     </ProjectReference>
   </ItemGroup>
