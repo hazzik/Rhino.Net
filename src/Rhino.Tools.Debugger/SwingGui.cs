@@ -36,7 +36,7 @@ namespace Rhino.Tools.Debugger
 		/// The action to run when the 'Exit' menu item is chosen or the
 		/// frame is closed.
 		/// </remarks>
-		private Runnable exitAction;
+		private Action exitAction;
 
 		/// <summary>
 		/// The
@@ -128,7 +128,7 @@ namespace Rhino.Tools.Debugger
 		/// that will be run when the "Exit" menu
 		/// item is chosen.
 		/// </summary>
-		public virtual void SetExitAction(Runnable r)
+		public virtual void SetExitAction(Action r)
 		{
 			exitAction = r;
 		}
@@ -839,9 +839,14 @@ namespace Rhino.Tools.Debugger
 		/// <remarks>Called when the source text for a script has been updated.</remarks>
 		public virtual void UpdateSourceText(SourceInfo sourceInfo)
 		{
-			RunProxy proxy = new RunProxy(this, RunProxy.UPDATE_SOURCE_TEXT);
-			proxy.sourceInfo = sourceInfo;
-			SwingUtilities.InvokeLater(proxy);
+			SwingUtilities.InvokeLater(() =>
+			{
+				string fileName = sourceInfo.Url();
+				if (!UpdateFileWindow(sourceInfo) && fileName != "<stdin>")
+				{
+					CreateFileWindow(sourceInfo, -1);
+				}
+			});
 		}
 
 		/// <summary>Called when the interrupt loop has been entered.</summary>
@@ -854,11 +859,10 @@ namespace Rhino.Tools.Debugger
 			}
 			else
 			{
-				RunProxy proxy = new RunProxy(this, RunProxy.ENTER_INTERRUPT);
-				proxy.lastFrame = lastFrame;
-				proxy.threadTitle = threadTitle;
-				proxy.alertMessage = alertMessage;
-				SwingUtilities.InvokeLater(proxy);
+				SwingUtilities.InvokeLater(() =>
+				{
+					EnterInterruptImpl(lastFrame, threadTitle, alertMessage);
+				});
 			}
 		}
 
@@ -905,247 +909,209 @@ namespace Rhino.Tools.Debugger
 
 		// ActionListener
 		/// <summary>Performs an action from the menu or toolbar.</summary>
-		/// <remarks>Performs an action from the menu or toolbar.</remarks>
 		public virtual void ActionPerformed(ActionEvent e)
 		{
 			string cmd = e.GetActionCommand();
 			int returnValue = -1;
-			if (cmd.Equals("Cut") || cmd.Equals("Copy") || cmd.Equals("Paste"))
+			switch (cmd)
 			{
-				JInternalFrame f = GetSelectedFrame();
-				if (f != null && f is ActionListener)
+				case "Paste":
+				case "Copy":
+				case "Cut":
 				{
-					((ActionListener)f).ActionPerformed(e);
+					JInternalFrame f = GetSelectedFrame();
+					if (f != null && f is ActionListener)
+					{
+						((ActionListener) f).ActionPerformed(e);
+					}
 				}
-			}
-			else
-			{
-				if (cmd.Equals("Step Over"))
-				{
+					break;
+				case "Step Over":
 					returnValue = Dim.STEP_OVER;
-				}
-				else
+					break;
+				case "Step Into":
+					returnValue = Dim.STEP_INTO;
+					break;
+				case "Step Out":
+					returnValue = Dim.STEP_OUT;
+					break;
+				case "Go":
+					returnValue = Dim.GO;
+					break;
+				case "Break":
+					dim.SetBreak();
+					break;
+				case "Exit":
+					Exit();
+					break;
+				case "Open":
 				{
-					if (cmd.Equals("Step Into"))
+					string fileName = ChooseFile("Select a file to compile");
+					if (fileName != null)
 					{
-						returnValue = Dim.STEP_INTO;
-					}
-					else
-					{
-						if (cmd.Equals("Step Out"))
+						string text = ReadFile(fileName);
+						if (text != null)
 						{
-							returnValue = Dim.STEP_OUT;
-						}
-						else
-						{
-							if (cmd.Equals("Go"))
+							new System.Threading.Thread(() =>
 							{
-								returnValue = Dim.GO;
-							}
-							else
-							{
-								if (cmd.Equals("Break"))
+								try
 								{
-									dim.SetBreak();
+									dim.CompileScript(fileName, text);
 								}
-								else
+								catch (Exception ex)
 								{
-									if (cmd.Equals("Exit"))
-									{
-										Exit();
-									}
-									else
-									{
-										if (cmd.Equals("Open"))
-										{
-											string fileName = ChooseFile("Select a file to compile");
-											if (fileName != null)
-											{
-												string text = ReadFile(fileName);
-												if (text != null)
-												{
-													RunProxy proxy = new RunProxy(this, RunProxy.OPEN_FILE);
-													proxy.fileName = fileName;
-													proxy.text = text;
-													new Sharpen.Thread(proxy).Start();
-												}
-											}
-										}
-										else
-										{
-											if (cmd.Equals("Load"))
-											{
-												string fileName = ChooseFile("Select a file to execute");
-												if (fileName != null)
-												{
-													string text = ReadFile(fileName);
-													if (text != null)
-													{
-														RunProxy proxy = new RunProxy(this, RunProxy.LOAD_FILE);
-														proxy.fileName = fileName;
-														proxy.text = text;
-														new Sharpen.Thread(proxy).Start();
-													}
-												}
-											}
-											else
-											{
-												if (cmd.Equals("More Windows..."))
-												{
-													MoreWindows dlg = new MoreWindows(this, fileWindows, "Window", "Files");
-													dlg.ShowDialog(this);
-												}
-												else
-												{
-													if (cmd.Equals("Console"))
-													{
-														if (console.IsIcon())
-														{
-															desk.GetDesktopManager().DeiconifyFrame(console);
-														}
-														console.Show();
-														desk.GetDesktopManager().ActivateFrame(console);
-														console.consoleTextArea.RequestFocus();
-													}
-													else
-													{
-														if (cmd.Equals("Cut"))
-														{
-														}
-														else
-														{
-															if (cmd.Equals("Copy"))
-															{
-															}
-															else
-															{
-																if (cmd.Equals("Paste"))
-																{
-																}
-																else
-																{
-																	if (cmd.Equals("Go to function..."))
-																	{
-																		FindFunction dlg = new FindFunction(this, "Go to function", "Function");
-																		dlg.ShowDialog(this);
-																	}
-																	else
-																	{
-																		if (cmd.Equals("Tile"))
-																		{
-																			JInternalFrame[] frames = desk.GetAllFrames();
-																			int count = frames.Length;
-																			int rows;
-																			int cols;
-																			rows = cols = (int)Math.Sqrt(count);
-																			if (rows * cols < count)
-																			{
-																				cols++;
-																				if (rows * cols < count)
-																				{
-																					rows++;
-																				}
-																			}
-																			Dimension size = desk.GetSize();
-																			int w = size.width / cols;
-																			int h = size.height / rows;
-																			int x = 0;
-																			int y = 0;
-																			for (int i = 0; i < rows; i++)
-																			{
-																				for (int j = 0; j < cols; j++)
-																				{
-																					int index = (i * cols) + j;
-																					if (index >= frames.Length)
-																					{
-																						break;
-																					}
-																					JInternalFrame f = frames[index];
-																					try
-																					{
-																						f.SetIcon(false);
-																						f.SetMaximum(false);
-																					}
-																					catch (Exception)
-																					{
-																					}
-																					desk.GetDesktopManager().SetBoundsForFrame(f, x, y, w, h);
-																					x += w;
-																				}
-																				y += h;
-																				x = 0;
-																			}
-																		}
-																		else
-																		{
-																			if (cmd.Equals("Cascade"))
-																			{
-																				JInternalFrame[] frames = desk.GetAllFrames();
-																				int count = frames.Length;
-																				int x;
-																				int y;
-																				int w;
-																				int h;
-																				x = y = 0;
-																				h = desk.GetHeight();
-																				int d = h / count;
-																				if (d > 30)
-																				{
-																					d = 30;
-																				}
-																				for (int i = count - 1; i >= 0; i--, x += d, y += d)
-																				{
-																					JInternalFrame f = frames[i];
-																					try
-																					{
-																						f.SetIcon(false);
-																						f.SetMaximum(false);
-																					}
-																					catch (Exception)
-																					{
-																					}
-																					Dimension dimen = f.GetPreferredSize();
-																					w = dimen.width;
-																					h = dimen.height;
-																					desk.GetDesktopManager().SetBoundsForFrame(f, x, y, w, h);
-																				}
-																			}
-																			else
-																			{
-																				object obj = GetFileWindow(cmd);
-																				if (obj != null)
-																				{
-																					FileWindow w = (FileWindow)obj;
-																					try
-																					{
-																						if (w.IsIcon())
-																						{
-																							w.SetIcon(false);
-																						}
-																						w.SetVisible(true);
-																						w.MoveToFront();
-																						w.SetSelected(true);
-																					}
-																					catch (Exception)
-																					{
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
+									MessageDialogWrapper.ShowMessageDialog(this, ex.Message, "Error Compiling " + fileName, JOptionPane.ERROR_MESSAGE);
 								}
-							}
+							}).Start();
 						}
 					}
 				}
+					break;
+				case "Load":
+				{
+					string fileName = ChooseFile("Select a file to execute");
+					if (fileName != null)
+					{
+						string text = ReadFile(fileName);
+						if (text != null)
+						{
+							new System.Threading.Thread(() =>
+							{
+								try
+								{
+									dim.EvalScript(fileName, text);
+								}
+								catch (Exception ex)
+								{
+									MessageDialogWrapper.ShowMessageDialog(this, ex.Message, "Run error for " + fileName, JOptionPane.ERROR_MESSAGE);
+								}
+							}).Start();
+						}
+					}
+				}
+					break;
+				case "More Windows...":
+				{
+					MoreWindows dlg = new MoreWindows(this, fileWindows, "Window", "Files");
+					dlg.ShowDialog(this);
+				}
+					break;
+				case "Console":
+					if (console.IsIcon())
+					{
+						desk.GetDesktopManager().DeiconifyFrame(console);
+					}
+					console.Show();
+					desk.GetDesktopManager().ActivateFrame(console);
+					console.consoleTextArea.RequestFocus();
+					break;
+				case "Go to function...":
+				{
+					FindFunction dlg = new FindFunction(this, "Go to function", "Function");
+					dlg.ShowDialog(this);
+				}
+					break;
+				case "Tile":
+				{
+					JInternalFrame[] frames = desk.GetAllFrames();
+					int count = frames.Length;
+					int rows;
+					int cols;
+					rows = cols = (int) Math.Sqrt(count);
+					if (rows*cols < count)
+					{
+						cols++;
+						if (rows*cols < count)
+						{
+							rows++;
+						}
+					}
+					Dimension size = desk.GetSize();
+					int w = size.width/cols;
+					int h = size.height/rows;
+					int x = 0;
+					int y = 0;
+					for (int i = 0; i < rows; i++)
+					{
+						for (int j = 0; j < cols; j++)
+						{
+							int index = (i*cols) + j;
+							if (index >= frames.Length)
+							{
+								break;
+							}
+							JInternalFrame f = frames[index];
+							try
+							{
+								f.SetIcon(false);
+								f.SetMaximum(false);
+							}
+							catch (Exception)
+							{
+							}
+							desk.GetDesktopManager().SetBoundsForFrame(f, x, y, w, h);
+							x += w;
+						}
+						y += h;
+						x = 0;
+					}
+				}
+					break;
+				case "Cascade":
+				{
+					JInternalFrame[] frames = desk.GetAllFrames();
+					int count = frames.Length;
+					int x;
+					int y;
+					int w;
+					int h;
+					x = y = 0;
+					h = desk.GetHeight();
+					int d = h/count;
+					if (d > 30)
+					{
+						d = 30;
+					}
+					for (int i = count - 1; i >= 0; i--, x += d, y += d)
+					{
+						JInternalFrame f = frames[i];
+						try
+						{
+							f.SetIcon(false);
+							f.SetMaximum(false);
+						}
+						catch (Exception)
+						{
+						}
+						Dimension dimen = f.GetPreferredSize();
+						w = dimen.width;
+						h = dimen.height;
+						desk.GetDesktopManager().SetBoundsForFrame(f, x, y, w, h);
+					}
+				}
+					break;
+				default:
+				{
+					object obj = GetFileWindow(cmd);
+					if (obj != null)
+					{
+						FileWindow w = (FileWindow) obj;
+						try
+						{
+							if (w.IsIcon())
+							{
+								w.SetIcon(false);
+							}
+							w.SetVisible(true);
+							w.MoveToFront();
+							w.SetSelected(true);
+						}
+						catch (Exception)
+						{
+						}
+					}
+				}
+					break;
 			}
 			if (returnValue != -1)
 			{
@@ -1570,7 +1536,7 @@ namespace Rhino.Tools.Debugger
 	/// <summary>Internal frame for the console.</summary>
 	/// <remarks>Internal frame for the console.</remarks>
 	[System.Serializable]
-	internal class JSInternalConsole : JInternalFrame, ActionListener
+	public class JSInternalConsole : JInternalFrame, ActionListener
 	{
 		/// <summary>Creates a new JSInternalConsole.</summary>
 		/// <remarks>Creates a new JSInternalConsole.</remarks>
@@ -2461,10 +2427,17 @@ namespace Rhino.Tools.Debugger
 			string url = GetUrl();
 			if (url != null)
 			{
-				RunProxy proxy = new RunProxy(debugGui, RunProxy.LOAD_FILE);
-				proxy.fileName = url;
-				proxy.text = sourceInfo.Source();
-				new Sharpen.Thread(proxy).Start();
+				new System.Threading.Thread(() =>
+				{
+					try
+					{
+						debugGui.dim.EvalScript(url, sourceInfo.Source());
+					}
+					catch (Exception ex)
+					{
+						MessageDialogWrapper.ShowMessageDialog(debugGui, ex.Message, "Run error for " + url, JOptionPane.ERROR_MESSAGE);
+					}
+				}).Start();
 			}
 		}
 
@@ -3989,130 +3962,6 @@ namespace Rhino.Tools.Debugger
 			{
 				JMenuItem item = runOnlyItems[i_1];
 				item.SetEnabled(!interrupted);
-			}
-		}
-	}
-
-	/// <summary>
-	/// Class to consolidate all cases that require to implement Runnable
-	/// to avoid class generation bloat.
-	/// </summary>
-	/// <remarks>
-	/// Class to consolidate all cases that require to implement Runnable
-	/// to avoid class generation bloat.
-	/// </remarks>
-	internal class RunProxy : Runnable
-	{
-		internal const int OPEN_FILE = 1;
-
-		internal const int LOAD_FILE = 2;
-
-		internal const int UPDATE_SOURCE_TEXT = 3;
-
-		internal const int ENTER_INTERRUPT = 4;
-
-		/// <summary>The debugger GUI.</summary>
-		/// <remarks>The debugger GUI.</remarks>
-		private SwingGui debugGui;
-
-		/// <summary>The type of Runnable this object is.</summary>
-		/// <remarks>
-		/// The type of Runnable this object is.  Takes one of the constants
-		/// defined in this class.
-		/// </remarks>
-		private int type;
-
-		/// <summary>The name of the file to open or load.</summary>
-		/// <remarks>The name of the file to open or load.</remarks>
-		internal string fileName;
-
-		/// <summary>The source text to update.</summary>
-		/// <remarks>The source text to update.</remarks>
-		internal string text;
-
-		/// <summary>The source for which to update the text.</summary>
-		/// <remarks>The source for which to update the text.</remarks>
-		internal SourceInfo sourceInfo;
-
-		/// <summary>The frame to interrupt in.</summary>
-		/// <remarks>The frame to interrupt in.</remarks>
-		internal Dim.StackFrame lastFrame;
-
-		/// <summary>The name of the interrupted thread.</summary>
-		/// <remarks>The name of the interrupted thread.</remarks>
-		internal string threadTitle;
-
-		/// <summary>
-		/// The message of the exception thrown that caused the thread
-		/// interruption, if any.
-		/// </summary>
-		/// <remarks>
-		/// The message of the exception thrown that caused the thread
-		/// interruption, if any.
-		/// </remarks>
-		internal string alertMessage;
-
-		/// <summary>Creates a new RunProxy.</summary>
-		/// <remarks>Creates a new RunProxy.</remarks>
-		public RunProxy(SwingGui debugGui, int type)
-		{
-			// Constants for 'type'.
-			this.debugGui = debugGui;
-			this.type = type;
-		}
-
-		/// <summary>Runs this Runnable.</summary>
-		/// <remarks>Runs this Runnable.</remarks>
-		public virtual void Run()
-		{
-			switch (type)
-			{
-				case OPEN_FILE:
-				{
-					try
-					{
-						debugGui.dim.CompileScript(fileName, text);
-					}
-					catch (Exception ex)
-					{
-						MessageDialogWrapper.ShowMessageDialog(debugGui, ex.Message, "Error Compiling " + fileName, JOptionPane.ERROR_MESSAGE);
-					}
-					break;
-				}
-
-				case LOAD_FILE:
-				{
-					try
-					{
-						debugGui.dim.EvalScript(fileName, text);
-					}
-					catch (Exception ex)
-					{
-						MessageDialogWrapper.ShowMessageDialog(debugGui, ex.Message, "Run error for " + fileName, JOptionPane.ERROR_MESSAGE);
-					}
-					break;
-				}
-
-				case UPDATE_SOURCE_TEXT:
-				{
-					string fileName = sourceInfo.Url();
-					if (!debugGui.UpdateFileWindow(sourceInfo) && !fileName.Equals("<stdin>"))
-					{
-						debugGui.CreateFileWindow(sourceInfo, -1);
-					}
-					break;
-				}
-
-				case ENTER_INTERRUPT:
-				{
-					debugGui.EnterInterruptImpl(lastFrame, threadTitle, alertMessage);
-					break;
-				}
-
-				default:
-				{
-					throw new ArgumentException(type.ToString());
-				}
 			}
 		}
 	}

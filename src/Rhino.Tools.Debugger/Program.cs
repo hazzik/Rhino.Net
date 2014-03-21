@@ -6,10 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System;
 using System.IO;
-using Rhino;
-using Rhino.Tools.Debugger;
+using Rhino.Tools.Shell;
 using Sharpen;
+using Environment = System.Environment;
 
 namespace Rhino.Tools.Debugger
 {
@@ -99,7 +100,7 @@ namespace Rhino.Tools.Debugger
 		/// <remarks>Sets the scope to be used for script evaluation.</remarks>
 		public virtual void SetScope(Scriptable scope)
 		{
-			SetScopeProvider(Program.IProxy.NewScopeProvider(scope));
+			SetScopeProvider(new ScopeProviderImpl(scope));
 		}
 
 		/// <summary>
@@ -132,7 +133,7 @@ namespace Rhino.Tools.Debugger
 		/// Assign a Runnable object that will be invoked when the user
 		/// selects "Exit..." or closes the Debugger main window.
 		/// </remarks>
-		public virtual void SetExitAction(Runnable r)
+		public virtual void SetExitAction(Action r)
 		{
 			debugGui.SetExitAction(r);
 		}
@@ -238,7 +239,7 @@ namespace Rhino.Tools.Debugger
 		{
 			Program main = new Program("Rhino JavaScript Debugger");
 			main.DoBreak();
-			main.SetExitAction(new Program.IProxy(Program.IProxy.EXIT_ACTION));
+			main.SetExitAction(() => Environment.Exit(0));
 			Runtime.SetIn(main.GetIn());
 			Runtime.SetOut(main.GetOut());
 			Runtime.SetErr(main.GetErr());
@@ -313,23 +314,23 @@ namespace Rhino.Tools.Debugger
 		private static Program MainEmbeddedImpl(ContextFactory factory, object scopeProvider, string title)
 		{
 			if (title == null)
-			{
 				title = "Rhino JavaScript Debugger (embedded usage)";
-			}
-			Program main = new Program(title);
+
+			var main = new Program(title);
 			main.DoBreak();
-			main.SetExitAction(new Program.IProxy(Program.IProxy.EXIT_ACTION));
+			main.SetExitAction(() => Environment.Exit(0));
 			main.AttachTo(factory);
-			if (scopeProvider is ScopeProvider)
+			var provider = scopeProvider as ScopeProvider;
+			if (provider != null)
 			{
-				main.SetScopeProvider((ScopeProvider)scopeProvider);
+				main.SetScopeProvider(provider);
 			}
 			else
 			{
-				Scriptable scope = (Scriptable)scopeProvider;
-				if (scope is Global)
+				Scriptable scope = (Scriptable) scopeProvider;
+				var global = scope as Global;
+				if (global != null)
 				{
-					Global global = (Global)scope;
 					global.SetIn(main.GetIn());
 					global.SetOut(main.GetOut());
 					global.SetErr(main.GetErr());
@@ -342,78 +343,19 @@ namespace Rhino.Tools.Debugger
 			return main;
 		}
 
-		/// <summary>
-		/// Class to consolidate all internal implementations of interfaces
-		/// to avoid class generation bloat.
-		/// </summary>
-		/// <remarks>
-		/// Class to consolidate all internal implementations of interfaces
-		/// to avoid class generation bloat.
-		/// </remarks>
-		private class IProxy : Runnable, ScopeProvider
+		private sealed class ScopeProviderImpl : ScopeProvider
 		{
-			public const int EXIT_ACTION = 1;
+			private readonly Scriptable scope;
 
-			public const int SCOPE_PROVIDER = 2;
-
-			/// <summary>The type of interface.</summary>
-			/// <remarks>The type of interface.</remarks>
-			private readonly int type;
-
-			/// <summary>
-			/// The scope object to expose when
-			/// <see cref="type">type</see>
-			/// =
-			/// <see cref="SCOPE_PROVIDER">SCOPE_PROVIDER</see>
-			/// .
-			/// </summary>
-			private Scriptable scope;
-
-			/// <summary>Creates a new IProxy.</summary>
-			/// <remarks>Creates a new IProxy.</remarks>
-			public IProxy(int type)
+			public ScopeProviderImpl(Scriptable scope)
 			{
-				// Constants for 'type'.
-				this.type = type;
+				if (scope == null) throw new ArgumentNullException("scope");
+				this.scope = scope;
 			}
 
-			/// <summary>
-			/// Creates a new IProxy that acts as a
-			/// <see cref="ScopeProvider">ScopeProvider</see>
-			/// .
-			/// </summary>
-			public static ScopeProvider NewScopeProvider(Scriptable scope)
-			{
-				Program.IProxy scopeProvider = new Program.IProxy(SCOPE_PROVIDER);
-				scopeProvider.scope = scope;
-				return scopeProvider;
-			}
-
-			// ContextAction
-			/// <summary>Exit action.</summary>
-			/// <remarks>Exit action.</remarks>
-			public virtual void Run()
-			{
-				if (type != EXIT_ACTION)
-				{
-					Kit.CodeBug();
-				}
-				System.Environment.Exit(0);
-			}
-
-			// ScopeProvider
 			/// <summary>Returns the scope for script evaluations.</summary>
-			/// <remarks>Returns the scope for script evaluations.</remarks>
-			public virtual Scriptable GetScope()
+			public Scriptable GetScope()
 			{
-				if (type != SCOPE_PROVIDER)
-				{
-					Kit.CodeBug();
-				}
-				if (scope == null)
-				{
-					Kit.CodeBug();
-				}
 				return scope;
 			}
 		}

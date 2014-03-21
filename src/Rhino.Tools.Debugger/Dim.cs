@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Threading;
 using Rhino.Debug;
 using Sharpen;
 
@@ -574,7 +575,7 @@ openStream_break: ;
 			lock (monitor)
 			{
 				this.returnValue = returnValue;
-				Sharpen.Runtime.Notify(monitor);
+				Monitor.Pulse(monitor);
 			}
 		}
 
@@ -585,7 +586,7 @@ openStream_break: ;
 			lock (monitor)
 			{
 				this.returnValue = GO;
-				Sharpen.Runtime.NotifyAll(monitor);
+				Monitor.PulseAll(monitor);
 			}
 		}
 
@@ -617,16 +618,16 @@ openStream_break: ;
 					{
 						evalRequest = expr;
 						evalFrame = frame;
-						Sharpen.Runtime.Notify(monitor);
+						Monitor.Pulse(monitor);
 						do
 						{
 							try
 							{
-								Sharpen.Runtime.Wait(monitor);
+								Monitor.Wait(monitor);
 							}
 							catch (Exception)
 							{
-								Sharpen.Thread.CurrentThread().Interrupt();
+								System.Threading.Thread.CurrentThread.Interrupt();
 								break;
 							}
 						}
@@ -822,7 +823,7 @@ openStream_break: ;
 					{
 						try
 						{
-							Sharpen.Runtime.Wait(eventThreadMonitor);
+							Monitor.Wait(eventThreadMonitor);
 						}
 						catch (Exception)
 						{
@@ -866,7 +867,7 @@ interruptedCheck_break: ;
 				{
 					int frameCount = contextData.FrameCount();
 					this.frameIndex = frameCount - 1;
-					string threadTitle = Sharpen.Thread.CurrentThread().ToString();
+					string threadTitle = System.Threading.Thread.CurrentThread.Name;
 					string alertMessage;
 					if (scriptException == null)
 					{
@@ -895,11 +896,11 @@ interruptedCheck_break: ;
 								{
 									try
 									{
-										Sharpen.Runtime.Wait(monitor);
+										Monitor.Wait(monitor);
 									}
 									catch (Exception)
 									{
-										Sharpen.Thread.CurrentThread().Interrupt();
+										System.Threading.Thread.CurrentThread.Interrupt();
 										break;
 									}
 									if (evalRequest != null)
@@ -913,7 +914,7 @@ interruptedCheck_break: ;
 										{
 											evalRequest = null;
 											evalFrame = null;
-											Sharpen.Runtime.Notify(monitor);
+											Monitor.Pulse(monitor);
 										}
 										continue;
 									}
@@ -980,7 +981,7 @@ interruptedCheck_break: ;
 				lock (eventThreadMonitor)
 				{
 					interruptedContextData = null;
-					Sharpen.Runtime.NotifyAll(eventThreadMonitor);
+					Monitor.PulseAll(eventThreadMonitor);
 				}
 			}
 		}
