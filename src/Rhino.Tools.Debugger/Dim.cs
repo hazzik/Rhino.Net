@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security;
 using System.Text;
 using Rhino.Debug;
@@ -414,7 +415,7 @@ openStream_break: ;
 		{
 			lock (urlToSourceInfo)
 			{
-				return Sharpen.Collections.ToArray(functionNames.Keys, new string[functionNames.Count]);
+				return functionNames.Keys.ToArray();
 			}
 		}
 

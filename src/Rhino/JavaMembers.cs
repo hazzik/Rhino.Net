@@ -15,6 +15,7 @@ using System.Text;
 using Rhino;
 using Rhino.Utils;
 using Sharpen;
+using Arrays = Rhino.Utils.Arrays;
 
 namespace Rhino
 {
@@ -446,7 +447,7 @@ namespace Rhino
 				var ms = o as MethodSignature;
 				if (ms != null)
 				{
-					return ms.name.Equals(name) && Arrays.Equals(args, ms.args);
+					return ms.name == name && Arrays.Equals(args, ms.args);
 				}
 				return false;
 			}

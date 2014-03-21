@@ -12,6 +12,7 @@ using System.Text;
 using Rhino;
 using Rhino.Utils;
 using Sharpen;
+using Arrays = Rhino.Utils.Arrays;
 
 namespace Rhino
 {

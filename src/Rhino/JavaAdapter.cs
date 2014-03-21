@@ -15,6 +15,7 @@ using System.Text;
 using Rhino.Annotations;
 using Rhino.Optimizer;
 using Sharpen;
+using Arrays = Rhino.Utils.Arrays;
 
 namespace Rhino
 {

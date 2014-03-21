@@ -2109,7 +2109,7 @@ namespace Rhino.Tools.Debugger
 			DefaultListModel model = (DefaultListModel)list.GetModel();
 			model.Clear();
 			string[] a = debugGui.dim.FunctionNames();
-			Arrays.Sort(a);
+			Array.Sort(a, string.CompareOrdinal);
 			for (int i = 0; i < a.Length; i++)
 			{
 				model.AddElement(a[i]);
