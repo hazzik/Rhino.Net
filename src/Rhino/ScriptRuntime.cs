@@ -1103,7 +1103,7 @@ namespace Rhino
 						object value;
 						if (id is int)
 						{
-							int intId = System.Convert.ToInt32(((int)id));
+							int intId = (int)id;
 							value = thisObj.Get(intId, thisObj);
 							if (value == ScriptableConstants.NOT_FOUND)
 							{
@@ -1318,7 +1318,7 @@ namespace Rhino
 			// short circuit for common integer values
 			if (val is int)
 			{
-				return System.Convert.ToInt32(((int)val));
+				return (int)val;
 			}
 			return ToInt32(ToNumber(val));
 		}
@@ -4145,7 +4145,7 @@ search_break: ;
 				}
 				else
 				{
-					int index = System.Convert.ToInt32(((int)id));
+					int index = (int)id;
 					@object.Put(index, @object, value);
 				}
 			}

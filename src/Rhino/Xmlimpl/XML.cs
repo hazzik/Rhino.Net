@@ -477,7 +477,7 @@ namespace Rhino.XmlImpl
 			bool result;
 			if (name is int)
 			{
-				result = (System.Convert.ToInt32(((int)name)) == 0);
+				result = (int)name == 0;
 			}
 			else
 			{

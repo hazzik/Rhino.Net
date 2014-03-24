@@ -743,7 +743,7 @@ openStream_break: ;
 			}
 			else
 			{
-				int index = System.Convert.ToInt32(((int)id));
+				int index = (int)id;
 				result = ScriptableObject.GetProperty(scriptable, index);
 				if (result == ScriptableConstants.NOT_FOUND)
 				{

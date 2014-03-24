@@ -684,7 +684,7 @@ namespace Rhino.XmlImpl
 			long index;
 			if (name is int)
 			{
-				index = System.Convert.ToInt32(((int)name));
+				index = (int)name;
 			}
 			else
 			{

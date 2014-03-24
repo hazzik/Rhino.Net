@@ -893,7 +893,7 @@ again_break: ;
 						}
 						else
 						{
-							int index = Convert.ToInt32(((int)id));
+							int index = (int)id;
 							if (index >= longVal)
 							{
 								Delete(index);
