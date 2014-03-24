@@ -229,9 +229,8 @@ namespace Rhino.Tests
 		{
 			string mainMethodClassName = "Main";
 			string scriptClassName = "Main";
-			CompilerEnvirons compilerEnv = new CompilerEnvirons();
-			compilerEnv.InitFromContext(context);
-			ErrorReporter compilationErrorReporter = compilerEnv.GetErrorReporter();
+            var compilerEnv = new CompilerEnvirons(context);
+			ErrorReporter compilationErrorReporter = compilerEnv.ErrorReporter;
 			Parser p = new Parser(compilerEnv, compilationErrorReporter);
 			AstRoot ast = p.Parse(source, "<eval>", 1);
 			IRFactory irf = new IRFactory(compilerEnv);

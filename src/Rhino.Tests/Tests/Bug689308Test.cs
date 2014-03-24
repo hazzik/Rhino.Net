@@ -34,11 +34,10 @@ namespace Rhino.Tests
 
 		private AstRoot Parse(string cs)
 		{
-			CompilerEnvirons compilerEnv = new CompilerEnvirons();
-			compilerEnv.InitFromContext(cx);
-			ErrorReporter compilationErrorReporter = compilerEnv.GetErrorReporter();
+            var compilerEnv = new CompilerEnvirons(cx);
+			ErrorReporter compilationErrorReporter = compilerEnv.ErrorReporter;
 			Parser p = new Parser(compilerEnv, compilationErrorReporter);
-			return p.Parse(cs.ToString(), "<eval>", 1);
+			return p.Parse(cs, "<eval>", 1);
 		}
 
 		private string ToSource(string cs)

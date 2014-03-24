@@ -171,7 +171,7 @@ namespace Rhino.Optimizer
 		private void Transform(ScriptNode tree)
 		{
 			InitOptFunctions_r(tree);
-			var optLevel = compilerEnv.GetOptimizationLevel();
+			var optLevel = compilerEnv.OptimizationLevel;
 			IDictionary<string, OptFunctionNode> possibleDirectCalls = null;
 			if (optLevel > 0)
 			{
@@ -261,7 +261,7 @@ namespace Rhino.Optimizer
 			var hasScript = (scriptOrFnNodes[0].GetType() == Token.SCRIPT);
 			var hasFunctions = (scriptOrFnNodes.Length > 1 || !hasScript);
 			string sourceFile = null;
-			if (compilerEnv.IsGenerateDebugInfo())
+			if (compilerEnv.GenerateDebugInfo)
 			{
 				sourceFile = scriptOrFnNodes[0].GetSourceName();
 			}
@@ -663,7 +663,7 @@ namespace Rhino.Optimizer
 			// public int getLanguageVersion() { return <version-constant>; }
 			var method = type.DefineMethod("GetLanguageVersion", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual, typeof(LanguageVersion), Type.EmptyTypes);
 			var il = method.GetILGenerator();
-			var version = compilerEnv.GetLanguageVersion();
+			var version = compilerEnv.LanguageVersion;
 			il.EmitLoadConstant((int) version);
 			il.Emit(OpCodes.Ret);
 		}

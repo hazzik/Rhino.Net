@@ -218,7 +218,7 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Ldarg_1);
 				il.Emit(OpCodes.Call, regExpInit);
 			}
-			if (compilerEnv.IsGenerateObserverCount())
+			if (compilerEnv.GenerateObserverCount)
 			{
 				SaveCurrentCodeOffset(il);
 			}
@@ -316,7 +316,7 @@ namespace Rhino.Optimizer
 						varRegisters[i] = reg;
 					}
 					// Add debug table entry if we're generating debug info
-					if (compilerEnv.IsGenerateDebugInfo())
+					if (compilerEnv.GenerateDebugInfo)
 					{
 						var name = fnCurrent.fnode.GetParamOrVarName(i);
 						Type type = fnCurrent.IsNumberVar(i) ? typeof (double) : typeof (Object);
@@ -418,7 +418,7 @@ namespace Rhino.Optimizer
 
 		private void GenerateEpilogue(ILGenerator il)
 		{
-			if (compilerEnv.IsGenerateObserverCount())
+			if (compilerEnv.GenerateObserverCount)
 			{
 				AddInstructionCount(il);
 			}
@@ -541,7 +541,7 @@ namespace Rhino.Optimizer
 				case Token.EMPTY:
 				{
 					// no-ops.
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						// Need to add instruction count even for no-ops to catch
 						// cases like while (1) {}
@@ -632,7 +632,7 @@ namespace Rhino.Optimizer
 				case Token.THROW:
 				{
 					GenerateExpression(il, child, node);
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						AddInstructionCount(il);
 					}
@@ -642,7 +642,7 @@ namespace Rhino.Optimizer
 
 				case Token.RETHROW:
 				{
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						AddInstructionCount(il);
 					}
@@ -677,7 +677,7 @@ namespace Rhino.Optimizer
 							}
 						}
 					}
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						AddInstructionCount(il);
 					}
@@ -695,7 +695,7 @@ namespace Rhino.Optimizer
 
 				case Token.SWITCH:
 				{
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						AddInstructionCount(il);
 					}
@@ -778,13 +778,13 @@ namespace Rhino.Optimizer
 
 				case Token.TARGET:
 				{
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						AddInstructionCount(il);
 					}
 					var label = GetTargetLabel(il, node);
 					il.MarkLabel(label);
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						SaveCurrentCodeOffset(il);
 					}
@@ -796,7 +796,7 @@ namespace Rhino.Optimizer
 				case Token.IFEQ:
 				case Token.IFNE:
 				{
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						AddInstructionCount(il);
 					}
@@ -815,7 +815,7 @@ namespace Rhino.Optimizer
 					{
 						break;
 					}
-					if (compilerEnv.IsGenerateObserverCount())
+					if (compilerEnv.GenerateObserverCount)
 					{
 						SaveCurrentCodeOffset(il);
 					}

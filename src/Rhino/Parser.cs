@@ -129,7 +129,7 @@ namespace Rhino
 		{
 		}
 
-		public Parser(CompilerEnvirons compilerEnv) : this(compilerEnv, compilerEnv.GetErrorReporter())
+		public Parser(CompilerEnvirons compilerEnv) : this(compilerEnv, compilerEnv.ErrorReporter)
 		{
 		}
 
@@ -159,7 +159,7 @@ namespace Rhino
 
 		internal virtual void AddStrictWarning(string messageId, string messageArg, int position, int length)
 		{
-			if (compilerEnv.IsStrictMode())
+			if (compilerEnv.StrictMode)
 			{
 				AddWarning(messageId, messageArg, position, length);
 			}
@@ -185,7 +185,7 @@ namespace Rhino
 		internal virtual void AddWarning(string messageId, string messageArg, int position, int length)
 		{
 			string message = LookupMessage(messageId, messageArg);
-			if (compilerEnv.ReportWarningAsError())
+			if (compilerEnv.ReportWarningAsError)
 			{
 				AddError(messageId, messageArg, position, length);
 			}
@@ -277,7 +277,7 @@ namespace Rhino
 		internal virtual void ReportError(string messageId, string messageArg, int position, int length)
 		{
 			AddError(messageId, position, length);
-			if (!compilerEnv.RecoverFromErrors())
+			if (!compilerEnv.RecoverFromErrors)
 			{
 				throw new Parser.ParserException();
 			}
@@ -298,7 +298,7 @@ namespace Rhino
 				scannedComments = new List<Comment>();
 			}
 			Comment commentNode = new Comment(ts.tokenBeg, ts.GetTokenLength(), ts.commentType, comment);
-			if (ts.commentType == Token.CommentType.JSDOC && compilerEnv.IsRecordingLocalJsDocComments())
+			if (ts.commentType == Token.CommentType.JSDOC && compilerEnv.RecordingLocalJsDocComments)
 			{
 				currentJsDocComment = commentNode;
 			}
@@ -363,7 +363,7 @@ namespace Rhino
 				}
 				else
 				{
-					if (compilerEnv.IsRecordingComments())
+					if (compilerEnv.RecordingComments)
 					{
 						string comment = ts.GetAndResetCurrentComment();
 						RecordComment(lineno, comment);
@@ -456,7 +456,7 @@ namespace Rhino
 
 		private void MustHaveXML()
 		{
-			if (!compilerEnv.IsXmlAvailable())
+			if (!compilerEnv.XmlAvailable)
 			{
 				ReportError("msg.XML.not.available");
 			}
@@ -571,7 +571,7 @@ namespace Rhino
 				throw new InvalidOperationException("parser reused");
 			}
 			this.sourceURI = uri;
-			if (compilerEnv.IsIdeMode())
+			if (compilerEnv.IdeMode)
 			{
 				this.sourceChars = sourceString.ToCharArray();
 			}
@@ -605,7 +605,7 @@ namespace Rhino
 			{
 				throw new InvalidOperationException("parser reused");
 			}
-			if (compilerEnv.IsIdeMode())
+			if (compilerEnv.IdeMode)
 			{
 				return Parse(reader.ReadToEnd(), uri, lineno);
 			}
@@ -685,7 +685,7 @@ namespace Rhino
 			catch (StackOverflowException)
 			{
 				string msg = LookupMessage("msg.too.deep.parser.recursion");
-				if (!compilerEnv.IsIdeMode())
+				if (!compilerEnv.IdeMode)
 				{
 					throw Context.ReportRuntimeError(msg, sourceURI, ts.lineno, null, 0);
 				}
@@ -698,7 +698,7 @@ namespace Rhino
 			{
 				string msg = this.syntaxErrorCount.ToString();
 				msg = LookupMessage("msg.got.syntax.errors", msg);
-				if (!compilerEnv.IsIdeMode())
+				if (!compilerEnv.IdeMode)
 				{
 					throw errorReporter.RuntimeError(msg, sourceURI, baseLineno, null, 0);
 				}
@@ -728,7 +728,7 @@ namespace Rhino
 			bool isExpressionClosure = false;
 			if (!MatchToken(Token.LC))
 			{
-				if (compilerEnv.GetLanguageVersion() < LanguageVersion.VERSION_1_8)
+				if (compilerEnv.LanguageVersion < LanguageVersion.VERSION_1_8)
 				{
 					ReportError("msg.no.brace.body");
 				}
@@ -936,7 +936,7 @@ bodyLoop_break: ;
 				}
 				if (!MatchToken(Token.LP))
 				{
-					if (compilerEnv.IsAllowMemberExprAsFunctionName())
+					if (compilerEnv.AllowMemberExprAsFunctionName)
 					{
 						AstNode memberExprHead = name;
 						name = null;
@@ -953,7 +953,7 @@ bodyLoop_break: ;
 				else
 				{
 					// Anonymous function:  leave name as null
-					if (compilerEnv.IsAllowMemberExprAsFunctionName())
+					if (compilerEnv.AllowMemberExprAsFunctionName)
 					{
 						// Note that memberExpr can not start with '(' like
 						// in function (1+2).toString(), because 'function (' already
@@ -987,7 +987,7 @@ bodyLoop_break: ;
 				fnNode.SetBody(ParseFunctionBody());
 				fnNode.SetEncodedSourceBounds(functionSourceStart, ts.tokenEnd);
 				fnNode.Length = ts.tokenEnd - functionSourceStart;
-				if (compilerEnv.IsStrictMode() && !fnNode.GetBody().HasConsistentReturnUsage())
+				if (compilerEnv.StrictMode && !fnNode.GetBody().HasConsistentReturnUsage())
 				{
 					string msg = (name != null && name.IdentifierLength() > 0) ? "msg.no.return.value" : "msg.anon.no.return.value";
 					AddStrictWarning(msg, name == null ? string.Empty : name.GetIdentifier());
@@ -1011,7 +1011,7 @@ bodyLoop_break: ;
 			// Have to wait until after parsing the function to set its parent
 			// scope, since defineSymbol needs the defining-scope check to stop
 			// at the function boundary when checking for redeclarations.
-			if (compilerEnv.IsIdeMode())
+			if (compilerEnv.IdeMode)
 			{
 				fnNode.SetParentScope(currentScope);
 			}
@@ -1028,7 +1028,7 @@ bodyLoop_break: ;
 		/// <exception cref="System.IO.IOException"></exception>
 		private AstNode Statements(AstNode parent)
 		{
-			if (currentToken != Token.LC && !compilerEnv.IsIdeMode())
+			if (currentToken != Token.LC && !compilerEnv.IdeMode)
 			{
 				// assertion can be invalid in bad code
 				CodeBug();
@@ -1092,7 +1092,7 @@ bodyLoop_break: ;
 				AstNode pn = StatementHelper();
 				if (pn != null)
 				{
-					if (compilerEnv.IsStrictMode() && !pn.HasSideEffects())
+					if (compilerEnv.StrictMode && !pn.HasSideEffects())
 					{
 						int beg = pn.Position;
 						beg = Math.Max(beg, LineBeginningFor(beg));
@@ -2176,7 +2176,7 @@ switchLoop_break: ;
 				LabeledStatement ls = labelSet.Get(name);
 				if (ls != null)
 				{
-					if (compilerEnv.IsIdeMode())
+					if (compilerEnv.IdeMode)
 					{
 						Label dup = ls.GetLabelByName(name);
 						ReportError("msg.dup.label", dup.GetAbsolutePosition(), dup.Length);
@@ -2423,7 +2423,7 @@ switchLoop_break: ;
 		{
 			if (name == null)
 			{
-				if (compilerEnv.IsIdeMode())
+				if (compilerEnv.IdeMode)
 				{
 					// be robust in IDE-mode
 					return;
@@ -2506,7 +2506,7 @@ switchLoop_break: ;
 			while (MatchToken(Token.COMMA))
 			{
 				int opPos = ts.tokenBeg;
-				if (compilerEnv.IsStrictMode() && !pn.HasSideEffects())
+				if (compilerEnv.StrictMode && !pn.HasSideEffects())
 				{
 					AddStrictWarning("msg.no.side.effects", string.Empty, pos, NodeEnd(pn) - pos);
 				}
@@ -2673,7 +2673,7 @@ switchLoop_break: ;
 					{
 						ConsumeToken();
 						int parseToken = tt;
-						if (compilerEnv.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
+						if (compilerEnv.LanguageVersion == LanguageVersion.VERSION_1_2)
 						{
 							// JavaScript 1.2 uses shallow equality for == and != .
 							if (tt == Token.EQ)
@@ -2864,7 +2864,7 @@ switchLoop_break: ;
 				case Token.LT:
 				{
 					// XML stream encountered in expression.
-					if (compilerEnv.IsXmlAvailable())
+					if (compilerEnv.XmlAvailable)
 					{
 						ConsumeToken();
 						return MemberExprTail(true, XmlInitializer());
@@ -3190,10 +3190,10 @@ tailLoop_break: ;
 				MustHaveXML();
 				memberTypeFlags = Node.DESCENDANTS_FLAG;
 			}
-			if (!compilerEnv.IsXmlAvailable())
+			if (!compilerEnv.XmlAvailable)
 			{
 				int maybeName = NextToken();
-				if (maybeName != Token.NAME && !(compilerEnv.IsReservedKeywordAsIdentifier() && TokenStream.IsKeyword(ts.GetString())))
+				if (maybeName != Token.NAME && !(compilerEnv.ReservedKeywordAsIdentifier && TokenStream.IsKeyword(ts.GetString())))
 				{
 					ReportError("msg.no.name.after.dot");
 				}
@@ -3240,7 +3240,7 @@ tailLoop_break: ;
 
 				default:
 				{
-					if (compilerEnv.IsReservedKeywordAsIdentifier())
+					if (compilerEnv.ReservedKeywordAsIdentifier)
 					{
 						// allow keywords as property names, e.g. ({if: 1})
 						string name = Token.KeywordToName(token);
@@ -3604,7 +3604,7 @@ tailLoop_break: ;
 			// a colon has biffed ts.tokenBeg, ts.tokenEnd.  We store the name's
 			// bounds in instance vars and createNameNode uses them.
 			SaveNameTokenData(namePos, nameString, nameLineno);
-			if (compilerEnv.IsXmlAvailable())
+			if (compilerEnv.XmlAvailable)
 			{
 				return PropertyName(-1, nameString, 0);
 			}
@@ -4120,7 +4120,7 @@ commaLoop_break: ;
 
 				default:
 				{
-					if (compilerEnv.IsReservedKeywordAsIdentifier() && TokenStream.IsKeyword(ts.GetString()))
+					if (compilerEnv.ReservedKeywordAsIdentifier && TokenStream.IsKeyword(ts.GetString()))
 					{
 						// convert keyword to property name, e.g. ({if: 1})
 						pname = CreateNameNode();
@@ -4140,7 +4140,7 @@ commaLoop_break: ;
 			// Support, e.g., |var {x, y} = o| as destructuring shorthand
 			// for |var {x: x, y: y} = o|, as implemented in spidermonkey JS 1.8.
 			int tt = PeekToken();
-			if ((tt == Token.COMMA || tt == Token.RC) && ptt == Token.NAME && compilerEnv.GetLanguageVersion() >= LanguageVersion.VERSION_1_8)
+			if ((tt == Token.COMMA || tt == Token.RC) && ptt == Token.NAME && compilerEnv.LanguageVersion >= LanguageVersion.VERSION_1_8)
 			{
 				if (!inDestructuringAssignment)
 				{
@@ -4219,7 +4219,7 @@ commaLoop_break: ;
 			}
 			if (s == null)
 			{
-				if (compilerEnv.IsIdeMode())
+				if (compilerEnv.IdeMode)
 				{
 					s = string.Empty;
 				}
@@ -4255,7 +4255,7 @@ commaLoop_break: ;
 				return;
 			}
 			bool activation = false;
-			if ("arguments".Equals(name) || (compilerEnv.GetActivationNames() != null && compilerEnv.GetActivationNames().Contains(name)))
+			if ("arguments".Equals(name) || (compilerEnv.ActivationNames != null && compilerEnv.ActivationNames.Contains(name)))
 			{
 				activation = true;
 			}
@@ -4263,7 +4263,7 @@ commaLoop_break: ;
 			{
 				if ("length".Equals(name))
 				{
-					if (token == Token.GETPROP && compilerEnv.GetLanguageVersion() == LanguageVersion.VERSION_1_2)
+					if (token == Token.GETPROP && compilerEnv.LanguageVersion == LanguageVersion.VERSION_1_2)
 					{
 						// Use of "length" in 1.2 requires an activation object.
 						activation = true;
@@ -4385,7 +4385,7 @@ commaLoop_break: ;
 			// Should probably change this to be a CompilerEnvirons setting,
 			// with an enum Never, Always, Permissive, where Permissive means
 			// don't warn for 1-line functions like function (s) {return x+2}
-			if (compilerEnv.IsStrictMode())
+			if (compilerEnv.StrictMode)
 			{
 				int beg = Math.Max(pos, LineBeginningFor(end));
 				if (end == -1)
@@ -4398,7 +4398,7 @@ commaLoop_break: ;
 
 		private void WarnTrailingComma<T>(int pos, IList<T> elems, int commaPos) where T: Node
 		{
-			if (compilerEnv.GetWarnTrailingComma())
+			if (compilerEnv.WarnTrailingComma)
 			{
 				// back up from comma to beginning of line or array/objlit
 				if (elems.Count > 0)

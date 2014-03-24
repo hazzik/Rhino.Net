@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,11 +34,10 @@ namespace Rhino.Tests
 
 		private AstRoot Parse(string cs)
 		{
-			CompilerEnvirons compilerEnv = new CompilerEnvirons();
-			compilerEnv.InitFromContext(cx);
-			ErrorReporter compilationErrorReporter = compilerEnv.GetErrorReporter();
+            var compilerEnv = new CompilerEnvirons(cx);
+			ErrorReporter compilationErrorReporter = compilerEnv.ErrorReporter;
 			Parser p = new Parser(compilerEnv, compilationErrorReporter);
-			return p.Parse(cs.ToString(), "<eval>", 1);
+			return p.Parse(cs, "<eval>", 1);
 		}
 
 		private string ToSource(string cs)

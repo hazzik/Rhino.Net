@@ -38,7 +38,7 @@ namespace Rhino
 		{
 		}
 
-		public IRFactory(CompilerEnvirons env) : this(env, env.GetErrorReporter())
+		public IRFactory(CompilerEnvirons env) : this(env, env.ErrorReporter)
 		{
 		}
 
@@ -59,7 +59,7 @@ namespace Rhino
 			ScriptNode script = (ScriptNode)Transform(root);
 			int sourceEndOffset = decompiler.GetCurrentOffset();
 			script.SetEncodedSourceBounds(sourceStartOffset, sourceEndOffset);
-			if (compilerEnv.IsGeneratingSource())
+			if (compilerEnv.GeneratingSource)
 			{
 				script.SetEncodedSource(decompiler.GetEncodedSource());
 			}

@@ -986,12 +986,13 @@ namespace Rhino
 		public bool StringIsCompilableUnit(string source)
 		{
 			bool errorseen = false;
-			CompilerEnvirons compilerEnv = new CompilerEnvirons();
-			compilerEnv.InitFromContext(this);
-			// no source name or source text manager, because we're just
-			// going to throw away the result.
-			compilerEnv.SetGeneratingSource(false);
-			Parser p = new Parser(compilerEnv, DefaultErrorReporter.instance);
+		    var compilerEnv = new CompilerEnvirons(this)
+		    {
+		        // no source name or source text manager, because we're just
+		        // going to throw away the result.
+		        GeneratingSource = false
+		    };
+		    Parser p = new Parser(compilerEnv, DefaultErrorReporter.instance);
 			try
 			{
 				p.Parse(source, null, 1);
@@ -2239,11 +2240,10 @@ namespace Rhino
 			{
 				Kit.CodeBug();
 			}
-			CompilerEnvirons compilerEnv = new CompilerEnvirons();
-			compilerEnv.InitFromContext(this);
+            var compilerEnv = new CompilerEnvirons(this);
 			if (compilationErrorReporter == null)
 			{
-				compilationErrorReporter = compilerEnv.GetErrorReporter();
+				compilationErrorReporter = compilerEnv.ErrorReporter;
 			}
 			if (debugger != null)
 			{

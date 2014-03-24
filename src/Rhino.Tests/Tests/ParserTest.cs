@@ -1003,7 +1003,7 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestParseObjectLiteral1()
 		{
-			environment.SetReservedKeywordAsIdentifier(true);
+			environment.ReservedKeywordAsIdentifier = true;
 			Parse("({a:1});");
 			Parse("({'a':1});");
 			Parse("({0:1});");
@@ -1024,9 +1024,9 @@ namespace Rhino.Tests
 		public virtual void TestParseObjectLiteral2()
 		{
 			// keywords, fail
-			environment.SetReservedKeywordAsIdentifier(false);
+			environment.ReservedKeywordAsIdentifier = false;
 			ExpectParseErrors("({function:1});", new string[] { "invalid property id" });
-			environment.SetReservedKeywordAsIdentifier(true);
+			environment.ReservedKeywordAsIdentifier = true;
 			// keywords ok
 			Parse("({function:1});");
 		}
@@ -1034,10 +1034,10 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestParseObjectLiteral3()
 		{
-			environment.SetLanguageVersion(LanguageVersion.VERSION_1_8);
-			environment.SetReservedKeywordAsIdentifier(true);
+			environment.LanguageVersion = LanguageVersion.VERSION_1_8;
+			environment.ReservedKeywordAsIdentifier = true;
 			Parse("var {get} = {get:1};");
-			environment.SetReservedKeywordAsIdentifier(false);
+			environment.ReservedKeywordAsIdentifier = false;
 			Parse("var {get} = {get:1};");
 			ExpectParseErrors("var {get} = {if:1};", new string[] { "invalid property id" });
 		}
@@ -1045,7 +1045,7 @@ namespace Rhino.Tests
 		[NUnit.Framework.Test]
 		public virtual void TestParseKeywordPropertyAccess()
 		{
-			environment.SetReservedKeywordAsIdentifier(true);
+			environment.ReservedKeywordAsIdentifier = true;
 			// keywords ok
 			Parse("({function:1}).function;");
 			// reserved words ok.
@@ -1070,9 +1070,9 @@ namespace Rhino.Tests
 		private AstRoot Parse(string @string, string[] errors, string[] warnings, bool jsdoc)
 		{
 			TestErrorReporter testErrorReporter = new _TestErrorReporter_1202(errors, errors, warnings);
-			environment.SetErrorReporter(testErrorReporter);
-			environment.SetRecordingComments(true);
-			environment.SetRecordingLocalJsDocComments(jsdoc);
+			environment.ErrorReporter = testErrorReporter;
+			environment.RecordingComments = true;
+			environment.RecordingLocalJsDocComments = jsdoc;
 			Parser p = new Parser(environment, testErrorReporter);
 			AstRoot script = null;
 			try
@@ -1116,9 +1116,9 @@ namespace Rhino.Tests
 		private AstRoot ParseAsReader(string @string)
 		{
 			TestErrorReporter testErrorReporter = new TestErrorReporter(null, null);
-			environment.SetErrorReporter(testErrorReporter);
-			environment.SetRecordingComments(true);
-			environment.SetRecordingLocalJsDocComments(true);
+			environment.ErrorReporter = testErrorReporter;
+			environment.RecordingComments = true;
+			environment.RecordingLocalJsDocComments = true;
 			Parser p = new Parser(environment, testErrorReporter);
 			AstRoot script = p.Parse(new StringReader(@string), null, 0);
 			NUnit.Framework.Assert.IsTrue(testErrorReporter.HasEncounteredAllErrors());

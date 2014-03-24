@@ -54,7 +54,7 @@ namespace Rhino.Tools.Jsc
 		{
 			reporter = new ToolErrorReporter(true);
 			compilerEnv = new CompilerEnvirons();
-			compilerEnv.SetErrorReporter(reporter);
+			compilerEnv.ErrorReporter = reporter;
 			mainMethodClass = Codegen.DEFAULT_MAIN_METHOD_CLASS.FullName;
 			targetImplements = new Type[0];
 		}
@@ -65,7 +65,7 @@ namespace Rhino.Tools.Jsc
 		{
 			targetPackage = string.Empty;
 			// default to no package
-			compilerEnv.SetGenerateDebugInfo(false);
+			compilerEnv.GenerateDebugInfo = false;
 			// default to no symbols
 			for (int i = 0; i < args.Length; i++)
 			{
@@ -95,13 +95,13 @@ namespace Rhino.Tools.Jsc
 					if (arg == "-version" && ++i < args.Length)
 					{
 						var version = (LanguageVersion) Convert.ToInt32(args[i]);
-						compilerEnv.SetLanguageVersion(version);
+						compilerEnv.LanguageVersion = version;
 						continue;
 					}
 					if ((arg == "-opt" || arg == "-O") && ++i < args.Length)
 					{
 						int optLevel = Convert.ToInt32(args[i]);
-						compilerEnv.SetOptimizationLevel(optLevel);
+						compilerEnv.OptimizationLevel = optLevel;
 						continue;
 					}
 				}
@@ -112,12 +112,12 @@ namespace Rhino.Tools.Jsc
 				}
 				if (arg == "-nosource")
 				{
-					compilerEnv.SetGeneratingSource(false);
+					compilerEnv.GeneratingSource = false;
 					continue;
 				}
 				if (arg == "-debug" || arg == "-g")
 				{
-					compilerEnv.SetGenerateDebugInfo(true);
+					compilerEnv.GenerateDebugInfo = true;
 					continue;
 				}
 				if (arg == "-main-method-class" && ++i < args.Length)
@@ -162,7 +162,7 @@ namespace Rhino.Tools.Jsc
 				}
 				if (arg == "-observe-instruction-count")
 				{
-					compilerEnv.SetGenerateObserverCount(true);
+					compilerEnv.GenerateObserverCount = true;
 				}
 				if (arg == "-package" && ++i < args.Length)
 				{

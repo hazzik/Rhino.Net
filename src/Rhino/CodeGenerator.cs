@@ -71,7 +71,7 @@ namespace Rhino
 			{
 				scriptOrFn = tree;
 			}
-			itsData = new InterpreterData(compilerEnv.GetLanguageVersion(), scriptOrFn.GetSourceName(), encodedSource, ((AstRoot)tree).IsInStrictMode());
+			itsData = new InterpreterData(compilerEnv.LanguageVersion, scriptOrFn.GetSourceName(), encodedSource, ((AstRoot)tree).IsInStrictMode());
 			itsData.topLevel = true;
 			if (returnFunction)
 			{
@@ -623,7 +623,7 @@ namespace Rhino
 						// Only use the tail call optimization if we're not in a try
 						// or we're not generating debug info (since the
 						// optimization will confuse the debugger)
-						if (type == Token.CALL && (contextFlags & ECF_TAIL) != 0 && !compilerEnv.IsGenerateDebugInfo() && !itsInTryFlag)
+						if (type == Token.CALL && (contextFlags & ECF_TAIL) != 0 && !compilerEnv.GenerateDebugInfo && !itsInTryFlag)
 						{
 							type = Icode_TAIL_CALL;
 						}
