@@ -395,17 +395,11 @@ namespace Rhino.Optimizer
 
 			var method = type.DefineMethod("ResumeGenerator", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, typeof (object), new[] {typeof (Context), typeof (Scriptable), typeof (int), typeof (object), typeof (object)});
 			var il = method.GetILGenerator();
-			// load arguments for dispatch to the corresponding *_gen method
-			il.Emit(OpCodes.Ldarg_0); // this
-			il.Emit(OpCodes.Ldarg_1); // cx
-			il.Emit(OpCodes.Ldarg_2); // scope
-			il.Emit(OpCodes.Ldarg_S, (byte) 4); // state
-			il.Emit(OpCodes.Ldarg_S, (byte) 5); // value
-			il.Emit(OpCodes.Ldarg_3); // operation
 			il.Emit(OpCodes.Ldarg_0); // this
 			il.Emit(OpCodes.Ldfld, idField);
 
 			Label[] switchTable = il.DefineSwitchTable(scriptOrFnNodes.Length);
+			il.Emit(OpCodes.Switch, switchTable);
 			var endlabel = il.DefineLabel();
 			for (var i = 0; i < scriptOrFnNodes.Length; i++)
 			{
@@ -413,7 +407,14 @@ namespace Rhino.Optimizer
 				il.MarkLabel(switchTable[i]);
 				if (IsGenerator(n))
 				{
-					il.Emit(OpCodes.Call, mainClass.GetMethod(GetBodyMethodName(n) + "_gen", new[] { mainClass, typeof (Context), typeof (Scriptable), typeof (object), typeof (object), typeof (int) }));
+					// load arguments for dispatch to the corresponding *_gen method
+					il.Emit(OpCodes.Ldarg_0); // this
+					il.Emit(OpCodes.Ldarg_1); // cx
+					il.Emit(OpCodes.Ldarg_2); // scope
+					il.Emit(OpCodes.Ldarg_S, (byte)4); // state
+					il.Emit(OpCodes.Ldarg_S, (byte)5); // value
+					il.Emit(OpCodes.Ldarg_3); // operation
+					il.Emit(OpCodes.Call, mainClass.GetMethod(GetBodyMethodName(n) + "_gen", new[] { mainClass, typeof(Context), typeof(Scriptable), typeof(object), typeof(object), typeof(int) }));
 					il.Emit(OpCodes.Ret);
 				}
 				else
@@ -821,7 +822,7 @@ namespace Rhino.Optimizer
 				var switchTable = il.DefineSwitchTable(count);
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldfld, idField);
-				il.Emit(OpCodes.Switch, switchTable.ToArray());
+				il.Emit(OpCodes.Switch, switchTable);
 
 				for (var i = 0; i < count; i++)
 				{

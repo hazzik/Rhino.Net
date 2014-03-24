@@ -182,7 +182,7 @@ namespace Rhino.Optimizer
 			if (isGenerator)
 			{
 				// reserve 'args[]'
-				operationLocal = il.DeclareLocal(typeof(object));
+				operationLocal = firstFreeLocal++;
 				localsMax = firstFreeLocal;
 				// Local 3 is a reference to a GeneratorState object. The rest
 				// of codegen expects local 3 to be a reference to the thisObj.
@@ -207,7 +207,7 @@ namespace Rhino.Optimizer
 					GenerateGetGeneratorResumptionPoint(il);
 					// generate dispatch table
 					generatorSwitch = il.DefineSwitchTable(targets.Count + GENERATOR_START + 1);
-					il.Emit(OpCodes.Switch);
+					il.Emit(OpCodes.Switch, generatorSwitch);
 					GenerateCheckForThrowOrClose(il, null, false, GENERATOR_START);
 				}
 			}
@@ -478,7 +478,8 @@ namespace Rhino.Optimizer
 			{
 				if (((FunctionNode)scriptOrFn).GetResumptionPoints() != null)
 				{
-					il.Emit(OpCodes.Br, generatorSwitch[0]);
+					//cfw.markTableSwitchDefault(generatorSwitch);
+					//no actions required.
 				}
 				// change state for re-entry
 				GenerateSetGeneratorResumptionPoint(il, GENERATOR_TERMINATE);
@@ -1641,11 +1642,11 @@ namespace Rhino.Optimizer
 				il.MarkLabel(generatorSwitch[nextState]);
 			}
 			// see if we need to dispatch for .close() or .throw()
-			il.EmitLoadLocal(operationLocal);
+			il.EmitLoadArgument(operationLocal);
 			il.EmitLoadConstant(NativeGenerator.GENERATOR_CLOSE);
 			il.Emit(OpCodes.Ceq);
 			il.Emit(OpCodes.Brtrue, closeLabel);
-			il.EmitLoadLocal(operationLocal);
+			il.EmitLoadArgument(operationLocal);
 			il.EmitLoadConstant(NativeGenerator.GENERATOR_THROW);
 			il.Emit(OpCodes.Ceq);
 			il.Emit(OpCodes.Brtrue, throwLabel);
@@ -4155,7 +4156,7 @@ namespace Rhino.Optimizer
 
 		private short argsArgument;
 
-		private LocalBuilder operationLocal;
+		private int operationLocal;
 
 		private short thisObjLocal;
 
