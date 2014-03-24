@@ -821,7 +821,7 @@ namespace Rhino.Optimizer
 					}
 					// there is exactly one value on the stack when enterring
 					// finally blocks: the return address (or its int encoding)
-					cfw.SetStackTop(1);
+					//cfw.SetStackTop(1);
 					// Save return address in a new local
 					LocalBuilder finallyRegister = GetNewWordLocal(il);
 					var finallyStart = il.DefineLabel();
@@ -833,7 +833,7 @@ namespace Rhino.Optimizer
 						GenerateStatement(il, child);
 						child = child.GetNext();
 					}
-					cfw.EmitLdloc(finallyRegister);
+					il.EmitLoadLocal(finallyRegister);
 					il.Emit(OpCodes.Conv_I4);
 					var ret = finallys.Get(node);
 					ret.tableLabel = il.DefineLabel();
@@ -2489,6 +2489,10 @@ namespace Rhino.Optimizer
 					il.BeginFinallyBlock(); 
 					//il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
 				}
+				else
+				{
+					il.BeginFaultBlock();
+				}
 				//il.EmitStoreLocal(exceptionLocal);
 				// reset the variable object local
 				il.EmitLoadLocal(savedVariableObject);
@@ -2497,7 +2501,8 @@ namespace Rhino.Optimizer
 				var finallyLabel = GetTargetLabel(il, finallyTarget);
 				if (isGenerator)
 				{
-					AddGotoWithReturn(il, finallyTarget);
+					InlineFinally(il, finallyTarget);
+					//AddGotoWithReturn(il, finallyTarget);
 				}
 				else
 				{
@@ -2514,15 +2519,16 @@ namespace Rhino.Optimizer
 				// mark the handler
 				if (isGenerator)
 				{
-					cfw.AddExceptionHandler(startLabel, finallyLabel, finallyHandler, null);
+					//cfw.AddExceptionHandler(startLabel, finallyLabel, finallyHandler, null);
 				}
 			}
 			// catch any
 			if (!isGenerator)
-			{   
-				il.EndExceptionBlock();
+			{
+				//il.EndExceptionBlock();
 				//exceptionManager.PopExceptionInfo();
 			}
+			il.EndExceptionBlock();
 			//il.MarkLabel(realEnd);
 		}
 
