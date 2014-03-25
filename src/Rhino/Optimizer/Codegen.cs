@@ -313,7 +313,7 @@ namespace Rhino.Optimizer
 			}
 			EmitConstantDudeInitializers(mainClass);
 			var type = mainClass.CreateType();
-			//Save();
+			Save();
 			return type;
 		}
 

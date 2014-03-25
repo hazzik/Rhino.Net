@@ -1782,12 +1782,13 @@ namespace Rhino.Optimizer
 					else
 					{
 						// This assumes that JSR is only ever used for finally
-						InlineFinally(il, target);
+                        //il.BeginFinallyBlock();
+                        //InlineFinally(il, target);
 					}
 				}
 				else
 				{
-					AddGoto(il, OpCodes.Leave, target);
+					AddGoto(il, OpCodes.Br, target);
 				}
 			}
 		}
@@ -2431,10 +2432,10 @@ namespace Rhino.Optimizer
 					exceptionManager.RemoveHandler(EVALUATOR_EXCEPTION, catchLabel);
 					exceptionManager.RemoveHandler(ECMAERROR_EXCEPTION, catchLabel);
 					exceptionManager.RemoveHandler(THROWABLE_EXCEPTION, catchLabel);
-					//il.BeginCatchBlock(typeof (RhinoException));
+					il.BeginCatchBlock(typeof (RhinoException));
 					//il.MarkLabel(catchLabel);
 					Label? handler = handlerLabels [ECMAERROR_EXCEPTION];
-					il.BeginCatchBlock(typeof (RhinoException));
+					//il.BeginCatchBlock(typeof (RhinoException));
 //			if (handler == null)
 //			{
 //				handler = il.DefineLabel();
@@ -2446,7 +2447,7 @@ namespace Rhino.Optimizer
 					il.EmitLoadLocal(savedVariableObject);
 					il.EmitStoreArgument(2);
 					//ExceptionTypeToName(exceptionType);
-					il.Emit(OpCodes.Br, ((Label?) catchLabel).Value);
+					//il.Emit(OpCodes.Br, ((Label?) catchLabel).Value);
 				}
 				GenerateStatement(il, child);
 				child = child.GetNext();
@@ -2484,16 +2485,16 @@ namespace Rhino.Optimizer
 				
 				//cfw.MarkHandler(finallyHandler);
 				il.MarkLabel(finallyHandler);
-				if (!isGenerator)
-				{
-					il.BeginFinallyBlock(); 
-					//il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
-				}
-				else
-				{
-					il.BeginFaultBlock();
-				}
-				//il.EmitStoreLocal(exceptionLocal);
+			    if (isGenerator)
+			    {
+			        il.BeginFaultBlock();
+			    }
+			    else
+			    {
+			        il.BeginFinallyBlock(); 
+			        //il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
+			    }
+			    //il.EmitStoreLocal(exceptionLocal);
 				// reset the variable object local
 				il.EmitLoadLocal(savedVariableObject);
 				il.EmitStoreArgument(2);
@@ -2506,7 +2507,9 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-					//InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
+				    InlineFinally(il, finallyTarget);
+
+				    //InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
 				}
 				// rethrow
 				/*il.EmitLoadLocal(exceptionLocal);
@@ -2515,7 +2518,7 @@ namespace Rhino.Optimizer
 					il.Emit(OpCodes.Castclass, typeof(Exception));
 				}
 				il.Emit(OpCodes.Throw);*/
-				il.MarkLabel(finallyEnd);
+				//il.MarkLabel(finallyEnd);
 				// mark the handler
 				if (isGenerator)
 				{
@@ -2528,6 +2531,7 @@ namespace Rhino.Optimizer
 				//il.EndExceptionBlock();
 				//exceptionManager.PopExceptionInfo();
 			}
+			//il.BeginFinallyBlock();
 			il.EndExceptionBlock();
 			//il.MarkLabel(realEnd);
 		}
