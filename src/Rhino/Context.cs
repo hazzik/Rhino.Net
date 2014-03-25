@@ -16,6 +16,7 @@ using System.Security;
 using Rhino.Annotations;
 using Rhino.Ast;
 using Rhino.Debug;
+using Rhino.Optimizer;
 using Rhino.Utils;
 using Rhino.Xml;
 using Sharpen;
@@ -2240,7 +2241,7 @@ namespace Rhino
 			{
 				Kit.CodeBug();
 			}
-            var compilerEnv = new CompilerEnvirons(this);
+			var compilerEnv = new CompilerEnvirons(this);
 			if (compilationErrorReporter == null)
 			{
 				compilationErrorReporter = compilerEnv.ErrorReporter;
@@ -2274,12 +2275,23 @@ namespace Rhino
 					throw new ArgumentException("compileFunction only accepts source with single JS function: " + sourceString);
 				}
 			}
-			IRFactory irf = new IRFactory(compilerEnv, compilationErrorReporter);
-			ScriptNode tree = irf.TransformTree(ast);
 			if (compiler == null)
 			{
 				compiler = CreateCompiler();
 			}
+			//TODO: It is a dirrrrrty hack as I do not want to rewrite try-catch-finally
+			//TODO: Delegate creation of IRFactory to Evaluator OR
+			IRFactory irf;
+			if (compiler is Codegen)
+			{
+				irf = new IRFactoryNet(compilerEnv, compilationErrorReporter);
+			}
+			else
+			{
+				irf = new IRFactory(compilerEnv, compilationErrorReporter);
+			}
+
+			ScriptNode tree = irf.TransformTree(ast);
 			
 			Action<object> debuggerNotificationAction = o => NotifyDebugger(sourceString, o);
 			object result;

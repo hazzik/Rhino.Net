@@ -20,7 +20,7 @@ namespace Rhino
 	/// <seealso cref="Node">Node</seealso>
 	/// <author>Mike McCabe</author>
 	/// <author>Norris Boyd</author>
-	public sealed class IRFactory : Parser
+	public class IRFactory : Parser
 	{
 		private const int LOOP_DO_WHILE = 0;
 
@@ -1898,7 +1898,7 @@ namespace Rhino
 		/// - a finally handler
 		/// ... and a goto to GOTO around these handlers.
 		/// </remarks>
-		private Node CreateTryCatchFinally(Node tryBlock, Node catchBlocks, Node finallyBlock, int lineno)
+		protected virtual Node CreateTryCatchFinally(Node tryBlock, Node catchBlocks, Node finallyBlock, int lineno)
 		{
 			bool hasFinally = (finallyBlock != null) && (finallyBlock.GetType() != Token.BLOCK || finallyBlock.HasChildren());
 			// short circuit
@@ -2044,7 +2044,7 @@ namespace Rhino
 			return handlerBlock;
 		}
 
-		private Node CreateWith(Node obj, Node body, int lineno)
+		protected Node CreateWith(Node obj, Node body, int lineno)
 		{
 			SetRequiresActivation();
 			Node result = new Node(Token.BLOCK, lineno);
@@ -2055,7 +2055,7 @@ namespace Rhino
 			return result;
 		}
 
-		private Node CreateIf(Node cond, Node ifTrue, Node ifFalse, int lineno)
+		protected Node CreateIf(Node cond, Node ifTrue, Node ifFalse, int lineno)
 		{
 			int condStatus = IsAlwaysDefinedBoolean(cond);
 			if (condStatus == ALWAYS_TRUE_BOOLEAN)
@@ -2703,7 +2703,7 @@ namespace Rhino
 			throw Kit.CodeBug();
 		}
 
-		private Node CreateUseLocal(Node localBlock)
+		protected Node CreateUseLocal(Node localBlock)
 		{
 			if (Token.LOCAL_BLOCK != localBlock.GetType())
 			{
@@ -2714,7 +2714,7 @@ namespace Rhino
 			return result;
 		}
 
-		private Jump MakeJump(int type, Node target)
+		protected Jump MakeJump(int type, Node target)
 		{
 			Jump n = new Jump(type);
 			n.target = target;
@@ -2940,4 +2940,165 @@ namespace Rhino
 			decompiler.AddToken(Token.RB);
 		}
 	}
+
+    class IRFactoryNet : IRFactory
+    {
+        public IRFactoryNet()
+        {
+        }
+
+        public IRFactoryNet(CompilerEnvirons env) : base(env)
+        {
+        }
+
+        public IRFactoryNet(CompilerEnvirons env, ErrorReporter errorReporter) : base(env, errorReporter)
+        {
+        }
+
+        protected override Node CreateTryCatchFinally(Node tryBlock, Node catchBlocks, Node finallyBlock, int lineno)
+        {
+            bool hasFinally = (finallyBlock != null) && (finallyBlock.GetType() != Token.BLOCK || finallyBlock.HasChildren());
+            // short circuit
+            if (tryBlock.GetType() == Token.BLOCK && !tryBlock.HasChildren() && !hasFinally)
+            {
+                return tryBlock;
+            }
+            bool hasCatch = catchBlocks.HasChildren();
+            // short circuit
+            if (!hasFinally && !hasCatch)
+            {
+                // bc finally might be an empty block...
+                return tryBlock;
+            }
+            Node handlerBlock = new Node(Token.LOCAL_BLOCK);
+            Jump pn = new Jump(Token.TRY, tryBlock, lineno);
+            pn.PutProp(Node.LOCAL_BLOCK_PROP, handlerBlock);
+            if (hasCatch)
+            {
+                // jump around catch code
+                Node endCatch = Node.NewTarget();
+                pn.AddChildToBack(MakeJump(Token.GOTO, endCatch));
+                // make a TARGET for the catch that the tcf node knows about
+                Node catchTarget = Node.NewTarget();
+                pn.target = catchTarget;
+                // mark it
+                pn.AddChildToBack(catchTarget);
+                //
+                //  Given
+                //
+                //   try {
+                //       tryBlock;
+                //   } catch (e if condition1) {
+                //       something1;
+                //   ...
+                //
+                //   } catch (e if conditionN) {
+                //       somethingN;
+                //   } catch (e) {
+                //       somethingDefault;
+                //   }
+                //
+                //  rewrite as
+                //
+                //   try {
+                //       tryBlock;
+                //       goto after_catch:
+                //   } catch (x) {
+                //       with (newCatchScope(e, x)) {
+                //           if (condition1) {
+                //               something1;
+                //               goto after_catch;
+                //           }
+                //       }
+                //   ...
+                //       with (newCatchScope(e, x)) {
+                //           if (conditionN) {
+                //               somethingN;
+                //               goto after_catch;
+                //           }
+                //       }
+                //       with (newCatchScope(e, x)) {
+                //           somethingDefault;
+                //           goto after_catch;
+                //       }
+                //   }
+                // after_catch:
+                //
+                // If there is no default catch, then the last with block
+                // arround  "somethingDefault;" is replaced by "rethrow;"
+                // It is assumed that catch handler generation will store
+                // exeception object in handlerBlock register
+                // Block with local for exception scope objects
+                Node catchScopeBlock = new Node(Token.LOCAL_BLOCK);
+                // expects catchblocks children to be (cond block) pairs.
+                Node cb = catchBlocks.GetFirstChild();
+                bool hasDefault = false;
+                int scopeIndex = 0;
+                while (cb != null)
+                {
+                    int catchLineNo = cb.GetLineno();
+                    Node name = cb.GetFirstChild();
+                    Node cond = name.GetNext();
+                    Node catchStatement = cond.GetNext();
+                    cb.RemoveChild(name);
+                    cb.RemoveChild(cond);
+                    cb.RemoveChild(catchStatement);
+                    // Add goto to the catch statement to jump out of catch
+                    // but prefix it with LEAVEWITH since try..catch produces
+                    // "with"code in order to limit the scope of the exception
+                    // object.
+                    catchStatement.AddChildToBack(new Node(Token.LEAVEWITH));
+                    catchStatement.AddChildToBack(MakeJump(Token.GOTO, endCatch));
+                    // Create condition "if" when present
+                    Node condStmt;
+                    if (cond.GetType() == Token.EMPTY)
+                    {
+                        condStmt = catchStatement;
+                        hasDefault = true;
+                    }
+                    else
+                    {
+                        condStmt = CreateIf(cond, catchStatement, null, catchLineNo);
+                    }
+                    // Generate code to create the scope object and store
+                    // it in catchScopeBlock register
+                    Node catchScope = new Node(Token.CATCH_SCOPE, name, CreateUseLocal(handlerBlock));
+                    catchScope.PutProp(Node.LOCAL_BLOCK_PROP, catchScopeBlock);
+                    catchScope.PutIntProp(Node.CATCH_SCOPE_PROP, scopeIndex);
+                    catchScopeBlock.AddChildToBack(catchScope);
+                    // Add with statement based on catch scope object
+                    catchScopeBlock.AddChildToBack(CreateWith(CreateUseLocal(catchScopeBlock), condStmt, catchLineNo));
+                    // move to next cb
+                    cb = cb.GetNext();
+                    ++scopeIndex;
+                }
+                pn.AddChildToBack(catchScopeBlock);
+                if (!hasDefault)
+                {
+                    // Generate code to rethrow if no catch clause was executed
+                    Node rethrow = new Node(Token.RETHROW);
+                    rethrow.PutProp(Node.LOCAL_BLOCK_PROP, handlerBlock);
+                    pn.AddChildToBack(rethrow);
+                }
+                pn.AddChildToBack(endCatch);
+            }
+            if (hasFinally)
+            {
+                Node finallyTarget = Node.NewTarget();
+                pn.SetFinally(finallyTarget);
+                // add jsr finally to the try block
+                pn.AddChildToBack(MakeJump(Token.JSR, finallyTarget));
+                // jump around finally code
+                Node finallyEnd = Node.NewTarget();
+                pn.AddChildToBack(MakeJump(Token.GOTO, finallyEnd));
+                pn.AddChildToBack(finallyTarget);
+                Node fBlock = new Node(Token.FINALLY, finallyBlock);
+                fBlock.PutProp(Node.LOCAL_BLOCK_PROP, handlerBlock);
+                pn.AddChildToBack(fBlock);
+                pn.AddChildToBack(finallyEnd);
+            }
+            handlerBlock.AddChildToBack(pn);
+            return handlerBlock;
+        }
+    }
 }
