@@ -591,7 +591,7 @@ openStream_break: ;
 			lock (monitor)
 			{
 				this.returnValue = returnValue;
-				Sharpen.Runtime.Notify(monitor);
+				System.Threading.Monitor.Pulse(monitor);
 			}
 		}
 
@@ -602,7 +602,7 @@ openStream_break: ;
 			lock (monitor)
 			{
 				this.returnValue = GO;
-				Sharpen.Runtime.NotifyAll(monitor);
+				System.Threading.Monitor.PulseAll(monitor);
 			}
 		}
 
@@ -634,12 +634,12 @@ openStream_break: ;
 					{
 						evalRequest = expr;
 						evalFrame = frame;
-						Sharpen.Runtime.Notify(monitor);
+						System.Threading.Monitor.Pulse(monitor);
 						do
 						{
 							try
 							{
-								Sharpen.Runtime.Wait(monitor);
+								System.Threading.Monitor.Wait(monitor);
 							}
 							catch (Exception)
 							{
@@ -835,7 +835,7 @@ openStream_break: ;
 					{
 						try
 						{
-							Sharpen.Runtime.Wait(eventThreadMonitor);
+							System.Threading.Monitor.Wait(eventThreadMonitor);
 						}
 						catch (Exception)
 						{
@@ -908,7 +908,7 @@ interruptedCheck_break: ;
 								{
 									try
 									{
-										Sharpen.Runtime.Wait(monitor);
+										System.Threading.Monitor.Wait(monitor);
 									}
 									catch (Exception)
 									{
@@ -926,7 +926,7 @@ interruptedCheck_break: ;
 										{
 											evalRequest = null;
 											evalFrame = null;
-											Sharpen.Runtime.Notify(monitor);
+											System.Threading.Monitor.Pulse(monitor);
 										}
 										continue;
 									}
@@ -993,7 +993,7 @@ interruptedCheck_break: ;
 				lock (eventThreadMonitor)
 				{
 					interruptedContextData = null;
-					Sharpen.Runtime.NotifyAll(eventThreadMonitor);
+					System.Threading.Monitor.PulseAll(eventThreadMonitor);
 				}
 			}
 		}

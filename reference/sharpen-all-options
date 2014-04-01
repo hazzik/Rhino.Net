@@ -148,6 +148,9 @@
 -methodMapping java.lang.Number.longValue System.Convert.ToInt64
 -methodMapping java.lang.Number.shortValue System.Convert.ToInt16
 -methodMapping java.lang.Object.memberwiseClone Clone
+-methodMapping java.lang.Object.notify System.Threading.Monitor.Pulse
+-methodMapping java.lang.Object.notifyAll System.Threading.Monitor.PulseAll
+-methodMapping java.lang.Object.wait System.Threading.Monitor.Wait
 -methodMapping java.lang.ProcessBuilder.command SetCommand
 -methodMapping java.lang.String.concat System.String.Concat
 -methodMapping java.lang.Short.valueOf Sharpen.Extensions.ValueOf
