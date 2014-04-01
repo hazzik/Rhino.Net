@@ -1054,7 +1054,7 @@ namespace Rhino.XmlImpl
 
 			internal virtual void Remove(int index)
 			{
-				list.Remove(index);
+				list.RemoveAt(index);
 			}
 
 			internal virtual void Add(InternalList other)

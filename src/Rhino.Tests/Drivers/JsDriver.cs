@@ -783,7 +783,7 @@ namespace Rhino.Drivers
 					string dashLetter = (letterOption == null) ? (string)null : "-" + letterOption;
 					if (option.Equals(dashLetter) || option.Equals("--" + wordOption))
 					{
-						arguments.Remove(0);
+						arguments.RemoveAt(0);
 						if (flag)
 						{
 							values.Insert(0, null);
@@ -794,12 +794,16 @@ namespace Rhino.Drivers
 							{
 								while (arguments.Count > 0 && !arguments[0].StartsWith("-"))
 								{
-									values.Add(arguments.Remove(0));
+									string argument = arguments[0];
+									arguments.RemoveAt(0);
+									values.Add(argument);
 								}
 							}
 							else
 							{
-								values.Set(0, arguments.Remove(0));
+								string argument = arguments[0];
+								arguments.RemoveAt(0);
+								values.Set(0, argument);
 							}
 						}
 						if (ignored)
@@ -934,16 +938,18 @@ namespace Rhino.Drivers
 						}
 					}
 					int lengthBefore = arguments.Count;
-					for (int i_1 = 0; i_1 < options.Count; i_1++)
+					foreach (Option t in options)
 					{
 						if (arguments.Count > 0)
 						{
-							options[i_1].Process(arguments);
+							t.Process(arguments);
 						}
 					}
 					if (arguments.Count == lengthBefore)
 					{
-						System.Console.Error.WriteLine("WARNING: ignoring unrecognized option " + arguments.Remove(0));
+						string argument = arguments[0];
+						arguments.RemoveAt(0);
+						System.Console.Error.WriteLine("WARNING: ignoring unrecognized option " + argument);
 					}
 				}
 			}
