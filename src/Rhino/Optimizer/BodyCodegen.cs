@@ -1783,8 +1783,8 @@ namespace Rhino.Optimizer
 					else
 					{
 						// This assumes that JSR is only ever used for finally
-                        //il.BeginFinallyBlock();
-                        //InlineFinally(il, target);
+						//il.BeginFinallyBlock();
+						//InlineFinally(il, target);
 					}
 				}
 				else
@@ -2486,16 +2486,16 @@ namespace Rhino.Optimizer
 				
 				//cfw.MarkHandler(finallyHandler);
 				il.MarkLabel(finallyHandler);
-			    if (isGenerator)
-			    {
-			        il.BeginFaultBlock();
-			    }
-			    else
-			    {
-			        il.BeginFinallyBlock(); 
-			        //il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
-			    }
-			    //il.EmitStoreLocal(exceptionLocal);
+				if (isGenerator)
+				{
+					il.BeginFaultBlock();
+				}
+				else
+				{
+					il.BeginFinallyBlock(); 
+					//il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
+				}
+				//il.EmitStoreLocal(exceptionLocal);
 				// reset the variable object local
 				il.EmitLoadLocal(savedVariableObject);
 				il.EmitStoreArgument(2);
@@ -2508,9 +2508,9 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-				    InlineFinally(il, finallyTarget);
+					InlineFinally(il, finallyTarget);
 
-				    //InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
+					//InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
 				}
 				// rethrow
 				/*il.EmitLoadLocal(exceptionLocal);

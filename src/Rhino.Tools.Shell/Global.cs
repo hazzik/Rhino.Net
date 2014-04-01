@@ -212,11 +212,11 @@ namespace Rhino.Tools.Shell
 			LanguageVersion result = cx.GetLanguageVersion();
 			if (args.Length > 0)
 			{
-			    int d = (int) Context.ToNumber(args [0]);
-			    LanguageVersion version = (LanguageVersion) d;
-			    cx.SetLanguageVersion(version);
+				int d = (int) Context.ToNumber(args [0]);
+				LanguageVersion version = (LanguageVersion) d;
+				cx.SetLanguageVersion(version);
 			}
-		    return (int) result;
+			return (int) result;
 		}
 
 		/// <summary>Load and execute a set of JavaScript source files.</summary>

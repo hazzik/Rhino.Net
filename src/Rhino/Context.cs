@@ -987,13 +987,13 @@ namespace Rhino
 		public bool StringIsCompilableUnit(string source)
 		{
 			bool errorseen = false;
-		    var compilerEnv = new CompilerEnvirons(this)
-		    {
-		        // no source name or source text manager, because we're just
-		        // going to throw away the result.
-		        GeneratingSource = false
-		    };
-		    Parser p = new Parser(compilerEnv, DefaultErrorReporter.instance);
+			var compilerEnv = new CompilerEnvirons(this)
+			{
+				// no source name or source text manager, because we're just
+				// going to throw away the result.
+				GeneratingSource = false
+			};
+			Parser p = new Parser(compilerEnv, DefaultErrorReporter.instance);
 			try
 			{
 				p.Parse(source, null, 1);
