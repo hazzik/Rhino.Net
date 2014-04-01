@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading;
 using Rhino;
 using Rhino.CommonJS.Module;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.CommonJS.Module
@@ -263,7 +264,7 @@ namespace Rhino.CommonJS.Module
 		private Scriptable GetExportedModuleInterface(Context cx, string id, Uri uri, Uri @base, bool isMain)
 		{
 			// Check if the requested module is already completely loaded
-			Scriptable exports = exportedModuleInterfaces.Get(id);
+			Scriptable exports = exportedModuleInterfaces.GetValueOrDefault(id);
 			if (exports != null)
 			{
 				if (isMain)
@@ -277,7 +278,7 @@ namespace Rhino.CommonJS.Module
 			IDictionary<string, Scriptable> threadLoadingModules = loadingModuleInterfaces.Value;
 			if (threadLoadingModules != null)
 			{
-				exports = threadLoadingModules.Get(id);
+				exports = threadLoadingModules.GetValueOrDefault(id);
 				if (exports != null)
 				{
 					return exports;
@@ -295,7 +296,7 @@ namespace Rhino.CommonJS.Module
 			{
 				// Recheck if it is already loaded - other thread might've
 				// completed loading it just as we entered the synchronized block.
-				exports = exportedModuleInterfaces.Get(id);
+				exports = exportedModuleInterfaces.GetValueOrDefault(id);
 				if (exports != null)
 				{
 					return exports;

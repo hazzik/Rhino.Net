@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -191,7 +192,7 @@ namespace Rhino
 
 		internal virtual object GetInterfaceAdapter(Type cl)
 		{
-			return interfaceAdapterCache == null ? null : interfaceAdapterCache.Get(cl);
+			return interfaceAdapterCache == null ? null : interfaceAdapterCache.GetValueOrDefault(cl);
 		}
 
 		internal virtual void CacheInterfaceAdapter(Type cl, object iadapter)

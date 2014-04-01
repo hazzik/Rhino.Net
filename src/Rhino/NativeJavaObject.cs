@@ -76,7 +76,7 @@ namespace Rhino
 		{
 			if (fieldAndMethods != null)
 			{
-				object result = fieldAndMethods.Get(name);
+				object result = fieldAndMethods.GetValueOrDefault(name);
 				if (result != null)
 				{
 					return result;

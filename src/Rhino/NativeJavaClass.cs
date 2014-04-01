@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -79,7 +80,7 @@ namespace Rhino
 			}
 			if (staticFieldAndMethods != null)
 			{
-				object result = staticFieldAndMethods.Get(name);
+				object result = staticFieldAndMethods.GetValueOrDefault(name);
 				if (result != null)
 				{
 					return result;

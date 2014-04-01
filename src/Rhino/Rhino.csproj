@@ -175,6 +175,7 @@
       <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Utils\Arrays.cs" />
+    <Compile Include="Utils\Dictionaries.cs" />
     <Compile Include="Utils\MemberInfoEx.cs" />
     <Compile Include="Compatibility\TypeEx.cs" />
     <Compile Include="Compatibility\ClassLoader.cs" />

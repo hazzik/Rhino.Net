@@ -14,6 +14,7 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using Rhino.Debug;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.Tools.Debugger
@@ -376,7 +377,7 @@ openStream_break: ;
 			SourceInfo sourceInfo = new SourceInfo(source, functions, url);
 			lock (urlToSourceInfo)
 			{
-				SourceInfo old = urlToSourceInfo.Get(url);
+				SourceInfo old = urlToSourceInfo.GetValueOrDefault(url);
 				if (old != null)
 				{
 					sourceInfo.CopyBreakpointsFrom(old);
@@ -407,7 +408,7 @@ openStream_break: ;
 		/// <remarks>Returns the FunctionSource object for the given function or script.</remarks>
 		private FunctionSource FunctionSource(DebuggableScript fnOrScript)
 		{
-			return functionToSource.Get(fnOrScript);
+			return functionToSource.GetValueOrDefault(fnOrScript);
 		}
 
 		/// <summary>Returns an array of all function names.</summary>
@@ -424,14 +425,14 @@ openStream_break: ;
 		/// <remarks>Returns the FunctionSource object for the function with the given name.</remarks>
 		public FunctionSource FunctionSourceByName(string functionName)
 		{
-			return functionNames.Get(functionName);
+			return functionNames.GetValueOrDefault(functionName);
 		}
 
 		/// <summary>Returns the SourceInfo object for the given URL.</summary>
 		/// <remarks>Returns the SourceInfo object for the given URL.</remarks>
 		public SourceInfo SourceInfo(string url)
 		{
-			return urlToSourceInfo.Get(url);
+			return urlToSourceInfo.GetValueOrDefault(url);
 		}
 
 		/// <summary>Returns the source URL for the given script or function.</summary>

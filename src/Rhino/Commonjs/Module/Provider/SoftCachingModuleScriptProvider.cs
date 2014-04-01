@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.CommonJS.Module.Provider
@@ -63,7 +64,7 @@ namespace Rhino.CommonJS.Module.Provider
 
 		protected internal override CachedModuleScript GetLoadedModule(string moduleId)
 		{
-			ScriptReference scriptRef = scripts.Get(moduleId);
+			ScriptReference scriptRef = scripts.GetValueOrDefault(moduleId);
 			return scriptRef != null ? scriptRef.GetCachedModuleScript() : null;
 		}
 

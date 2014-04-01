@@ -15,6 +15,7 @@ using System.Text;
 using Rhino;
 using Rhino.Tools.Debugger;
 using Rhino.Tools.Debugger.Treetable;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.Tools.Debugger
@@ -106,8 +107,8 @@ namespace Rhino.Tools.Debugger
 		/// </remarks>
 		private EventQueue awtEventQueue;
 
-		/// <summary>Creates a new SwingGui.</summary>
-		/// <remarks>Creates a new SwingGui.</remarks>
+		/// <summary>Sets the visibility of the debugger GUI.</summary>
+		/// <remarks>Sets the visibility of the debugger GUI.</remarks>
 		public SwingGui(Dim dim, string title) : base(title)
 		{
 			this.dim = dim;
@@ -292,7 +293,7 @@ namespace Rhino.Tools.Debugger
 			public override string GetDescription()
 			{
 				return "JavaScript Files (*.js)";
-			}
+		}
 		}
 
 		private sealed class _WindowAdapter_326 : WindowAdapter
@@ -301,17 +302,17 @@ namespace Rhino.Tools.Debugger
 			{
 				this._enclosing = _enclosing;
 			}
-
+		/// <summary>
 			public override void WindowClosing(WindowEvent e)
 			{
 				this._enclosing.Exit();
 			}
-
+		/// Returns the
 			private readonly SwingGui _enclosing;
 		}
-
-		/// <summary>
-		/// Runs the
+		/// <see cref="FileWindow">FileWindow</see>
+		/// for the given URL.
+		/// </summary>
 		/// <see cref="exitAction">exitAction</see>
 		/// .
 		/// </summary>
@@ -335,7 +336,7 @@ namespace Rhino.Tools.Debugger
 			{
 				return null;
 			}
-			return fileWindows.Get(url);
+			return fileWindows.GetValueOrDefault(url);
 		}
 
 		/// <summary>Returns a short version of the given URL.</summary>
@@ -1153,7 +1154,7 @@ namespace Rhino.Tools.Debugger
 							if (char.IsWhiteSpace(msg[k]))
 							{
 								break;
-							}
+}
 						}
 						if (k < len)
 						{

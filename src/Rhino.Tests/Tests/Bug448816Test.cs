@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Rhino;
 using Rhino.Tests;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.Tests
@@ -53,11 +54,11 @@ namespace Rhino.Tests
 		public virtual void TestBasicAccess()
 		{
 			Assert.IsTrue(map.Count == 4);
-			Assert.AreEqual(map.Get("a"), reference.Get("a"));
-			Assert.AreEqual(map.Get("b"), reference.Get("b"));
-			Assert.AreEqual(map.Get("c"), reference.Get("c"));
-			Assert.AreEqual(map.Get(1), reference.Get(1));
-			Assert.AreEqual(map.Get("notfound"), reference.Get("notfound"));
+			Assert.AreEqual(map.GetValueOrDefault("a"), reference.GetValueOrDefault("a"));
+			Assert.AreEqual(map.GetValueOrDefault("b"), reference.GetValueOrDefault("b"));
+			Assert.AreEqual(map.GetValueOrDefault("c"), reference.GetValueOrDefault("c"));
+			Assert.AreEqual(map.GetValueOrDefault(1), reference.GetValueOrDefault(1));
+			Assert.AreEqual(map.GetValueOrDefault("notfound"), reference.GetValueOrDefault("notfound"));
 			Assert.IsTrue(map.ContainsKey("b"));
 			Assert.IsTrue(map.Values.Contains(true));
 			Assert.IsFalse(map.ContainsKey("x"));

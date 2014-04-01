@@ -54,7 +54,7 @@ namespace Rhino
 		internal virtual bool Has(string name, bool isStatic)
 		{
 			IDictionary<string, object> ht = isStatic ? staticMembers : members;
-			object obj = ht.Get(name);
+			object obj = ht.GetValueOrDefault(name);
 			if (obj != null)
 			{
 				return true;
@@ -65,11 +65,11 @@ namespace Rhino
 		internal virtual object Get(Scriptable scope, string name, object javaObject, bool isStatic)
 		{
 			IDictionary<string, object> ht = isStatic ? staticMembers : members;
-			object member = ht.Get(name);
+			object member = ht.GetValueOrDefault(name);
 			if (!isStatic && member == null)
 			{
 				// Try to get static member from instance (LC3)
-				member = staticMembers.Get(name);
+				member = staticMembers.GetValueOrDefault(name);
 			}
 			if (member == null)
 			{
@@ -117,11 +117,11 @@ namespace Rhino
 		internal virtual void Put(Scriptable scope, string name, object javaObject, object value, bool isStatic)
 		{
 			IDictionary<string, object> ht = isStatic ? staticMembers : members;
-			object member = ht.Get(name);
+			object member = ht.GetValueOrDefault(name);
 			if (!isStatic && member == null)
 			{
 				// Try to get static member from instance (LC3)
-				member = staticMembers.Get(name);
+				member = staticMembers.GetValueOrDefault(name);
 			}
 			if (member == null)
 			{
@@ -129,7 +129,7 @@ namespace Rhino
 			}
 			if (member is FieldAndMethods)
 			{
-				FieldAndMethods fam = (FieldAndMethods)ht.Get(name);
+				FieldAndMethods fam = (FieldAndMethods)ht.GetValueOrDefault(name);
 				member = fam.field;
 			}
 			// Is this a bean property "set"?
@@ -273,11 +273,11 @@ namespace Rhino
 			{
 				// Explicit request for an overloaded method
 				string trueName = name.Substring(0, sigStart);
-				object obj = ht.Get(trueName);
+				object obj = ht.GetValueOrDefault(trueName);
 				if (!isStatic && obj == null)
 				{
 					// Try to get static member from instance (LC3)
-					obj = staticMembers.Get(trueName);
+					obj = staticMembers.GetValueOrDefault(trueName);
 				}
 				var njm = obj as NativeJavaMethod;
 				if (njm != null)
@@ -318,7 +318,7 @@ namespace Rhino
 				else
 				{
 					string trueName = methodOrCtor.GetName();
-					member = ht.Get(trueName);
+					member = ht.GetValueOrDefault(trueName);
 					if (member is NativeJavaMethod && ((NativeJavaMethod)member).methods.Length > 1)
 					{
 						NativeJavaMethod fun = new NativeJavaMethod(methodOrCtor, name);
@@ -469,7 +469,7 @@ namespace Rhino
 				bool isStatic = method.IsStatic;
 				IDictionary<string, object> ht = isStatic ? staticMembers : members;
 				string name = method.Name;
-				object value = ht.Get(name);
+				object value = ht.GetValueOrDefault(name);
 				if (value == null)
 				{
 					ht[name] = method;
@@ -545,7 +545,7 @@ namespace Rhino
 				{
 					bool isStatic = (field).IsStatic;
 					IDictionary<string, object> ht = isStatic ? staticMembers : members;
-					object member = ht.Get(name);
+					object member = ht.GetValueOrDefault(name);
 					if (member == null)
 					{
 						ht[name] = field;
@@ -648,7 +648,7 @@ namespace Rhino
 						{
 							continue;
 						}
-						object v = ht.Get(beanPropertyName);
+						object v = ht.GetValueOrDefault(beanPropertyName);
 						if (v != null)
 						{
 							// A private field shouldn't mask a public getter/setter
@@ -673,7 +673,7 @@ namespace Rhino
 						if (ht.ContainsKey(setterName))
 						{
 							// Is this value a method?
-							object member = ht.Get(setterName);
+							object member = ht.GetValueOrDefault(setterName);
 							var njmSet = member as NativeJavaMethod;
 							if (njmSet != null)
 							{
@@ -703,7 +703,7 @@ namespace Rhino
 				// Add the new bean properties.
 				foreach (string key in toAdd.Keys)
 				{
-					object value = toAdd.Get(key);
+					object value = toAdd.GetValueOrDefault(key);
 					ht[key] = value;
 				}
 			}
@@ -777,7 +777,7 @@ namespace Rhino
 			if (ht.ContainsKey(getterName))
 			{
 				// Check that the getter is a method.
-				var njmGet = ht.Get(getterName) as NativeJavaMethod;
+				var njmGet = ht.GetValueOrDefault(getterName) as NativeJavaMethod;
 				if (njmGet != null)
 				{
 					return ExtractGetMethod(njmGet.methods, isStatic);
@@ -894,7 +894,7 @@ namespace Rhino
 			Type cl = dynamicType;
 			for (; ; )
 			{
-				members = ct.Get(cl);
+				members = ct.GetValueOrDefault(cl);
 				if (members != null)
 				{
 					if (cl != dynamicType)

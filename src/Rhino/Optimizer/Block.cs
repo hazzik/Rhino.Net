@@ -12,6 +12,7 @@ using System.IO;
 using Rhino;
 using Rhino.Ast;
 using Rhino.Optimizer;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.Optimizer
@@ -167,7 +168,7 @@ namespace Rhino.Optimizer
 				if ((blockEndNodeType == Token.IFNE) || (blockEndNodeType == Token.IFEQ) || (blockEndNodeType == Token.GOTO))
 				{
 					Node target = ((Jump)blockEndNode).target;
-					Block.FatBlock branchTargetBlock = theTargetBlocks.Get(target);
+					Block.FatBlock branchTargetBlock = theTargetBlocks.GetValueOrDefault(target);
 					target.PutProp(Node.TARGETBLOCK_PROP, branchTargetBlock.realBlock);
 					fb.AddSuccessor(branchTargetBlock);
 					branchTargetBlock.AddPredecessor(fb);

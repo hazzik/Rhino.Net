@@ -14,6 +14,7 @@ using System.Reflection.Emit;
 using System.Text;
 using Rhino.Annotations;
 using Rhino.Optimizer;
+using Rhino.Utils;
 using Sharpen;
 using Arrays = Rhino.Utils.Arrays;
 
@@ -360,7 +361,7 @@ namespace Rhino
 			IDictionary<JavaAdapterSignature, Type> generated = cache.GetInterfaceAdapterCacheMap();
 			ObjToIntMap names = GetObjectFunctionNames(obj);
 			var sig = new JavaAdapterSignature(superClass, interfaces, names);
-			Type adapterClass = generated.Get(sig);
+			Type adapterClass = generated.GetValueOrDefault(sig);
 			if (adapterClass == null)
 			{
 				string adapterName = "adapter" + cache.NewClassSerialNumber();

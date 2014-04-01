@@ -5,8 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#if XML
 
+using Rhino.Utils;
+#if XML
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -423,13 +424,13 @@ namespace Rhino.XmlImpl
 
 			internal virtual void Declare(Namespace n)
 			{
-				if (map.Get(n.prefix) == null)
+				if (map.GetValueOrDefault(n.prefix) == null)
 				{
 					map[n.prefix] = n.uri;
 				}
 				//    TODO    I think this is analogous to the other way, but have not really thought it through ... should local scope
 				//            matter more than outer scope?
-				if (uriToPrefix.Get(n.uri) == null)
+				if (uriToPrefix.GetValueOrDefault(n.uri) == null)
 				{
 					uriToPrefix[n.uri] = n.prefix;
 				}
@@ -437,26 +438,26 @@ namespace Rhino.XmlImpl
 
 			internal virtual Namespace GetNamespaceByUri(string uri)
 			{
-				if (uriToPrefix.Get(uri) == null)
+				if (uriToPrefix.GetValueOrDefault(uri) == null)
 				{
 					return null;
 				}
-				return Namespace.Create(uri, uriToPrefix.Get(uri));
+				return Namespace.Create(uri, uriToPrefix.GetValueOrDefault(uri));
 			}
 
 			internal virtual Namespace GetNamespace(string prefix)
 			{
-				if (map.Get(prefix) == null)
+				if (map.GetValueOrDefault(prefix) == null)
 				{
 					return null;
 				}
-				return Namespace.Create(prefix, map.Get(prefix));
+				return Namespace.Create(prefix, map.GetValueOrDefault(prefix));
 			}
 
 			internal virtual Namespace[] GetNamespaces()
 			{
 				return (from prefix in map.Keys
-					let uri = map.Get(prefix)
+					let uri = map.GetValueOrDefault(prefix)
 					select Namespace.Create(prefix, uri)
 					into n
 					where !n.IsEmpty()

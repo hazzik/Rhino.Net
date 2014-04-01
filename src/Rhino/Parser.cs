@@ -12,6 +12,7 @@ using System.IO;
 using System.Text;
 using Rhino;
 using Rhino.Ast;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -1843,7 +1844,7 @@ switchLoop_break: ;
 				ConsumeToken();
 				if (labelSet != null)
 				{
-					label = labelSet.Get(ts.GetString());
+					label = labelSet.GetValueOrDefault(ts.GetString());
 				}
 				if (label == null)
 				{
@@ -2173,7 +2174,7 @@ switchLoop_break: ;
 			}
 			else
 			{
-				LabeledStatement ls = labelSet.Get(name);
+				LabeledStatement ls = labelSet.GetValueOrDefault(name);
 				if (ls != null)
 				{
 					if (compilerEnv.IdeMode)

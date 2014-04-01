@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -172,7 +173,7 @@ namespace Rhino
 		/// <returns>the built-in constructor</returns>
 		public virtual BaseFunction GetBuiltinCtor(Builtins type)
 		{
-			return ctors != null ? ctors.Get(type) : null;
+			return ctors != null ? ctors.GetValueOrDefault(type) : null;
 		}
 
 		/// <summary>

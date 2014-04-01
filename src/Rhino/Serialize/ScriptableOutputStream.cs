@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using Rhino;
 using Rhino.Serialize;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.Serialize
@@ -132,7 +133,7 @@ namespace Rhino.Serialize
 		/// <remarks>Returns true if the name is excluded from serialization.</remarks>
 		public virtual bool HasExcludedName(string name)
 		{
-			return table.Get(name) != null;
+			return table.GetValueOrDefault(name) != null;
 		}
 
 		/// <summary>Removes a name from the list of names to exclude.</summary>
@@ -200,7 +201,7 @@ namespace Rhino.Serialize
 		protected object ReplaceObject(object obj)
 		{
 			// suppress warning
-			string name = table.Get(obj);
+			string name = table.GetValueOrDefault(obj);
 			if (name == null)
 			{
 				return obj;

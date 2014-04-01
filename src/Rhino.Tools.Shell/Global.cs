@@ -15,6 +15,7 @@ using System.Text;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
 using Rhino.Serialize;
+using Rhino.Utils;
 using Sharpen;
 using Thread = System.Threading.Thread;
 
@@ -570,7 +571,7 @@ namespace Rhino.Tools.Shell
 				}
 				string expectedGroup = expectedMatcher.Group(0);
 				string actualGroup = actualMatcher.Group(0);
-				string mapping = doctestCanonicalizations.Get(expectedGroup);
+				string mapping = doctestCanonicalizations.GetValueOrDefault(expectedGroup);
 				if (mapping == null)
 				{
 					doctestCanonicalizations[expectedGroup] = actualGroup;

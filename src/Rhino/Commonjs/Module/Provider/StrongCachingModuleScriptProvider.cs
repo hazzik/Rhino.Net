@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.CommonJS.Module.Provider
@@ -38,7 +39,7 @@ namespace Rhino.CommonJS.Module.Provider
 
 		protected internal override CachedModuleScript GetLoadedModule(string moduleId)
 		{
-			return modules.Get(moduleId);
+			return modules.GetValueOrDefault(moduleId);
 		}
 
 		protected internal override void PutLoadedModule(string moduleId, ModuleScript moduleScript, object validator)

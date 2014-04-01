@@ -1838,7 +1838,7 @@ namespace Rhino
 			{
 				return null;
 			}
-			return threadLocalMap.Get(key);
+			return threadLocalMap.GetValueOrDefault(key);
 		}
 
 		/// <summary>Put a value that can later be retrieved using a given key.</summary>

@@ -1,3 +1,4 @@
+using Rhino.Utils;
 #if COMPILATION
 using System.Linq;
 using System;
@@ -431,7 +432,7 @@ namespace Rhino.Optimizer
 					var nodes = ((FunctionNode)scriptOrFn).GetResumptionPoints();
 					foreach (var node in nodes)
 					{
-						var live = liveLocals.Get(node);
+						var live = liveLocals.GetValueOrDefault(node);
 						if (live != null)
 						{
 							il.MarkLabel(generatorSwitch [GetNextGeneratorState(node)]);
@@ -455,7 +456,7 @@ namespace Rhino.Optimizer
 					{
 						if (n.GetType() == Token.FINALLY)
 						{
-							var ret = finallys.Get(n);
+							var ret = finallys.GetValueOrDefault(n);
 							// the finally will jump here
 							il.MarkLabel(ret.tableLabel);
 							//itsStackTop = stackTop;
@@ -835,7 +836,7 @@ namespace Rhino.Optimizer
 					}
 					il.EmitLoadLocal(finallyRegister);
 					il.Emit(OpCodes.Conv_I4);
-					var ret = finallys.Get(node);
+					var ret = finallys.GetValueOrDefault(node);
 					ret.tableLabel = il.DefineLabel();
 					il.Emit(OpCodes.Br, ret.tableLabel);
 					il.MarkLabel(finallyEnd);
@@ -1795,7 +1796,7 @@ namespace Rhino.Optimizer
 
 		private void AddGotoWithReturn(ILGenerator il, Node target)
 		{
-			var ret = finallys.Get(target);
+			var ret = finallys.GetValueOrDefault(target);
 			il.EmitLoadConstant(ret.jsrPoints.Count);
 			AddGoto(il, OpCodes.Br, target);
 			var retLabel = il.DefineLabel();

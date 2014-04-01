@@ -3039,7 +3039,7 @@ namespace Rhino
 			{
 				return null;
 			}
-			return h.Get(key);
+			return h.GetValueOrDefault(key);
 		}
 
 		/// <summary>

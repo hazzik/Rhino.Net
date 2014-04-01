@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Rhino;
 using Rhino.Ast;
 using Rhino.Optimizer;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino.Optimizer
@@ -79,7 +80,7 @@ namespace Rhino.Optimizer
 					if (targetName != null)
 					{
 						OptFunctionNode ofn;
-						ofn = possibleDirectCalls.Get(targetName);
+						ofn = possibleDirectCalls.GetValueOrDefault(targetName);
 						if (ofn != null && argCount == ofn.fnode.GetParamCount() && !ofn.fnode.RequiresActivation())
 						{
 							// Refuse to directCall any function with more

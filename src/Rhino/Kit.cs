@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Security;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -402,7 +403,7 @@ check_break: ;
 		{
 			lock (h)
 			{
-				object current = h.Get(key);
+				object current = h.GetValueOrDefault(key);
 				if (current == null)
 				{
 					h[key] = initialValue;
