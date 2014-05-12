@@ -21,7 +21,7 @@ namespace Rhino.Optimizer
 	/// <author>Norris Boyd</author>
 	internal class OptTransformer : NodeTransformer
 	{
-		internal OptTransformer(IDictionary<string, OptFunctionNode> possibleDirectCalls, ObjArray directCallTargets)
+		internal OptTransformer(IDictionary<string, OptFunctionNode> possibleDirectCalls, List<OptFunctionNode> directCallTargets)
 		{
 			this.possibleDirectCalls = possibleDirectCalls;
 			this.directCallTargets = directCallTargets;
@@ -91,7 +91,7 @@ namespace Rhino.Optimizer
 								node.PutProp(Node.DIRECTCALL_PROP, ofn);
 								if (!ofn.IsTargetOfDirectCall())
 								{
-									int index = directCallTargets.Size();
+									int index = directCallTargets.Count;
 									directCallTargets.Add(ofn);
 									ofn.SetDirectTargetIndex(index);
 								}
@@ -104,6 +104,6 @@ namespace Rhino.Optimizer
 
 		private IDictionary<string, OptFunctionNode> possibleDirectCalls;
 
-		private ObjArray directCallTargets;
+        private List<OptFunctionNode> directCallTargets;
 	}
 }

@@ -107,7 +107,7 @@ namespace Rhino.Tests
 
 		/// <exception cref="System.Exception"></exception>
 		[SetUp]
-		private void SetUp()
+		public void SetUp()
 		{
 			globalScope = CreateGlobalScope();
 		}

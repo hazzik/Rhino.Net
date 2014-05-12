@@ -510,11 +510,9 @@ openStream_break: ;
 		/// <remarks>Returns an array of all functions in the given script.</remarks>
 		private static DebuggableScript[] GetAllFunctions(DebuggableScript function)
 		{
-			ObjArray functions = new ObjArray();
+			var functions = new List<DebuggableScript>();
 			CollectFunctions_r(function, functions);
-			DebuggableScript[] result = new DebuggableScript[functions.Size()];
-			functions.ToArray(result);
-			return result;
+			return functions.ToArray();
 		}
 
 		/// <summary>
@@ -522,7 +520,7 @@ openStream_break: ;
 		/// <see cref="GetAllFunctions(Rhino.Debug.DebuggableScript)">GetAllFunctions(Rhino.Debug.DebuggableScript)</see>
 		/// .
 		/// </summary>
-		private static void CollectFunctions_r(DebuggableScript function, ObjArray array)
+		private static void CollectFunctions_r(DebuggableScript function, ICollection<DebuggableScript> array)
 		{
 			array.Add(function);
 			for (int i = 0; i != function.GetFunctionCount(); ++i)

@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+using System.Collections.Generic;
 using Rhino;
 using Rhino.Ast;
 using Rhino.Optimizer;
@@ -41,11 +42,10 @@ namespace Rhino.Optimizer
 			}
 			inDirectCallFunction = theFunction.IsTargetOfDirectCall();
 			this.theFunction = theFunction;
-			ObjArray statementsArray = new ObjArray();
+            var statementsArray = new List<Node>();
 			BuildStatementList_r(theFunction.fnode, statementsArray);
-			Node[] theStatementNodes = new Node[statementsArray.Size()];
-			statementsArray.ToArray(theStatementNodes);
-			Block.RunFlowAnalyzes(theFunction, theStatementNodes);
+            Node[] theStatementNodes = statementsArray.ToArray();
+		    Block.RunFlowAnalyzes(theFunction, theStatementNodes);
 			if (!theFunction.fnode.RequiresActivation())
 			{
 				parameterUsedInNumberContext = false;
@@ -508,7 +508,7 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		private static void BuildStatementList_r(Node node, ObjArray statements)
+		private static void BuildStatementList_r(Node node, ICollection<Node> statements)
 		{
 			int type = node.GetType();
 			if (type == Token.BLOCK || type == Token.LOCAL_BLOCK || type == Token.LOOP || type == Token.FUNCTION)

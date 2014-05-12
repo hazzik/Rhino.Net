@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Rhino.Tools.Debugger
 {
@@ -8,7 +10,7 @@ namespace Rhino.Tools.Debugger
 	{
 		/// <summary>The stack frames.</summary>
 		/// <remarks>The stack frames.</remarks>
-		private readonly ObjArray frameStack = new ObjArray();
+        private readonly Stack<StackFrame> frameStack = new Stack<StackFrame>();
 
 		/// <summary>Whether the debugger should break at the next line in this context.</summary>
 		/// <remarks>Whether the debugger should break at the next line in this context.</remarks>
@@ -40,15 +42,16 @@ namespace Rhino.Tools.Debugger
 		/// <remarks>Returns the number of stack frames.</remarks>
 		public int FrameCount()
 		{
-			return frameStack.Size();
+			return frameStack.Count;
 		}
 
 		/// <summary>Returns the stack frame with the given index.</summary>
 		/// <remarks>Returns the stack frame with the given index.</remarks>
 		public StackFrame GetFrame(int frameNumber)
 		{
-			int num = frameStack.Size() - frameNumber - 1;
-			return (StackFrame)frameStack.Get(num);
+            //TODO: optimize this
+			int num = frameStack.Count - frameNumber - 1;
+			return frameStack.ElementAt(num);
 		}
 
 		/// <summary>Pushes a stack frame on to the stack.</summary>

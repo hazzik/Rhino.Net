@@ -156,8 +156,6 @@ namespace Org.Mozilla.Classfile
 		private long[] itsFixupTable;
 
 		private int itsFixupTableTop;
-
-		private ObjArray itsVarDescriptors;
 	}
 
 	internal sealed class ExceptionTableEntry

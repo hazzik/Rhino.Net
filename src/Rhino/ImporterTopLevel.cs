@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using Rhino;
 using Sharpen;
 
@@ -120,21 +121,21 @@ namespace Rhino
 			{
 				elements = importedPackages.ToArray();
 			}
-			for (int i = 0; i < elements.Length; i++)
+			foreach (object element in elements)
 			{
-				NativeJavaPackage p = (NativeJavaPackage)elements[i];
-				object v = p.GetPkgProperty(name, start, false);
-				if (v != null && !(v is NativeJavaPackage))
-				{
-					if (result == ScriptableConstants.NOT_FOUND)
-					{
-						result = v;
-					}
-					else
-					{
-						throw Context.ReportRuntimeError2("msg.ambig.import", result.ToString(), v.ToString());
-					}
-				}
+			    NativeJavaPackage p = (NativeJavaPackage)element;
+			    object v = p.GetPkgProperty(name, start, false);
+			    if (v != null && !(v is NativeJavaPackage))
+			    {
+			        if (result == ScriptableConstants.NOT_FOUND)
+			        {
+			            result = v;
+			        }
+			        else
+			        {
+			            throw Context.ReportRuntimeError2("msg.ambig.import", result.ToString(), v.ToString());
+			        }
+			    }
 			}
 			return result;
 		}
@@ -211,9 +212,9 @@ namespace Rhino
 			}
 			lock (importedPackages)
 			{
-				for (int j = 0; j != importedPackages.Size(); j++)
+				for (int j = 0; j != importedPackages.Count; j++)
 				{
-					if (pkg.Equals(importedPackages.Get(j)))
+					if (pkg.Equals(importedPackages[j]))
 					{
 						return;
 					}
@@ -365,7 +366,7 @@ L0_break: ;
 
 		private const int MAX_PROTOTYPE_ID = 3;
 
-		private ObjArray importedPackages = new ObjArray();
+        private readonly List<NativeJavaPackage> importedPackages = new List<NativeJavaPackage>();
 
 		private bool topScopeFlag;
 		// #/string_id_map#

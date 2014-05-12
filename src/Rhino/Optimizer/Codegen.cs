@@ -198,7 +198,7 @@ namespace Rhino.Optimizer
 			}
 			if (possibleDirectCalls != null)
 			{
-				directCallTargets = new ObjArray();
+				directCallTargets = new List<OptFunctionNode>();
 			}
 			var ot = new OptTransformer(possibleDirectCalls, directCallTargets);
 			ot.Transform(tree);
@@ -220,19 +220,17 @@ namespace Rhino.Optimizer
 
 		private void InitScriptNodesData(ScriptNode scriptOrFn)
 		{
-			var x = new ObjArray();
-			CollectScriptNodes_r(scriptOrFn, x);
-			var count = x.Size();
-			scriptOrFnNodes = new ScriptNode[count];
-			x.ToArray(scriptOrFnNodes);
-			scriptOrFnIndexes = new ObjToIntMap(count);
-			for (var i = 0; i != count; ++i)
+			var nodes = new List<ScriptNode>();
+			CollectScriptNodes_r(scriptOrFn, nodes);
+			scriptOrFnNodes = nodes.ToArray();
+			scriptOrFnIndexes = new ObjToIntMap(nodes.Count);
+			for (var i = 0; i < nodes.Count; ++i)
 			{
 				scriptOrFnIndexes.Put(scriptOrFnNodes[i], i);
 			}
 		}
 
-		private static void CollectScriptNodes_r(ScriptNode n, ObjArray x)
+		private static void CollectScriptNodes_r(ScriptNode n, ICollection<ScriptNode> x)
 		{
 			x.Add(n);
 			var nestedCount = n.GetFunctionCount();
@@ -1084,7 +1082,7 @@ namespace Rhino.Optimizer
 
 		private CompilerEnvirons compilerEnv;
 
-		private ObjArray directCallTargets;
+		private List<OptFunctionNode> directCallTargets;
 
 		internal ScriptNode[] scriptOrFnNodes;
 

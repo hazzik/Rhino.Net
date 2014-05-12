@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -727,13 +728,13 @@ namespace Rhino
 			}
 			// has interpreter frame on the stack
 			Interpreter.CallFrame[] array;
-			if (cx.previousInterpreterInvocations == null || cx.previousInterpreterInvocations.Size() == 0)
+			if (cx.previousInterpreterInvocations == null || cx.previousInterpreterInvocations.Count == 0)
 			{
 				array = new Interpreter.CallFrame[1];
 			}
 			else
 			{
-				int previousCount = cx.previousInterpreterInvocations.Size();
+				int previousCount = cx.previousInterpreterInvocations.Count;
 				if (cx.previousInterpreterInvocations.Peek() == cx.lastInterpreterFrame)
 				{
 					// It can happen if exception was generated after
@@ -742,8 +743,7 @@ namespace Rhino
 					// In this case frames has to be ignored.
 					--previousCount;
 				}
-				array = new Interpreter.CallFrame[previousCount + 1];
-				cx.previousInterpreterInvocations.ToArray(array);
+			    array = (CallFrame[]) cx.previousInterpreterInvocations.ToArray();
 			}
 			array[array.Length - 1] = (Interpreter.CallFrame)cx.lastInterpreterFrame;
 			int interpreterFrameCount = 0;
@@ -1049,7 +1049,7 @@ namespace Rhino
 				// invocation on the stack
 				if (cx.previousInterpreterInvocations == null)
 				{
-					cx.previousInterpreterInvocations = new ObjArray();
+					cx.previousInterpreterInvocations = new Stack();
 				}
 				cx.previousInterpreterInvocations.Push(cx.lastInterpreterFrame);
 			}
@@ -2653,7 +2653,7 @@ StateLoop_continue: ;
 StateLoop_break: ;
 			// end of StateLoop: for(;;)
 			// Do cleanups/restorations before the final return or throw
-			if (cx.previousInterpreterInvocations != null && cx.previousInterpreterInvocations.Size() != 0)
+			if (cx.previousInterpreterInvocations != null && cx.previousInterpreterInvocations.Count != 0)
 			{
 				cx.lastInterpreterFrame = cx.previousInterpreterInvocations.Pop();
 			}

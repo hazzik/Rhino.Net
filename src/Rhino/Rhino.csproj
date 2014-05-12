@@ -245,7 +245,6 @@
     <Compile Include="NativeWith.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeTransformer.cs" />
-    <Compile Include="ObjArray.cs" />
     <Compile Include="ObjToIntMap.cs" />
     <Compile Include="Optimizer\Block.cs" />
     <Compile Include="Optimizer\BodyCodegen.cs" />

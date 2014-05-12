@@ -37,7 +37,7 @@ namespace Rhino.Tests
 			// get a js object as map
 			Context context = Context.Enter();
 			ScriptableObject scope = context.InitStandardObjects();
-			map = (IDictionary<object, object>)context.EvaluateString(scope, "({ a: 'a', b: true, c: new java.util.HashMap(), 1: 42});", "testsrc", 1, null);
+			map = (IDictionary<object, object>)context.EvaluateString(scope, "({ a: 'a', b: true, c: new System.Collections.Hashtable(), 1: 42});", "testsrc", 1, null);
 			Context.Exit();
 		}
 

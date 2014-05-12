@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 using System;
+using System.Collections;
 using Rhino;
 using Rhino.Ast;
 using Sharpen;
@@ -51,7 +52,7 @@ namespace Rhino
 
 		private int fixupTableTop;
 
-		private ObjArray literalIds = new ObjArray();
+		private ArrayList literalIds = new ArrayList();
 
 		private int exceptionTableTop;
 
@@ -168,7 +169,7 @@ namespace Rhino
 			itsData.argCount = scriptOrFn.GetParamCount();
 			itsData.encodedSourceStart = scriptOrFn.GetEncodedSourceStart();
 			itsData.encodedSourceEnd = scriptOrFn.GetEncodedSourceEnd();
-			if (literalIds.Size() != 0)
+			if (literalIds.Count != 0)
 			{
 				itsData.literalIds = literalIds.ToArray();
 			}
@@ -1285,14 +1286,14 @@ namespace Rhino
 				}
 				else
 				{
-					int index = literalIds.Size();
+					int index = literalIds.Count;
 					literalIds.Add(skipIndexes);
 					AddIndexOp(Icode_SPARE_ARRAYLIT, index);
 				}
 			}
 			else
 			{
-				int index = literalIds.Size();
+				int index = literalIds.Count;
 				literalIds.Add(propertyIds);
 				AddIndexOp(Token.OBJECTLIT, index);
 			}

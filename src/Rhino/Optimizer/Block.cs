@@ -105,7 +105,7 @@ namespace Rhino.Optimizer
 		{
 			// a mapping from each target node to the block it begins
 			IDictionary<Node, Block.FatBlock> theTargetBlocks = new Dictionary<Node, Block.FatBlock>();
-			ObjArray theBlocks = new ObjArray();
+			var theBlocks = new List<FatBlock>();
 			// there's a block that starts at index 0
 			int beginNodeIndex = 0;
 			for (int i = 0; i < statementNodes.Length; i++)
@@ -154,14 +154,14 @@ namespace Rhino.Optimizer
 				theBlocks.Add(fb);
 			}
 			// build successor and predecessor links
-			for (int i_1 = 0; i_1 < theBlocks.Size(); i_1++)
+			for (int i = 0; i < theBlocks.Count; i++)
 			{
-				Block.FatBlock fb = (Block.FatBlock)(theBlocks.Get(i_1));
+				Block.FatBlock fb = theBlocks[i];
 				Node blockEndNode = statementNodes[fb.realBlock.itsEndNodeIndex];
 				int blockEndNodeType = blockEndNode.GetType();
-				if ((blockEndNodeType != Token.GOTO) && (i_1 < (theBlocks.Size() - 1)))
+				if ((blockEndNodeType != Token.GOTO) && (i < (theBlocks.Count - 1)))
 				{
-					Block.FatBlock fallThruTarget = (Block.FatBlock)(theBlocks.Get(i_1 + 1));
+					Block.FatBlock fallThruTarget = theBlocks[i + 1];
 					fb.AddSuccessor(fallThruTarget);
 					fallThruTarget.AddPredecessor(fb);
 				}
@@ -174,15 +174,15 @@ namespace Rhino.Optimizer
 					branchTargetBlock.AddPredecessor(fb);
 				}
 			}
-			Block[] result = new Block[theBlocks.Size()];
-			for (int i_2 = 0; i_2 < theBlocks.Size(); i_2++)
+			Block[] result = new Block[theBlocks.Count];
+			for (int i = 0; i < theBlocks.Count; i++)
 			{
-				Block.FatBlock fb = (Block.FatBlock)(theBlocks.Get(i_2));
+				Block.FatBlock fb = theBlocks[i];
 				Block b = fb.realBlock;
 				b.itsSuccessors = fb.GetSuccessors();
 				b.itsPredecessors = fb.GetPredecessors();
-				b.itsBlockID = i_2;
-				result[i_2] = b;
+				b.itsBlockID = i;
+				result[i] = b;
 			}
 			return result;
 		}
