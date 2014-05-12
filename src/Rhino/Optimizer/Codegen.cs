@@ -223,10 +223,10 @@ namespace Rhino.Optimizer
 			var nodes = new List<ScriptNode>();
 			CollectScriptNodes_r(scriptOrFn, nodes);
 			scriptOrFnNodes = nodes.ToArray();
-			scriptOrFnIndexes = new ObjToIntMap(nodes.Count);
+			scriptOrFnIndexes = new Dictionary<ScriptNode, int>(nodes.Count);
 			for (var i = 0; i < nodes.Count; ++i)
 			{
-				scriptOrFnIndexes.Put(scriptOrFnNodes[i], i);
+				scriptOrFnIndexes[scriptOrFnNodes[i]] = i;
 			}
 		}
 
@@ -997,7 +997,7 @@ namespace Rhino.Optimizer
 
 		internal int GetIndex(ScriptNode n)
 		{
-			return scriptOrFnIndexes.GetExisting(n);
+			return scriptOrFnIndexes[n];
 		}
 
 		internal string GetDirectCtorName(ScriptNode n)
@@ -1086,7 +1086,7 @@ namespace Rhino.Optimizer
 
 		internal ScriptNode[] scriptOrFnNodes;
 
-		private ObjToIntMap scriptOrFnIndexes;
+		private Dictionary<ScriptNode, int> scriptOrFnIndexes;
 
 		private Type mainMethodClass = DEFAULT_MAIN_METHOD_CLASS;
 

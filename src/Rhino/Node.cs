@@ -9,7 +9,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using Rhino;
 using Rhino.Ast;
 using Label = System.Reflection.Emit.Label;
@@ -1173,11 +1172,7 @@ namespace Rhino
 			return type.ToString();
 		}
 
-		private void ToString(ObjToIntMap printIds, StringBuilder sb)
-		{
-		}
-
-		// can't add this as it recurses
+	    // can't add this as it recurses
 		// can't add this as it is dull
 		// NON_SPECIALCALL should not be stored
 		public virtual string ToStringTree(ScriptNode treeTop)
@@ -1185,19 +1180,7 @@ namespace Rhino
 			return null;
 		}
 
-		private static void ToStringTreeHelper(ScriptNode treeTop, Node n, ObjToIntMap printIds, int level, StringBuilder sb)
-		{
-		}
-
-		private static void GeneratePrintIds(Node n, ObjToIntMap map)
-		{
-		}
-
-		private static void AppendPrintId(Node n, ObjToIntMap printIds, StringBuilder sb)
-		{
-		}
-
-		protected internal int type = Token.ERROR;
+	    protected internal int type = Token.ERROR;
 
 		protected internal Node next;
 

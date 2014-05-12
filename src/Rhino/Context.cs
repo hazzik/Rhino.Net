@@ -2538,7 +2538,7 @@ namespace Rhino
 
 		internal XMLLib cachedXMLLib;
 
-		internal ObjToIntMap iterating;
+		internal HashSet<Scriptable> iterating;
 
 		internal object interpreterSecurityDomain;
 

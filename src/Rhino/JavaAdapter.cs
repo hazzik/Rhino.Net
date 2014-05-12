@@ -36,9 +36,9 @@ namespace Rhino
 
 			private Type[] interfaces;
 
-			private ObjToIntMap names;
+			private IDictionary<string, int> names;
 
-			internal JavaAdapterSignature(Type superClass, Type[] interfaces, ObjToIntMap names)
+			internal JavaAdapterSignature(Type superClass, Type[] interfaces, IDictionary<string, int> names)
 			{
 				this.superClass = superClass;
 				this.interfaces = interfaces;
@@ -70,16 +70,15 @@ namespace Rhino
 						}
 					}
 				}
-				if (names.Size() != sig.names.Size())
+				if (names.Count != sig.names.Count)
 				{
 					return false;
 				}
-				ObjToIntMap.Iterator iter = new ObjToIntMap.Iterator(names);
-				for (iter.Start(); !iter.Done(); iter.Next())
+			    foreach (var iter in names)
 				{
-					string name = (string)iter.GetKey();
-					int arity = iter.GetValue();
-					if (arity != sig.names.Get(name, arity + 1))
+					string name = iter.Key;
+					int arity = iter.Value;
+					if (arity != sig.names.GetValueOrDefault(name, arity + 1))
 					{
 						return false;
 					}
@@ -89,7 +88,7 @@ namespace Rhino
 
 			public override int GetHashCode()
 			{
-				return (superClass.GetHashCode() + Arrays.HashCode(interfaces)) ^ names.Size();
+				return (superClass.GetHashCode() + Arrays.HashCode(interfaces)) ^ names.Count;
 			}
 		}
 
@@ -330,10 +329,10 @@ namespace Rhino
 			throw new TypeLoadException("adapter");
 		}
 
-		private static ObjToIntMap GetObjectFunctionNames(Scriptable obj)
+		private static IDictionary<string, int> GetObjectFunctionNames(Scriptable obj)
 		{
 			object[] ids = ScriptableObject.GetPropertyIds(obj);
-			ObjToIntMap map = new ObjToIntMap(ids.Length);
+            var map = new Dictionary<string, int>(ids.Length);
 			for (int i = 0; i != ids.Length; ++i)
 			{
 				if (!(ids[i] is string))
@@ -349,7 +348,7 @@ namespace Rhino
 					{
 						length = 0;
 					}
-					map.Put(id, length);
+					map[id] = length;
 				}
 			}
 			return map;
@@ -359,7 +358,7 @@ namespace Rhino
 		{
 			ClassCache cache = ClassCache.Get(scope);
 			IDictionary<JavaAdapterSignature, Type> generated = cache.GetInterfaceAdapterCacheMap();
-			ObjToIntMap names = GetObjectFunctionNames(obj);
+			var names = GetObjectFunctionNames(obj);
 			var sig = new JavaAdapterSignature(superClass, interfaces, names);
 			Type adapterClass = generated.GetValueOrDefault(sig);
 			if (adapterClass == null)
@@ -374,7 +373,7 @@ namespace Rhino
 			return adapterClass;
 		}
 
-		public static Type CreateAdapterCode(ObjToIntMap functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName)
+		public static Type CreateAdapterCode(IDictionary<string, int> functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName)
 		{
 			var module = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("TempAssembly" + DateTime.Now.Millisecond), AssemblyBuilderAccess.Run)
 				.DefineDynamicModule("TempModule" + DateTime.Now.Millisecond);
@@ -382,7 +381,7 @@ namespace Rhino
 			return CreateAdapterCode(functionNames, name, baseType, interfaces, scriptClassName, module);
 		}
 
-		public static Type CreateAdapterCode(ObjToIntMap functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName, ModuleBuilder module)
+		public static Type CreateAdapterCode(IDictionary<string, int> functionNames, string name, Type baseType, Type[] interfaces, Type scriptClassName, ModuleBuilder module)
 		{
 			interfaces = interfaces ?? Type.EmptyTypes;
 
@@ -414,8 +413,8 @@ namespace Rhino
 			{
 				GenerateEmptyCtor(type, baseType, scriptClassName, delegee, self);
 			}
-			ObjToIntMap generatedOverrides = new ObjToIntMap();
-			ObjToIntMap generatedMethods = new ObjToIntMap();
+			var generatedOverrides = new HashSet<string>();
+            var generatedMethods = new HashSet<string>();
 
 			// generate methods to satisfy all specified interfaces.
 			foreach (Type @interface in interfaces)
@@ -429,7 +428,7 @@ namespace Rhino
 					}
 					string methodName = method.Name;
 					Type[] argTypes = method.GetParameterTypes();
-					if (!functionNames.Has(methodName))
+					if (!functionNames.ContainsKey(methodName))
 					{
 						try
 						{
@@ -448,11 +447,11 @@ namespace Rhino
 					// method/signature.
 					string methodSignature = GetMethodSignature(method, argTypes);
 					string methodKey = methodName + methodSignature;
-					if (!generatedOverrides.Has(methodKey))
+					if (!generatedOverrides.Contains(methodKey))
 					{
 						GenerateMethod(type, methodName, argTypes, method.ReturnType, true, factory, delegee, self);
-						generatedOverrides.Put(methodKey, 0);
-						generatedMethods.Put(methodName, 0);
+					    generatedOverrides.Add(methodKey);
+					    generatedMethods.Add(methodName);
 					}
 				}
 			}
@@ -467,19 +466,19 @@ namespace Rhino
 				// has a property of the same name, then an override is intended.
 				bool isAbstractMethod = method.IsAbstract;
 				string methodName = method.Name;
-				if (isAbstractMethod || functionNames.Has(methodName))
+				if (isAbstractMethod || functionNames.ContainsKey(methodName))
 				{
 					// make sure to generate only one instance of a particular
 					// method/signature.
 					Type[] argTypes = method.GetParameterTypes();
 					string methodSignature = GetMethodSignature(method, argTypes);
 					string methodKey = methodName + methodSignature;
-					if (!generatedOverrides.Has(methodKey))
+					if (!generatedOverrides.Contains(methodKey))
 					{
 						GenerateMethod(type, methodName, argTypes, method.ReturnType, true, factory, delegee, self);
-						generatedOverrides.Put(methodKey, 0);
-						generatedMethods.Put(methodName, 0);
-						// if a method was overridden, generate a "super$method"
+					    generatedOverrides.Add(methodKey);
+					    generatedMethods.Add(methodName);
+					    // if a method was overridden, generate a "super$method"
 						// which lets the delegate call the superclass' version.
 						if (!isAbstractMethod)
 						{
@@ -491,15 +490,14 @@ namespace Rhino
 			// Generate Java methods for remaining properties that are not 
 			// overrides.
 
-			ObjToIntMap.Iterator iter = new ObjToIntMap.Iterator(functionNames);
-			for (iter.Start(); !iter.Done(); iter.Next())
-			{
-				string functionName = (string)iter.GetKey();
-				if (generatedMethods.Has(functionName))
+		    foreach (var kvp in functionNames)
+		    {
+				string functionName = kvp.Key;
+				if (generatedMethods.Contains(functionName))
 				{
 					continue;
 				}
-				int length = iter.GetValue();
+				int length = kvp.Value;
 				Type[] parms = new Type[length];
 				for (int k = 0; k < length; k++)
 				{

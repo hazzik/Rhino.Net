@@ -2918,7 +2918,7 @@ namespace Rhino
 				return ScriptRuntime.emptyArgs;
 			}
 			object[] result = obj.GetIds();
-			ObjToIntMap map = null;
+			HashSet<object> map = null;
 			for (; ; )
 			{
 				obj = obj.Prototype;
@@ -2938,22 +2938,22 @@ namespace Rhino
 						result = ids;
 						continue;
 					}
-					map = new ObjToIntMap(result.Length + ids.Length);
-					for (int i = 0; i != result.Length; ++i)
+				    map = new HashSet<object>();
+					foreach (object item in result)
 					{
-						map.Intern(result[i]);
+					    map.Add(item);
 					}
-					result = null;
+				    result = null;
 				}
 				// Allow to GC the result
-				for (int i_1 = 0; i_1 != ids.Length; ++i_1)
+				foreach (object id in ids)
 				{
-					map.Intern(ids[i_1]);
+				    map.Add(id);
 				}
 			}
 			if (map != null)
 			{
-				result = map.GetKeys();
+				result = map.ToArray();
 			}
 			return result;
 		}

@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Rhino.Ast;
@@ -1075,12 +1076,12 @@ namespace Rhino
 			{
 				toplevel = true;
 				iterating = false;
-				cx.iterating = new ObjToIntMap(31);
+				cx.iterating = new HashSet<Scriptable>();
 			}
 			else
 			{
 				toplevel = false;
-				iterating = cx.iterating.Has(thisObj);
+				iterating = cx.iterating.Contains(thisObj);
 			}
 			StringBuilder result = new StringBuilder(128);
 			if (toplevel)
@@ -1094,8 +1095,8 @@ namespace Rhino
 			{
 				if (!iterating)
 				{
-					cx.iterating.Intern(thisObj);
-					// stop recursion.
+				    cx.iterating.Add(thisObj);
+				    // stop recursion.
 					object[] ids = thisObj.GetIds();
 					for (int i = 0; i < ids.Length; i++)
 					{
@@ -2230,7 +2231,7 @@ childScopesChecks_break: ;
 
 			internal int index;
 
-			internal ObjToIntMap used;
+			internal HashSet<object> used;
 
 			internal object currentId;
 
@@ -2350,7 +2351,7 @@ childScopesChecks_break: ;
 					continue;
 				}
 				object id = x.ids[x.index++];
-				if (x.used != null && x.used.Has(id))
+				if (x.used != null && x.used.Contains(id))
 				{
 					continue;
 				}
@@ -2444,16 +2445,11 @@ childScopesChecks_break: ;
 			}
 			if (x.obj != null && x.ids != null)
 			{
-				object[] previous = x.ids;
-				int L = previous.Length;
-				if (x.used == null)
+			    if (x.used == null)
 				{
-					x.used = new ObjToIntMap(L);
+					x.used = new HashSet<object>();
 				}
-				for (int i = 0; i != L; ++i)
-				{
-					x.used.Intern(previous[i]);
-				}
+			    x.used.UnionWith(x.ids);
 			}
 			x.ids = ids;
 			x.index = 0;

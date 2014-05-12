@@ -1025,12 +1025,12 @@ again_break: ;
 			{
 				toplevel = true;
 				iterating = false;
-				cx.iterating = new ObjToIntMap(31);
+				cx.iterating = new HashSet<Scriptable>();
 			}
 			else
 			{
 				toplevel = false;
-				iterating = cx.iterating.Has(thisObj);
+				iterating = cx.iterating.Contains(thisObj);
 			}
 			// Make sure cx.iterating is set to null when done
 			// so we don't leak memory
@@ -1038,7 +1038,7 @@ again_break: ;
 			{
 				if (!iterating)
 				{
-					cx.iterating.Put(thisObj, 0);
+					cx.iterating.Add(thisObj);
 					// stop recursion.
 					// make toSource print null and undefined values in recent versions
 					bool skipUndefinedAndNull = !toSource || cx.GetLanguageVersion() < LanguageVersion.VERSION_1_5;

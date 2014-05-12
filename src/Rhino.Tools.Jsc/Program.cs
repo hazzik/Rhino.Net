@@ -341,14 +341,14 @@ namespace Rhino.Tools.Jsc
 				return new[] { Tuple.Create(scriptClassName, scriptClassBytes) };
 			}
 			int functionCount = tree.GetFunctionCount();
-			ObjToIntMap functionNames = new ObjToIntMap(functionCount);
+			var functionNames = new Dictionary<string, int>(functionCount);
 			for (int i = 0; i < functionCount; i++)
 			{
 				FunctionNode ofn = tree.GetFunctionNode(i);
 				string name = ofn.GetName();
 				if (!string.IsNullOrEmpty(name))
 				{
-					functionNames.Put(name, ofn.GetParamCount());
+					functionNames[name] = ofn.GetParamCount();
 				}
 			}
 			if (superClass == null)

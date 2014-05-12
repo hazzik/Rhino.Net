@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Rhino;
+using Rhino.Utils;
 using Sharpen;
 
 namespace Rhino
@@ -933,7 +934,7 @@ L0_break: ;
 							}
 							// Save the string in case we need to use in
 							// object literal definitions.
-							this.@string = (string)allStrings.Intern(str);
+							this.@string = string.Intern(str);
 							if (result != Token.RESERVED)
 							{
 								return result;
@@ -956,7 +957,7 @@ L0_break: ;
 							str = ConvertLastCharToHex(str);
 						}
 					}
-					this.@string = (string)allStrings.Intern(str);
+					this.@string = string.Intern(str);
 					return Token.NAME;
 				}
 				// is it a number?
@@ -1230,7 +1231,7 @@ strLoop_continue: ;
 					}
 strLoop_break: ;
 					string str = GetStringFromBuffer();
-					this.@string = (string)allStrings.Intern(str);
+					this.@string = string.Intern(str);
 					return Token.STRING;
 				}
 				switch (c)
@@ -2612,9 +2613,7 @@ retry_break: ;
 
 		private int stringBufferTop;
 
-		private ObjToIntMap allStrings = new ObjToIntMap(50);
-
-		private readonly int[] ungetBuffer = new int[3];
+	    private readonly int[] ungetBuffer = new int[3];
 
 		private int ungetCursor;
 

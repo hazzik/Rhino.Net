@@ -9,9 +9,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Rhino;
+using System.Security.Policy;
 using Rhino.Ast;
-using Rhino.Optimizer;
 using Rhino.Utils;
 using Sharpen;
 
@@ -21,17 +20,15 @@ namespace Rhino.Optimizer
 	{
 		private class FatBlock
 		{
-			private static Block[] ReduceToArray(ObjToIntMap map)
+			private static Block[] ReduceToArray(ICollection<FatBlock> map)
 			{
 				Block[] result = null;
-				if (!map.IsEmpty())
+				if (!(map.Count <= 0))
 				{
-					result = new Block[map.Size()];
+					result = new Block[map.Count];
 					int i = 0;
-					ObjToIntMap.Iterator iter = map.NewIterator();
-					for (iter.Start(); !iter.Done(); iter.Next())
-					{
-						Block.FatBlock fb = (Block.FatBlock)(iter.GetKey());
+				    foreach (var fb in map)
+				    {
 						result[i++] = fb.realBlock;
 					}
 				}
@@ -40,15 +37,15 @@ namespace Rhino.Optimizer
 
 			internal virtual void AddSuccessor(Block.FatBlock b)
 			{
-				successors.Put(b, 0);
+			    successors.Add(b);
 			}
 
-			internal virtual void AddPredecessor(Block.FatBlock b)
-			{
-				predecessors.Put(b, 0);
-			}
+		    internal virtual void AddPredecessor(Block.FatBlock b)
+		    {
+		        predecessors.Add(b);
+		    }
 
-			internal virtual Block[] GetSuccessors()
+		    internal virtual Block[] GetSuccessors()
 			{
 				return ReduceToArray(successors);
 			}
@@ -58,9 +55,9 @@ namespace Rhino.Optimizer
 				return ReduceToArray(predecessors);
 			}
 
-			private ObjToIntMap successors = new ObjToIntMap();
+            private readonly HashSet<FatBlock> successors = new HashSet<FatBlock>();
 
-			private ObjToIntMap predecessors = new ObjToIntMap();
+            private readonly HashSet<FatBlock> predecessors = new HashSet<FatBlock>();
 
 			internal Block realBlock;
 			// all the Blocks that come immediately after this

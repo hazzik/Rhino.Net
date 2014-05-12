@@ -7,8 +7,10 @@
  */
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Rhino;
 using Rhino.Ast;
+using Rhino.Utils;
 using Sharpen;
 using Label = System.Reflection.Emit.Label;
 
@@ -40,7 +42,7 @@ namespace Rhino
 
 		private int doubleTableTop;
 
-		private ObjToIntMap strings = new ObjToIntMap(20);
+		private readonly IDictionary<string, int> strings = new Dictionary<string, int>(20);
 
 		private int localTop;
 
@@ -122,18 +124,17 @@ namespace Rhino
 				Array.Copy(itsData.itsICode, 0, tmp, 0, iCodeTop);
 				itsData.itsICode = tmp;
 			}
-			if (strings.Size() == 0)
+			if (strings.Count == 0)
 			{
 				itsData.itsStringTable = null;
 			}
 			else
 			{
-				itsData.itsStringTable = new string[strings.Size()];
-				ObjToIntMap.Iterator iter = strings.NewIterator();
-				for (iter.Start(); !iter.Done(); iter.Next())
+				itsData.itsStringTable = new string[strings.Count];
+				foreach (var iter in strings)
 				{
-					string str = (string)iter.GetKey();
-					int index = iter.GetValue();
+					string str = iter.Key;
+					int index = iter.Value;
 					if (itsData.itsStringTable[index] != null)
 					{
 						Kit.CodeBug();
@@ -1620,11 +1621,11 @@ namespace Rhino
 
 		private void AddStringPrefix(string str)
 		{
-			int index = strings.Get(str, -1);
+			int index = strings.GetValueOrDefault(str, -1);
 			if (index == -1)
 			{
-				index = strings.Size();
-				strings.Put(str, index);
+				index = strings.Count;
+				strings[str] = index;
 			}
 			if (index < 4)
 			{
