@@ -2345,7 +2345,7 @@ namespace Rhino
 			Evaluator result = null;
 			if (optimizationLevel >= 0 && codegenClass != null)
 			{
-				result = (Evaluator)Kit.NewInstanceOrNull(codegenClass);
+			    result = (Evaluator) Kit.NewInstanceOrNull(codegenClass);
 			}
 			if (result == null)
 			{

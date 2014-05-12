@@ -236,7 +236,7 @@ namespace Rhino.Tests
 			IRFactory irf = new IRFactory(compilerEnv);
 			ScriptNode tree = irf.TransformTree(ast);
 #if COMPILATION
-			Codegen codegen = new Codegen();
+			Codegen codegen = new Codegen("TempAssembly" + DateTime.UtcNow.Ticks);
 			codegen.SetMainMethodClass(mainMethodClassName);
 			codegen.CompileToClassFile(compilerEnv, scriptClassName, tree, tree.GetEncodedSource(), false);
 #endif

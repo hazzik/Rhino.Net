@@ -240,9 +240,13 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		public Codegen()
+		public Codegen() 
+			: this("TempAssembly" + DateTime.UtcNow.Ticks)
 		{
-			var name = "TempAssembly" + DateTime.UtcNow.Ticks;
+		}
+
+		public Codegen(string name)
+		{
 			dynamicAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(name), AssemblyBuilderAccess.RunAndSave);
 			module = dynamicAssembly.DefineDynamicModule(name + ".mod", name + ".dll", true);
 		}
@@ -310,17 +314,15 @@ namespace Rhino.Optimizer
 				GenerateExecute(mainClass, callMethod);
 			}
 			EmitConstantDudeInitializers(mainClass);
-			var type = mainClass.CreateType();
-			Save();
-			return type;
+			return mainClass.CreateType();
 		}
 
 		public void Save()
 		{
-			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
+		    dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
 		}
 
-		private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
+	    private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
 
 		private void EmitDirectConstructor(CachingTypeBuilder type, OptFunctionNode ofn)
 		{

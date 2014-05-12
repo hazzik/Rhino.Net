@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Rhino.Ast;
@@ -255,7 +256,7 @@ namespace Rhino.Tools.Jsc
 		/// <summary>Compile JavaScript source.</summary>
 		public void ProcessSource(IEnumerable<string> filenames)
 		{
-			Codegen codegen = new Codegen();
+			Codegen codegen = new Codegen(Path.GetFileNameWithoutExtension(filenames.FirstOrDefault()));
 			codegen.SetMainMethodClass(mainMethodClass);
 			foreach (string filename in filenames)
 			{
@@ -314,7 +315,7 @@ namespace Rhino.Tools.Jsc
 			}
 			try
 			{
-				codegen.Save();
+			    codegen.Save();
 			}
 			catch (Exception e)
 			{
