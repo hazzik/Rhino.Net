@@ -187,5 +187,17 @@ namespace Rhino
 			}
 			return switchTable;
 		}
+
+		public static void EmitDupX1(this ILGenerator il)
+		{
+			//il.Emit(ByteCode.DUP_X1);
+			var value1 = il.DeclareLocal(typeof (object));
+			var value2 = il.DeclareLocal(typeof (object));
+			il.Emit(OpCodes.Stloc, value1);
+			il.Emit(OpCodes.Stloc, value2);
+			il.Emit(OpCodes.Ldloc, value1);
+			il.Emit(OpCodes.Ldloc, value2);
+			il.Emit(OpCodes.Ldloc, value1);
+		}
 	}
 }

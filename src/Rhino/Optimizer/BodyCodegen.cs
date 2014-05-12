@@ -1573,7 +1573,7 @@ namespace Rhino.Optimizer
 				GenerateGetGeneratorStackState(il);
 				for (var i = 0; i < top; i++)
 				{
-					il.Emit(ByteCode.DUP_X1);
+					il.EmitDupX1();
 					il.Emit(ByteCode.SWAP);
 					il.EmitLoadConstant(i);
 					il.Emit(ByteCode.SWAP);
@@ -3581,8 +3581,9 @@ namespace Rhino.Optimizer
 					il.Emit(OpCodes.Pop);
 					il.Emit(OpCodes.Br, trueGOTO.Value);
 					il.MarkLabel(undefCheckLabel);
-					Codegen.PushUndefined(il);
-					il.Emit(ByteCode.IF_ACMPEQ, trueGOTO.Value);
+				    Codegen.PushUndefined(il);
+				    il.Emit(OpCodes.Ceq);
+				    il.Emit(OpCodes.Brtrue, trueGOTO.Value);
 				}
 				il.Emit(OpCodes.Br, falseGOTO.Value);
 			}
@@ -3892,8 +3893,8 @@ namespace Rhino.Optimizer
 			child = child.GetNext();
 			if (type == Token.SETPROP_OP)
 			{
-				// stack: ... object object name -> ... object name object name
-				il.Emit(ByteCode.DUP_X1);
+			    // stack: ... object object name -> ... object name object name
+			    il.EmitDupX1();
 				//for 'this.foo += ...' we call thisGet which can skip some
 				//casting overhead.
 				if (objectChild.GetType() == Token.THIS && nameChild.GetType() == Token.STRING)
@@ -3907,12 +3908,12 @@ namespace Rhino.Optimizer
 					AddScriptRuntimeInvoke(il, "GetObjectProp", typeof (Object), typeof (String), typeof (Context));
 				}
 			}
-			GenerateExpression(il, child, node);
+		    GenerateExpression(il, child, node);
 			il.Emit(OpCodes.Ldarg_1);
 			AddScriptRuntimeInvoke(il, "SetObjectProp", typeof (Object), typeof (String), typeof (Object), typeof (Context));
 		}
 
-		private void VisitSetElem(ILGenerator il, int type, Node node, Node child)
+	    private void VisitSetElem(ILGenerator il, int type, Node node, Node child)
 		{
 			GenerateExpression(il, child, node);
 			child = child.GetNext();
@@ -3937,7 +3938,7 @@ namespace Rhino.Optimizer
 				{
 					// stack: ... object object indexObject
 					//        -> ... object indexObject object indexObject
-					il.Emit(ByteCode.DUP_X1);
+					il.EmitDupX1();
 					il.Emit(OpCodes.Ldarg_1);
 					AddScriptRuntimeInvoke(il, "GetObjectElem", typeof (Object), typeof (Object), typeof (Context));
 				}
