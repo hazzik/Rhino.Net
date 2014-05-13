@@ -800,7 +800,7 @@ namespace Rhino
 
 			bool ICollection<object>.Contains(object item)
 			{
-				return Enumerable.Contains(this, item);
+				return this.Contains(item, null);
 			}
 
 			void ICollection<object>.CopyTo(object[] array, int arrayIndex)

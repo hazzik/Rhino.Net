@@ -29,8 +29,8 @@ namespace Rhino.Tests
 			new ContextFactory().Call(cx =>
 			{
 				cx.GetWrapFactory().SetJavaPrimitiveWrap(false);
-				Assert.AreEqual("string[]", cx.EvaluateString(cx.InitStandardObjects(), "new Rhino.Tests.Bug496585Test().method('one', 'two', 'three')", "<test>", 1, null));
-				Assert.AreEqual("string+function", cx.EvaluateString(cx.InitStandardObjects(), "new Rhino.Tests.Bug496585Test().method('one', function() {})", "<test>", 1, null));
+				Assert.AreEqual("string[]", cx.EvaluateString(cx.InitStandardObjects(), "new Rhino.Tests.Bug496585Test().Method('one', 'two', 'three')", "<test>", 1, null));
+				Assert.AreEqual("string+function", cx.EvaluateString(cx.InitStandardObjects(), "new Rhino.Tests.Bug496585Test().Method('one', function() {})", "<test>", 1, null));
 				return null;
 			});
 		}
