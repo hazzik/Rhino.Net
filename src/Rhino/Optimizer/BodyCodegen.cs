@@ -3104,7 +3104,7 @@ namespace Rhino.Optimizer
 						}
 						if (post)
 						{
-							il.Emit(ByteCode.DUP2);
+							il.Emit(OpCodes.Dup);
 						}
 						il.EmitLoadConstant(1.0);
 						if ((incrDecrMask & Node.DECR_FLAG) == 0)
@@ -3117,7 +3117,7 @@ namespace Rhino.Optimizer
 						}
 						if (!post)
 						{
-							il.Emit(ByteCode.DUP2);
+							il.Emit(OpCodes.Dup);
 						}
 						if (varIsDirectCallParameter)
 						{
@@ -3138,12 +3138,11 @@ namespace Rhino.Optimizer
 						{
 							reg.EmitLoadSlot1(il);
 						}
-						var dup = OpCodes.Dup;
 						if (post)
 						{
-							il.Emit(dup);
+							il.Emit(OpCodes.Dup);
 						}
-						AddObjectToNumber(il);
+						AddObjectToNumberUnBoxed(il);
 						il.EmitLoadConstant(1.0);
 						if ((incrDecrMask & Node.DECR_FLAG) == 0)
 						{
@@ -3153,9 +3152,10 @@ namespace Rhino.Optimizer
 						{
 							il.Emit(OpCodes.Sub);
 						}
+						il.Emit(OpCodes.Box, typeof (double));
 						if (!post)
 						{
-							il.Emit(dup);
+							il.Emit(OpCodes.Dup);
 						}
 						reg.EmitStoreSlot1(il);
 						break;
@@ -3377,29 +3377,25 @@ namespace Rhino.Optimizer
 			{
 				case Token.LE:
 				{
-					il.Emit(ByteCode.DCMPG);
-					il.Emit(ByteCode.IFLE, trueGOTO.Value);
+					il.Emit(OpCodes.Ble, trueGOTO.Value);
 					break;
 				}
 
 				case Token.GE:
 				{
-					il.Emit(ByteCode.DCMPL);
-					il.Emit(ByteCode.IFGE, trueGOTO.Value);
+					il.Emit(OpCodes.Bge, trueGOTO.Value);
 					break;
 				}
 
 				case Token.LT:
 				{
-					il.Emit(ByteCode.DCMPG);
-					il.Emit(ByteCode.IFLT, trueGOTO.Value);
+					il.Emit(OpCodes.Blt, trueGOTO.Value);
 					break;
 				}
 
 				case Token.GT:
 				{
-					il.Emit(ByteCode.DCMPL);
-					il.Emit(ByteCode.IFGT, trueGOTO.Value);
+					il.Emit(OpCodes.Bgt, trueGOTO.Value);
 					break;
 				}
 
@@ -3485,8 +3481,9 @@ namespace Rhino.Optimizer
 					// if both operands are dcp
 					var leftIsNotNumber = il.DefineLabel();
 					left_dcp_register.EmitLoadSlot1(il);
-					il.Emit(OpCodes.Ldtoken, typeof(void));
-					il.Emit(ByteCode.IF_ACMPNE, leftIsNotNumber);
+					il.Emit(OpCodes.Ldtoken, typeof (void));
+					il.Emit(OpCodes.Ceq);
+					il.Emit(OpCodes.Brfalse, leftIsNotNumber);
 					left_dcp_register.EmitLoadSlot2(il);
 					DcpLoadAsNumber(il, right_dcp_register);
 					GenSimpleCompare(il, type, trueGOTO, falseGOTO);
@@ -3494,7 +3491,8 @@ namespace Rhino.Optimizer
 					var rightIsNotNumber = il.DefineLabel();
 					right_dcp_register.EmitLoadSlot1(il);
 					il.Emit(OpCodes.Ldtoken, typeof(void));
-					il.Emit(ByteCode.IF_ACMPNE, rightIsNotNumber);
+					il.Emit(OpCodes.Ceq);
+					il.Emit(OpCodes.Brfalse, rightIsNotNumber);
 					left_dcp_register.EmitLoadSlot1(il);
 					AddObjectToNumber(il);
 					right_dcp_register.EmitLoadSlot2(il);
@@ -3736,7 +3734,7 @@ namespace Rhino.Optimizer
 					{
 						if (needValue)
 						{
-							il.Emit(ByteCode.DUP2);
+							il.Emit(OpCodes.Dup);
 						}
 						reg.EmitLoadSlot1(il);
 						il.Emit(OpCodes.Ldtoken, typeof(void));
@@ -3776,7 +3774,7 @@ namespace Rhino.Optimizer
 						{
 							if (needValue)
 							{
-								il.Emit(ByteCode.DUP2);
+								il.Emit(OpCodes.Dup);
 							}
 							// Cannot save number in variable since !isNumberVar,
 							// so convert to object

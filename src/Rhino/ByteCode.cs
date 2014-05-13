@@ -10,11 +10,6 @@ namespace Org.Mozilla.Classfile
 	/// <author>Roger Lawrence</author>
 	public static class ByteCode
 	{
-		public static OpCode DUP2
-		{
-			get { return OpCodes.Nop; }
-		}
-
 		public static OpCode DUP2_X1
 		{
 			get { return OpCodes.Nop; }
@@ -25,37 +20,7 @@ namespace Org.Mozilla.Classfile
 			get { return OpCodes.Nop; }
 		}
 
-		public static OpCode DCMPL
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode DCMPG
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode IFLT
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode IFGE
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode IFGT
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode IFLE
-		{
-			get { return OpCodes.Nop; }
-		}
-
-	    public static OpCode IF_ACMPNE
+		public static OpCode IF_ACMPNE
 		{
 			get { return OpCodes.Nop; }
 		}
