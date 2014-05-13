@@ -8,11 +8,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Rhino;
 using Rhino.Ast;
 using Rhino.Utils;
-using Sharpen;
-using Label = System.Reflection.Emit.Label;
 
 namespace Rhino
 {

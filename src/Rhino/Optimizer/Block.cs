@@ -635,11 +635,7 @@ namespace Rhino.Optimizer
 			return changed;
 		}
 
-		private void PrintLiveOnEntrySet(OptFunctionNode fn)
-		{
-		}
-
-		private Block[] itsSuccessors;
+	    private Block[] itsSuccessors;
 
 		private Block[] itsPredecessors;
 

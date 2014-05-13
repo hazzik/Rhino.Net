@@ -55,17 +55,7 @@ namespace Org.Mozilla.Classfile
 			get { return OpCodes.Nop; }
 		}
 
-		public static OpCode IF_ICMPLE
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode IF_ACMPEQ
-		{
-			get { return OpCodes.Nop; }
-		}
-
-		public static OpCode IF_ACMPNE
+	    public static OpCode IF_ACMPNE
 		{
 			get { return OpCodes.Nop; }
 		}
