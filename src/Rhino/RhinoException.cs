@@ -11,8 +11,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using Sharpen;
 
 namespace Rhino
@@ -299,22 +301,20 @@ namespace Rhino
 			// Pattern to recover function name from java method name -
 			// see Codegen.getBodyMethodName()
 			// kudos to Marc Guillemot for coming up with this
-			Sharpen.Pattern pattern = Sharpen.Pattern.Compile("_c_(.*)_\\d+");
 			foreach (var e in stack)
 			{
 				string fileName = e.GetFileName();
-				if (e.GetMethod().Name.StartsWith("_c_") && e.GetFileLineNumber() > -1 && fileName != null && !fileName.EndsWith(".cs"))
+				var method = e.GetMethod();
+				if (method.Name.StartsWith("_c_") && e.GetFileLineNumber() > -1 && fileName != null && !fileName.EndsWith(".cs"))
 				{
-					string methodName = e.GetMethod().Name;
-					Matcher match = pattern.Matcher(methodName);
 					// the method representing the main script is always "_c_script_0" -
 					// at least we hope so
-					methodName = !"_c_script_0".Equals(methodName) && match.Find() ? match.Group(1) : null;
+					string methodName = GetMethodName(method);
 					list.Add(new ScriptStackElement(fileName, methodName, e.GetFileLineNumber()));
 				}
 				else
 				{
-					if ("Rhino.Interpreter".Equals(e.GetMethod().DeclaringType.FullName) && "InterpretLoop".Equals(e.GetMethod().Name) && interpreterStack != null && interpreterStack.Length > interpreterStackIndex)
+					if ("Rhino.Interpreter" == method.DeclaringType.FullName && "InterpretLoop" == method.Name && interpreterStack != null && interpreterStack.Length > interpreterStackIndex)
 					{
 						foreach (ScriptStackElement elem in interpreterStack[interpreterStackIndex++])
 						{
@@ -324,6 +324,17 @@ namespace Rhino
 				}
 			}
 			return list.ToArray();
+		}
+
+		private static string GetMethodName(MethodBase method)
+		{
+			string methodName = method.Name;
+			if ("_c_script_0" == methodName) return null;
+			var matches = methodNameRegex.Matches(methodName);
+			if (matches.Count == 0) return null;
+			Group grp = matches[0].Groups[1];
+			if (!grp.Success) return null;
+			return grp.Value;
 		}
 
 		public void PrintStackTrace(PrintWriter s)
@@ -400,5 +411,6 @@ namespace Rhino
 		internal object interpreterStackInfo;
 
 		internal int[] interpreterLineData;
+	    private static readonly Regex methodNameRegex = new Regex ("_c_(.*)_\\d+", RegexOptions.Compiled);
 	}
 }

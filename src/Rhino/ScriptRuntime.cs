@@ -695,7 +695,7 @@ namespace Rhino
 				{
 					start++;
 				}
-				if (start + 7 == end && s.RegionMatches(start, "Infinity", 0, 8))
+				if (start + 7 == end && (start >= 0 && start + 8 <= s.Length && string.Compare(s, start, "Infinity", 0, 8, false) == 0))
 				{
 					return startChar == '-' ? double.NegativeInfinity : double.PositiveInfinity;
 				}
@@ -729,7 +729,12 @@ namespace Rhino
 			}
 		}
 
-		/// <summary>Helper function for builtin objects that use the varargs form.</summary>
+	    private static bool RegionMatches(string s, int start)
+	    {
+	        return start >= 0 && start + 8 <= s.Length && string.Compare(s, start, "Infinity", 0, 8, false) == 0;
+	    }
+
+	    /// <summary>Helper function for builtin objects that use the varargs form.</summary>
 		/// <remarks>
 		/// Helper function for builtin objects that use the varargs form.
 		/// ECMA function formal arguments are undefined if not supplied;

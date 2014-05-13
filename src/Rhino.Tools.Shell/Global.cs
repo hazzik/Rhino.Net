@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using Rhino.CommonJS.Module;
 using Rhino.CommonJS.Module.Provider;
 using Rhino.Serialize;
@@ -49,6 +50,7 @@ namespace Rhino.Tools.Shell
 		private readonly string[] prompts = { "js> ", "  > " };
 
 		private Dictionary<string, string> doctestCanonicalizations;
+		private static readonly Regex regex = new Regex ("@[0-9a-fA-F]+", RegexOptions.Compiled);
 
 		public Global()
 		{
@@ -547,42 +549,36 @@ namespace Rhino.Tools.Shell
 			// regexp that matches the hex number preceded by '@', then enter mappings into
 			// "doctestCanonicalizations" so that we ensure that the mappings are
 			// consistent within a session.
-			Pattern p = Pattern.Compile("@[0-9a-fA-F]+");
-			Matcher expectedMatcher = p.Matcher(expected);
-			Matcher actualMatcher = p.Matcher(actual);
+			MatchCollection expectedMatches = regex.Matches(expected);
+			MatchCollection actualMatches = regex.Matches(actual);
 			for (; ; )
 			{
-				if (!expectedMatcher.Find())
-				{
+				if (expectedMatches.Count == 0)
 					return false;
-				}
-				if (!actualMatcher.Find())
-				{
+				if (actualMatches.Count == 0)
 					return false;
-				}
-				if (actualMatcher.Start() != expectedMatcher.Start())
-				{
+
+				if (actualMatches[0].Index != expectedMatches[0].Index)
 					return false;
-				}
-				int start = expectedMatcher.Start();
+
+				int start = expectedMatches[0].Index;
 				if (expected.Substring(0, start) != actual.Substring(0, start))
-				{
 					return false;
-				}
-				string expectedGroup = expectedMatcher.Group(0);
-				string actualGroup = actualMatcher.Group(0);
-				string mapping = doctestCanonicalizations.GetValueOrDefault(expectedGroup);
+
+				Group expectedGroup = expectedMatches[0].Groups[0];
+				string expectedGroupValue = expectedGroup.Success ? expectedGroup.Value : null;
+				Group actualGroup = actualMatches[0].Groups[0];
+				string actualGroupValue = actualGroup.Success ? actualGroup.Value : null;
+				string mapping = doctestCanonicalizations.GetValueOrDefault(expectedGroupValue);
 				if (mapping == null)
 				{
-					doctestCanonicalizations[expectedGroup] = actualGroup;
-					expected = expected.Replace(expectedGroup, actualGroup);
+					doctestCanonicalizations[expectedGroupValue] = actualGroupValue;
+					expected = expected.Replace(expectedGroupValue, actualGroupValue);
 				}
 				else
 				{
-					if (actualGroup != mapping)
-					{
+					if (actualGroupValue != mapping)
 						return false;
-					}
 				}
 				// wrong object!
 				if (expected == actual)

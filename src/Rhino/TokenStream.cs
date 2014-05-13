@@ -2588,7 +2588,7 @@ retry_break: ;
 			int lastIndex = str.Length - 1;
 			StringBuilder buf = new StringBuilder(str.Substring(0, lastIndex));
 			buf.Append("\\u");
-			string hexCode = Sharpen.Extensions.ToHexString(str[lastIndex]);
+			string hexCode = Convert.ToString(str[lastIndex], 16);
 			for (int i = 0; i < 4 - hexCode.Length; ++i)
 			{
 				buf.Append('0');
