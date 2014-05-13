@@ -1172,7 +1172,7 @@ namespace Rhino
 			return type.ToString();
 		}
 
-	    // can't add this as it recurses
+		// can't add this as it recurses
 		// can't add this as it is dull
 		// NON_SPECIALCALL should not be stored
 		public virtual string ToStringTree(ScriptNode treeTop)
@@ -1180,7 +1180,7 @@ namespace Rhino
 			return null;
 		}
 
-	    protected internal int type = Token.ERROR;
+		protected internal int type = Token.ERROR;
 
 		protected internal Node next;
 

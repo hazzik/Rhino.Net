@@ -315,7 +315,7 @@ namespace Rhino.Tools.Jsc
 			}
 			try
 			{
-			    codegen.Save();
+				codegen.Save();
 			}
 			catch (Exception e)
 			{

@@ -2938,17 +2938,17 @@ namespace Rhino
 						result = ids;
 						continue;
 					}
-				    map = new HashSet<object>();
+					map = new HashSet<object>();
 					foreach (object item in result)
 					{
-					    map.Add(item);
+						map.Add(item);
 					}
-				    result = null;
+					result = null;
 				}
 				// Allow to GC the result
 				foreach (object id in ids)
 				{
-				    map.Add(id);
+					map.Add(id);
 				}
 			}
 			if (map != null)

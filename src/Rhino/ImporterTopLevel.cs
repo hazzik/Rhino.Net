@@ -123,19 +123,19 @@ namespace Rhino
 			}
 			foreach (object element in elements)
 			{
-			    NativeJavaPackage p = (NativeJavaPackage)element;
-			    object v = p.GetPkgProperty(name, start, false);
-			    if (v != null && !(v is NativeJavaPackage))
-			    {
-			        if (result == ScriptableConstants.NOT_FOUND)
-			        {
-			            result = v;
-			        }
-			        else
-			        {
-			            throw Context.ReportRuntimeError2("msg.ambig.import", result.ToString(), v.ToString());
-			        }
-			    }
+				NativeJavaPackage p = (NativeJavaPackage)element;
+				object v = p.GetPkgProperty(name, start, false);
+				if (v != null && !(v is NativeJavaPackage))
+				{
+					if (result == ScriptableConstants.NOT_FOUND)
+					{
+						result = v;
+					}
+					else
+					{
+						throw Context.ReportRuntimeError2("msg.ambig.import", result.ToString(), v.ToString());
+					}
+				}
 			}
 			return result;
 		}
@@ -366,7 +366,7 @@ L0_break: ;
 
 		private const int MAX_PROTOTYPE_ID = 3;
 
-        private readonly List<NativeJavaPackage> importedPackages = new List<NativeJavaPackage>();
+		private readonly List<NativeJavaPackage> importedPackages = new List<NativeJavaPackage>();
 
 		private bool topScopeFlag;
 		// #/string_id_map#

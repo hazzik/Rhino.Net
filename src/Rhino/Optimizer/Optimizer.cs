@@ -42,10 +42,10 @@ namespace Rhino.Optimizer
 			}
 			inDirectCallFunction = theFunction.IsTargetOfDirectCall();
 			this.theFunction = theFunction;
-            var statementsArray = new List<Node>();
+			var statementsArray = new List<Node>();
 			BuildStatementList_r(theFunction.fnode, statementsArray);
-            Node[] theStatementNodes = statementsArray.ToArray();
-		    Block.RunFlowAnalyzes(theFunction, theStatementNodes);
+			Node[] theStatementNodes = statementsArray.ToArray();
+			Block.RunFlowAnalyzes(theFunction, theStatementNodes);
 			if (!theFunction.fnode.RequiresActivation())
 			{
 				parameterUsedInNumberContext = false;

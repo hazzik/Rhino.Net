@@ -1095,8 +1095,8 @@ namespace Rhino
 			{
 				if (!iterating)
 				{
-				    cx.iterating.Add(thisObj);
-				    // stop recursion.
+					cx.iterating.Add(thisObj);
+					// stop recursion.
 					object[] ids = thisObj.GetIds();
 					for (int i = 0; i < ids.Length; i++)
 					{
@@ -2445,11 +2445,11 @@ childScopesChecks_break: ;
 			}
 			if (x.obj != null && x.ids != null)
 			{
-			    if (x.used == null)
+				if (x.used == null)
 				{
 					x.used = new HashSet<object>();
 				}
-			    x.used.UnionWith(x.ids);
+				x.used.UnionWith(x.ids);
 			}
 			x.ids = ids;
 			x.index = 0;

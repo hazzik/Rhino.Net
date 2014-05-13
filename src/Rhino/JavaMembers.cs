@@ -477,22 +477,22 @@ namespace Rhino
 				else
 				{
 					List<MethodInfo> overloadedMethods;
-                    List<MethodInfo> objArray = value as List<MethodInfo>;
+					List<MethodInfo> objArray = value as List<MethodInfo>;
 					if (objArray != null)
 					{
 						overloadedMethods = objArray;
 					}
 					else
 					{
-					    var m = value as MethodInfo;
-					    if (m == null)
+						var m = value as MethodInfo;
+						if (m == null)
 						{
 							Kit.CodeBug();
 						}
 						// value should be instance of Method as at this stage
 						// staticMembers and members can only contain methods
 						overloadedMethods = new List<MethodInfo>();
-                        overloadedMethods.Add(m);
+						overloadedMethods.Add(m);
 						ht[name] = overloadedMethods;
 					}
 					overloadedMethods.Add(method);
@@ -516,7 +516,7 @@ namespace Rhino
 					}
 					else
 					{
-					    var overloadedMethods = (List<MethodInfo>) value;
+						var overloadedMethods = (List<MethodInfo>) value;
 						int N = overloadedMethods.Count;
 						if (N < 2)
 						{

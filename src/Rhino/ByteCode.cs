@@ -10,7 +10,7 @@ namespace Org.Mozilla.Classfile
 	/// <author>Roger Lawrence</author>
 	public static class ByteCode
 	{
-	    public static OpCode DUP2
+		public static OpCode DUP2
 		{
 			get { return OpCodes.Nop; }
 		}

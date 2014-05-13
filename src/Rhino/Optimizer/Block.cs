@@ -27,8 +27,8 @@ namespace Rhino.Optimizer
 				{
 					result = new Block[map.Count];
 					int i = 0;
-				    foreach (var fb in map)
-				    {
+					foreach (var fb in map)
+					{
 						result[i++] = fb.realBlock;
 					}
 				}
@@ -37,15 +37,15 @@ namespace Rhino.Optimizer
 
 			internal virtual void AddSuccessor(Block.FatBlock b)
 			{
-			    successors.Add(b);
+				successors.Add(b);
 			}
 
-		    internal virtual void AddPredecessor(Block.FatBlock b)
-		    {
-		        predecessors.Add(b);
-		    }
+			internal virtual void AddPredecessor(Block.FatBlock b)
+			{
+				predecessors.Add(b);
+			}
 
-		    internal virtual Block[] GetSuccessors()
+			internal virtual Block[] GetSuccessors()
 			{
 				return ReduceToArray(successors);
 			}
@@ -55,9 +55,9 @@ namespace Rhino.Optimizer
 				return ReduceToArray(predecessors);
 			}
 
-            private readonly HashSet<FatBlock> successors = new HashSet<FatBlock>();
+			private readonly HashSet<FatBlock> successors = new HashSet<FatBlock>();
 
-            private readonly HashSet<FatBlock> predecessors = new HashSet<FatBlock>();
+			private readonly HashSet<FatBlock> predecessors = new HashSet<FatBlock>();
 
 			internal Block realBlock;
 			// all the Blocks that come immediately after this

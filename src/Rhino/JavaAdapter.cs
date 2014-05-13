@@ -74,7 +74,7 @@ namespace Rhino
 				{
 					return false;
 				}
-			    foreach (var iter in names)
+				foreach (var iter in names)
 				{
 					string name = iter.Key;
 					int arity = iter.Value;
@@ -332,7 +332,7 @@ namespace Rhino
 		private static IDictionary<string, int> GetObjectFunctionNames(Scriptable obj)
 		{
 			object[] ids = ScriptableObject.GetPropertyIds(obj);
-            var map = new Dictionary<string, int>(ids.Length);
+			var map = new Dictionary<string, int>(ids.Length);
 			for (int i = 0; i != ids.Length; ++i)
 			{
 				if (!(ids[i] is string))
@@ -414,7 +414,7 @@ namespace Rhino
 				GenerateEmptyCtor(type, baseType, scriptClassName, delegee, self);
 			}
 			var generatedOverrides = new HashSet<string>();
-            var generatedMethods = new HashSet<string>();
+			var generatedMethods = new HashSet<string>();
 
 			// generate methods to satisfy all specified interfaces.
 			foreach (Type @interface in interfaces)
@@ -450,8 +450,8 @@ namespace Rhino
 					if (!generatedOverrides.Contains(methodKey))
 					{
 						GenerateMethod(type, methodName, argTypes, method.ReturnType, true, factory, delegee, self);
-					    generatedOverrides.Add(methodKey);
-					    generatedMethods.Add(methodName);
+						generatedOverrides.Add(methodKey);
+						generatedMethods.Add(methodName);
 					}
 				}
 			}
@@ -476,9 +476,9 @@ namespace Rhino
 					if (!generatedOverrides.Contains(methodKey))
 					{
 						GenerateMethod(type, methodName, argTypes, method.ReturnType, true, factory, delegee, self);
-					    generatedOverrides.Add(methodKey);
-					    generatedMethods.Add(methodName);
-					    // if a method was overridden, generate a "super$method"
+						generatedOverrides.Add(methodKey);
+						generatedMethods.Add(methodName);
+						// if a method was overridden, generate a "super$method"
 						// which lets the delegate call the superclass' version.
 						if (!isAbstractMethod)
 						{
@@ -490,8 +490,8 @@ namespace Rhino
 			// Generate Java methods for remaining properties that are not 
 			// overrides.
 
-		    foreach (var kvp in functionNames)
-		    {
+			foreach (var kvp in functionNames)
+			{
 				string functionName = kvp.Key;
 				if (generatedMethods.Contains(functionName))
 				{

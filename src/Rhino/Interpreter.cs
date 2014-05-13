@@ -743,7 +743,7 @@ namespace Rhino
 					// In this case frames has to be ignored.
 					--previousCount;
 				}
-			    array = (CallFrame[]) cx.previousInterpreterInvocations.ToArray();
+				array = (CallFrame[]) cx.previousInterpreterInvocations.ToArray();
 			}
 			array[array.Length - 1] = (Interpreter.CallFrame)cx.lastInterpreterFrame;
 			int interpreterFrameCount = 0;

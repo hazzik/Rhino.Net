@@ -104,6 +104,6 @@ namespace Rhino.Optimizer
 
 		private IDictionary<string, OptFunctionNode> possibleDirectCalls;
 
-        private List<OptFunctionNode> directCallTargets;
+		private List<OptFunctionNode> directCallTargets;
 	}
 }

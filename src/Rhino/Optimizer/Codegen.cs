@@ -319,10 +319,10 @@ namespace Rhino.Optimizer
 
 		public void Save()
 		{
-		    dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
+			dynamicAssembly.Save(dynamicAssembly.GetName().Name + ".dll");
 		}
 
-	    private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
+		private Dictionary<OptFunctionNode, MethodInfo> functionInits = new Dictionary<OptFunctionNode, MethodInfo>(); 
 
 		private void EmitDirectConstructor(CachingTypeBuilder type, OptFunctionNode ofn)
 		{

@@ -38,7 +38,7 @@ namespace Rhino
 		private void TransformCompilationUnit(ScriptNode tree)
 		{
 			loops = new Stack<Node>();
-            loopEnds = new Stack<Node>();
+			loopEnds = new Stack<Node>();
 			// to save against upchecks if no finally blocks are used.
 			hasFinally = false;
 			// Flatten all only if we are not using scope objects for block scope
@@ -159,8 +159,8 @@ namespace Rhino
 						Node unwindBlock = null;
 						for (int i = loops.Count - 1; i >= 0; i--)
 						{
-                            //TODO: optimize that
-						    Node n = loops.ElementAt(i);
+							//TODO: optimize that
+							Node n = loops.ElementAt(i);
 							int elemtype = n.GetType();
 							if (elemtype == Token.TRY || elemtype == Token.WITH)
 							{

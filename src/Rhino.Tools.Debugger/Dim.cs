@@ -708,40 +708,40 @@ openStream_break: ;
 		/// <summary>Returns the value of a property on the given script object.</summary>
 		private static object GetObjectPropertyImpl(object @object, object id)
 		{
-		    var scriptable = (Scriptable)@object;
-		    var name = id as string;
-		    if (name != null)
-		    {
-		        switch (name)
-		        {
-		            case "this":
-		                return scriptable;
+			var scriptable = (Scriptable)@object;
+			var name = id as string;
+			if (name != null)
+			{
+				switch (name)
+				{
+					case "this":
+						return scriptable;
 
-		            case "__proto__":
-		                return scriptable.Prototype;
+					case "__proto__":
+						return scriptable.Prototype;
 
-		            case "__parent__":
-		                return scriptable.ParentScope;
-		            
-                    default:
-		            {
-		                object result = ScriptableObject.GetProperty(scriptable, name);
-		                if (result == ScriptableConstants.NOT_FOUND)
-		                    return Undefined.instance;
-		                
-                        return result;
-		            }
-		        }
-		    }
-		    else
-		    {
-		        int index = (int) id;
-		        object result = ScriptableObject.GetProperty(scriptable, index);
-		        if (result == ScriptableConstants.NOT_FOUND)
-		            return Undefined.instance;
-		        
-                return result;
-		    }
+					case "__parent__":
+						return scriptable.ParentScope;
+					
+					default:
+					{
+						object result = ScriptableObject.GetProperty(scriptable, name);
+						if (result == ScriptableConstants.NOT_FOUND)
+							return Undefined.instance;
+						
+						return result;
+					}
+				}
+			}
+			else
+			{
+				int index = (int) id;
+				object result = ScriptableObject.GetProperty(scriptable, index);
+				if (result == ScriptableConstants.NOT_FOUND)
+					return Undefined.instance;
+				
+				return result;
+			}
 		}
 
 		/// <summary>Returns an array of the property names on the given script object.</summary>

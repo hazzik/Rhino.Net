@@ -2613,7 +2613,7 @@ retry_break: ;
 
 		private int stringBufferTop;
 
-	    private readonly int[] ungetBuffer = new int[3];
+		private readonly int[] ungetBuffer = new int[3];
 
 		private int ungetCursor;
 
