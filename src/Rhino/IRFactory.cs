@@ -3048,7 +3048,7 @@ namespace Rhino
 					// "with"code in order to limit the scope of the exception
 					// object.
 					catchStatement.AddChildToBack(new Node(Token.LEAVEWITH));
-					//catchStatement.AddChildToBack(MakeJump(Token.GOTO, endCatch));
+					catchStatement.AddChildToBack(MakeJump(Token.GOTO, endCatch));
 					// Create condition "if" when present
 					Node condStmt;
 					if (cond.GetType() == Token.EMPTY)
@@ -3080,7 +3080,7 @@ namespace Rhino
 					rethrow.PutProp(Node.LOCAL_BLOCK_PROP, handlerBlock);
 					pn.AddChildToBack(rethrow);
 				}
-				//pn.AddChildToBack(endCatch);
+				pn.AddChildToBack(endCatch);
 			}
 			if (hasFinally)
 			{
