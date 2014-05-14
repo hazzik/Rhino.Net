@@ -498,7 +498,7 @@ namespace Rhino.Optimizer
 		// catch any
 		private void GenerateGetGeneratorLocalsState(ILGenerator il)
 		{
-			cfw.EmitLdloc(generatorStateLocal);
+			il.EmitLoadLocal(generatorStateLocal);
 			AddOptRuntimeInvoke(il, "GetGeneratorLocalsState", new[] {typeof (object)});
 		}
 
@@ -810,9 +810,7 @@ namespace Rhino.Optimizer
 					//cfw.SetStackTop(1);
 					// Save return address in a new local
 					LocalBuilder finallyRegister = GetNewWordLocal(il);
-					var finallyStart = il.DefineLabel();
-					var finallyEnd = il.DefineLabel();
-					il.MarkLabel(finallyStart);
+                    //il.BeginFinallyBlock();
 					il.EmitStoreLocal(finallyRegister);
 					while (child != null)
 					{
@@ -823,8 +821,8 @@ namespace Rhino.Optimizer
 					il.Emit(OpCodes.Conv_I4);
 					var ret = finallys.GetValueOrDefault(node);
 					ret.tableLabel = il.DefineLabel();
-					il.Emit(OpCodes.Br, ret.tableLabel);
-					il.MarkLabel(finallyEnd);
+					il.Emit(OpCodes.Leave, ret.tableLabel);
+				    //il.Emit(OpCodes.Endfinally);
 					break;
 				}
 
@@ -1763,13 +1761,14 @@ namespace Rhino.Optimizer
 				{
 					if (isGenerator)
 					{
-						AddGotoWithReturn(il, target);
+						//AddGotoWithReturn(il, target);
+					    //InlineFinally(il, target);
 					}
 					else
 					{
 						// This assumes that JSR is only ever used for finally
-						//il.BeginFinallyBlock();
-						//InlineFinally(il, target);
+						il.BeginFinallyBlock();
+						InlineFinally(il, target);
 					}
 				}
 				else
@@ -1786,7 +1785,7 @@ namespace Rhino.Optimizer
 			AddGoto(il, OpCodes.Br, target);
 			var retLabel = il.DefineLabel();
 			il.MarkLabel(retLabel);
-			ret.jsrPoints.Add(retLabel);
+			//ret.jsrPoints.Add(retLabel);
 		}
 
 		private MethodBuilder GenerateArrayLiteralFactory(Node node, int count)
@@ -2470,32 +2469,32 @@ namespace Rhino.Optimizer
 				var finallyEnd = il.DefineLabel();
 				
 				//cfw.MarkHandler(finallyHandler);
-				il.MarkLabel(finallyHandler);
+//				il.MarkLabel(finallyHandler);
 				if (isGenerator)
 				{
-					il.BeginFaultBlock();
+					//il.BeginFaultBlock();
 				}
 				else
 				{
-					il.BeginFinallyBlock(); 
+					//il.BeginFinallyBlock(); 
 					//il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
 				}
 				//il.EmitStoreLocal(exceptionLocal);
 				// reset the variable object local
-				il.EmitLoadLocal(savedVariableObject);
-				il.EmitStoreArgument(2);
+//				il.EmitLoadLocal(savedVariableObject);
+//				il.EmitStoreArgument(2);
 				// get the label to JSR to
 				var finallyLabel = GetTargetLabel(il, finallyTarget);
 				if (isGenerator)
 				{
-					InlineFinally(il, finallyTarget);
+//					InlineFinally(il, finallyTarget);
 					//AddGotoWithReturn(il, finallyTarget);
 				}
 				else
 				{
-					InlineFinally(il, finallyTarget);
+//					InlineFinally(il, finallyTarget);
 
-					//InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
+//					InlineFinally(il, finallyTarget, handlerLabels[FINALLY_EXCEPTION], finallyEnd);
 				}
 				// rethrow
 				/*il.EmitLoadLocal(exceptionLocal);
@@ -2615,54 +2614,7 @@ namespace Rhino.Optimizer
 				exceptionInfo.Add(ei);
 			}
 
-			/// <summary>
-			/// Register an exception handler for the try block at the top of the
-			/// exception information stack.
-			/// </summary>
-			/// <remarks>
-			/// Register an exception handler for the try block at the top of the
-			/// exception information stack.
-			/// </remarks>
-			/// <param name="exceptionType">
-			/// one of the integer constants representing an
-			/// exception type
-			/// </param>
-			/// <param name="handlerLabel">the label of the exception handler</param>
-			/// <param name="startLabel">the label where the exception handling begins</param>
-			internal virtual void AddHandler(int exceptionType, Label handlerLabel, Label startLabel)
-			{
-				var top = GetTop();
-				top.handlerLabels[exceptionType] = handlerLabel;
-				top.exceptionStarts[exceptionType] = startLabel;
-			}
-
-			/// <summary>Register multiple exception handlers for the top try block.</summary>
-			/// <remarks>
-			/// Register multiple exception handlers for the top try block. If the
-			/// exception type maps to a zero label, then it is ignored.
-			/// </remarks>
-			/// <param name="handlerLabels">
-			///     a map from integer constants representing an
-			///     exception type to the label of the exception
-			///     handler
-			/// </param>
-			/// <param name="startLabel">
-			///     the label where all of the exception handling
-			///     begins
-			/// </param>
-			internal virtual void SetHandlers(Label[] handlerLabels, Label startLabel)
-			{
-				var top = GetTop();
-				for (var i = 0; i < handlerLabels.Length; i++)
-				{
-					if (handlerLabels[i] != null)
-					{
-						AddHandler(i, handlerLabels[i], startLabel);
-					}
-				}
-			}
-
-			/// <summary>Remove an exception handler for the top try block.</summary>
+		    /// <summary>Remove an exception handler for the top try block.</summary>
 			/// <remarks>Remove an exception handler for the top try block.</remarks>
 			/// <param name="exceptionType">
 			///     one of the integer constants representing an
@@ -2686,14 +2638,7 @@ namespace Rhino.Optimizer
 				}
 			}
 
-			/// <summary>Remove the top try block from the exception information stack.</summary>
-			/// <remarks>Remove the top try block from the exception information stack.</remarks>
-			internal virtual void PopExceptionInfo()
-			{
-				exceptionInfo.RemoveLast();
-			}
-
-			/// <summary>Mark the start of an inlined finally block.</summary>
+		    /// <summary>Mark the start of an inlined finally block.</summary>
 			/// <remarks>
 			/// Mark the start of an inlined finally block.
 			/// When a finally block is inlined, any exception handlers that are
