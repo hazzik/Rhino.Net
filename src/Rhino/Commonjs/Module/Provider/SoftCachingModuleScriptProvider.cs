@@ -109,7 +109,6 @@ namespace Rhino.CommonJS.Module.Provider
 
 		/// <exception cref="System.IO.IOException"></exception>
 		/// <exception cref="System.TypeLoadException"></exception>
-		[OnDeserializing]
 		private void ReadObject(ObjectInputStream @in)
 		{
 			scriptRefQueue = new ReferenceQueue<Script>();
