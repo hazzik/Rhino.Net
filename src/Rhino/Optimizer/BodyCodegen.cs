@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using Rhino.Utils;
 #if COMPILATION
 using System.Linq;
@@ -358,7 +359,7 @@ namespace Rhino.Optimizer
 				var linenum = scriptOrFn.GetEndLineno();
 				if (linenum != -1)
 				{
-					AddLineNumberEntry(linenum);
+					AddLineNumberEntry(il, linenum);
 				}
 			}
 			else
@@ -379,7 +380,7 @@ namespace Rhino.Optimizer
 			}
 		}
 
-		private void AddLineNumberEntry(int linenum)
+		private void AddLineNumberEntry(ILGenerator il, int linenum)
 		{
 		}
 
@@ -460,39 +461,36 @@ namespace Rhino.Optimizer
 				il.Emit(OpCodes.Ret);
 				return;
 			}
-			if (isGenerator)
-			{
-				if (((FunctionNode)scriptOrFn).GetResumptionPoints() != null)
-				{
-					//cfw.markTableSwitchDefault(generatorSwitch);
-					//no actions required.
-				}
-				// change state for re-entry
-				GenerateSetGeneratorResumptionPoint(il, GENERATOR_TERMINATE);
-				// throw StopIteration
-				il.Emit(OpCodes.Ldarg_2);
-				AddOptRuntimeInvoke(il, "ThrowStopIteration", new[] {typeof (object)});
-				Codegen.PushUndefined(il);
-				il.Emit(OpCodes.Ret);
-			}
-			else
-			{
-				if (fnCurrent == null)
-				{
-					il.EmitLoadLocal(popvLocal);
-					il.Emit(OpCodes.Ret);
-				}
-				else
-				{
-					var local = il.DeclareLocal(typeof (object));
-					il.EmitStoreLocal(local);
-					il.BeginFinallyBlock();
-					GenerateActivationExit(il);
-					il.EndExceptionBlock();	
-					il.EmitLoadLocal(local);
-					il.Emit(OpCodes.Ret);
-				}
-			}
+		    if (isGenerator)
+		    {
+		        if (((FunctionNode) scriptOrFn).GetResumptionPoints() != null)
+		        {
+		            //cfw.markTableSwitchDefault(generatorSwitch);
+		            //no actions required.
+		        }
+		        // change state for re-entry
+		        GenerateSetGeneratorResumptionPoint(il, GENERATOR_TERMINATE);
+		        // throw StopIteration
+		        il.Emit(OpCodes.Ldarg_2);
+		        AddOptRuntimeInvoke(il, "ThrowStopIteration", new[] { typeof (object) });
+		        Codegen.PushUndefined(il);
+		        il.Emit(OpCodes.Ret);
+		    }
+		    else if (fnCurrent == null)
+		    {
+		        il.EmitLoadLocal(popvLocal);
+		        il.Emit(OpCodes.Ret);
+		    }
+		    else
+		    {
+		        var exceptionObject = il.DeclareLocal(typeof (object));
+		        il.EmitStoreLocal(exceptionObject);
+		        il.BeginFinallyBlock();
+                GenerateActivationExit(il);
+		        il.EndExceptionBlock();
+		        il.EmitLoadLocal(exceptionObject);
+		        il.Emit(OpCodes.Ret);
+		    }
 		}
 
 		// catch any
@@ -514,7 +512,7 @@ namespace Rhino.Optimizer
 
 		private void GenerateStatement(ILGenerator il, Node node)
 		{
-			UpdateLineNumber(node);
+			UpdateLineNumber(node, il);
 			var type = node.GetType();
 			var child = node.GetFirstChild();
 			switch (type)
@@ -545,18 +543,19 @@ namespace Rhino.Optimizer
 				{
 					var prevLocal = inLocalBlock;
 					inLocalBlock = true;
-					LocalBuilder local = il.DeclareLocal(typeof (object));
+				    var local = DeclareLocal(il);
 					if (isGenerator)
 					{
 						il.Emit(OpCodes.Ldnull);
 						il.EmitStoreLocal(local);
 					}
-					node.PutIntProp(Node.LOCAL_PROP, local.LocalIndex);
+					node.PutProp(Node.LOCAL_PROP, local);
 					while (child != null)
 					{
 						GenerateStatement(il, child);
 						child = child.GetNext();
 					}
+				    ReleaseLocal(local);
 					node.RemoveProp(Node.LOCAL_PROP);
 					inLocalBlock = prevLocal;
 					break;
@@ -632,7 +631,7 @@ namespace Rhino.Optimizer
 					{
 						AddInstructionCount(il);
 					}
-					int local = GetLocalBlockRegister(node);
+					var local = GetLocalBlockRegister(node);
 					il.EmitLoadLocal(local);
 					il.Emit(OpCodes.Throw);
 					break;
@@ -809,7 +808,7 @@ namespace Rhino.Optimizer
 					// finally blocks: the return address (or its int encoding)
 					//cfw.SetStackTop(1);
 					// Save return address in a new local
-					LocalBuilder finallyRegister = GetNewWordLocal(il);
+					LocalBuilder finallyRegister = DeclareLocal(il);
                     //il.BeginFinallyBlock();
 					il.EmitStoreLocal(finallyRegister);
 					while (child != null)
@@ -1410,7 +1409,7 @@ namespace Rhino.Optimizer
 
 				case Token.LOCAL_LOAD:
 				{
-					int local = GetLocalBlockRegister(node);
+					var local = GetLocalBlockRegister(node);
 					il.EmitLoadLocal(local);
 					break;
 				}
@@ -1975,6 +1974,7 @@ namespace Rhino.Optimizer
 				constructor = constructor,
 				regExpInit = regExpInit,
 				identityGenerator = identityGenerator,
+                maxLocals = maxLocals
 			};
 			bodygen.InitBodyGeneration();
 			return bodygen;
@@ -2132,16 +2132,18 @@ namespace Rhino.Optimizer
 		{
 			var firstArgChild = child.GetNext();
 
-			if (type == Token.NEW)
-			{
-				GenerateExpression(il, child, node);
-			}
-			else
-			{
-				GenerateFunctionAndThisObj(il, child, node);
-				il.EmitStoreLocal(il.DeclareLocal(typeof (object)));
-			}
-			// stack: ... functionObj
+		    LocalBuilder thisObjLocal = null;
+		    if (type == Token.NEW)
+		    {
+		        GenerateExpression(il, child, node);
+		    }
+		    else
+		    {
+		        GenerateFunctionAndThisObj(il, child, node);
+		        thisObjLocal = DeclareLocal(il);
+		        il.EmitStoreLocal(thisObjLocal);
+		    }
+		    // stack: ... functionObj
 			var beyond = il.DefineLabel();
 			var regularCall = il.DefineLabel();
 			il.Emit(OpCodes.Dup);
@@ -2164,32 +2166,29 @@ namespace Rhino.Optimizer
 			}
 			else
 			{
-				il.Emit(OpCodes.Ldarg_3);
+			    il.EmitLoadLocal(thisObjLocal);
 			}
 			// stack: ... directFunc cx scope thisObj
 			var argChild = firstArgChild;
 			while (argChild != null)
 			{
 				var dcp_register = NodeIsDirectCallParameter(argChild);
-				if (dcp_register != null)
-				{
-					dcp_register.EmitLoadSlot1(il);
-					dcp_register.EmitLoadSlot2(il);
-				}
-				else
-				{
-					if (argChild.GetIntProp(Node.ISNUMBER_PROP, -1) == Node.BOTH)
-					{
-						il.Emit(OpCodes.Ldtoken, typeof (void));
-						GenerateExpression(il, argChild, node);
-					}
-					else
-					{
-						GenerateExpression(il, argChild, node);
-						il.EmitLoadConstant(0.0);
-					}
-				}
-				argChild = argChild.GetNext();
+			    if (dcp_register != null)
+			    {
+			        dcp_register.EmitLoadSlot1(il);
+			        dcp_register.EmitLoadSlot2(il);
+			    }
+			    else if (argChild.GetIntProp(Node.ISNUMBER_PROP, -1) == Node.BOTH)
+			    {
+			        il.Emit(OpCodes.Ldtoken, typeof (void));
+			        GenerateExpression(il, argChild, node);
+			    }
+			    else
+			    {
+			        GenerateExpression(il, argChild, node);
+			        il.EmitLoadConstant(0.0);
+			    }
+			    argChild = argChild.GetNext();
 			}
 			il.Emit(OpCodes.Ldsfld, typeof (ScriptRuntime).GetField("emptyArgs"));
 			il.Emit(OpCodes.Call, tb.GetMethod((type == Token.NEW) ? codegen.GetDirectCtorName(target.fnode) : codegen.GetBodyMethodName(target.fnode), codegen.GetParameterTypes(target.fnode)));
@@ -2201,9 +2200,11 @@ namespace Rhino.Optimizer
 			// stack: ... functionObj cx scope
 			if (type != Token.NEW)
 			{
-				il.Emit(OpCodes.Ldarg_3);
+			    il.EmitLoadLocal(thisObjLocal);
+			    ReleaseLocal(thisObjLocal);
+                // stack: ... functionObj cx scope thisObj
 			}
-			// stack: ... functionObj cx scope thisObj
+			
 			// XXX: this will generate code for the child array the second time,
 			// so expression code generation better not to alter tree structure...
 			GenerateCallArgArray(il, node, firstArgChild, true);
@@ -2275,12 +2276,13 @@ namespace Rhino.Optimizer
 				// load the argument index and assign the value to the args array.
 				if (isGenerator)
 				{
-					var tempLocal = il.DeclareLocal(typeof (object));
+				    var tempLocal = DeclareLocal(il);
 					il.EmitStoreLocal(tempLocal);
 					il.Emit(OpCodes.Castclass, typeof(Object[]));
 					il.Emit(OpCodes.Dup);
 					il.EmitLoadConstant(i);
 					il.EmitLoadLocal(tempLocal);
+				    ReleaseLocal(tempLocal);
 				}
 				il.Emit(OpCodes.Stelem_Ref);
 				argChild = argChild.GetNext();
@@ -2349,14 +2351,14 @@ namespace Rhino.Optimizer
 			AddScriptRuntimeInvoke(il, "LastStoredScriptable", typeof (Context));
 		}
 
-		private void UpdateLineNumber(Node node)
+		private void UpdateLineNumber(Node node, ILGenerator il)
 		{
 			itsLineNumber = node.GetLineno();
 			if (itsLineNumber == -1)
 			{
 				return;
 			}
-			AddLineNumberEntry(itsLineNumber);
+			AddLineNumberEntry(il, itsLineNumber);
 		}
 
 		private void VisitTryCatchFinally(ILGenerator il, Jump node, Node child)
@@ -2365,9 +2367,10 @@ namespace Rhino.Optimizer
 			// statements; could statically check and omit this if there aren't any.
 			// XXX OPT Maybe instead do syntactic transforms to associate
 			// each 'with' with a try/finally block that does the exitwith.
-			var savedVariableObject = il.DeclareLocal(typeof (object));
+		    var savedVariableObject = DeclareLocal(il);
 			il.Emit(OpCodes.Ldarg_2);
 			il.Emit(OpCodes.Stloc, savedVariableObject);
+            il.EmitWriteLine(savedVariableObject);
 
 			il.BeginExceptionBlock();
 			var startLabel = il.DefineLabel();
@@ -2427,9 +2430,10 @@ namespace Rhino.Optimizer
 //			}
 					//cfw.MarkHandler(handler.Value);
 					// MS JVM gets cranky if the exception object is left on the stack
-					il.EmitStoreLocal(exceptionLocal);
-					// reset the variable object local
-					il.EmitLoadLocal(savedVariableObject);
+                    il.EmitStoreLocal(exceptionLocal);
+                    // reset the variable object local
+                    il.EmitWriteLine(savedVariableObject);
+                    il.EmitLoadLocal(savedVariableObject);
 					il.EmitStoreArgument(2);
 					//ExceptionTypeToName(exceptionType);
 					//il.Emit(OpCodes.Br, ((Label?) catchLabel).Value);
@@ -2507,10 +2511,10 @@ namespace Rhino.Optimizer
 				// mark the handler
 				if (isGenerator)
 				{
-					//cfw.AddExceptionHandler(startLabel, finallyLabel, finallyHandler, null);
+                    //cfw.AddExceptionHandler(startLabel, finallyLabel, finallyHandler, null); // catch any
 				}
 			}
-			// catch any
+		    ReleaseLocal(savedVariableObject);
 			if (!isGenerator)
 			{
 				//il.EndExceptionBlock();
@@ -2861,40 +2865,23 @@ namespace Rhino.Optimizer
 
 		private bool GenerateSaveLocals(ILGenerator il, Node node)
 		{
-			var count = 0;
-			for (var i = 0; i < firstFreeLocal; i++)
-			{
-				if (locals[i] != 0)
-				{
-					count++;
-				}
-			}
-			if (count == 0)
+			if (locals2.Count == 0)
 			{
 				((FunctionNode)scriptOrFn).AddLiveLocals(node, null);
 				return false;
 			}
 			// calculate the max locals
-			maxLocals = maxLocals > count ? maxLocals : count;
+            maxLocals = maxLocals > locals2.Count ? maxLocals : locals2.Count;
 			// create a locals list
-			var ls = new int[count];
-			var s = 0;
-			for (var i = 0; i < firstFreeLocal; i++)
-			{
-				if (locals[i] != 0)
-				{
-					ls[s] = i;
-					s++;
-				}
-			}
-			// save the locals
-			((FunctionNode)scriptOrFn).AddLiveLocals(node, ls);
+            var ls = locals2.Select(x => x.LocalIndex).ToArray();
+		    // save the locals
+		    ((FunctionNode)scriptOrFn).AddLiveLocals(node, ls);
 			// save locals
 			GenerateGetGeneratorLocalsState(il);
-			for (var i = 0; i < count; i++)
+            for (var i = 0; i < ls.Length; i++)
 			{
 				il.Emit(OpCodes.Dup);
-				il.EmitLoadConstant(i);
+			    il.EmitLoadConstant(i);
 				il.EmitLoadLocal(ls[i]);
 				il.Emit(OpCodes.Stelem_Ref);
 			}
@@ -2909,7 +2896,7 @@ namespace Rhino.Optimizer
 			// of SWITCH node
 			GenerateExpression(il, child, switchNode);
 			// save selector value
-			var selector = il.DeclareLocal(typeof (object));
+		    var selector = DeclareLocal(il);
 			il.EmitStoreLocal(selector);
 			for (var caseNode = (Jump)child.GetNext(); caseNode != null; caseNode = (Jump)caseNode.GetNext())
 			{
@@ -2923,6 +2910,7 @@ namespace Rhino.Optimizer
 				AddScriptRuntimeInvoke(il, "ShallowEq", typeof (Object), typeof (Object));
 				AddGoto(il, OpCodes.Brtrue, caseNode.target);
 			}
+		    ReleaseLocal(selector);
 		}
 
 		private void VisitTypeOfName(ILGenerator il, Node node)
@@ -3885,7 +3873,7 @@ namespace Rhino.Optimizer
 
 		private void VisitDotQuery(ILGenerator il, Node node, Node child)
 		{
-			UpdateLineNumber(node);
+			UpdateLineNumber(node, il);
 			GenerateExpression(il, child, node);
 			il.Emit(OpCodes.Ldarg_2);
 			AddScriptRuntimeInvoke(il, "EnterDotQuery", typeof (Object), typeof (Scriptable));
@@ -3916,11 +3904,10 @@ namespace Rhino.Optimizer
 			il.Emit(OpCodes.Box, typeof (bool));
 		}
 
-		private static int GetLocalBlockRegister(Node node)
+        private static LocalBuilder GetLocalBlockRegister(Node node)
 		{
 			var localBlock = (Node)node.GetProp(Node.LOCAL_BLOCK_PROP);
-			var localSlot = localBlock.GetExistingIntProp(Node.LOCAL_PROP);
-			return localSlot;
+            return (LocalBuilder) localBlock.GetExistingProp(Node.LOCAL_PROP);
 		}
 
 		private static void DcpLoadAsNumber(ILGenerator il, IVariableInfoEmitter reg)
@@ -4029,12 +4016,21 @@ namespace Rhino.Optimizer
 			il.MarkLabel(skip);
 		}
 
-		private LocalBuilder GetNewWordLocal(ILGenerator il)
+	    private readonly List<LocalBuilder> locals2 = new List<LocalBuilder>();
+
+		private LocalBuilder DeclareLocal(ILGenerator il)
 		{
-			return il.DeclareLocal(typeof (object));
+		    var local = il.DeclareLocal(typeof (object));
+		    locals2.Add(local);
+		    return local;
 		}
 
-		// This is a valid call only for a local that is allocated by default.
+	    private void ReleaseLocal(LocalBuilder local)
+	    {
+	        locals2.Remove(local);
+	    }
+
+	    // This is a valid call only for a local that is allocated by default.
 		private void IncReferenceWordLocal(int local)
 		{
 			locals[local]++;

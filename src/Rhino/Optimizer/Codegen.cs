@@ -1,3 +1,4 @@
+using System.Diagnostics.SymbolStore;
 #if COMPILATION
 /*
  * This code is derived from rhino (http://github.com/mozilla/rhino)
@@ -250,6 +251,7 @@ namespace Rhino.Optimizer
 		{
 			dynamicAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(name), AssemblyBuilderAccess.RunAndSave);
 			module = dynamicAssembly.DefineDynamicModule(name + ".mod", name + ".dll", true);
+		    var document = module.DefineDocument("RTAsm.il", SymDocumentType.Text, SymLanguageType.JScript, SymLanguageVendor.Microsoft);
 		}
 
 		private readonly ModuleBuilder module;

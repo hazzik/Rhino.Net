@@ -550,6 +550,16 @@ namespace Rhino
 			return item.intValue;
 		}
 
+		public virtual object GetExistingProp(int propType)
+		{
+			Node.PropListItem item = LookupProperty(propType);
+			if (item == null)
+			{
+				Kit.CodeBug();
+			}
+			return item.objectValue;
+		}
+
 		public virtual void PutProp(int propType, object prop)
 		{
 			if (prop == null)
