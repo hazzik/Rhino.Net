@@ -195,7 +195,7 @@ namespace Rhino.Optimizer
 		{
 			return null;
 			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
+			StringWriter pw = sw;
 			pw.WriteLine(blockList.Length + " Blocks");
 			for (int i = 0; i < blockList.Length; i++)
 			{

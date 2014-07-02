@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +41,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -169,6 +171,45 @@
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
     <Compile Include="PropertyAttributes.cs" />
+    <Compile Include="Sharpen\AbstractCollection.cs" />
+    <Compile Include="Sharpen\AbstractMap.cs" />
+    <Compile Include="Sharpen\AbstractSet.cs" />
+    <Compile Include="Sharpen\AccessController.cs" />
+    <Compile Include="Sharpen\Arrays.cs" />
+    <Compile Include="Sharpen\ConcurrentHashMap.cs" />
+    <Compile Include="Sharpen\ConcurrentMap.cs" />
+    <Compile Include="Sharpen\CopyOnWriteArrayList.cs" />
+    <Compile Include="Sharpen\DateFormat.cs" />
+    <Compile Include="Sharpen\EnumeratorWrapper.cs" />
+    <Compile Include="Sharpen\EventObject.cs" />
+    <Compile Include="Sharpen\Exceptions.cs" />
+    <Compile Include="Sharpen\Extensions.cs" />
+    <Compile Include="Sharpen\FileInputStream.cs" />
+    <Compile Include="Sharpen\FileOutputStream.cs" />
+    <Compile Include="Sharpen\FilePath.cs" />
+    <Compile Include="Sharpen\HttpURLConnection.cs" />
+    <Compile Include="Sharpen\InputStream.cs" />
+    <Compile Include="Sharpen\Iterable.cs" />
+    <Compile Include="Sharpen\Iterator.cs" />
+    <Compile Include="Sharpen\LinkageError.cs" />
+    <Compile Include="Sharpen\LinkedHashMap.cs" />
+    <Compile Include="Sharpen\ListIterator.cs" />
+    <Compile Include="Sharpen\ObjectInputStream.cs" />
+    <Compile Include="Sharpen\ObjectOutputStream.cs" />
+    <Compile Include="Sharpen\OutputStream.cs" />
+    <Compile Include="Sharpen\PipedInputStream.cs" />
+    <Compile Include="Sharpen\PipedOutputStream.cs" />
+    <Compile Include="Sharpen\PrivilegedAction.cs" />
+    <Compile Include="Sharpen\PropertyChangeEvent.cs" />
+    <Compile Include="Sharpen\PropertyChangeListener.cs" />
+    <Compile Include="Sharpen\Proxy.cs" />
+    <Compile Include="Sharpen\Reference.cs" />
+    <Compile Include="Sharpen\ReferenceQueue.cs" />
+    <Compile Include="Sharpen\Runtime.cs" />
+    <Compile Include="Sharpen\SimpleDateFormat.cs" />
+    <Compile Include="Sharpen\SoftReference.cs" />
+    <Compile Include="Sharpen\SynchronizedList.cs" />
+    <Compile Include="Sharpen\WrappedSystemStream.cs" />
     <Compile Include="Tools\Resources\Messages.Designer.cs">
       <DependentUpon>Messages.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -310,12 +351,6 @@
     <Compile Include="Xml\XMLObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sharpen\Sharpen\Sharpen.csproj">
-      <Project>{72944a6c-45ff-4ef8-b349-8c9cabf519d4}</Project>
-      <Name>Sharpen</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
@@ -325,6 +360,7 @@
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -15,7 +15,6 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Sharpen;
 
 namespace Rhino
 {
@@ -337,19 +336,7 @@ namespace Rhino
 			return grp.Value;
 		}
 
-		public void PrintStackTrace(PrintWriter s)
-		{
-			if (interpreterStackInfo == null)
-			{
-				s.WriteLine(this);
-			}
-			else
-			{
-				s.Write(GenerateStackTrace());
-			}
-		}
-
-		public void PrintStackTrace(TextWriter s)
+	    public void PrintStackTrace(TextWriter s)
 		{
 			if (interpreterStackInfo == null)
 			{

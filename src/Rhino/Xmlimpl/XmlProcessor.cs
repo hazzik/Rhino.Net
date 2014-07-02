@@ -395,13 +395,13 @@ namespace Rhino.XmlImpl
 			var comment = node as XmlComment;
 			if (comment != null)
 			{
-				s.Append("<!--" + comment.GetNodeValue() + "-->");
+				s.Append("<!--" + comment.Value + "-->");
 				return s.ToString();
 			}
 			var pi = node as XmlProcessingInstruction;
 			if (pi != null)
 			{
-				s.Append("<?" + pi.Target + " " + pi.GetData() + "?>");
+				s.Append("<?" + pi.Target + " " + pi.Data + "?>");
 				return s.ToString();
 			}
 			s.Append(ElementToXmlString((XmlElement)node));

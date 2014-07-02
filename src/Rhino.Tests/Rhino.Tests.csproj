@@ -63,10 +63,6 @@
       <Project>{ffa067fa-eb0f-4b26-92ff-76d435d1f690}</Project>
       <Name>Rhino</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sharpen\Sharpen\Sharpen.csproj">
-      <Project>{72944a6c-45ff-4ef8-b349-8c9cabf519d4}</Project>
-      <Name>Sharpen</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="opt-1.tests" />

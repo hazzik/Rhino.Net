@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using Rhino;
 using Rhino.CommonJS.Module;
@@ -700,8 +701,7 @@ goodUsage_break: ;
 				}
 				try
 				{
-					MessageDigest md = MessageDigest.GetInstance("MD5");
-					digest = md.Digest(bytes);
+					digest = MD5.Create().ComputeHash(bytes);
 				}
 				catch (NoSuchAlgorithmException nsa)
 				{

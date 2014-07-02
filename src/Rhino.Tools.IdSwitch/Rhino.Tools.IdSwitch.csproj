@@ -66,10 +66,6 @@
       <Project>{FFA067FA-EB0F-4B26-92FF-76D435D1F690}</Project>
       <Name>Rhino</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sharpen\Sharpen\Sharpen.csproj">
-      <Project>{72944A6C-45FF-4EF8-B349-8C9CABF519D4}</Project>
-      <Name>Sharpen</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpen", "Sharpen\Sharpen\Sharpen.csproj", "{72944A6C-45FF-4EF8-B349-8C9CABF519D4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino", "Rhino\Rhino.csproj", "{FFA067FA-EB0F-4B26-92FF-76D435D1F690}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Tools.Shell", "Rhino.Tools.Shell\Rhino.Tools.Shell.csproj", "{2F70C72B-5E72-4E39-8EFE-17CC5DAC921F}"
@@ -29,12 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{72944A6C-45FF-4EF8-B349-8C9CABF519D4}.AllFeatures|Any CPU.ActiveCfg = Release|Any CPU
-		{72944A6C-45FF-4EF8-B349-8C9CABF519D4}.AllFeatures|Any CPU.Build.0 = Release|Any CPU
-		{72944A6C-45FF-4EF8-B349-8C9CABF519D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72944A6C-45FF-4EF8-B349-8C9CABF519D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72944A6C-45FF-4EF8-B349-8C9CABF519D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{72944A6C-45FF-4EF8-B349-8C9CABF519D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FFA067FA-EB0F-4B26-92FF-76D435D1F690}.AllFeatures|Any CPU.ActiveCfg = AllFeatures|Any CPU
 		{FFA067FA-EB0F-4B26-92FF-76D435D1F690}.AllFeatures|Any CPU.Build.0 = AllFeatures|Any CPU
 		{FFA067FA-EB0F-4B26-92FF-76D435D1F690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

@@ -809,7 +809,9 @@ namespace Rhino.Optimizer
 					//cfw.SetStackTop(1);
 					// Save return address in a new local
 					LocalBuilder finallyRegister = DeclareLocal(il);
-                    //il.BeginFinallyBlock();
+				    //il.BeginFaultBlock();
+				    var f = il.DefineLabel();
+				    il.MarkLabel(f);
 					il.EmitStoreLocal(finallyRegister);
 					while (child != null)
 					{
@@ -821,6 +823,7 @@ namespace Rhino.Optimizer
 					var ret = finallys.GetValueOrDefault(node);
 					ret.tableLabel = il.DefineLabel();
 					il.Emit(OpCodes.Leave, ret.tableLabel);
+				    ret.jsrPoints.Add(f);
 				    //il.Emit(OpCodes.Endfinally);
 					break;
 				}
@@ -1758,17 +1761,18 @@ namespace Rhino.Optimizer
 			{
 				if (type == Token.JSR)
 				{
+					// This assumes that JSR is only ever used for finally
 					if (isGenerator)
 					{
-						//AddGotoWithReturn(il, target);
-					    //InlineFinally(il, target);
+                        il.BeginFaultBlock();
 					}
 					else
 					{
-						// This assumes that JSR is only ever used for finally
 						il.BeginFinallyBlock();
-						InlineFinally(il, target);
 					}
+                    InlineFinally(il, target);
+                    if (isGenerator)
+                        il.EndExceptionBlock();
 				}
 				else
 				{
@@ -1781,10 +1785,10 @@ namespace Rhino.Optimizer
 		{
 			var ret = finallys.GetValueOrDefault(target);
 			il.EmitLoadConstant(ret.jsrPoints.Count);
-			AddGoto(il, OpCodes.Br, target);
+			AddGoto(il, OpCodes.Leave, target);
 			var retLabel = il.DefineLabel();
 			il.MarkLabel(retLabel);
-			//ret.jsrPoints.Add(retLabel);
+			ret.jsrPoints.Add(retLabel);
 		}
 
 		private MethodBuilder GenerateArrayLiteralFactory(Node node, int count)
@@ -2480,7 +2484,7 @@ namespace Rhino.Optimizer
 				}
 				else
 				{
-					//il.BeginFinallyBlock(); 
+//					il.BeginFinallyBlock(); 
 					//il.MarkLabel(handlerLabels[FINALLY_EXCEPTION]);
 				}
 				//il.EmitStoreLocal(exceptionLocal);
@@ -2517,11 +2521,11 @@ namespace Rhino.Optimizer
 		    ReleaseLocal(savedVariableObject);
 			if (!isGenerator)
 			{
-				//il.EndExceptionBlock();
+				il.EndExceptionBlock();
 				//exceptionManager.PopExceptionInfo();
 			}
 			//il.BeginFinallyBlock();
-			il.EndExceptionBlock();
+//			il.EndExceptionBlock();
 			//il.MarkLabel(realEnd);
 		}
 

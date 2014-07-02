@@ -9,7 +9,7 @@ namespace Rhino.Tools.Debugger
     public partial class EvalTextArea
     {
         /// <summary>History of expressions that have been evaluated</summary>
-        private readonly IList<string> history = Collections.SynchronizedList(new List<string>());
+        private readonly IList<string> history = new Sharpen.SynchronizedList<string> (new List<string>());
 
         /// <summary>Index of the selected history item.</summary>
         private int historyIndex = -1;

@@ -56,14 +56,14 @@ namespace Rhino.Tools.Shell
 		{
 			private readonly TextReader @in;
 
-			private readonly PrintWriter @out;
+			private readonly TextWriter @out;
 
 			private readonly TextReader reader;
 
 			internal SimpleShellConsole(TextReader @in, TextWriter ps, Encoding cs)
 			{
 				this.@in = @in;
-				this.@out = new PrintWriter(ps);
+				this.@out = ps;
 				this.reader = @in;
 			}
 

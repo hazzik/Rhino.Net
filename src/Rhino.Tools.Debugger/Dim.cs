@@ -305,7 +305,7 @@ namespace Rhino.Tools.Debugger
 							if (home != null)
 							{
 								string pathFromHome = sourceUrl.Substring(2);
-								FilePath f = new FilePath(new FilePath(home), pathFromHome);
+								FilePath f = new FilePath(home, pathFromHome);
 								if (f.Exists())
 								{
 									@is = new FileInputStream(f);
