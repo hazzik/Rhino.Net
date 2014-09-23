@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -78,7 +79,8 @@ namespace Rhino.Tools.Shell
 			try
 			{
 #if ENHANCED_SECURITY
-				if (bool.GetBoolean("rhino.use_java_policy_security"))
+				bool usePolicySecurity;
+				if (bool.TryParse(ConfigurationManager.AppSettings["rhino.use_java_policy_security"], out usePolicySecurity) && usePolicySecurity)
 				{
 					InitJavaPolicySecuritySupport();
 				}
